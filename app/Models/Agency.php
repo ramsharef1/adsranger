@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 /** An agency workspace (a tenant of the /app panel). */
@@ -20,6 +21,11 @@ class Agency extends Model
     public function members(): BelongsToMany
     {
         return $this->belongsToMany(User::class)->withPivot('role')->withTimestamps();
+    }
+
+    public function invitations(): HasMany
+    {
+        return $this->hasMany(AgencyInvitation::class);
     }
 
     public static function uniqueSlug(string $name): string
