@@ -34,6 +34,9 @@ class AppPanelProvider extends PanelProvider
             ->favicon(asset('brand/favicon.svg'))
             ->login()
             ->profile(isSimple: false)
+            ->tenant(\App\Models\Agency::class, slugAttribute: 'slug')
+            ->tenantRegistration(\App\Filament\Pages\Tenancy\RegisterAgency::class)
+            ->tenantProfile(\App\Filament\Pages\Tenancy\EditAgencyProfile::class)
             ->colors([
                 'primary' => Color::Teal,
             ])
