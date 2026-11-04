@@ -1,5 +1,6 @@
 <!-- Read-only mirror of the AdsRanger build spec (D-23). Source of truth: https://claude.ai/artifact/Wp4VRMVMzdif9WERPAgYc8
-     Exported 2026-11-05 (doc rev 47). Do not edit here; refresh from the source when the spec changes. Live status per feature: ADSR-060. -->
+     Exported 2026-11-05 (doc rev 54). Do not edit here; refresh from the source when the spec changes.
+     Per-feature tier + status: ADSR-060 (overrides this copy for #4, #5, #83, #84 per D-32). -->
 
 # AdsRanger: Build Spec
 
@@ -51,15 +52,15 @@ The product is a Laravel modular monolith on PostgreSQL and Redis, hosted on Ram
 
 | Layer | Choice | Notes |
 | --- | --- | --- |
-| Framework | Laravel 11 (PHP 8.3) | Scheduler, queues, signed URLs, policies built in |
+| Framework | Laravel 13 (PHP 8.4) | Scheduler, queues, signed URLs, policies built in |
 | Modules | nwidart/laravel-modules | One folder per module; see Module system |
-| Database | PostgreSQL 16 | Single database, `tenant_id` on every tenant row |
-| Queue + cache | Redis + Laravel Horizon | One job per ad account per pull; no time caps |
-| Admin screens | Filament 3 | Users, clients, settings, audit, billing |
-| App screens | Livewire 3 (or Inertia + Vue) | RTL + LTR layouts |
-| Charts | ECharts | Light and dark themes, Arabic numerals optional |
+| Database | PostgreSQL 13 | Single database, `tenant_id` on every tenant row |
+| Queue + cache | Database queue + cache (no Redis on the shared VPS) | One job per ad account per pull; no time caps |
+| Admin screens | Filament 5 (/admin) | Users, clients, settings, audit, billing |
+| App screens | Filament 5 panel /app/{agency} (Livewire) | RTL + LTR layouts |
+| Charts | Chart.js (EX-44) | Light and dark themes, Arabic numerals optional |
 | Billing | Paddle (Laravel Cashier Paddle) | Merchant of record; Stripe later if the entity allows |
-| Email | Postmark or Amazon SES | Digests, alerts, invites |
+| Email | Server mail now; Brevo for transactional mail (D-22) | Digests, alerts, invites |
 | PDF | Browsershot (headless Chrome) | Monthly report, EN/AR |
 | Hosting | VPS + Cloudflare, Laravel Forge or Ploi | Managed Postgres once paying customers arrive |
 | Monitoring | Sentry + Laravel Pulse | Errors, slow jobs, queue health |
