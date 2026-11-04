@@ -32,6 +32,18 @@ class SyncService
             $run->update(['status' => 'ok', 'rows' => $rows, 'finished_at' => now()]);
             $account->update(['sync_status' => 'ok', 'sync_error' => null, 'sync_failures' => 0, 'last_synced_at' => now()]);
             $account->connection?->update(['last_synced_at' => now(), 'status' => 'active', 'last_error' => null]);
+        } catch (ReportPending $e) {
+            // Asynchronous report not ready yet: try again in 10 minutes, for up to about 4 hours.
+            $run->update(['status' => 'pending', 'error' => Str::limit($e->getMessage(), 500), 'finished_at' => now()]);
+            $account->update(['sync_status' => 'pending']);
+            $tries = SyncRun::where('ad_account_id', $account->id)->where('from', $from)->where('to', $to)->where('status', 'pending')
+                ->where('created_at', '>', now()->subHours(5))->count();
+            if ($tries < 24) {
+                \App\Jobs\SyncAdAccount::dispatch($account->id, $from, $to, $kind)->delay(now()->addMinutes(10));
+            } else {
+                $run->update(['status' => 'error', 'error' => 'The network did not finish the report within 4 hours.']);
+                $account->update(['sync_status' => 'error', 'sync_error' => 'The network did not finish the report within 4 hours.', 'sync_failures' => $account->sync_failures + 1]);
+            }
         } catch (\Throwable $e) {
             $msg = Str::limit($e->getMessage(), 500);
             $run->update(['status' => 'error', 'error' => $msg, 'finished_at' => now()]);
@@ -86,7 +98,11 @@ class SyncService
                 $adIds[(string) $a['external_id']] = $m->id;
             }
 
-            DailyMetric::where('ad_account_id', $account->id)->where('source', 'api')->whereBetween('date', [$from, $to])->delete();
+            // A connector may cover less than asked (history limits): it then returns 'range' => [from, to], or null for nothing.
+            $range = array_key_exists('range', $payload) ? $payload['range'] : [$from, $to];
+            if ($range) {
+                DailyMetric::where('ad_account_id', $account->id)->where('source', 'api')->whereBetween('date', [$range[0], $range[1]])->delete();
+            }
 
             $cols = ['spend', 'impressions', 'reach', 'clicks', 'link_clicks', 'results', 'calls', 'calls_confirmed', 'calls_20s', 'messages',
                 'leads', 'purchases', 'thruplays', 'landing_views', 'add_to_cart', 'checkouts', 'revenue'];

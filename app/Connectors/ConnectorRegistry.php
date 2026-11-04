@@ -16,6 +16,15 @@ class ConnectorRegistry
         'microsoft' => MicrosoftConnector::class,
         'linkedin' => LinkedInConnector::class,
         'x' => XConnector::class,
+        'taboola' => TaboolaConnector::class,
+        'outbrain' => OutbrainConnector::class,
+        'revcontent' => RevcontentConnector::class,
+        'mgid' => MgidConnector::class,
+        'apple_ads' => AppleAdsConnector::class,
+        'yahoo_dsp' => YahooDspConnector::class,
+        'amazon_ads' => AmazonAdsConnector::class,
+        'pinterest' => PinterestConnector::class,
+        'reddit' => RedditConnector::class,
     ];
 
     public static function for(AdNetwork $network): Connector

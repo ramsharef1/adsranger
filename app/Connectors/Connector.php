@@ -30,6 +30,36 @@ abstract class Connector
         return url('/app/connect/'.$this->network->key.'/callback');
     }
 
+    /** 'oauth' = the user signs in on the network (platform app keys); 'keys' = the agency pastes its own API credentials. */
+    public function connectMode(): string
+    {
+        return 'oauth';
+    }
+
+    /**
+     * Fields an agency fills in to connect with its own API credentials ('keys' mode).
+     * @return array<int, array{0:string,1:string,2:bool,3:string,4?:string,5?:bool}> [key, label, secret, help, type text|textarea, optional]
+     */
+    public function keyFields(): array
+    {
+        return [];
+    }
+
+    /** One line shown above the key form: where the agency finds its credentials. */
+    public function keyHelp(): string
+    {
+        return '';
+    }
+
+    /** Row for networks that report at campaign-day level (native, retail). Conversions count as the result when the campaign has any. */
+    protected static function campaignRow(string $date, string $campaign, array $m, bool $converts, ?float $conversions = null): array
+    {
+        $m['link_clicks'] ??= $m['clicks'] ?? 0;
+
+        return ['date' => substr($date, 0, 10), 'level' => 'campaign', 'campaign' => $campaign]
+            + static::metrics($m, $converts ? 'conversion' : 'link_click', $converts ? (float) $conversions : null);
+    }
+
     /** True when "Connect" works for this network today. */
     public function supportsConnect(): bool
     {

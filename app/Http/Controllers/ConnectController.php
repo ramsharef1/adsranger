@@ -71,11 +71,19 @@ class ConnectController extends Controller
         ]);
         AuditLog::record('connection.created', $agency, ['network' => $net->key, 'connection_id' => $connection->id]);
 
+        $found = static::importAccounts($connector, $connection, $agency);
+
+        return redirect($back)->with('connect_ok', $net->name.' connected. '.$found.' account(s) found.');
+    }
+
+    /** Save the ad accounts a new connection can reach. New accounts are tracked while the plan allows. Returns how many were found. */
+    public static function importAccounts(\App\Connectors\Connector $connector, Connection $connection, Agency $agency): int
+    {
         $found = 0;
         try {
             foreach ($connector->accounts($connection) as $a) {
                 $acc = AdAccount::firstOrNew(['connection_id' => $connection->id, 'external_id' => $a['id']]);
-                $acc->fill(['agency_id' => $agency->id, 'ad_network_id' => $net->id, 'name' => $a['name'], 'currency' => $a['currency'], 'timezone' => $a['timezone'], 'status' => $a['status']] + (isset($a['meta']) ? ['meta' => $a['meta']] : []));
+                $acc->fill(['agency_id' => $agency->id, 'ad_network_id' => $connection->ad_network_id, 'name' => $a['name'], 'currency' => $a['currency'], 'timezone' => $a['timezone'], 'status' => $a['status']] + (isset($a['meta']) ? ['meta' => $a['meta']] : []));
                 if (! $acc->exists) {
                     $acc->is_active = PlanLimits::canActivateAdAccount($agency);
                 }
@@ -87,6 +95,6 @@ class ConnectController extends Controller
             $connection->update(['status' => 'error', 'last_error' => Str::limit($e->getMessage(), 500)]);
         }
 
-        return redirect($back)->with('connect_ok', $net->name.' connected. '.$found.' account(s) found.');
+        return $found;
     }
 }

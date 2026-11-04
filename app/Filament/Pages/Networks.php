@@ -9,7 +9,14 @@ use App\Support\TeamRoles;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
+use App\Http\Controllers\ConnectController;
+use App\Models\AuditLog;
+use App\Models\Connection;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\EmbeddedTable;
@@ -47,6 +54,51 @@ class Networks extends Page implements HasTable
         return $schema->components([EmbeddedTable::make()]);
     }
 
+    /** Connect a network with the agency's own API credentials. */
+    protected function connectWithKeys(AdNetwork $net, array $data): void
+    {
+        $agency = Filament::getTenant();
+        $user = auth()->user();
+        abort_unless(TeamRoles::canManageData($user, $agency) && NetworkAccess::allows($user, $agency, $net), 403);
+        $connector = ConnectorRegistry::for($net);
+        abort_unless($connector->connectMode() === 'keys', 404);
+
+        $key = 'connect-keys:'.$user->id;
+        if (RateLimiter::tooManyAttempts($key, 6)) {
+            Notification::make()->title('Too many attempts. Try again in a few minutes.')->danger()->send();
+
+            return;
+        }
+        RateLimiter::hit($key, 600);
+
+        $input = [];
+        foreach ($data as $k => $v) {
+            if (str_starts_with($k, 'k_')) {
+                $input[substr($k, 2)] = $v;
+            }
+        }
+        try {
+            $t = $connector->connectWithKeys($input);
+        } catch (\Throwable $e) {
+            Notification::make()->title('Could not connect '.$net->name)->body(Str::limit($e->getMessage(), 220))->danger()->persistent()->send();
+
+            return;
+        }
+        $connection = Connection::create([
+            'agency_id' => $agency->id, 'ad_network_id' => $net->id, 'created_by' => $user->id,
+            'status' => 'active', 'environment' => $net->environment ?? 'live',
+            'external_user_id' => $t['user_id'], 'external_user_name' => $t['user_name'],
+            'access_token' => $t['access_token'], 'credentials' => $t['credentials'],
+            'token_expires_at' => $t['expires_in'] ? now()->addSeconds(max(60, (int) $t['expires_in'] - 60)) : null,
+            'scopes' => 'api-keys',
+        ]);
+        AuditLog::record('connection.created', $agency, ['network' => $net->key, 'connection_id' => $connection->id, 'method' => 'api_keys']);
+        $found = ConnectController::importAccounts($connector, $connection, $agency);
+        RateLimiter::clear($key);
+        $n = Notification::make()->title($net->name.' connected')->body($found.' account(s) found.'.($connection->fresh()->status === 'error' ? ' Listing accounts failed: '.Str::limit((string) $connection->fresh()->last_error, 160) : ''));
+        ($found ? $n->success() : $n->warning())->send();
+    }
+
     public function table(Table $table): Table
     {
         $agency = Filament::getTenant();
@@ -61,8 +113,8 @@ class Networks extends Page implements HasTable
                 TextColumn::make('name')->weight('bold'),
                 TextColumn::make('category')->badge()->color('gray'),
                 TextColumn::make('availability')->label('Status')->badge()
-                    ->state(fn (AdNetwork $r) => ConnectorRegistry::for($r)->supportsConnect() ? 'Ready to connect' : ($r->hasKeys() ? 'Connector coming soon' : 'Waiting for setup'))
-                    ->color(fn (string $state) => $state === 'Ready to connect' ? 'success' : 'gray'),
+                    ->state(fn (AdNetwork $r) => ConnectorRegistry::for($r)->supportsConnect() ? (ConnectorRegistry::for($r)->connectMode() === 'keys' ? 'Connect with your API keys' : 'Ready to connect') : ($r->hasKeys() ? 'Connector coming soon' : 'Waiting for setup'))
+                    ->color(fn (string $state) => str_starts_with($state, 'Ready') || str_starts_with($state, 'Connect with') ? 'success' : 'gray'),
                 TextColumn::make('connected')->label('Connected')
                     ->state(fn (AdNetwork $r) => $agency->connections()->where('ad_network_id', $r->id)->where('status', '!=', 'disconnected')->count()),
                 TextColumn::make('who')->label('Who can use')
@@ -70,8 +122,18 @@ class Networks extends Page implements HasTable
             ])
             ->recordActions([
                 Action::make('connect')->label('Connect')->icon('heroicon-o-link')->button()
-                    ->visible(fn (AdNetwork $r) => TeamRoles::canManageData(auth()->user(), $agency) && ConnectorRegistry::for($r)->supportsConnect())
+                    ->visible(fn (AdNetwork $r) => TeamRoles::canManageData(auth()->user(), $agency) && ConnectorRegistry::for($r)->connectMode() === 'oauth' && ConnectorRegistry::for($r)->supportsConnect())
                     ->url(fn (AdNetwork $r) => url('/app/connect/'.$r->key.'/start?agency='.$agency->slug)),
+                Action::make('connectKeys')->label('Connect')->icon('heroicon-o-key')->button()
+                    ->visible(fn (AdNetwork $r) => TeamRoles::canManageData(auth()->user(), $agency) && ConnectorRegistry::for($r)->connectMode() === 'keys')
+                    ->modalHeading(fn (AdNetwork $r) => 'Connect '.$r->name)
+                    ->modalDescription(fn (AdNetwork $r) => ConnectorRegistry::for($r)->keyHelp().' Your credentials are stored encrypted and used only to read your ad data.')
+                    ->modalSubmitActionLabel('Connect')
+                    ->schema(fn (AdNetwork $r) => collect(ConnectorRegistry::for($r)->keyFields())->map(fn (array $f) => ($f[4] ?? 'text') === 'textarea'
+                        ? Textarea::make('k_'.$f[0])->label($f[1])->helperText($f[3])->rows(5)->maxLength(8000)->required(empty($f[5]))->extraInputAttributes(['dir' => 'ltr', 'autocomplete' => 'off', 'spellcheck' => 'false'])
+                        : TextInput::make('k_'.$f[0])->label($f[1])->helperText($f[3])->maxLength(500)->required(empty($f[5]))->password($f[2])->revealable($f[2])
+                            ->extraInputAttributes(['dir' => 'ltr', 'autocomplete' => $f[2] ? 'new-password' : 'off']))->all())
+                    ->action(fn (AdNetwork $r, array $data) => $this->connectWithKeys($r, $data)),
                 Action::make('who')->label('Who can use')->icon('heroicon-o-user-group')
                     ->visible(fn () => TeamRoles::canManageTeam(auth()->user(), $agency))
                     ->schema([

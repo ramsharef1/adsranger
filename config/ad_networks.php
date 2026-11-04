@@ -140,4 +140,86 @@ return [
             ['api_secret', 'API Key Secret', true, 'App > Keys and tokens > Consumer Keys > API Key Secret.'],
         ],
     ],
+
+    // Stage 2 (Wave 3d). Native and DSP networks connect with each agency's own API credentials: no platform keys here.
+    'amazon_ads' => [
+        'name' => 'Amazon Ads', 'category' => 'Retail', 'stage' => 2,
+        'console' => 'https://advertising.amazon.com/API/docs/en-us/guides/onboarding/overview',
+        'steps' => [
+            'Create a Login with Amazon security profile at developer.amazon.com (Login with Amazon > Create a New Security Profile).',
+            'Apply for Amazon Ads API access with that security profile (advertising.amazon.com/API > Apply for access). Approval can take a few weeks.',
+            'In the security profile > Web Settings, add the Redirect URL below as an Allowed Return URL. Copy the Client ID and Client Secret.',
+            'Region: eu covers the UAE, Saudi Arabia, Egypt and Turkey. Profiles in every region are listed after connecting.',
+            'Reporting API v3 shuts off on 30 Jun 2027; the connector moves to Reporting API v1 before then.',
+        ],
+        'fields' => [
+            ['client_id', 'Client ID', false, 'Login with Amazon security profile > Web Settings. Starts with amzn1.application-oa2-client.'],
+            ['client_secret', 'Client Secret', true, 'Same screen > Show secret.'],
+            ['region', 'Sign-in region', false, 'eu (default, Middle East + Europe), na or fe.'],
+        ],
+    ],
+    'pinterest' => [
+        'name' => 'Pinterest Ads', 'category' => 'Social', 'stage' => 2,
+        'console' => 'https://developers.pinterest.com/apps/',
+        'steps' => [
+            'Sign in to developers.pinterest.com with a Pinterest business account and click Connect app.',
+            'Fill in the app details (AdsRanger, adsranger.com, privacy policy URL) and submit. The app starts with Trial access (1,000 calls a day).',
+            'In the app settings add the Redirect URL below. Copy the App ID and App secret key.',
+            'Request Standard access when ready for customers.',
+        ],
+        'fields' => [
+            ['client_id', 'App ID', false, 'developers.pinterest.com > My apps > your app > App ID.'],
+            ['client_secret', 'App secret key', true, 'Same screen > App secret key > Show.'],
+        ],
+    ],
+    'reddit' => [
+        'name' => 'Reddit Ads', 'category' => 'Social', 'stage' => 2,
+        'console' => 'https://ads.reddit.com/',
+        'steps' => [
+            'In Reddit Ads Manager open Business settings > Developer applications and create an app (or request Ads API access from your Reddit rep).',
+            'Add the Redirect URL below as the redirect URI.',
+            'Copy the App ID and Secret.',
+        ],
+        'fields' => [
+            ['client_id', 'App ID', false, 'Business settings > Developer applications > your app.'],
+            ['client_secret', 'Secret', true, 'Same screen.'],
+            ['reddit_username', 'Reddit username of the app owner', false, 'Used in the User-Agent Reddit requires, e.g. adsranger_app (without u/).'],
+        ],
+    ],
+    'taboola' => [
+        'name' => 'Taboola', 'category' => 'Native', 'stage' => 2,
+        'console' => 'https://developers.taboola.com/backstage-api/reference/welcome',
+        'steps' => ['Nothing to set up here. Each agency asks its Taboola account manager for Backstage API credentials and enters them in Networks > Connect.'],
+        'fields' => [],
+    ],
+    'outbrain' => [
+        'name' => 'Outbrain', 'category' => 'Native', 'stage' => 2,
+        'console' => 'https://developer.outbrain.com/home-page/amplify-api',
+        'steps' => ['Nothing to set up here. Each agency asks Outbrain to enable Amplify API access and connects with its own login or token in Networks > Connect.'],
+        'fields' => [],
+    ],
+    'mgid' => [
+        'name' => 'MGID', 'category' => 'Native', 'stage' => 2,
+        'console' => 'https://help.mgid.com/api-advertisers',
+        'steps' => ['Nothing to set up here. Each agency copies its API token from the MGID dashboard (Settings > API) into Networks > Connect.'],
+        'fields' => [],
+    ],
+    'revcontent' => [
+        'name' => 'Revcontent', 'category' => 'Native', 'stage' => 2,
+        'console' => 'https://help.revcontent.com/knowledge/publisher-advertiser-api-requests',
+        'steps' => ['Nothing to set up here. Each agency asks its Revcontent rep to enable API access and enters its Stats API credentials in Networks > Connect.'],
+        'fields' => [],
+    ],
+    'apple_ads' => [
+        'name' => 'Apple Ads (App Store)', 'category' => 'Search', 'stage' => 2,
+        'console' => 'https://developer.apple.com/documentation/apple-ads-platform-api',
+        'steps' => ['Nothing to set up here. Each agency creates an API user in Apple Ads, uploads a public key and enters the IDs and private key in Networks > Connect. Built on the Apple Ads Platform API (Search Ads API v5 shuts off on 26 Jan 2027).'],
+        'fields' => [],
+    ],
+    'yahoo_dsp' => [
+        'name' => 'Yahoo DSP (incl. Native)', 'category' => 'Programmatic', 'stage' => 2,
+        'console' => 'https://help.yahooinc.com/dsp-api/docs/setup-access-guide',
+        'steps' => ['Nothing to set up here. Each agency gets an API client ID and secret for its DSP seat from Yahoo and enters them in Networks > Connect.'],
+        'fields' => [],
+    ],
 ];
