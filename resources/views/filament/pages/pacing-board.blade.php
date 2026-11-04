@@ -48,8 +48,13 @@
                         <td style="padding:6px;text-align:end">{{ $p['budget'] ? R::money($p['budget'], $cur) : '–' }}@if ($p['from_plan'])<span style="{{ $muted }}" title="From the budget plan"> · plan</span>@endif</td>
                         <td style="padding:6px;text-align:end">{{ R::money($p['spent'], $cur) }}</td>
                         <td style="padding:6px;text-align:end">{{ $p['pace'] !== null ? round($p['pace']).'%' : '–' }}</td>
-                        <td style="padding:6px;text-align:end">{{ R::money($p['forecast_spend'], $cur) }}@if ($p['forecast_vs_budget'])<span style="{{ $muted }}"> · {{ round($p['forecast_vs_budget']) }}%</span>@endif</td>
-                        <td style="padding:6px;text-align:end">{{ number_format($p['results']) }} · {{ number_format($p['forecast_results']) }} · {{ $p['target_results'] ? number_format($p['target_results']) : '–' }}
+                        @if ($forecastLocked)
+                            <td style="padding:6px;text-align:end"><x-locked-button feature="forecast" /></td>
+                            <td style="padding:6px;text-align:end">{{ number_format($p['results']) }} · <x-locked-button feature="forecast" /> · {{ $p['target_results'] ? number_format($p['target_results']) : '–' }}
+                        @else
+                            <td style="padding:6px;text-align:end">{{ R::money($p['forecast_spend'], $cur) }}@if ($p['forecast_vs_budget'])<span style="{{ $muted }}"> · {{ round($p['forecast_vs_budget']) }}%</span>@endif</td>
+                            <td style="padding:6px;text-align:end">{{ number_format($p['results']) }} · {{ number_format($p['forecast_results']) }} · {{ $p['target_results'] ? number_format($p['target_results']) : '–' }}
+                        @endif
                             <div style="{{ $muted }}">{{ R::label($p['main_type']) }}</div></td>
                         <td style="padding:6px;text-align:end">{{ $p['daily_needed'] !== null ? R::money($p['daily_needed'], $cur) : '–' }}</td>
                         <td style="padding:6px"><x-filament::badge :color="$sc" style="display:inline-flex">{{ $sl }}</x-filament::badge></td>
@@ -66,4 +71,7 @@
             Health = results vs target 40 · pacing 20 · 2-week trend 20 · tracking and accounts 20 (hover the score for details).
         </div>
     </x-filament::section>
+    @if ($forecastLocked)
+        <x-locked-modal feature="forecast" :can-upgrade="$canUpgrade" />
+    @endif
 </x-filament-panels::page>

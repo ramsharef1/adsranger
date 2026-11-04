@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\GatedByPlan;
 use App\Models\AuditLog;
 use App\Models\BudgetPlan;
 use App\Models\Client;
@@ -17,6 +18,10 @@ use UnitEnum;
 /** Annual budget plan vs actual (#45): 12 months per client, plan vs actual vs forecast. */
 class BudgetPlanner extends Page
 {
+    use GatedByPlan;
+
+    protected static string $planFeature = 'annual_budget';
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
 
     protected static string|UnitEnum|null $navigationGroup = 'Planning';

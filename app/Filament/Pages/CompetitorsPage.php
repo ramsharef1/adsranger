@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\GatedByPlan;
 use App\Models\AuditLog;
 use App\Models\Client;
 use App\Models\Competitor;
@@ -18,6 +19,10 @@ use UnitEnum;
  */
 class CompetitorsPage extends Page
 {
+    use GatedByPlan;
+
+    protected static string $planFeature = 'competitors';
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-eye';
 
     protected static string|UnitEnum|null $navigationGroup = 'Planning';

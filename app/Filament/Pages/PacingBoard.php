@@ -6,6 +6,7 @@ use App\Jobs\SnapshotHealth;
 use App\Models\Client;
 use App\Support\HealthScore;
 use App\Support\Pacing;
+use App\Support\PlanGate;
 use App\Support\TeamRoles;
 use BackedEnum;
 use Filament\Facades\Filament;
@@ -69,6 +70,8 @@ class PacingBoard extends Page
         });
 
         return ['rows' => $rows, 'canManage' => TeamRoles::canManageData(auth()->user(), $a), 'tz' => $a->timezone ?: 'UTC',
-            'scored' => $clients->max('health_at')];
+            'scored' => $clients->max('health_at'),
+            // #37 month-end forecast is Pro (EX-50: the column stays, the value locks).
+            'forecastLocked' => PlanGate::locked($a, 'forecast'), 'canUpgrade' => PlanGate::canUpgrade(auth()->user(), $a)];
     }
 }

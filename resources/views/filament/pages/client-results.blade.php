@@ -85,10 +85,19 @@
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;font-size:13px">
                 <div><div style="{{ $muted }}">Budget{{ $pace['from_plan'] ? ' (plan)' : '' }}</div><strong>{{ $pace['budget'] ? R::money($pace['budget'], $cur) : '–' }}</strong></div>
                 <div><div style="{{ $muted }}">Spent so far</div><strong>{{ R::money($pace['spent'], $cur) }}</strong>@if ($pace['pace'] !== null)<span style="{{ $muted }}"> · {{ round($pace['pace']) }}% of expected</span>@endif</div>
-                <div><div style="{{ $muted }}">Month-end forecast</div><strong>{{ R::money($pace['forecast_spend'], $cur) }}</strong>@if ($pace['forecast_vs_budget'])<span style="{{ $muted }}"> · {{ round($pace['forecast_vs_budget']) }}% of budget</span>@endif</div>
+                @if ($forecastLocked)
+                    <div><div style="{{ $muted }}">Month-end forecast</div><x-locked-button feature="forecast" /></div>
+                @else
+                    <div><div style="{{ $muted }}">Month-end forecast</div><strong>{{ R::money($pace['forecast_spend'], $cur) }}</strong>@if ($pace['forecast_vs_budget'])<span style="{{ $muted }}"> · {{ round($pace['forecast_vs_budget']) }}% of budget</span>@endif</div>
+                @endif
                 <div><div style="{{ $muted }}">Needed per day</div><strong>{{ $pace['daily_needed'] !== null ? R::money($pace['daily_needed'], $cur) : '–' }}</strong></div>
-                <div><div style="{{ $muted }}">{{ R::label($pace['main_type']) ?: 'Results' }} so far → forecast</div><strong>{{ number_format($pace['results']) }} → {{ number_format($pace['forecast_results']) }}</strong>@if ($pace['target_results'])<span style="{{ $muted }}"> · target {{ number_format($pace['target_results']) }}</span>@endif</div>
-                <div><div style="{{ $muted }}">Forecast cost / result</div><strong>{{ R::money($pace['forecast_cpr'], $cur) }}</strong></div>
+                @if ($forecastLocked)
+                    <div><div style="{{ $muted }}">{{ R::label($pace['main_type']) ?: 'Results' }} so far</div><strong>{{ number_format($pace['results']) }}</strong>@if ($pace['target_results'])<span style="{{ $muted }}"> · target {{ number_format($pace['target_results']) }}</span>@endif</div>
+                    <div><div style="{{ $muted }}">Forecast cost / result</div><x-locked-button feature="forecast" /></div>
+                @else
+                    <div><div style="{{ $muted }}">{{ R::label($pace['main_type']) ?: 'Results' }} so far → forecast</div><strong>{{ number_format($pace['results']) }} → {{ number_format($pace['forecast_results']) }}</strong>@if ($pace['target_results'])<span style="{{ $muted }}"> · target {{ number_format($pace['target_results']) }}</span>@endif</div>
+                    <div><div style="{{ $muted }}">Forecast cost / result</div><strong>{{ R::money($pace['forecast_cpr'], $cur) }}</strong></div>
+                @endif
             </div>
             <div style="{{ $muted }};margin-top:8px">Forecast = spent so far + last {{ config('planning.pacing.run_rate_days') }} days' daily average × {{ $pace['days_left'] }} days left.
                 <a href="{{ \App\Filament\Pages\BudgetPlanner::getUrl(['client' => $client->id]) }}" style="color:#14B8A6">Budget plan</a> ·
@@ -240,5 +249,8 @@
                 @endforeach
             </div>
         </x-filament::section>
+    @endif
+    @if ($forecastLocked)
+        <x-locked-modal feature="forecast" :can-upgrade="$canUpgrade" />
     @endif
 </x-filament-panels::page>

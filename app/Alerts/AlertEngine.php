@@ -11,23 +11,27 @@ use App\Models\AlertRule;
 use App\Models\Campaign;
 use App\Models\Client;
 use App\Models\DailyMetric;
+use App\Models\LandingPage;
 use App\Support\Fx;
+use App\Support\GoogleInsights;
 use App\Support\MetricsQuery;
 use App\Support\Pacing;
+use App\Support\PlanGate;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 
 /** Evaluates the alert rules for one agency and keeps the inbox in sync (open, refresh, auto-resolve). */
 class AlertEngine
 {
-    /** Effective rules for an agency: [key => ['enabled'=>bool,'severity'=>..,'t'=>thresholds,'label'=>..]]. */
+    /** Effective rules for an agency: [key => ['enabled'=>bool,'locked'=>bool,'severity'=>..,'t'=>thresholds,'label'=>..]]. A rule above the plan is locked and never runs (#23, D-30). */
     public static function rules(Agency $a): array
     {
         $over = AlertRule::where('agency_id', $a->id)->get()->keyBy('rule_key');
         $out = [];
         foreach (config('alerts.rules') as $k => $r) {
             $o = $over[$k] ?? null;
-            $out[$k] = ['enabled' => $o ? $o->enabled : true, 'severity' => $r['severity'], 'label' => $r['label'],
+            $locked = ! PlanGate::allowsAlertRule($a, $k);
+            $out[$k] = ['enabled' => ! $locked && ($o ? $o->enabled : true), 'locked' => $locked, 'severity' => $r['severity'], 'label' => $r['label'],
                 't' => array_merge($r['thresholds'], array_filter((array) ($o?->thresholds ?? []), fn ($v) => $v !== null && $v !== ''))];
         }
 
@@ -154,7 +158,7 @@ class AlertEngine
     /** Search terms with spend and no conversions over the last 7 days (#46). */
     protected static function searchTermWaste(Client $c, Carbon $d, array $r, array &$found): void
     {
-        $w = \App\Support\GoogleInsights::wasteTotal($c, $d->copy()->subDays(6)->toDateString(), $d->toDateString());
+        $w = GoogleInsights::wasteTotal($c, $d->copy()->subDays(6)->toDateString(), $d->toDateString());
         if ($w['count'] && $w['cost'] >= (float) $r['t']['min_spend']) {
             static::add($found, 'search_term_waste', $r, ['client_id' => $c->id, 'entity_type' => 'client', 'entity_id' => $c->id, 'entity_name' => $c->name,
                 'title' => 'Wasted search terms: '.$c->name,
@@ -166,7 +170,7 @@ class AlertEngine
     /** Broken landing pages that ads still send clicks to (#49). */
     protected static function landingPage(Agency $a, array $r, array &$found): void
     {
-        foreach (\App\Models\LandingPage::where('agency_id', $a->id)->where('state', 'broken')->where('clicks_30d', '>=', (int) $r['t']['min_clicks'])
+        foreach (LandingPage::where('agency_id', $a->id)->where('state', 'broken')->where('clicks_30d', '>=', (int) $r['t']['min_clicks'])
             ->where('last_seen_at', '>=', now()->subDays(30))->limit(50)->get() as $lp) {
             static::add($found, 'landing_page', $r, ['client_id' => $lp->client_id, 'entity_type' => 'landing_page', 'entity_id' => $lp->id,
                 'entity_name' => mb_substr($lp->url, 0, 190), 'title' => 'Broken landing page',

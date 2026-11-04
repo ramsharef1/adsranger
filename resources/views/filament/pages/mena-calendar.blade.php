@@ -51,7 +51,13 @@
                                 @if ($s)<div style="{{ $muted }}">{{ \Carbon\Carbon::parse($s['start'])->format('M Y') }}</div>@endif</td>
                         @endif
                         <td style="padding:6px;{{ $muted }}">{{ $e['tip'] }}</td>
-                        <td style="padding:6px;text-align:end"><x-filament::button size="xs" color="gray" wire:click="plan('{{ $e['key'] }}', '{{ $e['start'] }}')">Plan</x-filament::button></td>
+                        <td style="padding:6px;text-align:end">
+                            @if ($scenarioLocked)
+                                <x-locked-button feature="scenario_planner" label="Plan" />
+                            @else
+                                <x-filament::button size="xs" color="gray" wire:click="plan('{{ $e['key'] }}', '{{ $e['start'] }}')">Plan</x-filament::button>
+                            @endif
+                        </td>
                     </tr>
                 @empty
                     <tr><td colspan="7" style="padding:12px;{{ $muted }}">No events in the next 12 months for this market.</td></tr>
@@ -99,5 +105,8 @@
                 </div>
             @endif
         </x-filament::section>
+    @endif
+    @if ($scenarioLocked)
+        <x-locked-modal feature="scenario_planner" :can-upgrade="$canUpgrade" />
     @endif
 </x-filament-panels::page>

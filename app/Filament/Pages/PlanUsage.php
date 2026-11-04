@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Support\NetworkAccess;
+use App\Support\PlanGate;
 use App\Support\PlanLimits;
 use BackedEnum;
 use Filament\Facades\Filament;
@@ -38,6 +39,10 @@ class PlanUsage extends Page
                 ['Tracked ad accounts', PlanLimits::adAccountsUsed($a), PlanLimits::adAccountsLimit($a)],
             ],
             'networks' => NetworkAccess::forAgency($a)->pluck('name'),
+            // EX-50 point 7: what each tier unlocks, from the gating config; in-app prices allowed (D-19), never public (D-07).
+            'tier' => PlanGate::tier($a),
+            'byTier' => PlanGate::byTier(),
+            'prices' => config('plan_features.prices'),
         ];
     }
 }

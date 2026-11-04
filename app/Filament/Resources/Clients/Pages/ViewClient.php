@@ -3,11 +3,14 @@
 namespace App\Filament\Resources\Clients\Pages;
 
 use App\Filament\Resources\Clients\ClientResource;
+use App\Models\AdSet;
 use App\Models\Alert;
+use App\Models\Campaign;
 use App\Support\HealthScore;
 use App\Support\MetricsQuery;
 use App\Support\Pacing;
 use App\Support\Periods;
+use App\Support\PlanGate;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -63,6 +66,8 @@ class ViewClient extends ViewRecord
             'client' => $c,
             'health' => HealthScore::compute($c),
             'pace' => Pacing::month($c),
+            'forecastLocked' => PlanGate::locked($c->agency, 'forecast'),
+            'canUpgrade' => PlanGate::canUpgrade(auth()->user(), $c->agency),
             'funnel' => MetricsQuery::funnel($t),
             'actions' => MetricsQuery::conversionActions($c, $from, $to),
             'from' => $from, 'to' => $to,
@@ -73,8 +78,8 @@ class ViewClient extends ViewRecord
             'level' => $level,
             'rows' => MetricsQuery::breakdown($c, $from, $to, $level, $this->adSet ?: $this->campaign),
             'crumbs' => [
-                'campaign' => $this->campaign ? \App\Models\Campaign::find($this->campaign)?->name : null,
-                'ad_set' => $this->adSet ? \App\Models\AdSet::find($this->adSet)?->name : null,
+                'campaign' => $this->campaign ? Campaign::find($this->campaign)?->name : null,
+                'ad_set' => $this->adSet ? AdSet::find($this->adSet)?->name : null,
             ],
             'top' => MetricsQuery::topAds($c, $from, $to),
             'alerts' => Alert::where('client_id', $c->id)->where('status', 'open')->latest()->limit(5)->get(),

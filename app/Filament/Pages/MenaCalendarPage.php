@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\Client;
 use App\Support\MenaCalendar;
+use App\Support\PlanGate;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Pages\Page;
@@ -41,6 +42,8 @@ class MenaCalendarPage extends Page
 
     public function plan(string $key, string $start): void
     {
+        // #96 scenario planner is Pro; the button opens the locked modal instead (EX-50), so this is only a guard.
+        abort_if(PlanGate::locked(Filament::getTenant(), 'scenario_planner'), 403);
         $this->event = $key.'|'.$start;
     }
 
@@ -69,6 +72,7 @@ class MenaCalendarPage extends Page
         }
 
         return ['events' => $events, 'today' => $today, 'clients' => $clients, 'client' => $client, 'picked' => $picked, 'scenario' => $scenario,
-            'seasons' => $seasons, 'countries' => config('adsranger.countries'), 'intl' => MenaCalendar::hasIntl()];
+            'seasons' => $seasons, 'countries' => config('adsranger.countries'), 'intl' => MenaCalendar::hasIntl(),
+            'scenarioLocked' => PlanGate::locked($a, 'scenario_planner'), 'canUpgrade' => PlanGate::canUpgrade(auth()->user(), $a)];
     }
 }

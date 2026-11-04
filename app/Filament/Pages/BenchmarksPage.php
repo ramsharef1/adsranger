@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\GatedByPlan;
 use App\Models\AuditLog;
 use App\Models\Client;
 use App\Support\Benchmarks;
@@ -16,6 +17,10 @@ use UnitEnum;
 /** Internal benchmarks (#41) and the opt-in MENA benchmarks network (#42). */
 class BenchmarksPage extends Page
 {
+    use GatedByPlan;
+
+    protected static string $planFeature = 'benchmarks';
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     protected static string|UnitEnum|null $navigationGroup = 'Planning';

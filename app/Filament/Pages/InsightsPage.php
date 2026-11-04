@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\GatedByPlan;
 use App\Models\Client;
 use App\Support\Insights;
 use App\Support\Periods;
@@ -13,6 +14,10 @@ use UnitEnum;
 /** Client insights: budget planner (#38), reallocation (#39), hours (#43), placements + audience (#44), geo (#97), saturation + overlap (#98). */
 class InsightsPage extends Page
 {
+    use GatedByPlan;
+
+    protected static string $planFeature = 'insights';
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-light-bulb';
 
     protected static string|UnitEnum|null $navigationGroup = 'Planning';

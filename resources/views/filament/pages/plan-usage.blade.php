@@ -17,6 +17,39 @@
         </div>
     </x-filament::section>
     <x-filament::section>
+        <x-slot name="heading">{{ __('plan.unlocks') }}</x-slot>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+            @php $prev = null; @endphp
+            @foreach ($byTier as $t => $features)
+                <div style="border:1px solid {{ $t === $tier ? '#14B8A6' : 'rgba(148,163,184,.35)' }};border-radius:12px;padding:12px;display:grid;gap:6px;align-content:start">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+                        <strong>{{ \App\Support\PlanGate::tierLabel($t) }}</strong>
+                        @if ($t === $tier)
+                            <x-filament::badge color="success" style="display:inline-flex">{{ __('plan.current') }}</x-filament::badge>
+                        @endif
+                    </div>
+                    @if (isset($prices[$t]))
+                        <div style="font-size:13px;opacity:.75">{{ __('plan.per_month', ['price' => $prices[$t]]) }}</div>
+                    @endif
+                    @if ($prev === null)
+                        <div style="font-size:13px;line-height:1.7">{{ __('plan.core') }}</div>
+                    @else
+                        <div style="font-size:13px;opacity:.75">{{ __('plan.included_below', ['tier' => \App\Support\PlanGate::tierLabel($prev)]) }}</div>
+                    @endif
+                    @if ($features)
+                        <ul style="font-size:13px;line-height:1.7;margin:0;padding-inline-start:18px;list-style:disc">
+                            @foreach ($features as $f)
+                                <li>{{ \App\Support\PlanGate::featureText($f, 'name') }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+                @php $prev = $t; @endphp
+            @endforeach
+        </div>
+        <p style="font-size:13px;opacity:.7;margin-top:8px">{{ __('plan.contact') }}</p>
+    </x-filament::section>
+    <x-filament::section>
         <x-slot name="heading">Networks in your plan</x-slot>
         <p style="font-size:14px;line-height:1.8">{{ $networks->isEmpty() ? 'None yet — networks appear as they are switched on.' : $networks->implode(' · ') }}</p>
         <p style="font-size:13px;opacity:.7;margin-top:8px">Need a bigger plan or another network? Contact support@adsranger.com. Online upgrades come with billing.</p>

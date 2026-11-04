@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Alerts\AlertEngine;
 use App\Models\AlertRule;
 use App\Models\AuditLog;
+use App\Support\PlanGate;
 use App\Support\TeamRoles;
 use BackedEnum;
 use Filament\Facades\Filament;
@@ -48,6 +49,9 @@ class AlertRules extends Page
         abort_unless($this->canEdit(), 403);
         $a = Filament::getTenant();
         foreach (config('alerts.rules') as $k => $def) {
+            if (! PlanGate::allowsAlertRule($a, $k)) {
+                continue; // locked by plan: keep whatever was stored (EX-50: existing data is never touched)
+            }
             $in = $this->rules[$k] ?? [];
             $t = [];
             foreach ($def['thresholds'] as $tk => $dv) {
@@ -70,6 +74,10 @@ class AlertRules extends Page
 
     protected function getViewData(): array
     {
-        return ['defs' => config('alerts.rules'), 'edit' => $this->canEdit()];
+        $a = Filament::getTenant();
+        $locked = collect(array_keys(config('alerts.rules')))->filter(fn ($k) => ! PlanGate::allowsAlertRule($a, $k))->values()->all();
+
+        return ['defs' => config('alerts.rules'), 'edit' => $this->canEdit(), 'locked' => $locked,
+            'canUpgrade' => PlanGate::canUpgrade(auth()->user(), $a)];
     }
 }

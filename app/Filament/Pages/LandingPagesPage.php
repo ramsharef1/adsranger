@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\GatedByPlan;
 use App\Jobs\CheckLandingPages;
 use App\Models\AuditLog;
 use App\Models\Client;
@@ -18,6 +19,10 @@ use UnitEnum;
 /** Landing page health (#49): broken, slow, redirecting or insecure pages behind the ads. */
 class LandingPagesPage extends Page
 {
+    use GatedByPlan;
+
+    protected static string $planFeature = 'landing_pages';
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-globe-alt';
 
     protected static string|UnitEnum|null $navigationGroup = 'Planning';

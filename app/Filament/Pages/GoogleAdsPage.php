@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Connectors\ConnectorRegistry;
+use App\Filament\Concerns\GatedByPlan;
 use App\Models\AdAccount;
 use App\Models\AuditLog;
 use App\Models\Client;
@@ -20,6 +21,10 @@ use UnitEnum;
 /** Google Ads depth: impression share + Quality Score (#47), search terms + negatives (#46), Performance Max asset groups (#48). */
 class GoogleAdsPage extends Page
 {
+    use GatedByPlan;
+
+    protected static string $planFeature = 'google_depth';
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-magnifying-glass';
 
     protected static string|UnitEnum|null $navigationGroup = 'Planning';
