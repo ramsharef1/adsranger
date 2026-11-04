@@ -7,6 +7,8 @@ use App\Filament\Admin\Resources\Agencies\Pages\ListAgencies;
 use App\Models\Agency;
 use BackedEnum;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -57,10 +59,15 @@ class AgencyResource extends Resource
                 Select::make('currency')->options(collect(config('adsranger.currencies'))->mapWithKeys(fn ($c) => [$c => $c])),
             ])->columnSpan(2),
             Section::make('Plan and status')->columns(2)->schema([
-                Select::make('plan')->options(config('adsranger.plans'))->required()
+                Select::make('plan')->options(fn () => \App\Models\Plan::orderBy('sort')->pluck('name', 'key'))->required()
                     ->helperText('Controls which features and networks the agency gets.'),
                 Select::make('status')->options(config('adsranger.agency_statuses'))->required()
                     ->helperText('Suspended agencies cannot sign in to their workspace.'),
+                DateTimePicker::make('trial_ends_at')->label('Trial ends')->seconds(false),
+            ])->columnSpan(2),
+            Section::make('Network overrides')->description('Layer 3 of the access rules. "Always allow" turns a network on for this agency even when it is off globally or not in its plan (good for beta tests). "Block" hides it, and wins over everything.')->columns(2)->schema([
+                CheckboxList::make('allowedNetworks')->label('Always allow')->relationship('allowedNetworks', 'name'),
+                CheckboxList::make('blockedNetworks')->label('Block')->relationship('blockedNetworks', 'name'),
             ])->columnSpan(2),
         ]);
     }

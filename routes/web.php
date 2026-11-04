@@ -15,3 +15,11 @@ foreach (['privacy', 'terms', 'data-deletion'] as $legalPage) {
 // Agency invitations
 Route::get('/invite/{token}', [\App\Http\Controllers\InvitationController::class, 'show']);
 Route::post('/invite/{token}', [\App\Http\Controllers\InvitationController::class, 'accept'])->middleware('throttle:10,1');
+
+// Network OAuth connect (guests are sent to /app/login inside the controller)
+Route::get('/app/connect/{network}/start', function (\Illuminate\Http\Request $r, string $network) {
+    return $r->user() ? app(\App\Http\Controllers\ConnectController::class)->start($r, $network) : redirect()->guest('/app/login');
+})->where('network', '[a-z0-9_]+');
+Route::get('/app/connect/{network}/callback', function (\Illuminate\Http\Request $r, string $network) {
+    return $r->user() ? app(\App\Http\Controllers\ConnectController::class)->callback($r, $network) : redirect()->guest('/app/login');
+})->where('network', '[a-z0-9_]+');

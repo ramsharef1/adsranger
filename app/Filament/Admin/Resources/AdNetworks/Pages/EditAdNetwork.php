@@ -3,6 +3,9 @@
 namespace App\Filament\Admin\Resources\AdNetworks\Pages;
 
 use App\Filament\Admin\Resources\AdNetworks\AdNetworkResource;
+use App\Connectors\ConnectorRegistry;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 
 class EditAdNetwork extends EditRecord
@@ -11,7 +14,32 @@ class EditAdNetwork extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [];
+        return [
+            Action::make('test')->label('Test keys')->icon('heroicon-o-beaker')
+                ->action(function () {
+                    $n = $this->record->fresh();
+                    $lines = [];
+                    $best = null;
+                    foreach (['live', 'sandbox'] as $env) {
+                        if (empty(array_filter((array) ($n->{"credentials_{$env}"} ?? []))) && ! isset($n::REUSES[$n->key])) {
+                            continue;
+                        }
+                        $probe = clone $n;
+                        $probe->environment = $env;
+                        [$ok, $msg] = ConnectorRegistry::for($probe)->test();
+                        $lines[] = ucfirst($env).': '.($ok === true ? 'OK' : ($ok === false ? 'FAILED' : 'n/a')).' — '.$msg;
+                        $best = $best === false ? false : ($ok === false ? false : ($ok ?? $best));
+                    }
+                    if (! $lines) {
+                        Notification::make()->title('No keys saved yet')->warning()->send();
+
+                        return;
+                    }
+                    $n->forceFill(['last_tested_at' => now(), 'last_test_result' => mb_substr(implode(' | ', $lines), 0, 900)])->saveQuietly();
+                    Notification::make()->title($best === false ? 'Key test failed' : ($best ? 'Keys work' : 'Keys saved (cannot be fully tested)'))
+                        ->body(implode("\n", $lines))->{$best === false ? 'danger' : ($best ? 'success' : 'warning')}()->persistent()->send();
+                }),
+        ];
     }
 
     /** Secrets are never sent to the browser: blank them before the form fills. */

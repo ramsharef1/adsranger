@@ -29,6 +29,7 @@ class RegisterAgency extends RegisterTenant
                 'owner_id' => $user->id,
                 'plan' => 'starter',
                 'status' => 'trial',
+                'trial_ends_at' => now()->addDays((int) config('adsranger.trial_days', 14)),
             ]);
             $agency->members()->attach($user->id, ['role' => 'owner']);
 

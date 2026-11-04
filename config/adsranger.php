@@ -19,6 +19,15 @@ return [
     'languages' => ['ar' => 'العربية', 'en' => 'English'],
     'plans' => ['starter' => 'Starter', 'pro' => 'Pro', 'agency' => 'Agency'],
     'agency_statuses' => ['active' => 'Active', 'trial' => 'Trial', 'suspended' => 'Suspended'],
+    // Slugs an agency may not use (they clash with /app routes).
+    'reserved_slugs' => ['new', 'login', 'logout', 'register', 'profile', 'connect', 'password-reset', 'email-verification', 'admin', 'api'],
+    'trial_days' => 14,
+    // Networks that start with report import only (no public API yet).
+    'import_networks' => [
+        'noon' => 'Noon Ads', 'talabat' => 'Talabat Ads', 'careem' => 'Careem Ads', 'arabyads' => 'ArabyAds',
+        'anghami' => 'Anghami Ads', 'shahid' => 'Shahid (MBC)', 'osn' => 'OSN+', 'telegram' => 'Telegram Ads',
+        'arabclicks' => 'ArabClicks', 'publisher' => 'Arabic publisher (other)', 'other' => 'Other network',
+    ],
     'member_roles' => [
         'owner' => 'Owner',
         'admin' => 'Admin',

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Members\Pages;
 
 use App\Filament\Resources\Members\MemberResource;
 use App\Models\AgencyInvitation;
+use App\Support\PlanLimits;
 use App\Support\TeamRoles;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
@@ -30,6 +31,11 @@ class ListMembers extends ListRecords
                     $agency = Filament::getTenant();
                     if ($agency->members()->where('email', strtolower(trim($data['email'])))->exists()) {
                         Notification::make()->title('Already a member of this workspace')->warning()->send();
+
+                        return;
+                    }
+                    if (! PlanLimits::canAddSeat($agency)) {
+                        Notification::make()->title('No free seats')->body('Your plan includes '.PlanLimits::seatsLimit($agency).' seats (members + pending invites). Revoke an invite, remove a member, or upgrade.')->warning()->send();
 
                         return;
                     }

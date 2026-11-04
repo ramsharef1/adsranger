@@ -7,6 +7,7 @@ use App\Filament\Admin\Resources\AdNetworks\Pages\ListAdNetworks;
 use App\Models\AdNetwork;
 use BackedEnum;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -96,6 +97,11 @@ class AdNetworkResource extends Resource
                     ->helperText('Which key set AdsRanger uses for this network.'),
                 Toggle::make('enabled')->label('Visible to agencies')
                     ->helperText('When off, agencies cannot connect this network.'),
+            ]),
+            Section::make('Plans')->description('Which plans include this network (layer 2 of the access rules).')->schema([
+                CheckboxList::make('plans')->hiddenLabel()->relationship('plans', 'name')->columns(3),
+                Placeholder::make('last_test')->label('Last key test')
+                    ->content(fn ($record) => $record?->last_tested_at ? $record->last_tested_at->diffForHumans().' · '.$record->last_test_result : 'Not tested yet. Use "Test keys" at the top.'),
             ]),
             Tabs::make('keys')->tabs([
                 $keysTab('live', 'Live keys'),

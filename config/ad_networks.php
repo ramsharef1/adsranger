@@ -37,6 +37,21 @@ return [
             ['client_secret', 'OAuth Client Secret', true, 'Same screen as the Client ID > Client secret.'],
             ['project_id', 'Cloud project ID', false, 'Cloud Console project picker > ID column (not the project name).'],
             ['login_customer_id', 'Manager (MCC) account ID', false, 'Optional. 10 digits without dashes, shown top right in Google Ads when signed in to your manager account.'],
+            ['api_version', 'Google Ads API version', false, 'The newest supported version from the Google Ads API release notes, written like v22.'],
+        ],
+    ],
+    'ga4' => [
+        'name' => 'Google Analytics 4', 'category' => 'Analytics', 'stage' => 1,
+        'console' => 'https://console.cloud.google.com/',
+        'steps' => [
+            'GA4 uses the same Google Cloud project and OAuth client as Google Ads.',
+            'APIs & Services > Library: enable the Google Analytics Admin API and the Google Analytics Data API.',
+            'Add the Redirect URL below to the same OAuth client\'s authorised redirect URIs.',
+            'Leave the fields below empty to reuse the Google Ads keys.',
+        ],
+        'fields' => [
+            ['client_id', 'OAuth Client ID (optional)', false, 'Leave empty to reuse the Google Ads client.'],
+            ['client_secret', 'OAuth Client Secret (optional)', true, 'Leave empty to reuse the Google Ads client.'],
         ],
     ],
     'google_merchant' => [

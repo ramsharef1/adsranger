@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class AdNetwork extends Model
 {
@@ -20,7 +21,37 @@ class AdNetwork extends Model
             'enabled' => 'boolean',
             'credentials_live' => 'encrypted:array',
             'credentials_sandbox' => 'encrypted:array',
+            'last_tested_at' => 'datetime',
         ];
+    }
+
+    public function plans(): BelongsToMany
+    {
+        return $this->belongsToMany(Plan::class);
+    }
+
+    /** Networks that reuse another network's OAuth client when their own fields are empty. */
+    public const REUSES = ['ga4' => 'google_ads', 'google_merchant' => 'google_ads'];
+
+    /** The key set in use (live or sandbox), with fallback to the parent network's keys. */
+    public function credentials(?string $env = null): array
+    {
+        $env = $env ?: $this->environment;
+        $own = array_filter((array) ($this->{"credentials_{$env}"} ?? []));
+        if (isset(self::REUSES[$this->key]) && empty($own['client_id'])) {
+            $parent = static::where('key', self::REUSES[$this->key])->first();
+            $own = array_filter((array) ($parent?->{"credentials_{$env}"} ?? [])) + $own;
+        }
+
+        return $own;
+    }
+
+    public function hasKeys(?string $env = null): bool
+    {
+        $c = $this->credentials($env);
+        $first = collect($this->definition()['fields'] ?? [])->first()[0] ?? null;
+
+        return $first === null || ! empty($c[$first]) || ! empty($c['client_id']) || ! empty($c['app_id']) || ! empty($c['api_key']);
     }
 
     /** Catalogue entry from config/ad_networks.php (name, steps, fields...). */

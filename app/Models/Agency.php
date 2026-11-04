@@ -13,9 +13,19 @@ class Agency extends Model
 {
     protected $guarded = [];
 
+    protected function casts(): array
+    {
+        return ['trial_ends_at' => 'datetime'];
+    }
+
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function planModel(): BelongsTo
+    {
+        return $this->belongsTo(Plan::class, 'plan', 'key');
     }
 
     public function members(): BelongsToMany
@@ -28,9 +38,39 @@ class Agency extends Model
         return $this->hasMany(AgencyInvitation::class);
     }
 
+    public function connections(): HasMany
+    {
+        return $this->hasMany(Connection::class);
+    }
+
+    public function adAccounts(): HasMany
+    {
+        return $this->hasMany(AdAccount::class);
+    }
+
+    public function dataImports(): HasMany
+    {
+        return $this->hasMany(DataImport::class);
+    }
+
+    /** Admin override: networks switched ON for this agency even if off globally or not in its plan. */
+    public function allowedNetworks(): BelongsToMany
+    {
+        return $this->belongsToMany(AdNetwork::class, 'agency_network_overrides')->withPivotValue('mode', 'allow')->withTimestamps();
+    }
+
+    /** Admin override: networks switched OFF for this agency. Wins over everything else. */
+    public function blockedNetworks(): BelongsToMany
+    {
+        return $this->belongsToMany(AdNetwork::class, 'agency_network_overrides')->withPivotValue('mode', 'deny')->withTimestamps();
+    }
+
     public static function uniqueSlug(string $name): string
     {
         $base = Str::slug($name) ?: 'agency';
+        if (in_array($base, config('adsranger.reserved_slugs', []), true)) {
+            $base .= '-agency';
+        }
         $slug = $base;
         $i = 2;
         while (static::where('slug', $slug)->exists()) {

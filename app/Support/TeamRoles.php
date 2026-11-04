@@ -24,6 +24,12 @@ class TeamRoles
         return $user && $agency && in_array($user->roleIn($agency), ['owner', 'admin'], true);
     }
 
+    /** Owners, admins and account managers can connect networks and import data. */
+    public static function canManageData(?User $user, ?Agency $agency): bool
+    {
+        return $user && $agency && in_array($user->roleIn($agency), ['owner', 'admin', 'manager'], true);
+    }
+
     public static function isReadOnly(?User $user, ?Agency $agency): bool
     {
         return $user && $agency && $user->roleIn($agency) === 'analyst';
