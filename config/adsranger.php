@@ -20,7 +20,10 @@ return [
     'plans' => ['starter' => 'Starter', 'pro' => 'Pro', 'agency' => 'Agency'],
     'agency_statuses' => ['active' => 'Active', 'trial' => 'Trial', 'suspended' => 'Suspended'],
     // Slugs an agency may not use (they clash with /app routes).
-    'reserved_slugs' => ['new', 'login', 'logout', 'register', 'profile', 'connect', 'password-reset', 'email-verification', 'admin', 'api'],
+    // Agency slugs that would collide with panel-level /app routes (Filament: login, logout, new, profile,
+    // password-reset, email-verification, register, multi-factor-authentication; ours: connect). Tenant-route check 2026-11-05.
+    'reserved_slugs' => ['new', 'login', 'logout', 'register', 'profile', 'connect', 'password-reset', 'email-verification',
+        'multi-factor-authentication', 'two-factor-authentication', 'admin', 'api', 'app', 'auth', 'oauth', 'webhooks', 'livewire', 'filament'],
     'trial_days' => 14,
     // Networks that start with report import only (no public API yet).
     'import_networks' => [

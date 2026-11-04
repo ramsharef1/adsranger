@@ -12,7 +12,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Private routes are never indexable (ADSR-040 §2, tenant-route check 2026-11-05).
+        $middleware->append(\App\Http\Middleware\NoIndexPrivateRoutes::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
