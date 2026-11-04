@@ -6,7 +6,12 @@ use App\Filament\Admin\Resources\Agencies\Pages\EditAgency;
 use App\Filament\Admin\Resources\Agencies\Pages\ListAgencies;
 use App\Models\Agency;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
+use Filament\Notifications\Notification;
+use App\Support\DemoData;
+use App\Alerts\AlertEngine;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
@@ -94,7 +99,20 @@ class AgencyResource extends Resource
                 SelectFilter::make('plan')->options(config('adsranger.plans')),
                 SelectFilter::make('status')->options(config('adsranger.agency_statuses')),
             ])
-            ->recordActions([EditAction::make()]);
+            ->recordActions([EditAction::make(), ActionGroup::make([
+                Action::make('demo')->label('Load demo data')->icon('heroicon-o-beaker')->requiresConfirmation()
+                    ->modalDescription('Adds 3 sample clients with 90 days of Meta-style results and runs the alert rules. Remove it any time.')
+                    ->action(function (Agency $r) {
+                        $rows = array_sum(DemoData::seed($r));
+                        $s = AlertEngine::run($r, now($r->timezone ?: 'UTC')->subDay()->toDateString());
+                        Notification::make()->title("Demo data loaded: $rows rows, {$s['opened']} alerts")->success()->send();
+                    }),
+                Action::make('undemo')->label('Remove demo data')->icon('heroicon-o-trash')->color('danger')->requiresConfirmation()
+                    ->action(function (Agency $r) {
+                        DemoData::remove($r);
+                        Notification::make()->title('Demo data removed')->success()->send();
+                    }),
+            ])]);
     }
 
     public static function getPages(): array

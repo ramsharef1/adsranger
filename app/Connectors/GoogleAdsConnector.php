@@ -2,7 +2,9 @@
 
 namespace App\Connectors;
 
+use App\Models\AdAccount;
 use App\Models\Connection;
+use App\Support\ResultResolver;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
@@ -84,5 +86,69 @@ class GoogleAdsConnector extends Connector
     public function test(): array
     {
         return $this->oauthClientTest('https://oauth2.googleapis.com/token');
+    }
+
+    public function supportsSync(): bool
+    {
+        return true;
+    }
+
+    /** Run a GAQL query and return every result row. */
+    protected function search(Connection $c, string $customerId, string $query): array
+    {
+        $token = $this->freshToken($c);
+        $v = $this->cred('api_version', 'v22');
+        $headers = array_filter(['login-customer-id' => preg_replace('/\D/', '', (string) $this->cred('login_customer_id')) ?: null]);
+        $out = [];
+        $body = ['query' => $query];
+        for ($i = 0; $i < 50; $i++) {
+            $res = Http::withToken($token)->withHeaders($headers)->timeout(60)->retry(2, 2000, throw: false)
+                ->post("https://googleads.googleapis.com/{$v}/customers/{$customerId}/googleAds:search", $body);
+            if ($res->failed()) {
+                $msg = $res->json('error.details.0.errors.0.message') ?? $res->json('error.message') ?? 'HTTP '.$res->status();
+                throw new RuntimeException('Google Ads: '.$msg);
+            }
+            array_push($out, ...$res->json('results', []));
+            $next = $res->json('nextPageToken');
+            if (! $next) {
+                break;
+            }
+            $body['pageToken'] = $next;
+        }
+
+        return $out;
+    }
+
+    public function pull(AdAccount $account, string $from, string $to): array
+    {
+        $c = $account->connection ?: throw new RuntimeException('The Google Ads connection is missing. Reconnect it.');
+        $cid = preg_replace('/\D/', '', $account->external_id);
+        $range = "segments.date BETWEEN '$from' AND '$to'";
+
+        $campaigns = [];
+        foreach ($this->search($c, $cid, "SELECT campaign.id, campaign.name, campaign.status, campaign.advertising_channel_type, campaign_budget.amount_micros FROM campaign WHERE campaign.status != 'REMOVED'") as $r) {
+            $id = (string) $r['campaign']['id'];
+            $campaigns[$id] = ['external_id' => $id, 'name' => $r['campaign']['name'] ?? null, 'status' => $r['campaign']['status'] ?? null,
+                'objective' => null, 'channel' => $r['campaign']['advertisingChannelType'] ?? null,
+                'daily_budget' => isset($r['campaignBudget']['amountMicros']) ? $r['campaignBudget']['amountMicros'] / 1_000_000 : null];
+        }
+
+        $actions = [];
+        foreach ($this->search($c, $cid, "SELECT campaign.id, segments.date, segments.conversion_action_name, segments.conversion_action_category, metrics.conversions, metrics.conversions_value FROM campaign WHERE $range AND metrics.conversions > 0") as $r) {
+            $actions[$r['campaign']['id'].'|'.$r['segments']['date']][] = ['name' => $r['segments']['conversionActionName'] ?? '?',
+                'category' => $r['segments']['conversionActionCategory'] ?? null, 'conversions' => $r['metrics']['conversions'] ?? 0, 'value' => $r['metrics']['conversionsValue'] ?? 0];
+        }
+
+        $rows = [];
+        foreach ($this->search($c, $cid, "SELECT campaign.id, segments.date, metrics.cost_micros, metrics.impressions, metrics.clicks, metrics.conversions, metrics.conversions_value FROM campaign WHERE $range") as $r) {
+            $id = (string) $r['campaign']['id'];
+            $d = $r['segments']['date'];
+            $m = $r['metrics'] ?? [];
+            $rows[] = ['date' => $d, 'level' => 'campaign', 'campaign' => $id, 'ad_set' => null, 'ad' => null]
+                + ResultResolver::google(['cost_micros' => $m['costMicros'] ?? 0, 'impressions' => $m['impressions'] ?? 0, 'clicks' => $m['clicks'] ?? 0,
+                    'conversions' => $m['conversions'] ?? 0, 'conversions_value' => $m['conversionsValue'] ?? 0], $actions[$id.'|'.$d] ?? []);
+        }
+
+        return ['campaigns' => array_values($campaigns), 'ad_sets' => [], 'ads' => [], 'rows' => $rows];
     }
 }

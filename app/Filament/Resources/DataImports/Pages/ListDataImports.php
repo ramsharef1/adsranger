@@ -26,6 +26,8 @@ class ListDataImports extends ListRecords
                 ->modalDescription('Columns are matched automatically (English or Arabic headers). A date and a spend column are required; impressions, clicks, results, revenue and campaign are optional.')
                 ->schema([
                     Select::make('network')->label('Network')->options(DataImportResource::networkOptions())->searchable()->required(),
+                    Select::make('client_id')->label('Client')->options(fn () => \App\Models\Client::where('agency_id', Filament::getTenant()->id)->orderBy('name')->pluck('name', 'id'))
+                        ->searchable()->helperText('Rows count toward this client\'s results. Results = the conversions / results column.'),
                     FileUpload::make('file')->label('CSV file')->disk('local')->directory('imports')
                         ->acceptedFileTypes(['text/csv', 'text/plain', 'application/csv', 'application/vnd.ms-excel'])->maxSize(10240)
                         ->helperText('Export from the network as CSV (up to 10 MB, 50,000 rows).'),
@@ -38,9 +40,9 @@ class ListDataImports extends ListRecords
                         if (! empty($data['file'])) {
                             $csv = Storage::disk('local')->get($data['file']);
                             Storage::disk('local')->delete($data['file']);
-                            $import = MetricsImporter::import($agency, auth()->user(), $data['network'], (string) $csv, basename($data['file']), 'file');
+                            $import = MetricsImporter::import($agency, auth()->user(), $data['network'], (string) $csv, basename($data['file']), 'file', $data['client_id'] ?? null);
                         } elseif (! empty($data['sheet'])) {
-                            $import = MetricsImporter::import($agency, auth()->user(), $data['network'], MetricsImporter::fetchSheet($data['sheet']), $data['sheet'], 'sheet');
+                            $import = MetricsImporter::import($agency, auth()->user(), $data['network'], MetricsImporter::fetchSheet($data['sheet']), $data['sheet'], 'sheet', $data['client_id'] ?? null);
                         } else {
                             Notification::make()->title('Choose a CSV file or paste a Google Sheets link')->warning()->send();
 

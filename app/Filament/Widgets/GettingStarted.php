@@ -28,6 +28,7 @@ class GettingStarted extends Widget
             ['Create your workspace', 'Name, country, time zone and currency.', true, $base.'/profile'],
             ['Invite your team', 'Add account managers and analysts.', $a->members()->count() > 1 || $a->invitations()->exists(), $base.'/members'],
             ['Connect a network', 'Meta, Google Ads or GA4 to start.', $a->connections()->exists(), $base.'/networks'],
+            ['Add your clients', 'Targets, currency and which ad accounts belong to each.', $a->clients()->exists(), $base.'/clients'],
             ['Choose the ad accounts to track', 'Pick which accounts count toward your plan.', $a->adAccounts()->where('is_active', true)->exists(), $base.'/ad-accounts'],
             ['Import data from other networks', 'CSV or Google Sheets, for networks without an API.', $a->dataImports()->exists(), $base.'/imports'],
         ];

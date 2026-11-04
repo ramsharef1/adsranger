@@ -15,7 +15,7 @@ class Agency extends Model
 
     protected function casts(): array
     {
-        return ['trial_ends_at' => 'datetime'];
+        return ['trial_ends_at' => 'datetime', 'digest_sent_on' => 'date', 'alerts_run_on' => 'date'];
     }
 
     public function owner(): BelongsTo
@@ -46,6 +46,26 @@ class Agency extends Model
     public function adAccounts(): HasMany
     {
         return $this->hasMany(AdAccount::class);
+    }
+
+    public function clients(): HasMany
+    {
+        return $this->hasMany(Client::class);
+    }
+
+    public function alerts(): HasMany
+    {
+        return $this->hasMany(Alert::class);
+    }
+
+    public function alertRules(): HasMany
+    {
+        return $this->hasMany(AlertRule::class);
+    }
+
+    public function syncRuns(): HasMany
+    {
+        return $this->hasMany(SyncRun::class);
     }
 
     public function dataImports(): HasMany

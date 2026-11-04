@@ -120,7 +120,7 @@ class MetricsImporter
         }
     }
 
-    public static function import(Agency $agency, User $user, string $network, string $csv, string $filename, string $source = 'file'): DataImport
+    public static function import(Agency $agency, User $user, string $network, string $csv, string $filename, string $source = 'file', ?int $clientId = null): DataImport
     {
         $csv = str_replace(["\r\n", "\r"], "\n", $csv);
         $lines = array_values(array_filter(explode("\n", $csv), fn ($l) => trim($l) !== ''));
@@ -139,8 +139,8 @@ class MetricsImporter
             throw new RuntimeException('Too many rows (max '.self::MAX_ROWS.' per import).');
         }
 
-        return DB::transaction(function () use ($agency, $user, $network, $lines, $delim, $map, $headers, $filename, $source) {
-            $import = DataImport::create(['agency_id' => $agency->id, 'user_id' => $user->id, 'network' => $network, 'source' => $source,
+        return DB::transaction(function () use ($agency, $user, $network, $lines, $delim, $map, $headers, $filename, $source, $clientId) {
+            $import = DataImport::create(['agency_id' => $agency->id, 'client_id' => $clientId, 'user_id' => $user->id, 'network' => $network, 'source' => $source,
                 'filename' => Str::limit($filename, 190), 'mapping' => collect($map)->map(fn ($i) => $headers[$i])->all()]);
             $get = fn ($row, $f) => isset($map[$f]) ? ($row[$map[$f]] ?? null) : null;
             $batch = [];
@@ -153,11 +153,11 @@ class MetricsImporter
                     continue; // skip totals / blank rows
                 }
                 $batch[] = [
-                    'agency_id' => $agency->id, 'data_import_id' => $import->id, 'network' => $network, 'date' => $d,
+                    'agency_id' => $agency->id, 'client_id' => $clientId, 'level' => 'campaign', 'result_type' => 'conversion', 'data_import_id' => $import->id, 'network' => $network, 'date' => $d,
                     'campaign_id' => Str::limit((string) $get($r, 'campaign_id'), 190, '') ?: null,
                     'campaign_name' => Str::limit((string) $get($r, 'campaign_name'), 250, '') ?: null,
                     'spend' => static::num($get($r, 'spend')), 'impressions' => (int) static::num($get($r, 'impressions')),
-                    'clicks' => (int) static::num($get($r, 'clicks')), 'conversions' => static::num($get($r, 'conversions')),
+                    'clicks' => (int) static::num($get($r, 'clicks')), 'conversions' => static::num($get($r, 'conversions')), 'results' => static::num($get($r, 'conversions')),
                     'revenue' => static::num($get($r, 'revenue')),
                     'currency' => Str::upper(Str::limit((string) ($get($r, 'currency') ?: $agency->currency), 8, '')),
                     'source' => 'import', 'created_at' => $now, 'updated_at' => $now,

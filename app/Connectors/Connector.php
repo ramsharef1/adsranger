@@ -52,6 +52,21 @@ abstract class Connector
         return [];
     }
 
+    /** True when this connector can pull structure + daily metrics. */
+    public function supportsSync(): bool
+    {
+        return false;
+    }
+
+    /**
+     * Pull structure and daily metrics for one ad account and date range.
+     * @return array{campaigns:array,ad_sets:array,ads:array,rows:array}
+     */
+    public function pull(\App\Models\AdAccount $account, string $from, string $to): array
+    {
+        throw new RuntimeException($this->network->name.' sync is not available yet.');
+    }
+
     /** Check the saved keys without a user. @return array{0:?bool,1:string} [ok (null = cannot test), message] */
     abstract public function test(): array;
 
