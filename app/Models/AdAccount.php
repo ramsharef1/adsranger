@@ -52,7 +52,9 @@ class AdAccount extends Model
             if ($a->wasChanged('client_id')) {
                 DailyMetric::where('ad_account_id', $a->id)->update(['client_id' => $a->client_id]);
                 Alert::where('ad_account_id', $a->id)->update(['client_id' => $a->client_id]);
-                \Illuminate\Support\Facades\DB::table('metric_breakdowns')->where('ad_account_id', $a->id)->update(['client_id' => $a->client_id]);
+                foreach (['metric_breakdowns', 'google_campaign_daily', 'search_terms', 'google_keywords', 'google_asset_groups'] as $t) {
+                    \Illuminate\Support\Facades\DB::table($t)->where('ad_account_id', $a->id)->update(['client_id' => $a->client_id]);
+                }
             }
         });
     }

@@ -118,6 +118,12 @@ class SyncService
             if (! empty($payload['breakdowns'])) {
                 BreakdownStore::replace($account, $payload['breakdowns'], $from, $to);
             }
+            if (! empty($payload['google'])) {
+                GoogleStore::store($account, $payload['google'], $from, $to);
+            }
+            if (! empty($payload['landing_urls'])) {
+                \App\Support\LandingPages::register($account, $payload['landing_urls'], $account->network->key === 'meta' ? 'meta' : 'google');
+            }
 
             return $count;
         });

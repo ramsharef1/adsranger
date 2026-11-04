@@ -3,6 +3,7 @@
 use App\Jobs\DailySync;
 use App\Jobs\RunAlerts;
 use App\Jobs\SnapshotHealth;
+use App\Jobs\CheckLandingPages;
 use App\Support\Fx;
 use Illuminate\Support\Facades\Schedule;
 
@@ -10,4 +11,5 @@ use Illuminate\Support\Facades\Schedule;
 Schedule::job(new DailySync)->dailyAt('02:30')->name('daily-sync')->withoutOverlapping();
 Schedule::job(new RunAlerts)->everyFifteenMinutes()->name('alerts')->withoutOverlapping();
 Schedule::job(new SnapshotHealth)->dailyAt('04:00')->name('health-snapshot')->withoutOverlapping();
+Schedule::job(new CheckLandingPages)->dailyAt('05:10')->name('landing-pages')->withoutOverlapping();
 Schedule::call(fn () => Fx::pull())->dailyAt('01:15')->name('fx-pull')->withoutOverlapping();

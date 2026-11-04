@@ -140,8 +140,24 @@ class MetaConnector extends Connector
                 'start_time' => $s['start_time'] ?? null, 'end_time' => $s['end_time'] ?? null];
         }
         $ads = [];
-        foreach ($this->all("$act/ads", ['fields' => 'id,name,adset_id,campaign_id,effective_status,creative{thumbnail_url,image_url},ad_review_feedback', 'limit' => 200], $token) as $a) {
+        $urls = [];
+        foreach ($this->all("$act/ads", ['fields' => 'id,name,adset_id,campaign_id,effective_status,creative{thumbnail_url,image_url,object_story_spec,asset_feed_spec{link_urls}},ad_review_feedback', 'limit' => 200], $token) as $a) {
             $fb = $a['ad_review_feedback']['global'] ?? null;
+            // Landing URLs for the landing page checker (#49), only from active ads.
+            if (($a['effective_status'] ?? '') === 'ACTIVE') {
+                $spec = $a['creative']['object_story_spec'] ?? [];
+                foreach ([$spec['link_data']['link'] ?? null, $spec['video_data']['call_to_action']['value']['link'] ?? null,
+                    $spec['link_data']['call_to_action']['value']['link'] ?? null] as $u) {
+                    if ($u) {
+                        $urls[$u] = true;
+                    }
+                }
+                foreach ($a['creative']['asset_feed_spec']['link_urls'] ?? [] as $lu) {
+                    if (! empty($lu['website_url'])) {
+                        $urls[$lu['website_url']] = true;
+                    }
+                }
+            }
             $ads[$a['id']] = ['external_id' => $a['id'], 'name' => $a['name'] ?? null, 'campaign' => $a['campaign_id'] ?? null, 'ad_set' => $a['adset_id'] ?? null,
                 'status' => $a['effective_status'] ?? null, 'thumbnail_url' => $a['creative']['thumbnail_url'] ?? ($a['creative']['image_url'] ?? null),
                 'review_feedback' => $fb ? json_encode($fb) : null];
@@ -163,7 +179,7 @@ class MetaConnector extends Connector
 
         $breakdowns = config('insights.pull_breakdowns', true) ? $this->breakdowns($act, $token, $from, $to, $campaigns, $adSets) : [];
 
-        return ['campaigns' => array_values($campaigns), 'ad_sets' => array_values($adSets), 'ads' => array_values($ads), 'rows' => $rows, 'breakdowns' => $breakdowns];
+        return ['campaigns' => array_values($campaigns), 'ad_sets' => array_values($adSets), 'ads' => array_values($ads), 'rows' => $rows, 'breakdowns' => $breakdowns, 'landing_urls' => array_keys($urls)];
     }
 
     /**

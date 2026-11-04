@@ -3,6 +3,9 @@
 // Wave 3b insights: #38 budget planner, #39 reallocation, #41/#42 benchmarks, #43 heatmap, #44 placements + audience, #97 geo, #98 overlap + saturation.
 return [
     'pull_breakdowns' => true,      // Meta + Google: hour, placement, device, region / city, age × gender
+    'pull_google_extras' => true,   // Google: impression share, search terms, keyword QS, PMax asset groups, landing URLs (Wave 3c)
+    'search_terms' => ['waste_min_spend' => 20, 'waste_min_clicks' => 5], // client currency, period shown
+    'landing' => ['slow_ms' => 3000, 'pagespeed_key' => env('PAGESPEED_API_KEY')],
     'curve' => [
         'days' => 90,               // history used to fit the spend → results curve
         'min_points' => 14,         // days with spend and results needed before a curve is shown

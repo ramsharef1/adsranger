@@ -54,6 +54,9 @@ class AlertEngine
             if ($rules['pacing']['enabled'] ?? false) {
                 static::pacing($c, $d, $rules['pacing'], $found);
             }
+            if ($rules['search_term_waste']['enabled'] ?? false) {
+                static::searchTermWaste($c, $d, $rules['search_term_waste'], $found);
+            }
         }
         if ($rules['tracking_issue']['enabled']) {
             static::trackingIssue($a, $d, $rules['tracking_issue'], $found);
@@ -69,6 +72,9 @@ class AlertEngine
         }
         if ($rules['account_health']['enabled']) {
             static::accountHealth($a, $rules['account_health'], $found);
+        }
+        if ($rules['landing_page']['enabled'] ?? false) {
+            static::landingPage($a, $rules['landing_page'], $found);
         }
 
         return static::store($a, $found);
@@ -143,6 +149,30 @@ class AlertEngine
             'detail' => 'Forecast '.number_format($p['forecast_spend'], 2).' vs budget '.number_format($p['budget'], 2).' '.$c->currency.' for '.$p['month_label']
                 .'. Spend about '.number_format((float) $p['daily_needed'], 2).' a day to land on budget.',
             'payload' => ['forecast' => round($p['forecast_spend'], 2), 'budget' => $p['budget'], 'pct' => round($off, 1)]]);
+    }
+
+    /** Search terms with spend and no conversions over the last 7 days (#46). */
+    protected static function searchTermWaste(Client $c, Carbon $d, array $r, array &$found): void
+    {
+        $w = \App\Support\GoogleInsights::wasteTotal($c, $d->copy()->subDays(6)->toDateString(), $d->toDateString());
+        if ($w['count'] && $w['cost'] >= (float) $r['t']['min_spend']) {
+            static::add($found, 'search_term_waste', $r, ['client_id' => $c->id, 'entity_type' => 'client', 'entity_id' => $c->id, 'entity_name' => $c->name,
+                'title' => 'Wasted search terms: '.$c->name,
+                'detail' => number_format($w['cost'], 2).' '.$c->currency.' on '.$w['count'].' search terms with no conversions in the last 7 days. Review them in Google Ads → Search terms.',
+                'payload' => ['cost' => round($w['cost'], 2), 'terms' => $w['count']]]);
+        }
+    }
+
+    /** Broken landing pages that ads still send clicks to (#49). */
+    protected static function landingPage(Agency $a, array $r, array &$found): void
+    {
+        foreach (\App\Models\LandingPage::where('agency_id', $a->id)->where('state', 'broken')->where('clicks_30d', '>=', (int) $r['t']['min_clicks'])
+            ->where('last_seen_at', '>=', now()->subDays(30))->limit(50)->get() as $lp) {
+            static::add($found, 'landing_page', $r, ['client_id' => $lp->client_id, 'entity_type' => 'landing_page', 'entity_id' => $lp->id,
+                'entity_name' => mb_substr($lp->url, 0, 190), 'title' => 'Broken landing page',
+                'detail' => $lp->url.' — '.($lp->error ?: 'HTTP '.$lp->status_code).'. Ads sent '.$lp->clicks_30d.' clicks here in 30 days.',
+                'payload' => ['status' => $lp->status_code]]);
+        }
     }
 
     protected static function trackingIssue(Agency $a, Carbon $d, array $r, array &$found): void

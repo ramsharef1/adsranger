@@ -37,7 +37,7 @@ return [
             ['client_secret', 'OAuth Client Secret', true, 'Same screen as the Client ID > Client secret.'],
             ['project_id', 'Cloud project ID', false, 'Cloud Console project picker > ID column (not the project name).'],
             ['login_customer_id', 'Manager (MCC) account ID', false, 'Optional. 10 digits without dashes, shown top right in Google Ads when signed in to your manager account.'],
-            ['api_version', 'Google Ads API version', false, 'The newest supported version from the Google Ads API release notes, written like v22.'],
+            ['api_version', 'Google Ads API version', false, 'Optional. Leave empty to use v24. Each version works for about a year; use the newest from the Google Ads API release notes, written like v24.'],
         ],
     ],
     'ga4' => [

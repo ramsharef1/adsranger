@@ -75,6 +75,95 @@ class DemoData
             $acct->update(['last_synced_at' => now(), 'sync_status' => 'ok', 'backfilled_at' => now()]);
         }
 
+        $out += static::google($a, min($days, 90));
+
+        return $out;
+    }
+
+    /** Sample Google Ads account for the clinic and the store: Search + PMax, search terms, impression share, Quality Score, asset groups. */
+    protected static function google(Agency $a, int $days): array
+    {
+        $net = AdNetwork::where('key', 'google_ads')->first();
+        if (! $net) {
+            return [];
+        }
+        $conn = Connection::firstOrCreate(['agency_id' => $a->id, 'ad_network_id' => $net->id, 'external_user_id' => self::TAG],
+            ['status' => 'active', 'environment' => self::TAG, 'external_user_name' => 'Demo data']);
+        $tz = $a->timezone ?: 'UTC';
+        $specs = [
+            ['Demo · Smile Dental Clinic', 'JOD', 'https://example.com/smile-dental', [
+                ['g1', 'Search – Dental implants', 'SEARCH', 18, 6.0, ['dental implants amman' => [1, 0.12], 'زراعة اسنان عمان' => [1, 0.1], 'teeth implant price' => [1, 0.08], 'free dental implants' => [0, 0], 'dental implant course' => [0, 0], 'best dentist near me' => [1, 0.05]]],
+                ['g2', 'Search – Teeth whitening', 'SEARCH', 10, 4.0, ['teeth whitening amman' => [1, 0.1], 'تبييض الاسنان' => [1, 0.09], 'whitening strips' => [0, 0], 'teeth whitening at home' => [0, 0.01]]],
+            ]],
+            ['Demo · Souq Store', 'AED', 'https://example.com/souq-store', [
+                ['g3', 'PMax – All products', 'PERFORMANCE_MAX', 60, 22.0, []],
+                ['g4', 'Search – Brand', 'SEARCH', 15, 8.0, ['souq store' => [1, 0.2], 'souq store dubai' => [1, 0.18], 'souq store careers' => [0, 0]]],
+            ]],
+        ];
+        $out = [];
+        foreach ($specs as $i => [$clientName, $cur, $site, $camps]) {
+            $client = Client::where('agency_id', $a->id)->where('name', $clientName)->first();
+            if (! $client) {
+                continue;
+            }
+            $acct = AdAccount::firstOrCreate(['connection_id' => $conn->id, 'external_id' => '99900000'.($i + 1)], [
+                'agency_id' => $a->id, 'ad_network_id' => $net->id, 'client_id' => $client->id, 'name' => $clientName.' · Google', 'currency' => $cur,
+                'timezone' => $tz, 'status' => 'ENABLED', 'is_active' => false]);
+            $p = ['campaigns' => [], 'ad_sets' => [], 'ads' => [], 'rows' => [], 'google' => ['campaign_daily' => [], 'search_terms' => [], 'keywords' => [], 'asset_groups' => [],
+                'landing_urls' => [$site.'?utm_source=google' => 340, $site.'/offers' => 120, 'https://example.com/this-page-does-not-exist-adsranger' => 25]]];
+            foreach ($camps as [$cid, $name, $channel, $budget, $cpa, $terms]) {
+                $p['campaigns'][] = ['external_id' => $cid, 'name' => $name, 'status' => 'ENABLED', 'channel' => $channel, 'daily_budget' => $budget];
+                for ($d = $days; $d >= 1; $d--) {
+                    $date = now($tz)->subDays($d)->toDateString();
+                    $cost = round($budget * (0.7 + mt_rand(0, 50) / 100), 2);
+                    $conv = round($cost / ($cpa * (0.7 + mt_rand(0, 60) / 100)), 1);
+                    $p['rows'][] = ['date' => $date, 'level' => 'campaign', 'campaign' => $cid, 'ad_set' => null, 'ad' => null]
+                        + ResultResolver::google(['cost_micros' => $cost * 1e6, 'impressions' => (int) ($cost * mt_rand(40, 90)), 'clicks' => (int) ($cost * mt_rand(2, 4)),
+                            'conversions' => $conv, 'conversions_value' => $channel === 'PERFORMANCE_MAX' ? $conv * mt_rand(90, 240) : 0]);
+                    if ($channel === 'SEARCH') {
+                        $p['google']['campaign_daily'][] = ['campaign' => $cid, 'date' => $date, 'search_is' => 0.35 + mt_rand(0, 30) / 100,
+                            'lost_budget' => $budget < 15 ? 0.25 + mt_rand(0, 10) / 100 : 0.05, 'lost_rank' => 0.2 + mt_rand(0, 15) / 100,
+                            'top_is' => 0.5 + mt_rand(0, 20) / 100, 'abs_top_is' => 0.2 + mt_rand(0, 15) / 100];
+                        if ($d <= 30) {
+                            foreach ($terms as $t => [$good, $rate]) {
+                                $clicks = mt_rand(0, 4);
+                                if (! $clicks) {
+                                    continue;
+                                }
+                                $p['google']['search_terms'][] = ['campaign' => $cid, 'ad_group' => $cid.'ag', 'term' => $t, 'status' => 'NONE', 'date' => $date,
+                                    'impressions' => $clicks * mt_rand(8, 20), 'clicks' => $clicks, 'cost' => round($clicks * $cpa * 0.15, 2),
+                                    'conversions' => $good && mt_rand(0, 99) < $rate * 300 ? 1 : 0, 'conv_value' => 0];
+                            }
+                        }
+                    }
+                }
+                foreach (array_keys($terms) as $k => $t) {
+                    if ($terms[$t][0]) {
+                        $p['google']['keywords'][] = ['campaign' => $cid, 'ad_group' => $cid.'ag', 'id' => $cid.$k, 'text' => $t, 'match_type' => $k % 2 ? 'PHRASE' : 'EXACT',
+                            'status' => 'ENABLED', 'qs' => [8, 6, 4, 7, 3, 9][$k % 6], 'creative_qs' => ['ABOVE_AVERAGE', 'AVERAGE', 'BELOW_AVERAGE'][$k % 3],
+                            'landing_qs' => ['AVERAGE', 'ABOVE_AVERAGE', 'BELOW_AVERAGE'][$k % 3], 'ctr_qs' => ['ABOVE_AVERAGE', 'AVERAGE', 'BELOW_AVERAGE'][($k + 1) % 3],
+                            'impressions' => mt_rand(800, 4000), 'clicks' => mt_rand(40, 200), 'cost' => mt_rand(60, 300), 'conversions' => mt_rand(2, 25)];
+                    }
+                }
+                if ($channel === 'PERFORMANCE_MAX') {
+                    foreach ([['All products', 'GOOD'], ['Summer sale', 'POOR']] as $g => [$gName, $strength]) {
+                        $p['google']['asset_groups'][] = ['campaign' => $cid, 'campaign_name' => $name, 'id' => $cid.'grp'.$g, 'name' => $gName, 'status' => 'ENABLED',
+                            'ad_strength' => $strength, 'impressions' => mt_rand(20000, 60000), 'clicks' => mt_rand(500, 1500), 'cost' => $g ? 420 : 1300, 'conversions' => $g ? 9 : 58,
+                            'conv_value' => $g ? 1800 : 12600, 'assets' => [
+                                ['field' => 'HEADLINE', 'label' => 'BEST', 'type' => 'TEXT', 'text' => 'Free delivery across the UAE'],
+                                ['field' => 'HEADLINE', 'label' => 'GOOD', 'type' => 'TEXT', 'text' => 'تسوق الآن'],
+                                ['field' => 'HEADLINE', 'label' => 'LOW', 'type' => 'TEXT', 'text' => 'Great products'],
+                                ['field' => 'DESCRIPTION', 'label' => 'LEARNING', 'type' => 'TEXT', 'text' => 'New arrivals every week'],
+                                ['field' => 'MARKETING_IMAGE', 'label' => $g ? 'LOW' : 'GOOD', 'type' => 'IMAGE', 'text' => 'Banner 1200x628'],
+                            ]];
+                    }
+                }
+            }
+            $from = now($tz)->subDays($days)->toDateString();
+            $out[$clientName.' · Google'] = SyncService::ingest($acct, $p, $from, now()->toDateString());
+            $acct->update(['last_synced_at' => now(), 'sync_status' => 'ok', 'backfilled_at' => now()]);
+        }
+
         return $out;
     }
 
@@ -154,10 +243,11 @@ class DemoData
 
     public static function remove(Agency $a): void
     {
-        $conn = Connection::where('agency_id', $a->id)->where('external_user_id', self::TAG)->first();
-        if ($conn) {
+        foreach (Connection::where('agency_id', $a->id)->where('external_user_id', self::TAG)->get() as $conn) {
+            $clientIds = $conn->adAccounts()->pluck('client_id')->filter();
             \App\Models\DailyMetric::whereIn('ad_account_id', $conn->adAccounts()->pluck('id'))->delete();
-            Client::whereIn('id', $conn->adAccounts()->pluck('client_id')->filter())->delete();
+            \App\Models\LandingPage::where('agency_id', $a->id)->whereIn('client_id', $clientIds)->delete();
+            Client::whereIn('id', $clientIds)->delete();
             $conn->delete(); // cascades to ad accounts, structure and metrics
         }
     }
