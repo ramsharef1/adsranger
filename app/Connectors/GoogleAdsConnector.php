@@ -13,9 +13,20 @@ use RuntimeException;
 class GoogleAdsConnector extends Connector
 {
     /** Each major Google Ads API version is supported for about a year (monthly releases since 2026). Override in /admin → Ad Networks. */
-    public const DEFAULT_VERSION = 'v24';
+    public const DEFAULT_VERSION = 'v26';
+
+    /** Oldest major version still accepted as a stored override (v24 sunsets ~May 2027, ADSR-050). */
+    public const MIN_MAJOR = 24;
 
     protected string $scope = 'https://www.googleapis.com/auth/adwords';
+
+    /** The stored override (like v26) if it is well-formed and not older than MIN_MAJOR; otherwise the default. */
+    public function apiVersion(): string
+    {
+        $v = strtolower(trim((string) $this->cred('api_version', '')));
+
+        return preg_match('/^v(\d+)$/', $v, $m) && (int) $m[1] >= self::MIN_MAJOR ? $v : self::DEFAULT_VERSION;
+    }
 
     public function supportsConnect(): bool
     {
@@ -65,7 +76,7 @@ class GoogleAdsConnector extends Connector
     public function accounts(Connection $connection): array
     {
         $token = $this->freshToken($connection);
-        $v = $this->cred('api_version', self::DEFAULT_VERSION);
+        $v = $this->apiVersion();
         $headers = array_filter(['login-customer-id' => preg_replace('/\D/', '', (string) $this->cred('login_customer_id')) ?: null]);
         $res = Http::withToken($token)->withHeaders($headers)->timeout(30)->get("https://googleads.googleapis.com/{$v}/customers:listAccessibleCustomers");
         if ($res->failed()) {
@@ -102,7 +113,7 @@ class GoogleAdsConnector extends Connector
     protected function search(Connection $c, string $customerId, string $query): array
     {
         $token = $this->freshToken($c);
-        $v = $this->cred('api_version', self::DEFAULT_VERSION);
+        $v = $this->apiVersion();
         $headers = array_filter(['login-customer-id' => preg_replace('/\D/', '', (string) $this->cred('login_customer_id')) ?: null]);
         $out = [];
         $body = ['query' => $query];
@@ -249,7 +260,7 @@ class GoogleAdsConnector extends Connector
     {
         $c = $account->connection ?: throw new RuntimeException('The Google Ads connection is missing. Reconnect it.');
         $cid = preg_replace('/\D/', '', $account->external_id);
-        $v = $this->cred('api_version', self::DEFAULT_VERSION);
+        $v = $this->apiVersion();
         $headers = array_filter(['login-customer-id' => preg_replace('/\D/', '', (string) $this->cred('login_customer_id')) ?: null]);
         $ops = array_map(fn ($i) => ['create' => ['campaign' => "customers/$cid/campaigns/".preg_replace('/\D/', '', (string) $i['campaign']), 'negative' => true,
             'keyword' => ['text' => mb_substr((string) $i['text'], 0, 80), 'matchType' => $i['match'] === 'PHRASE' ? 'PHRASE' : 'EXACT']]], $items);

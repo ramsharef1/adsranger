@@ -15,6 +15,12 @@ class LinkedInConnector extends Connector
 
     protected const TOKEN = 'https://www.linkedin.com/oauth/v2/accessToken';
 
+    /** Tested default for the LinkedIn-Version header. Each version lives about a year; bump before it sunsets (ADSR-050). */
+    public const DEFAULT_VERSION = '202610';
+
+    /** A stored override older than this many months is ignored (LinkedIn sunsets versions after about a year). */
+    protected const MAX_AGE_MONTHS = 11;
+
     protected const OBJECTIVES = [
         'LEAD_GENERATION' => 'lead', 'WEBSITE_CONVERSION' => 'conversion', 'WEBSITE_VISIT' => 'link_click', 'BRAND_AWARENESS' => 'impressions',
         'VIDEO_VIEW' => 'thruplay', 'ENGAGEMENT' => 'engagement', 'JOB_APPLICANT' => 'lead', 'TALENT_LEAD' => 'lead', 'CREATIVE_ENGAGEMENT' => 'engagement',
@@ -30,9 +36,15 @@ class LinkedInConnector extends Connector
         return true;
     }
 
-    protected function version(): string
+    /** The stored yyyymm override if it is well-formed, not in the future and not near its sunset; otherwise the tested default. */
+    public function version(): string
     {
-        return $this->cred('api_version', now()->subMonths(2)->format('Ym'));
+        $v = trim((string) $this->cred('api_version', ''));
+        if (preg_match('/^\d{6}$/', $v) && $v >= now()->subMonths(self::MAX_AGE_MONTHS)->format('Ym') && $v <= now()->format('Ym')) {
+            return $v;
+        }
+
+        return self::DEFAULT_VERSION;
     }
 
     public function authorizeUrl(string $state): string
