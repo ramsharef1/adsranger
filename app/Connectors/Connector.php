@@ -2,6 +2,7 @@
 
 namespace App\Connectors;
 
+use App\Models\AdAccount;
 use App\Models\AdNetwork;
 use App\Models\Connection;
 use Illuminate\Support\Facades\Http;
@@ -65,6 +66,89 @@ abstract class Connector
     public function pull(\App\Models\AdAccount $account, string $from, string $to): array
     {
         throw new RuntimeException($this->network->name.' sync is not available yet.');
+    }
+
+    /** Current access token, refreshed first when it is about to expire. */
+    protected function token(Connection $c): string
+    {
+        if ($c->refresh_token && $c->token_expires_at && $c->token_expires_at->lt(now()->addMinutes(2))) {
+            $t = $this->refresh((string) $c->refresh_token);
+            $c->update(['access_token' => $t['access_token'], 'refresh_token' => $t['refresh_token'] ?? $c->refresh_token,
+                'token_expires_at' => ! empty($t['expires_in']) ? now()->addSeconds((int) $t['expires_in'] - 60) : null]);
+        }
+
+        return $c->access_token ?: throw new RuntimeException($this->network->name.': no access token. Reconnect the account.');
+    }
+
+    /** @return array{access_token:string,refresh_token:?string,expires_in:?int} */
+    protected function refresh(string $refreshToken): array
+    {
+        throw new RuntimeException($this->network->name.': the token expired. Reconnect the account.');
+    }
+
+    /** Standard OAuth2 refresh_token grant. */
+    protected function oauthRefresh(string $url, string $refreshToken, array $extra = []): array
+    {
+        $res = Http::asForm()->timeout(20)->post($url, $extra + ['grant_type' => 'refresh_token', 'refresh_token' => $refreshToken,
+            'client_id' => $this->cred('client_id'), 'client_secret' => $this->cred('client_secret')]);
+        $tok = $res->json('access_token') ?: throw new RuntimeException($this->network->name.' refresh failed: '.($res->json('error_description') ?? $res->json('error') ?? 'HTTP '.$res->status()));
+
+        return ['access_token' => $tok, 'refresh_token' => $res->json('refresh_token'), 'expires_in' => $res->json('expires_in')];
+    }
+
+    /** Split a date range into windows of at most $days days. @return array<int, array{0:string,1:string}> */
+    protected static function windows(string $from, string $to, int $days): array
+    {
+        $out = [];
+        $f = \Carbon\Carbon::parse($from);
+        $end = \Carbon\Carbon::parse($to);
+        while ($f->lte($end)) {
+            $t = $f->copy()->addDays($days - 1)->min($end);
+            $out[] = [$f->toDateString(), $t->toDateString()];
+            $f = $t->copy()->addDay();
+        }
+
+        return $out;
+    }
+
+    /** A metrics row with every counter present. */
+    protected static function metrics(array $m, string $type, ?float $results = null): array
+    {
+        $base = array_fill_keys(['impressions', 'reach', 'clicks', 'link_clicks'], 0)
+            + array_fill_keys(['spend', 'purchases', 'leads', 'messages', 'calls', 'calls_confirmed', 'calls_20s', 'thruplays', 'landing_views', 'add_to_cart', 'checkouts', 'revenue'], 0.0);
+        $m = array_merge($base, $m);
+        $m['results'] = (float) ($results ?? match ($type) {
+            'purchase' => $m['purchases'], 'lead' => $m['leads'], 'message' => $m['messages'], 'link_click' => $m['link_clicks'],
+            'landing_page_view' => $m['landing_views'], 'thruplay' => $m['thruplays'], 'reach' => $m['reach'], 'impressions' => $m['impressions'],
+            'conversion' => $m['purchases'] + $m['leads'], default => 0,
+        });
+        $m['result_type'] = $type;
+        $m['roas_eligible'] = in_array($type, ['purchase', 'conversion'], true) && $m['revenue'] > 0;
+
+        return $m;
+    }
+
+    /**
+     * Problems with an ad account (disabled, payment, restrictions, rejected ads).
+     * @return array<int, array{0:string,1:string}> [severity high|medium, message]
+     */
+    public function health(AdAccount $account): array
+    {
+        if (! $account->connection || ! $this->supportsSync()) {
+            return [];
+        }
+        foreach ($this->accounts($account->connection) as $a) {
+            if ((string) $a['id'] === (string) $account->external_id) {
+                $st = strtoupper((string) ($a['status'] ?? ''));
+                if ($st && preg_match('/DISABLE|SUSPEND|CLOSED|CANCEL|DELETE|PAUSED_BY|LIMIT|RESTRICT|PENDING|FRAUD|DENY/', $st)) {
+                    return [['high', 'Account status on '.$this->network->name.': '.str_replace('_', ' ', strtolower($st)).'.']];
+                }
+
+                return [];
+            }
+        }
+
+        return [['high', 'The account is no longer reachable with this connection. It may have been removed or access was revoked.']];
     }
 
     /** Check the saved keys without a user. @return array{0:?bool,1:string} [ok (null = cannot test), message] */

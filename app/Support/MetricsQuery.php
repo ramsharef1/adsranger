@@ -158,6 +158,42 @@ class MetricsQuery
         return array_slice($ads, 0, $limit);
     }
 
+    /** Google conversions by action (#13): [action => [category, conversions, value]] for the period. */
+    public static function conversionActions(Client $c, string $from, string $to): array
+    {
+        $out = [];
+        foreach (static::base($c, $from, $to)->whereNotNull('breakdown')->pluck('breakdown') as $b) {
+            foreach ((array) (is_string($b) ? json_decode($b, true) : $b) as $a) {
+                $k = $a['action'] ?? '?';
+                $o = $out[$k] ?? ['category' => $a['category'] ?? null, 'conversions' => 0.0, 'value' => 0.0];
+                $o['conversions'] += (float) ($a['conversions'] ?? 0);
+                $o['value'] += (float) ($a['value'] ?? 0);
+                $out[$k] = $o;
+            }
+        }
+        uasort($out, fn ($x, $y) => $y['conversions'] <=> $x['conversions']);
+
+        return $out;
+    }
+
+    /** Full funnel (#16) from totals: steps with counts and step-to-step rates. Empty steps are dropped. */
+    public static function funnel(array $t): array
+    {
+        $sales = $t['purchases'] > 0 || $t['add_to_cart'] > 0 || $t['checkouts'] > 0;
+        $steps = array_filter([
+            'Impressions' => $t['impressions'], 'Link clicks' => $t['link_clicks'] ?: $t['clicks'], 'Landing page views' => $t['landing_views'],
+        ] + ($sales ? ['Add to cart' => $t['add_to_cart'], 'Checkouts' => $t['checkouts'], 'Purchases' => $t['purchases']]
+            : ['Leads' => $t['leads'], 'Conversations' => $t['messages'], 'Calls' => $t['calls']]), fn ($v) => $v > 0);
+        $out = [];
+        $prev = null;
+        foreach ($steps as $label => $n) {
+            $out[] = ['label' => $label, 'n' => $n, 'rate' => $prev ? $n / $prev * 100 : null];
+            $prev = $n;
+        }
+
+        return $out;
+    }
+
     /** Freshest successful sync among the client's accounts. */
     public static function lastSynced(Client $c): ?\Carbon\CarbonInterface
     {

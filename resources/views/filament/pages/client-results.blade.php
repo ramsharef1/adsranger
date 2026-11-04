@@ -84,6 +84,45 @@
         </x-filament::section>
     @endif
 
+    @if (count($funnel) > 1)
+        <x-filament::section>
+            <x-slot name="heading">Funnel</x-slot>
+            @php $fTop = max(1, $funnel[0]['n']); @endphp
+            <div style="display:grid;gap:8px">
+                @foreach ($funnel as $f)
+                    <div style="display:grid;grid-template-columns:150px 1fr 150px;gap:10px;align-items:center;font-size:13px">
+                        <div>{{ $f['label'] }}</div>
+                        <div style="height:14px;border-radius:6px;background:rgba(148,163,184,.18);overflow:hidden">
+                            <div style="height:14px;width:{{ max(1, round(log10(max(1, $f['n'])) / log10(max(10, $fTop)) * 100)) }}%;background:#14B8A6"></div>
+                        </div>
+                        <div style="text-align:end"><strong>{{ number_format($f['n']) }}</strong>@if ($f['rate'] !== null)<span style="{{ $muted }}"> · {{ number_format($f['rate'], $f['rate'] < 1 ? 2 : 1) }}%</span>@endif</div>
+                    </div>
+                @endforeach
+            </div>
+            <div style="{{ $muted }};margin-top:6px">Bars use a log scale so small steps stay visible. % = share of the step before.</div>
+        </x-filament::section>
+    @endif
+
+    @if (count($actions))
+        <x-filament::section>
+            <x-slot name="heading">Google conversions by action</x-slot>
+            <table style="width:100%;border-collapse:collapse;font-size:13px">
+                <thead><tr style="{{ $muted }}"><th style="padding:6px;text-align:start">Conversion action</th><th style="padding:6px;text-align:start">Category</th>
+                    <th style="padding:6px;text-align:end">Conversions</th><th style="padding:6px;text-align:end">Value</th></tr></thead>
+                <tbody>
+                @foreach ($actions as $name => $a)
+                    <tr style="border-top:1px solid rgba(148,163,184,.2)">
+                        <td style="padding:6px">{{ $name }}</td><td style="padding:6px">{{ $a['category'] ? ucfirst(strtolower(str_replace('_', ' ', $a['category']))) : '–' }}</td>
+                        <td style="padding:6px;text-align:end">{{ number_format($a['conversions'], 1) }}</td>
+                        <td style="padding:6px;text-align:end">{{ $a['value'] > 0 ? R::money($a['value']) : '–' }}</td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+            <div style="{{ $muted }};margin-top:6px">Count-only actions carry no value. Results above use primary conversion actions only.</div>
+        </x-filament::section>
+    @endif
+
     <x-filament::section>
         <x-slot name="heading">6-month trend</x-slot>
         <div style="display:grid;grid-template-columns:repeat({{ count($months) }},1fr);gap:10px;align-items:end;height:170px">

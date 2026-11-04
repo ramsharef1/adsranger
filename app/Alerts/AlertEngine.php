@@ -63,6 +63,9 @@ class AlertEngine
         if ($rules['connection_problem']['enabled']) {
             static::connectionProblem($a, $rules['connection_problem'], $found);
         }
+        if ($rules['account_health']['enabled']) {
+            static::accountHealth($a, $rules['account_health'], $found);
+        }
 
         return static::store($a, $found);
     }
@@ -199,6 +202,21 @@ class AlertEngine
             if ($why) {
                 static::add($found, 'connection_problem', $r, ['client_id' => $acct->client_id, 'ad_account_id' => $acct->id, 'entity_type' => 'ad_account',
                     'entity_id' => $acct->id, 'entity_name' => $acct->name, 'title' => 'Connection problem: '.($acct->network?->name).' · '.$acct->name, 'detail' => $why]);
+            }
+        }
+    }
+
+    protected static function accountHealth(Agency $a, array $r, array &$found): void
+    {
+        foreach (AdAccount::with('network')->where('agency_id', $a->id)->where('is_active', true)->whereNotNull('health')->get() as $acct) {
+            foreach ((array) $acct->health as $i => $issue) {
+                [$sev, $msg] = array_pad((array) $issue, 2, '');
+                if (str_contains($msg, 'rejected') && (int) preg_replace('/\D.*/', '', $msg) < (int) $r['t']['min_rejected']) {
+                    continue;
+                }
+                static::add($found, 'account_health', ['severity' => $sev === 'medium' ? 'medium' : 'high'] + $r, ['client_id' => $acct->client_id, 'ad_account_id' => $acct->id,
+                    'entity_type' => 'ad_account', 'entity_id' => $acct->id * 100 + $i, 'entity_name' => $acct->name,
+                    'title' => 'Account health: '.($acct->network?->name).' · '.$acct->name, 'detail' => $msg]);
             }
         }
     }

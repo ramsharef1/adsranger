@@ -22,6 +22,7 @@ class DailySync implements ShouldQueue
                 $tz = $a->timezone ?: ($a->agency->timezone ?? 'UTC');
                 $today = now($tz);
                 SyncAdAccount::dispatch($a->id, $today->copy()->subDays(3)->toDateString(), $today->toDateString(), 'daily');
+                CheckAccountHealth::dispatch($a->id);
                 if (! $a->backfilled_at) {
                     \App\Sync\SyncService::queueBackfill($a);
                 }

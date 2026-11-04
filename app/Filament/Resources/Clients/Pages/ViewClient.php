@@ -55,11 +55,15 @@ class ViewClient extends ViewRecord
         [$pf, $pt] = Periods::previous($from, $to);
         $level = $this->adSet ? 'ad' : ($this->campaign ? 'ad_set' : 'campaign');
 
+        $t = MetricsQuery::totals($c, $from, $to);
+
         return [
             'client' => $c,
+            'funnel' => MetricsQuery::funnel($t),
+            'actions' => MetricsQuery::conversionActions($c, $from, $to),
             'from' => $from, 'to' => $to,
             'periods' => Periods::options(),
-            't' => MetricsQuery::totals($c, $from, $to),
+            't' => $t,
             'prev' => MetricsQuery::totals($c, $pf, $pt),
             'months' => MetricsQuery::monthly($c, 6),
             'level' => $level,

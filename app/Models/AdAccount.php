@@ -12,7 +12,7 @@ class AdAccount extends Model
 
     protected function casts(): array
     {
-        return ['is_active' => 'boolean', 'last_synced_at' => 'datetime', 'backfilled_at' => 'datetime'];
+        return ['is_active' => 'boolean', 'last_synced_at' => 'datetime', 'backfilled_at' => 'datetime', 'meta' => 'array', 'health' => 'array', 'health_checked_at' => 'datetime'];
     }
 
     public function agency(): BelongsTo

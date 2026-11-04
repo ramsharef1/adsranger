@@ -161,4 +161,29 @@ class MetaConnector extends Connector
 
         return ['campaigns' => array_values($campaigns), 'ad_sets' => array_values($adSets), 'ads' => array_values($ads), 'rows' => $rows];
     }
+
+    public function health(AdAccount $account): array
+    {
+        $token = $account->connection?->access_token;
+        if (! $token) {
+            return [['high', 'The Meta connection has no token. Reconnect it.']];
+        }
+        $res = Http::timeout(30)->get($this->graph($account->external_id), ['fields' => 'account_status,disable_reason,amount_spent,spend_cap', 'access_token' => $token]);
+        if ($res->failed()) {
+            return [['high', 'Meta: '.($res->json('error.message') ?? 'the account could not be read')]];
+        }
+        $out = [];
+        $st = (int) $res->json('account_status');
+        $names = [2 => 'disabled', 3 => 'unsettled (a payment failed)', 7 => 'pending risk review', 8 => 'pending settlement', 9 => 'in grace period (payment due)', 100 => 'pending closure', 101 => 'closed'];
+        if (isset($names[$st])) {
+            $out[] = [in_array($st, [9, 8], true) ? 'medium' : 'high', 'Meta account is '.$names[$st].'.'.((int) $res->json('disable_reason') ? ' Disable reason code '.$res->json('disable_reason').'.' : '')];
+        }
+        $cap = (float) $res->json('spend_cap');
+        $spent = (float) $res->json('amount_spent');
+        if ($cap > 0 && $spent / $cap >= 0.9) {
+            $out[] = [$spent >= $cap ? 'high' : 'medium', 'Account spending limit '.round($spent / $cap * 100).'% used ('.number_format($spent / 100, 2).' of '.number_format($cap / 100, 2).' '.$account->currency.').'];
+        }
+
+        return $out;
+    }
 }

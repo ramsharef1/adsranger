@@ -79,6 +79,10 @@ class AdAccountResource extends Resource
                     ->formatStateUsing(fn ($state) => ['ok' => 'OK', 'error' => 'Error', 'running' => 'Running'][$state] ?? 'Not yet')
                     ->tooltip(fn (AdAccount $r) => $r->sync_error),
                 TextColumn::make('last_synced_at')->label('Data updated')->since()->placeholder('—'),
+                TextColumn::make('health')->label('Health')->badge()
+                    ->state(fn (AdAccount $r) => $r->health_checked_at ? (empty($r->health) ? 'OK' : count($r->health).' issue(s)') : null)
+                    ->color(fn ($state) => $state === 'OK' ? 'success' : 'danger')->placeholder('Not checked')
+                    ->tooltip(fn (AdAccount $r) => collect((array) $r->health)->map(fn ($i) => $i[1] ?? '')->implode(' · ') ?: null),
             ])
             ->filters([
                 SelectFilter::make('ad_network_id')->label('Network')->relationship('network', 'name'),
@@ -111,6 +115,14 @@ class AdAccountResource extends Resource
                         $tz = $r->timezone ?: (Filament::getTenant()->timezone ?: 'UTC');
                         SyncAdAccount::dispatch($r->id, now($tz)->subDays(7)->toDateString(), now($tz)->toDateString(), 'manual');
                         Notification::make()->title('Sync queued')->body('The last 7 days are being refreshed.')->success()->send();
+                    }),
+                Action::make('health')->label('Check health')->icon('heroicon-o-heart')->color('gray')
+                    ->visible(fn (AdAccount $r) => $can() && $r->is_active && $r->network && ConnectorRegistry::for($r->network)->supportsSync())
+                    ->action(function (AdAccount $r) {
+                        (new \App\Jobs\CheckAccountHealth($r->id))->handle();
+                        $r->refresh();
+                        Notification::make()->title(empty($r->health) ? 'No problems found' : count($r->health).' issue(s) found')
+                            ->body(collect((array) $r->health)->map(fn ($i) => $i[1])->implode("\n") ?: null)->{empty($r->health) ? 'success' : 'warning'}()->send();
                     }),
                 Action::make('untrack')->label('Stop tracking')->icon('heroicon-o-pause')->color('gray')
                     ->visible(fn (AdAccount $r) => $can() && $r->is_active)

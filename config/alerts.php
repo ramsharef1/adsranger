@@ -17,6 +17,8 @@ return [
             'help' => 'An active campaign or ad set ends within this many days.', 'thresholds' => ['days' => 3]],
         'connection_problem' => ['label' => 'Connection problem', 'severity' => 'high',
             'help' => 'Token expired or revoked, or the account failed to sync this many times in a row.', 'thresholds' => ['failures' => 2]],
+        'account_health' => ['label' => 'Account health', 'severity' => 'high',
+            'help' => 'Disabled or restricted account, failed payment, spending limit nearly used, or rejected ads (checked every night).', 'thresholds' => ['min_rejected' => 1]],
     ],
     'severities' => ['high' => 'High', 'medium' => 'Medium', 'low' => 'Low'],
     'conversion_goals' => ['OFFSITE_CONVERSIONS', 'VALUE', 'LEAD_GENERATION', 'QUALITY_LEAD', 'CONVERSATIONS', 'QUALITY_CALL'],

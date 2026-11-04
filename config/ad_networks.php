@@ -123,6 +123,7 @@ return [
         'fields' => [
             ['client_id', 'Client ID', false, 'Developer app > Auth tab > Client ID.'],
             ['client_secret', 'Primary Client Secret', true, 'Developer app > Auth tab > Primary Client Secret.'],
+            ['api_version', 'API version (optional)', false, 'Format yyyymm, e.g. 202509. Leave empty to use a recent version automatically.'],
         ],
     ],
     'x' => [

@@ -49,13 +49,14 @@ class ConnectController extends Controller
         abort_unless($user->canAccessTenant($agency) && TeamRoles::canManageData($user, $agency), 403);
         $back = '/app/'.$agency->slug.'/connections';
 
-        if ($request->query('error') || ! $request->query('code')) {
+        $code = (string) ($request->query('code') ?? $request->query('oauth_verifier') ?? $request->query('auth_code'));
+        if ($request->query('error') || $request->query('denied') || $code === '') {
             return redirect($back)->with('connect_error', 'Connection cancelled: '.Str::limit((string) ($request->query('error_description') ?? $request->query('error')), 160));
         }
 
         $connector = ConnectorRegistry::for($net);
         try {
-            $tok = $connector->exchange((string) $request->query('code'));
+            $tok = $connector->exchange($code);
         } catch (\Throwable $e) {
             return redirect($back)->with('connect_error', Str::limit($e->getMessage(), 200));
         }
@@ -74,7 +75,7 @@ class ConnectController extends Controller
         try {
             foreach ($connector->accounts($connection) as $a) {
                 $acc = AdAccount::firstOrNew(['connection_id' => $connection->id, 'external_id' => $a['id']]);
-                $acc->fill(['agency_id' => $agency->id, 'ad_network_id' => $net->id, 'name' => $a['name'], 'currency' => $a['currency'], 'timezone' => $a['timezone'], 'status' => $a['status']]);
+                $acc->fill(['agency_id' => $agency->id, 'ad_network_id' => $net->id, 'name' => $a['name'], 'currency' => $a['currency'], 'timezone' => $a['timezone'], 'status' => $a['status']] + (isset($a['meta']) ? ['meta' => $a['meta']] : []));
                 if (! $acc->exists) {
                     $acc->is_active = PlanLimits::canActivateAdAccount($agency);
                 }

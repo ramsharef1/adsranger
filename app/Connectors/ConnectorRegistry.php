@@ -10,6 +10,12 @@ class ConnectorRegistry
         'meta' => MetaConnector::class,
         'google_ads' => GoogleAdsConnector::class,
         'ga4' => Ga4Connector::class,
+        'google_merchant' => MerchantConnector::class,
+        'tiktok' => TikTokConnector::class,
+        'snapchat' => SnapchatConnector::class,
+        'microsoft' => MicrosoftConnector::class,
+        'linkedin' => LinkedInConnector::class,
+        'x' => XConnector::class,
     ];
 
     public static function for(AdNetwork $network): Connector
