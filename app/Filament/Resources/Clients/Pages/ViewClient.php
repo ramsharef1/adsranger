@@ -4,7 +4,9 @@ namespace App\Filament\Resources\Clients\Pages;
 
 use App\Filament\Resources\Clients\ClientResource;
 use App\Models\Alert;
+use App\Support\HealthScore;
 use App\Support\MetricsQuery;
+use App\Support\Pacing;
 use App\Support\Periods;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
@@ -59,6 +61,8 @@ class ViewClient extends ViewRecord
 
         return [
             'client' => $c,
+            'health' => HealthScore::compute($c),
+            'pace' => Pacing::month($c),
             'funnel' => MetricsQuery::funnel($t),
             'actions' => MetricsQuery::conversionActions($c, $from, $to),
             'from' => $from, 'to' => $to,

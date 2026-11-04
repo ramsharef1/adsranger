@@ -1,7 +1,7 @@
 @php
     $muted = 'opacity:.65;font-size:12px';
     $inp = 'width:90px;padding:4px 8px;border-radius:8px;border:1px solid rgba(148,163,184,.35);background:transparent;font-size:13px';
-    $names = ['min_days' => 'days', 'min_spend' => 'min. spend', 'days' => 'days', 'pct' => '%', 'min_results' => 'min. results', 'failures' => 'failures'];
+    $names = ['min_days' => 'days', 'min_spend' => 'min. spend', 'days' => 'days', 'pct' => '%', 'min_results' => 'min. results', 'failures' => 'failures', 'from_day' => 'from day of month', 'min_rejected' => 'min. rejected ads'];
 @endphp
 <x-filament-panels::page>
     <x-filament::section>

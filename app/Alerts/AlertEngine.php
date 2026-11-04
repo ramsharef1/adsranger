@@ -13,6 +13,7 @@ use App\Models\Client;
 use App\Models\DailyMetric;
 use App\Support\Fx;
 use App\Support\MetricsQuery;
+use App\Support\Pacing;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 
@@ -49,6 +50,9 @@ class AlertEngine
             }
             if ($rules['cpr_rising']['enabled']) {
                 static::cprRising($c, $d, $rules['cpr_rising'], $found);
+            }
+            if ($rules['pacing']['enabled'] ?? false) {
+                static::pacing($c, $d, $rules['pacing'], $found);
             }
         }
         if ($rules['tracking_issue']['enabled']) {
@@ -120,6 +124,25 @@ class AlertEngine
                 'detail' => 'Last 7 days '.number_format($now['cpr'], 2).' vs '.number_format($prev['cpr'], 2).' '.$c->currency.' the week before.',
                 'payload' => ['now' => round($now['cpr'], 4), 'prev' => round($prev['cpr'], 4), 'pct' => round($pct, 1)]]);
         }
+    }
+
+    /** Month-end forecast too far from the monthly budget (#36). $d = the last complete day. */
+    protected static function pacing(Client $c, Carbon $d, array $r, array &$found): void
+    {
+        $p = Pacing::month($c, $d->copy()->addDay());
+        if (! $p['budget'] || $p['full_days'] < (int) $r['t']['from_day'] || $p['forecast_vs_budget'] === null) {
+            return;
+        }
+        $off = $p['forecast_vs_budget'] - 100;
+        if (abs($off) < (float) $r['t']['pct']) {
+            return;
+        }
+        $over = $off > 0;
+        static::add($found, 'pacing', $r, ['client_id' => $c->id, 'entity_type' => 'client', 'entity_id' => $c->id, 'entity_name' => $c->name,
+            'title' => ($over ? 'Over-pacing ' : 'Under-pacing ').round(abs($off)).'%: '.$c->name,
+            'detail' => 'Forecast '.number_format($p['forecast_spend'], 2).' vs budget '.number_format($p['budget'], 2).' '.$c->currency.' for '.$p['month_label']
+                .'. Spend about '.number_format((float) $p['daily_needed'], 2).' a day to land on budget.',
+            'payload' => ['forecast' => round($p['forecast_spend'], 2), 'budget' => $p['budget'], 'pct' => round($off, 1)]]);
     }
 
     protected static function trackingIssue(Agency $a, Carbon $d, array $r, array &$found): void

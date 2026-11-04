@@ -125,6 +125,10 @@ class ClientResource extends Resource
                 TextColumn::make('vertical')->formatStateUsing(fn ($state) => config('adsranger.verticals')[$state] ?? $state)->toggleable(),
                 TextColumn::make('market')->toggleable(),
                 TextColumn::make('currency'),
+                TextColumn::make('health_score')->label('Health')->badge()->sortable()
+                    ->formatStateUsing(fn ($state) => $state === null ? '–' : $state.' · '.\App\Support\HealthScore::band((int) $state)[0])
+                    ->color(fn ($state) => \App\Support\HealthScore::band($state === null ? null : (int) $state)[1])
+                    ->tooltip(fn ($record) => collect((array) $record->health_parts)->map(fn ($x, $k) => ucfirst($k).': '.$x['points'].'/'.$x['max'].' · '.$x['note'])->implode("\n") ?: 'Scores run nightly.'),
                 TextColumn::make('ad_accounts_count')->counts('adAccounts')->label('Accounts'),
                 TextColumn::make('monthly_budget')->label('Budget / month')->numeric(2)->toggleable(),
                 TextColumn::make('target_cpr')->label('Target CPR')->numeric(2)->toggleable(),

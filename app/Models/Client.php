@@ -15,7 +15,8 @@ class Client extends Model
 
     protected function casts(): array
     {
-        return ['hide_spend' => 'boolean', 'monthly_budget' => 'float', 'target_cpr' => 'float', 'target_roas' => 'float', 'target_results' => 'integer'];
+        return ['hide_spend' => 'boolean', 'monthly_budget' => 'float', 'target_cpr' => 'float', 'target_roas' => 'float', 'target_results' => 'integer',
+            'health_score' => 'integer', 'health_parts' => 'array', 'health_at' => 'datetime'];
     }
 
     public function agency(): BelongsTo
@@ -32,6 +33,11 @@ class Client extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class);
+    }
+
+    public function budgetPlans(): HasMany
+    {
+        return $this->hasMany(BudgetPlan::class);
     }
 
     public function alerts(): HasMany

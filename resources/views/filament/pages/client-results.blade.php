@@ -56,6 +56,45 @@
         @endforeach
     </div>
 
+    @php [$pl, $pc] = \App\Support\Pacing::label($pace['status']); @endphp
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
+        <div style="{{ $card }}">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="{{ $muted }}">Health score (last 14 days)</div>
+                <x-filament::badge :color="$health['color']">{{ $health['band'] }}</x-filament::badge>
+            </div>
+            <div style="font-size:28px;font-weight:700;margin:4px 0 8px">{{ $health['score'] ?? '–' }}<span style="{{ $muted }}"> / 100</span></div>
+            @forelse ($health['parts'] as $k => $part)
+                <div style="display:grid;grid-template-columns:90px 1fr 54px;gap:8px;align-items:center;font-size:12px;margin-top:4px">
+                    <div>{{ ['results' => 'Results', 'pacing' => 'Pacing', 'trend' => 'Trend', 'tracking' => 'Tracking'][$k] ?? $k }}</div>
+                    <div style="height:8px;border-radius:6px;background:rgba(148,163,184,.18);overflow:hidden" role="img" aria-label="{{ $part['points'] }} of {{ $part['max'] }}">
+                        <div style="height:8px;width:{{ $part['max'] ? round($part['points'] / $part['max'] * 100) : 0 }}%;background:#14B8A6"></div>
+                    </div>
+                    <div style="text-align:end">{{ $part['points'] }}/{{ $part['max'] }}</div>
+                </div>
+                <div style="{{ $muted }};margin:1px 0 0 98px">{{ $part['note'] }}</div>
+            @empty
+                <div style="{{ $muted }}">No spend or results in the last 14 days.</div>
+            @endforelse
+        </div>
+        <div style="{{ $card }}">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="{{ $muted }}">{{ $pace['month_label'] }} · day {{ $pace['full_days'] }} of {{ $pace['days_in'] }}</div>
+                <x-filament::badge :color="$pc">{{ $pl }}</x-filament::badge>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;font-size:13px">
+                <div><div style="{{ $muted }}">Budget{{ $pace['from_plan'] ? ' (plan)' : '' }}</div><strong>{{ $pace['budget'] ? R::money($pace['budget'], $cur) : '–' }}</strong></div>
+                <div><div style="{{ $muted }}">Spent so far</div><strong>{{ R::money($pace['spent'], $cur) }}</strong>@if ($pace['pace'] !== null)<span style="{{ $muted }}"> · {{ round($pace['pace']) }}% of expected</span>@endif</div>
+                <div><div style="{{ $muted }}">Month-end forecast</div><strong>{{ R::money($pace['forecast_spend'], $cur) }}</strong>@if ($pace['forecast_vs_budget'])<span style="{{ $muted }}"> · {{ round($pace['forecast_vs_budget']) }}% of budget</span>@endif</div>
+                <div><div style="{{ $muted }}">Needed per day</div><strong>{{ $pace['daily_needed'] !== null ? R::money($pace['daily_needed'], $cur) : '–' }}</strong></div>
+                <div><div style="{{ $muted }}">{{ R::label($pace['main_type']) ?: 'Results' }} so far → forecast</div><strong>{{ number_format($pace['results']) }} → {{ number_format($pace['forecast_results']) }}</strong>@if ($pace['target_results'])<span style="{{ $muted }}"> · target {{ number_format($pace['target_results']) }}</span>@endif</div>
+                <div><div style="{{ $muted }}">Forecast cost / result</div><strong>{{ R::money($pace['forecast_cpr'], $cur) }}</strong></div>
+            </div>
+            <div style="{{ $muted }};margin-top:8px">Forecast = spent so far + last {{ config('planning.pacing.run_rate_days') }} days' daily average × {{ $pace['days_left'] }} days left.
+                <a href="{{ \App\Filament\Pages\BudgetPlanner::getUrl(['client' => $client->id]) }}" style="color:#14B8A6">Budget plan</a></div>
+        </div>
+    </div>
+
     @if ($goals || count($t['by_type']) > 1)
         <x-filament::section>
             <x-slot name="heading">Results by goal</x-slot>
