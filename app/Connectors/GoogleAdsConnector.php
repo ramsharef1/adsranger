@@ -5,7 +5,9 @@ namespace App\Connectors;
 use App\Models\AdAccount;
 use App\Models\Connection;
 use App\Support\ResultResolver;
+use App\Sync\BreakdownStore;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 
 class GoogleAdsConnector extends Connector
@@ -149,7 +151,58 @@ class GoogleAdsConnector extends Connector
                     'conversions' => $m['conversions'] ?? 0, 'conversions_value' => $m['conversionsValue'] ?? 0], $actions[$id.'|'.$d] ?? []);
         }
 
-        return ['campaigns' => array_values($campaigns), 'ad_sets' => [], 'ads' => [], 'rows' => $rows];
+        $breakdowns = config('insights.pull_breakdowns', true) ? $this->breakdowns($c, $cid, $range) : [];
+
+        return ['campaigns' => array_values($campaigns), 'ad_sets' => [], 'ads' => [], 'rows' => $rows, 'breakdowns' => $breakdowns];
+    }
+
+    /** Hour of day (#43), network + device (#44), city (#97). Primary conversions are the results. Failures are logged, not fatal. */
+    protected function breakdowns(Connection $c, string $cid, string $range): array
+    {
+        $m = 'metrics.cost_micros, metrics.impressions, metrics.clicks, metrics.conversions';
+        $specs = [
+            'hour' => ["SELECT segments.date, segments.hour, $m FROM campaign WHERE $range", fn ($r) => (string) ($r['segments']['hour'] ?? 0)],
+            'placement' => ["SELECT segments.date, segments.ad_network_type, $m FROM campaign WHERE $range", fn ($r) => 'google:'.strtolower((string) ($r['segments']['adNetworkType'] ?? 'unknown'))],
+            'device' => ["SELECT segments.date, segments.device, $m FROM campaign WHERE $range", fn ($r) => strtolower((string) ($r['segments']['device'] ?? 'unknown'))],
+            'region' => ["SELECT segments.date, segments.geo_target_city, $m FROM geographic_view WHERE $range AND segments.geo_target_city IS NOT NULL",
+                fn ($r) => (string) ($r['segments']['geoTargetCity'] ?? 'unknown')],
+        ];
+        $out = [];
+        foreach ($specs as $dim => [$q, $key]) {
+            try {
+                $rows = [];
+                foreach ($this->search($c, $cid, $q) as $r) {
+                    $x = $r['metrics'] ?? [];
+                    $rows[] = ['date' => $r['segments']['date'], 'key' => $key($r), 'spend' => ((float) ($x['costMicros'] ?? 0)) / 1_000_000,
+                        'impressions' => (int) ($x['impressions'] ?? 0), 'clicks' => (int) ($x['clicks'] ?? 0), 'link_clicks' => (int) ($x['clicks'] ?? 0),
+                        'results' => (float) ($x['conversions'] ?? 0), 'result_type' => 'conversion'];
+                }
+                $out[$dim] = BreakdownStore::collapse($rows);
+            } catch (\Throwable $e) {
+                Log::warning('Google breakdown skipped', ['customer' => $cid, 'dimension' => $dim, 'error' => mb_substr($e->getMessage(), 0, 200)]);
+            }
+        }
+        // City resource names → readable names.
+        if (! empty($out['region'])) {
+            try {
+                $ids = array_values(array_unique(array_filter(array_column($out['region'], 'key'), fn ($k) => str_starts_with($k, 'geoTargetConstants/'))));
+                $names = [];
+                foreach (array_chunk($ids, 200) as $chunk) {
+                    $in = implode(',', array_map(fn ($i) => "'$i'", $chunk));
+                    foreach ($this->search($c, $cid, "SELECT geo_target_constant.resource_name, geo_target_constant.canonical_name FROM geo_target_constant WHERE geo_target_constant.resource_name IN ($in)") as $g) {
+                        $names[$g['geoTargetConstant']['resourceName']] = $g['geoTargetConstant']['canonicalName'] ?? null;
+                    }
+                }
+                foreach ($out['region'] as &$r) {
+                    $r['label'] = $names[$r['key']] ?? null;
+                }
+                unset($r);
+            } catch (\Throwable $e) {
+                Log::warning('Google city names skipped', ['customer' => $cid, 'error' => mb_substr($e->getMessage(), 0, 200)]);
+            }
+        }
+
+        return $out;
     }
 
     public function health(AdAccount $account): array

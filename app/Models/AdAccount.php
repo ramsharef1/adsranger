@@ -52,6 +52,7 @@ class AdAccount extends Model
             if ($a->wasChanged('client_id')) {
                 DailyMetric::where('ad_account_id', $a->id)->update(['client_id' => $a->client_id]);
                 Alert::where('ad_account_id', $a->id)->update(['client_id' => $a->client_id]);
+                \Illuminate\Support\Facades\DB::table('metric_breakdowns')->where('ad_account_id', $a->id)->update(['client_id' => $a->client_id]);
             }
         });
     }

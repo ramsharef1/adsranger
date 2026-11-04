@@ -91,7 +91,8 @@
                 <div><div style="{{ $muted }}">Forecast cost / result</div><strong>{{ R::money($pace['forecast_cpr'], $cur) }}</strong></div>
             </div>
             <div style="{{ $muted }};margin-top:8px">Forecast = spent so far + last {{ config('planning.pacing.run_rate_days') }} days' daily average × {{ $pace['days_left'] }} days left.
-                <a href="{{ \App\Filament\Pages\BudgetPlanner::getUrl(['client' => $client->id]) }}" style="color:#14B8A6">Budget plan</a></div>
+                <a href="{{ \App\Filament\Pages\BudgetPlanner::getUrl(['client' => $client->id]) }}" style="color:#14B8A6">Budget plan</a> ·
+                <a href="{{ \App\Filament\Pages\InsightsPage::getUrl(['client' => $client->id]) }}" style="color:#14B8A6">Insights</a></div>
         </div>
     </div>
 

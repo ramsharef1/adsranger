@@ -115,6 +115,9 @@ class SyncService
             if ($batch) {
                 DailyMetric::insert($batch);
             }
+            if (! empty($payload['breakdowns'])) {
+                BreakdownStore::replace($account, $payload['breakdowns'], $from, $to);
+            }
 
             return $count;
         });

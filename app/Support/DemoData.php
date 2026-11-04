@@ -69,10 +69,85 @@ class DemoData
                     }
                 }
             }
+            $payload['breakdowns'] = static::breakdowns($payload['rows'], $market, now($a->timezone ?: 'UTC')->subDay()->toDateString());
             $from = now($a->timezone ?: 'UTC')->subDays($days)->toDateString();
             $out[$name] = SyncService::ingest($acct, $payload, $from, now()->toDateString());
             $acct->update(['last_synced_at' => now(), 'sync_status' => 'ok', 'backfilled_at' => now()]);
         }
+
+        return $out;
+    }
+
+    /** Sample breakdowns (hour, placement, region, age × gender, 30-day reach) spread from the daily rows. */
+    protected static function breakdowns(array $rows, string $market, string $yesterday): array
+    {
+        $hours = [0 => 3, 1 => 2, 2 => 1, 3 => 1, 4 => 1, 5 => 1, 6 => 1, 7 => 2, 8 => 3, 9 => 4, 10 => 5, 11 => 5, 12 => 5, 13 => 5, 14 => 5, 15 => 5,
+            16 => 6, 17 => 6, 18 => 6, 19 => 7, 20 => 8, 21 => 9, 22 => 8, 23 => 5];
+        $places = ['facebook:feed' => 30, 'instagram:feed' => 22, 'instagram:story' => 16, 'instagram:instagram_reels' => 14, 'facebook:facebook_reels' => 8,
+            'facebook:story' => 5, 'audience_network:classic' => 3, 'messenger:messenger_inbox' => 2];
+        $regions = ['JO' => ['Amman' => 55, 'Irbid' => 15, 'Zarqa' => 12, 'Aqaba' => 6, 'Balqa' => 7, 'Madaba' => 5],
+            'SA' => ['Riyadh Region' => 34, 'Makkah Region' => 27, 'Eastern Province' => 18, 'Madinah Region' => 8, 'Asir Region' => 6, 'Qassim Region' => 7],
+            'AE' => ['Dubai' => 44, 'Abu Dhabi' => 28, 'Sharjah' => 16, 'Ajman' => 6, 'Ras al-Khaimah' => 4, 'Fujairah' => 2]][$market] ?? ['Unknown' => 100];
+        $ages = [];
+        foreach (['18-24' => 18, '25-34' => 34, '35-44' => 24, '45-54' => 14, '55-64' => 7, '65+' => 3] as $age => $w) {
+            $ages["$age|female"] = $w * 0.55;
+            $ages["$age|male"] = $w * 0.45;
+        }
+        // Cost-efficiency multipliers so the insights show contrast (results weight ÷ spend weight).
+        $eff = fn (string $k) => 0.6 + (crc32($k) % 90) / 100;
+        $daily = [];
+        foreach ($rows as $r) {
+            $k = $r['date'].'|'.$r['result_type'];
+            $d = $daily[$k] ?? ['date' => $r['date'], 'result_type' => $r['result_type'], 'spend' => 0, 'impressions' => 0, 'reach' => 0, 'clicks' => 0, 'link_clicks' => 0, 'results' => 0];
+            foreach (['spend', 'impressions', 'reach', 'clicks', 'link_clicks', 'results'] as $m) {
+                $d[$m] += $r[$m] ?? 0;
+            }
+            $daily[$k] = $d;
+        }
+        $spread = function (array $weights, string $dim) use ($daily, $eff) {
+            $sum = array_sum($weights);
+            $resW = [];
+            foreach ($weights as $key => $w) {
+                $resW[$key] = $w * $eff($dim.$key);
+            }
+            $resSum = array_sum($resW);
+            $out = [];
+            foreach ($daily as $d) {
+                foreach ($weights as $key => $w) {
+                    $f = $w / $sum;
+                    $out[] = ['date' => $d['date'], 'key' => (string) $key, 'result_type' => $d['result_type'], 'spend' => round($d['spend'] * $f, 4),
+                        'impressions' => (int) ($d['impressions'] * $f), 'reach' => (int) ($d['reach'] * $f), 'clicks' => (int) ($d['clicks'] * $f),
+                        'link_clicks' => (int) ($d['link_clicks'] * $f), 'results' => round($d['results'] * $resW[$key] / $resSum, 2)];
+                }
+            }
+
+            return $out;
+        };
+        $out = ['hour' => $spread($hours, 'h'), 'placement' => $spread($places, 'p'), 'region' => $spread($regions, 'r'), 'age_gender' => $spread($ages, 'a')];
+
+        // 30-day reach per ad set + account (frequency 1.8–3.8; ~20% overlap).
+        $since = \Carbon\Carbon::parse($yesterday)->subDays(29)->toDateString();
+        $sets = [];
+        foreach ($rows as $r) {
+            if ($r['date'] < $since || empty($r['ad_set'])) {
+                continue;
+            }
+            $sets[$r['ad_set']]['impressions'] = ($sets[$r['ad_set']]['impressions'] ?? 0) + $r['impressions'];
+            $sets[$r['ad_set']]['link_clicks'] = ($sets[$r['ad_set']]['link_clicks'] ?? 0) + $r['link_clicks'];
+            $sets[$r['ad_set']]['spend'] = ($sets[$r['ad_set']]['spend'] ?? 0) + $r['spend'];
+        }
+        $reach = [];
+        $sumReach = 0;
+        foreach ($sets as $id => $x) {
+            $freq = 1.8 + (crc32($id) % 200) / 100;
+            $rch = (int) ($x['impressions'] / $freq);
+            $sumReach += $rch;
+            $reach[] = ['date' => $yesterday, 'key' => 'adset:'.$id, 'impressions' => $x['impressions'], 'reach' => $rch, 'link_clicks' => $x['link_clicks'], 'spend' => $x['spend']];
+        }
+        if ($reach) {
+            $reach[] = ['date' => $yesterday, 'key' => 'account', 'impressions' => array_sum(array_column($sets, 'impressions')), 'reach' => (int) ($sumReach * 0.8)];
+        }
+        $out['reach30'] = $reach;
 
         return $out;
     }
