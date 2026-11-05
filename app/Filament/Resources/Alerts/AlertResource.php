@@ -87,8 +87,8 @@ class AlertResource extends Resource
             ->emptyStateHeading(__('No alerts'))
             ->emptyStateDescription(__('Alert rules run every morning after the overnight sync.'))
             ->columns([
-                TextColumn::make('severity')->badge()->color(fn ($state) => ['high' => 'danger', 'medium' => 'warning', 'low' => 'gray'][$state] ?? 'gray')
-                    ->formatStateUsing(fn ($state) => __(ucfirst($state))),
+                TextColumn::make('severity')->label(__('Level'))->badge()->color(fn ($state) => \App\Support\Severity::color($state))->icon(fn ($state) => \App\Support\Severity::icon($state))
+                    ->formatStateUsing(fn ($state) => \App\Support\Severity::label($state)),
                 TextColumn::make('title')->wrap()->weight('bold')->description(fn (Alert $r) => $r->detail)->searchable(),
                 TextColumn::make('client.name')->label(__('Client'))->toggleable(),
                 TextColumn::make('rule_key')->label(__('Rule'))->formatStateUsing(fn ($state) => __(config("alerts.rules.$state.label") ?? $state))->toggleable(),
@@ -99,7 +99,7 @@ class AlertResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('status')->options(['open' => __('Open'), 'snoozed' => __('Snoozed'), 'resolved' => __('Resolved')])->default('open'),
-                SelectFilter::make('severity')->options(config('alerts.severities')),
+                SelectFilter::make('severity')->label(__('Level'))->options(fn () => \App\Support\Severity::options()),
                 SelectFilter::make('client_id')->label(__('Client'))->options(fn () => Client::visibleTo(auth()->user(), $agency)->orderBy('name')->pluck('name', 'id')->all()),
                 TernaryFilter::make('mine')->label(__('Assigned to me'))->queries(true: fn ($q) => $q->where('assigned_to', auth()->id()), false: fn ($q) => $q, blank: fn ($q) => $q),
             ])

@@ -31,7 +31,7 @@ class AlertsDigestMail extends Mailable
         $rows = $clients->map(fn (Client $c) => ['client' => $c, 't' => MetricsQuery::totals($c, $this->day, $this->day)])->all();
         $alerts = Alert::where('agency_id', $this->agency->id)->where('status', 'open')
             ->where(fn ($q) => $q->whereNull('client_id')->orWhereIn('client_id', $clients->pluck('id')))
-            ->orderByRaw("CASE severity WHEN 'high' THEN 0 WHEN 'medium' THEN 1 ELSE 2 END")->limit(30)->get()->all();
+            ->orderByRaw("CASE severity WHEN 'critical' THEN 0 WHEN 'warning' THEN 1 ELSE 2 END")->limit(30)->get()->all();
 
         return new Content(view: 'mail.alerts', with: ['agency' => $this->agency, 'alerts' => $alerts, 'digest' => ['day' => $this->day, 'rows' => $rows]]);
     }

@@ -12,7 +12,7 @@
                 <div style="min-width:240px;flex:1">
                     <label style="display:flex;gap:8px;align-items:center;font-weight:600">
                         <input type="checkbox" wire:model="rules.{{ $k }}.enabled" @disabled(! $edit || $isLocked)> {{ __($d['label']) }}
-                        <x-filament::badge :color="['high' => 'danger', 'medium' => 'warning', 'low' => 'gray'][$d['severity']]" style="display:inline-flex">{{ __(ucfirst($d['severity'])) }}</x-filament::badge>
+                        <x-filament::badge :color="\App\Support\Severity::color($d['severity'])" :icon="\App\Support\Severity::icon($d['severity'])" style="display:inline-flex">{{ \App\Support\Severity::label($d['severity']) }}</x-filament::badge>
                         @if ($isLocked)
                             <x-locked-button feature="alert_rules_pro" />
                         @endif

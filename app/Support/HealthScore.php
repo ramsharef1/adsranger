@@ -108,9 +108,9 @@ class HealthScore
     {
         $open = Alert::where('client_id', $c->id)->where('status', 'open')->whereIn('rule_key', self::TRACKING_RULES)->get(['severity']);
         $accounts = $c->adAccounts()->where('is_active', true)->get(['sync_status', 'health']);
-        $penalty = $open->sum(fn ($a) => $a->severity === 'high' ? 0.5 : 0.25)
+        $penalty = $open->sum(fn ($a) => $a->severity === 'critical' ? 0.5 : 0.25)
             + $accounts->where('sync_status', 'error')->count() * 0.25
-            + $accounts->sum(fn ($a) => collect((array) $a->health)->where(0, 'high')->count()) * 0.25;
+            + $accounts->sum(fn ($a) => collect((array) $a->health)->filter(fn ($i) => \App\Support\Severity::normalize($i[0] ?? null) === 'critical')->count()) * 0.25;
         $bits = array_filter([
             $open->count() ? $open->count().' open tracking/account alert(s)' : null,
             ($e = $accounts->where('sync_status', 'error')->count()) ? "$e account(s) failing to sync" : null,

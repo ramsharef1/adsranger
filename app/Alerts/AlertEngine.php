@@ -271,7 +271,7 @@ class AlertEngine
                 if (str_contains($msg, 'rejected') && (int) preg_replace('/\D.*/', '', $msg) < (int) $r['t']['min_rejected']) {
                     continue;
                 }
-                static::add($found, 'account_health', ['severity' => $sev === 'medium' ? 'medium' : 'high'] + $r, ['client_id' => $acct->client_id, 'ad_account_id' => $acct->id,
+                static::add($found, 'account_health', ['severity' => \App\Support\Severity::normalize($sev) === 'critical' ? 'critical' : 'warning'] + $r, ['client_id' => $acct->client_id, 'ad_account_id' => $acct->id,
                     'entity_type' => 'ad_account', 'entity_id' => $acct->id * 100 + $i, 'entity_name' => $acct->name,
                     'title' => 'Account health: '.($acct->network?->name).' · '.$acct->name, 'detail' => $msg]);
             }
@@ -299,7 +299,7 @@ class AlertEngine
                 $stats['resolved']++;
             }
         }
-        $high = collect($new)->where('severity', 'high');
+        $high = collect($new)->where('severity', 'critical');
         if ($high->isNotEmpty()) {
             foreach ($a->members()->where('email_alerts', true)->get() as $u) {
                 $mine = $high->filter(fn (Alert $al) => ! $al->client_id || Client::visibleTo($u, $a)->whereKey($al->client_id)->exists());

@@ -1124,5 +1124,9 @@
     "Open client": "فتح العميل",
     "Ad network": "المنصة الإعلانية",
     "Period": "الفترة",
-    "See all ads": "عرض كل الإعلانات"
+    "See all ads": "عرض كل الإعلانات",
+    "Critical": "حرج",
+    "Warning": "تحذير",
+    "Info": "للعلم",
+    "Level": "المستوى"
 }

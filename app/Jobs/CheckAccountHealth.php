@@ -30,11 +30,11 @@ class CheckAccountHealth implements ShouldQueue
         try {
             $issues = ConnectorRegistry::for($a->network)->health($a);
         } catch (\Throwable $e) {
-            $issues = [['medium', 'Health check failed: '.Str::limit($e->getMessage(), 200)]];
+            $issues = [['warning', 'Health check failed: '.Str::limit($e->getMessage(), 200)]];
         }
         $rejected = Ad::where('ad_account_id', $a->id)->whereIn('status', ['DISAPPROVED', 'REJECTED', 'WITH_ISSUES'])->count();
         if ($rejected && ! collect($issues)->contains(fn ($i) => str_contains($i[1], 'disapproved'))) {
-            $issues[] = ['medium', "$rejected ad(s) rejected or with issues on ".$a->network->name.'.'];
+            $issues[] = ['warning', "$rejected ad(s) rejected or with issues on ".$a->network->name.'.'];
         }
         $a->forceFill(['health' => $issues ?: null, 'health_checked_at' => now()])->saveQuietly();
     }

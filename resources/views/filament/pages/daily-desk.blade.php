@@ -41,7 +41,7 @@
                         <td style="padding:6px;text-align:end">{{ $t['roas'] ? number_format($t['roas'], 2).'×' : '–' }}</td>
                         <td style="padding:6px">
                             @foreach ($r['alerts'] as $al)
-                                <x-filament::badge :color="['high' => 'danger', 'medium' => 'warning', 'low' => 'gray'][$al->severity] ?? 'gray'" style="display:inline-flex">{{ $al->n }} {{ __($al->severity) }}</x-filament::badge>
+                                <x-filament::badge :color="\App\Support\Severity::color($al->severity)" :icon="\App\Support\Severity::icon($al->severity)" style="display:inline-flex">{{ $al->n }} {{ \App\Support\Severity::label($al->severity) }}</x-filament::badge>
                             @endforeach
                         </td>
                     </tr>

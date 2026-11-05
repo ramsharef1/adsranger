@@ -92,7 +92,7 @@ class MerchantConnector extends GoogleAdsConnector
         foreach ($d['accountIssues'] ?? [] as $iss) {
             $sev = strtoupper((string) ($iss['severity'] ?? ''));
             if (in_array($sev, ['CRITICAL', 'ERROR'], true)) {
-                $out[] = [$sev === 'CRITICAL' ? 'high' : 'medium', 'Merchant Center: '.($iss['title'] ?? 'account issue')];
+                $out[] = [$sev === 'CRITICAL' ? 'critical' : 'warning', 'Merchant Center: '.($iss['title'] ?? 'account issue')];
             }
         }
 

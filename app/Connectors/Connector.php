@@ -160,7 +160,7 @@ abstract class Connector
 
     /**
      * Problems with an ad account (disabled, payment, restrictions, rejected ads).
-     * @return array<int, array{0:string,1:string}> [severity high|medium, message]
+     * @return array<int, array{0:string,1:string}> [severity critical|warning, message] (D-88)
      */
     public function health(AdAccount $account): array
     {
@@ -171,14 +171,14 @@ abstract class Connector
             if ((string) $a['id'] === (string) $account->external_id) {
                 $st = strtoupper((string) ($a['status'] ?? ''));
                 if ($st && preg_match('/DISABLE|SUSPEND|CLOSED|CANCEL|DELETE|PAUSED_BY|LIMIT|RESTRICT|PENDING|FRAUD|DENY/', $st)) {
-                    return [['high', 'Account status on '.$this->network->name.': '.str_replace('_', ' ', strtolower($st)).'.']];
+                    return [['critical', 'Account status on '.$this->network->name.': '.str_replace('_', ' ', strtolower($st)).'.']];
                 }
 
                 return [];
             }
         }
 
-        return [['high', 'The account is no longer reachable with this connection. It may have been removed or access was revoked.']];
+        return [['critical', 'The account is no longer reachable with this connection. It may have been removed or access was revoked.']];
     }
 
     /** Check the saved keys without a user. @return array{0:?bool,1:string} [ok (null = cannot test), message] */

@@ -1,6 +1,6 @@
 @php
     $ar = $agency->language === 'ar';
-    $sev = ['high' => '#dc2626', 'medium' => '#d97706', 'low' => '#64748b'];
+    $lvl = fn ($s) => ($ar ? ['critical' => 'حرج', 'warning' => 'تحذير', 'info' => 'للعلم'] : ['critical' => 'Critical', 'warning' => 'Warning', 'info' => 'Info'])[\App\Support\Severity::normalize($s)];
     $base = url('/app/'.$agency->slug);
 @endphp
 <!doctype html>
@@ -29,10 +29,10 @@
         </div>
     @endif
     <div style="background:#fff;border-radius:12px;padding:18px">
-        <div style="font-weight:600;margin-bottom:10px">{{ $digest ? ($ar ? 'التنبيهات المفتوحة' : 'Open alerts') : ($ar ? 'تنبيهات جديدة عاجلة' : 'New high alerts') }}</div>
+        <div style="font-weight:600;margin-bottom:10px">{{ $digest ? ($ar ? 'التنبيهات المفتوحة' : 'Open alerts') : ($ar ? 'تنبيهات حرجة جديدة' : 'New critical alerts') }}</div>
         @forelse ($alerts as $a)
             <div style="border-top:1px solid #e2e8f0;padding:8px 0">
-                <span style="display:inline-block;width:8px;height:8px;border-radius:9px;background:{{ $sev[$a->severity] ?? '#64748b' }}"></span>
+                <span style="display:inline-block;font-size:12px;font-weight:600;color:{{ \App\Support\Severity::hex($a->severity) }}">● {{ $lvl($a->severity) }}</span>
                 <strong style="font-size:14px">{{ $a->title }}</strong>
                 <div style="font-size:13px;color:#475569;margin-top:2px">{{ $a->detail }}</div>
             </div>

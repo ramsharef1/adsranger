@@ -332,11 +332,11 @@ class GoogleAdsConnector extends Connector
         $out = [];
         $st = $this->search($c, $cid, 'SELECT customer.status FROM customer LIMIT 1')[0]['customer']['status'] ?? null;
         if ($st && $st !== 'ENABLED') {
-            $out[] = ['high', 'Google Ads account status: '.strtolower($st).'.'];
+            $out[] = ['critical', 'Google Ads account status: '.strtolower($st).'.'];
         }
         $n = count($this->search($c, $cid, "SELECT ad_group_ad.ad.id FROM ad_group_ad WHERE ad_group_ad.policy_summary.approval_status = 'DISAPPROVED' AND ad_group_ad.status = 'ENABLED' LIMIT 200"));
         if ($n) {
-            $out[] = ['medium', "$n enabled Google ad(s) disapproved by policy."];
+            $out[] = ['warning', "$n enabled Google ad(s) disapproved by policy."];
         }
 
         return $out;

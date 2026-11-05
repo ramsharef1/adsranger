@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-/** Immediate email for new high-severity alerts (opt-in per user). */
+/** Immediate email for new Critical alerts (D-88; opt-in per user). */
 class AlertMail extends Mailable
 {
     use Queueable, SerializesModels;
