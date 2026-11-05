@@ -20,7 +20,8 @@ return [
     'ending_notice_days' => 3,
     'deletion_notice_days' => 7,
     'delete_mode' => env('TRIAL_DELETE_MODE', 'archive'),
-    'purge_after_days' => env('TRIAL_PURGE_AFTER_DAYS', 30),
+    // D-80: archives are kept until the lawyer approves the privacy/terms wording; then set TRIAL_PURGE_AFTER_DAYS=30.
+    'purge_after_days' => ($d = env('TRIAL_PURGE_AFTER_DAYS')) === null || $d === '' ? null : (int) $d,
     // UTC time of the daily lifecycle run (routes/console.php).
     'run_at_utc' => '03:10',
 ];

@@ -78,6 +78,7 @@ class TrialLifecycleTest extends TestCase
 
     public function test_timeline_moves_through_each_stage_once_with_mails_and_audits(): void
     {
+        config(['trial.purge_after_days' => 30]); // auto-purge is off by default (D-80); this test covers it when enabled
         [$a, $owner] = $this->agency();
         DemoData::seed($a, 10);
         $clients = Client::where('agency_id', $a->id)->count();
@@ -319,5 +320,10 @@ class TrialLifecycleTest extends TestCase
             $this->assertEqualsWithDelta(now()->addDays(7)->timestamp, $to->timestamp, 2);
             $this->assertSame($stage, AuditLog::where('action', 'agency.trial_extended')->where('subject_id', $a->id)->latest('id')->first()->meta['lifted_from']);
         }
+    }
+
+    public function test_archives_are_kept_by_default(): void
+    {
+        $this->assertNull(config('trial.purge_after_days'));
     }
 }
