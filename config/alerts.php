@@ -3,6 +3,7 @@
 // Alert rule defaults (spec module 3). Each agency can switch a rule off or change thresholds in /app → Alert rules.
 return [
     'rules' => [
+        // 7 Starter rules
         'tracking_break' => ['label' => 'Tracking break', 'severity' => 'critical',
             'help' => '0 results yesterday after results on each of the 7 days before.', 'thresholds' => ['min_days' => 7]],
         'spend_no_results' => ['label' => 'Spend, no results', 'severity' => 'critical',
@@ -17,6 +18,8 @@ return [
             'help' => 'An active campaign or ad set ends within this many days.', 'thresholds' => ['days' => 3]],
         'connection_problem' => ['label' => 'Connection problem', 'severity' => 'critical',
             'help' => 'Token expired or revoked, or the account failed to sync this many times in a row.', 'thresholds' => ['failures' => 2]],
+
+        // 11 Pro rules (#23)
         'pacing' => ['label' => 'Budget pacing', 'severity' => 'warning',
             'help' => 'From this day of the month: the month-end spend forecast is more than this % above or below the monthly budget.', 'thresholds' => ['pct' => 20, 'from_day' => 7]],
         'landing_page' => ['label' => 'Broken landing page', 'severity' => 'critical',
@@ -25,6 +28,20 @@ return [
             'help' => 'Google search terms with no conversions spent at least this amount (client currency) in the last 7 days.', 'thresholds' => ['min_spend' => 50]],
         'account_health' => ['label' => 'Account health', 'severity' => 'critical',
             'help' => 'Disabled or restricted account, failed payment, spending limit nearly used, or rejected ads (checked every night).', 'thresholds' => ['min_rejected' => 1]],
+        'ctr_drop' => ['label' => 'Click-through rate drop', 'severity' => 'warning',
+            'help' => 'Link click-through rate down by at least this % vs the 7 days before (needs 1,000+ impressions in each week).', 'thresholds' => ['pct' => 25, 'min_impressions' => 1000]],
+        'roas_drop' => ['label' => 'Return on ad spend drop', 'severity' => 'warning',
+            'help' => 'ROAS down by at least this % vs the 7 days before on revenue campaigns.', 'thresholds' => ['pct' => 25, 'min_spend' => 50]],
+        'spend_spike' => ['label' => 'Daily spend spike', 'severity' => 'critical',
+            'help' => 'Yesterday\'s spend jumped by at least this % above the previous 7-day daily average.', 'thresholds' => ['pct' => 80, 'min_spend' => 50]],
+        'high_frequency' => ['label' => 'Creative fatigue (high frequency)', 'severity' => 'warning',
+            'help' => '7-day average impressions per reached person is at least this number.', 'thresholds' => ['max_freq' => 4]],
+        'zero_impressions' => ['label' => 'Active campaign with 0 impressions', 'severity' => 'critical',
+            'help' => 'An active campaign had 0 impressions yesterday after delivering impressions in the 7 days before.', 'thresholds' => ['min_prior_impressions' => 500]],
+        'lead_cost_spike' => ['label' => 'Cost per lead above target', 'severity' => 'warning',
+            'help' => '7-day cost per result exceeds the client\'s target CPR by at least this %.', 'thresholds' => ['pct' => 25]],
+        'high_cpc' => ['label' => 'Cost per click surge', 'severity' => 'info',
+            'help' => '7-day cost per link click up by at least this % vs the 7 days before (needs 20+ clicks in each week).', 'thresholds' => ['pct' => 40, 'min_clicks' => 20]],
     ],
     'severities' => ['critical' => 'Critical', 'warning' => 'Warning', 'info' => 'Info'], // D-88
     'conversion_goals' => ['OFFSITE_CONVERSIONS', 'VALUE', 'LEAD_GENERATION', 'QUALITY_LEAD', 'CONVERSATIONS', 'QUALITY_CALL'],

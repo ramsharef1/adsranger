@@ -71,5 +71,5 @@ return [
     ],
 
     // Alert rules that need `alert_rules_pro` (#23: 7 rules on Starter, the rest on Pro).
-    'pro_alert_rules' => ['pacing', 'tracking_issue', 'landing_page', 'search_term_waste'],
+    'pro_alert_rules' => ['pacing', 'landing_page', 'search_term_waste', 'account_health', 'ctr_drop', 'roas_drop', 'spend_spike', 'high_frequency', 'zero_impressions', 'lead_cost_spike', 'high_cpc'],
 ];

@@ -15,7 +15,7 @@ class MetricsQuery
 
     protected static function base(Client $c, string $from, string $to): Builder
     {
-        return DailyMetric::query()->where('agency_id', $c->agency_id)->where('client_id', $c->id)->whereBetween('date', [$from, $to]);
+        return DailyMetric::query()->where('agency_id', $c->agency_id)->where('client_id', $c->id)->whereDate('date', '>=', $from)->whereDate('date', '<=', $to);
     }
 
     protected static function sums(array $extraGroup = []): array

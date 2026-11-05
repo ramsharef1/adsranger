@@ -61,6 +61,27 @@ class AlertEngine
             if ($rules['search_term_waste']['enabled'] ?? false) {
                 static::searchTermWaste($c, $d, $rules['search_term_waste'], $found);
             }
+            if ($rules['ctr_drop']['enabled'] ?? false) {
+                static::ctrDrop($c, $d, $rules['ctr_drop'], $found);
+            }
+            if ($rules['roas_drop']['enabled'] ?? false) {
+                static::roasDrop($c, $d, $rules['roas_drop'], $found);
+            }
+            if ($rules['spend_spike']['enabled'] ?? false) {
+                static::spendSpike($c, $d, $rules['spend_spike'], $found);
+            }
+            if ($rules['high_frequency']['enabled'] ?? false) {
+                static::highFrequency($c, $d, $rules['high_frequency'], $found);
+            }
+            if ($rules['lead_cost_spike']['enabled'] ?? false) {
+                static::leadCostSpike($c, $d, $rules['lead_cost_spike'], $found);
+            }
+            if ($rules['high_cpc']['enabled'] ?? false) {
+                static::highCpc($c, $d, $rules['high_cpc'], $found);
+            }
+        }
+        if ($rules['zero_impressions']['enabled'] ?? false) {
+            static::zeroImpressions($a, $d, $rules['zero_impressions'], $found);
         }
         if ($rules['tracking_issue']['enabled']) {
             static::trackingIssue($a, $d, $rules['tracking_issue'], $found);
@@ -274,6 +295,134 @@ class AlertEngine
                 static::add($found, 'account_health', ['severity' => \App\Support\Severity::normalize($sev) === 'critical' ? 'critical' : 'warning'] + $r, ['client_id' => $acct->client_id, 'ad_account_id' => $acct->id,
                     'entity_type' => 'ad_account', 'entity_id' => $acct->id * 100 + $i, 'entity_name' => $acct->name,
                     'title' => 'Account health: '.($acct->network?->name).' · '.$acct->name, 'detail' => $msg]);
+            }
+        }
+    }
+
+    protected static function ctrDrop(Client $c, Carbon $d, array $r, array &$found): void
+    {
+        $now = MetricsQuery::totals($c, $d->copy()->subDays(6)->toDateString(), $d->toDateString());
+        $prev = MetricsQuery::totals($c, $d->copy()->subDays(13)->toDateString(), $d->copy()->subDays(7)->toDateString());
+        $minImp = (float) ($r['t']['min_impressions'] ?? 1000);
+        if (! $now['ctr'] || ! $prev['ctr'] || $now['impressions'] < $minImp || $prev['impressions'] < $minImp) {
+            return;
+        }
+        $dropPct = (1 - $now['ctr'] / $prev['ctr']) * 100;
+        if ($dropPct >= (float) $r['t']['pct']) {
+            static::add($found, 'ctr_drop', $r, ['client_id' => $c->id, 'entity_type' => 'client', 'entity_id' => $c->id, 'entity_name' => $c->name,
+                'title' => 'CTR down '.round($dropPct).'%: '.$c->name,
+                'detail' => 'Last 7 days '.number_format($now['ctr'], 2).'% vs '.number_format($prev['ctr'], 2).'% the week before.',
+                'payload' => ['now' => round($now['ctr'], 3), 'prev' => round($prev['ctr'], 3), 'pct' => round($dropPct, 1)]]);
+        }
+    }
+
+    protected static function roasDrop(Client $c, Carbon $d, array $r, array &$found): void
+    {
+        $now = MetricsQuery::totals($c, $d->copy()->subDays(6)->toDateString(), $d->toDateString());
+        $prev = MetricsQuery::totals($c, $d->copy()->subDays(13)->toDateString(), $d->copy()->subDays(7)->toDateString());
+        $minSpend = (float) ($r['t']['min_spend'] ?? 50);
+        if (! $now['roas'] || ! $prev['roas'] || $now['roas_spend'] < $minSpend || $prev['roas_spend'] < $minSpend) {
+            return;
+        }
+        $dropPct = (1 - $now['roas'] / $prev['roas']) * 100;
+        if ($dropPct >= (float) $r['t']['pct']) {
+            static::add($found, 'roas_drop', $r, ['client_id' => $c->id, 'entity_type' => 'client', 'entity_id' => $c->id, 'entity_name' => $c->name,
+                'title' => 'ROAS down '.round($dropPct).'%: '.$c->name,
+                'detail' => 'Last 7 days '.number_format($now['roas'], 2).'x vs '.number_format($prev['roas'], 2).'x the week before.',
+                'payload' => ['now' => round($now['roas'], 2), 'prev' => round($prev['roas'], 2), 'pct' => round($dropPct, 1)]]);
+        }
+    }
+
+    protected static function spendSpike(Client $c, Carbon $d, array $r, array &$found): void
+    {
+        $days = MetricsQuery::daily($c, $d->copy()->subDays(7)->toDateString(), $d->toDateString());
+        $y = $days[$d->toDateString()] ?? ['spend' => 0.0];
+        $prevSum = 0.0;
+        for ($i = 1; $i <= 7; $i++) {
+            $prevSum += $days[$d->copy()->subDays($i)->toDateString()]['spend'] ?? 0.0;
+        }
+        $avg = $prevSum / 7;
+        if ($y['spend'] < (float) ($r['t']['min_spend'] ?? 50) || $avg <= 0) {
+            return;
+        }
+        $spikePct = ($y['spend'] / $avg - 1) * 100;
+        if ($spikePct >= (float) $r['t']['pct']) {
+            static::add($found, 'spend_spike', $r, ['client_id' => $c->id, 'entity_type' => 'client', 'entity_id' => $c->id, 'entity_name' => $c->name,
+                'title' => 'Daily spend spike +'.round($spikePct).'%: '.$c->name,
+                'detail' => 'Spent '.number_format($y['spend'], 2).' '.$c->currency.' on '.$d->toDateString().' vs '.number_format($avg, 2).' daily average.',
+                'payload' => ['spend' => round($y['spend'], 2), 'avg' => round($avg, 2), 'pct' => round($spikePct, 1)]]);
+        }
+    }
+
+    protected static function highFrequency(Client $c, Carbon $d, array $r, array &$found): void
+    {
+        $now = MetricsQuery::totals($c, $d->copy()->subDays(6)->toDateString(), $d->toDateString());
+        if ($now['reach'] <= 0 || $now['impressions'] < 1000) {
+            return;
+        }
+        $freq = $now['impressions'] / $now['reach'];
+        if ($freq >= (float) ($r['t']['max_freq'] ?? 4)) {
+            static::add($found, 'high_frequency', $r, ['client_id' => $c->id, 'entity_type' => 'client', 'entity_id' => $c->id, 'entity_name' => $c->name,
+                'title' => 'High ad frequency ('.number_format($freq, 1).'): '.$c->name,
+                'detail' => 'Reached people saw ads '.number_format($freq, 1).' times on average over the last 7 days. Refresh creatives or widen audiences.',
+                'payload' => ['frequency' => round($freq, 2)]]);
+        }
+    }
+
+    protected static function leadCostSpike(Client $c, Carbon $d, array $r, array &$found): void
+    {
+        if (! $c->target_cpr || $c->target_cpr <= 0) {
+            return;
+        }
+        $now = MetricsQuery::totals($c, $d->copy()->subDays(6)->toDateString(), $d->toDateString());
+        if (! $now['cpr'] || $now['main_results'] < 3) {
+            return;
+        }
+        $overPct = ($now['cpr'] / (float) $c->target_cpr - 1) * 100;
+        if ($overPct >= (float) $r['t']['pct']) {
+            static::add($found, 'lead_cost_spike', $r, ['client_id' => $c->id, 'entity_type' => 'client', 'entity_id' => $c->id, 'entity_name' => $c->name,
+                'title' => 'Cost per result '.round($overPct).'% above target: '.$c->name,
+                'detail' => 'Last 7 days '.number_format($now['cpr'], 2).' vs target '.number_format((float) $c->target_cpr, 2).' '.$c->currency.'.',
+                'payload' => ['cpr' => round($now['cpr'], 2), 'target' => (float) $c->target_cpr, 'pct' => round($overPct, 1)]]);
+        }
+    }
+
+    protected static function highCpc(Client $c, Carbon $d, array $r, array &$found): void
+    {
+        $now = MetricsQuery::totals($c, $d->copy()->subDays(6)->toDateString(), $d->toDateString());
+        $prev = MetricsQuery::totals($c, $d->copy()->subDays(13)->toDateString(), $d->copy()->subDays(7)->toDateString());
+        $minClicks = (float) ($r['t']['min_clicks'] ?? 20);
+        if ($now['link_clicks'] < $minClicks || $prev['link_clicks'] < $minClicks || $now['spend'] <= 0 || $prev['spend'] <= 0) {
+            return;
+        }
+        $cpcNow = $now['spend'] / $now['link_clicks'];
+        $cpcPrev = $prev['spend'] / $prev['link_clicks'];
+        $pct = ($cpcNow / $cpcPrev - 1) * 100;
+        if ($pct >= (float) $r['t']['pct']) {
+            static::add($found, 'high_cpc', $r, ['client_id' => $c->id, 'entity_type' => 'client', 'entity_id' => $c->id, 'entity_name' => $c->name,
+                'title' => 'Cost per click up '.round($pct).'%: '.$c->name,
+                'detail' => 'Last 7 days '.number_format($cpcNow, 2).' vs '.number_format($cpcPrev, 2).' '.$c->currency.' the week before.',
+                'payload' => ['now' => round($cpcNow, 3), 'prev' => round($cpcPrev, 3), 'pct' => round($pct, 1)]]);
+        }
+    }
+
+    protected static function zeroImpressions(Agency $a, Carbon $d, array $r, array &$found): void
+    {
+        $minPrior = (int) ($r['t']['min_prior_impressions'] ?? 500);
+        $priorImp = DailyMetric::query()->where('agency_id', $a->id)->whereNotNull('campaign_ref')
+            ->whereDate('date', '>=', $d->copy()->subDays(7)->toDateString())
+            ->whereDate('date', '<=', $d->copy()->subDays(1)->toDateString())
+            ->selectRaw('campaign_ref, SUM(impressions) as imp')->groupBy('campaign_ref')->pluck('imp', 'campaign_ref');
+        $yImp = DailyMetric::query()->where('agency_id', $a->id)->whereNotNull('campaign_ref')
+            ->whereDate('date', $d->toDateString())
+            ->selectRaw('campaign_ref, SUM(impressions) as imp')->groupBy('campaign_ref')->pluck('imp', 'campaign_ref');
+        foreach (Campaign::where('agency_id', $a->id)->whereIn('status', ['ACTIVE', 'ENABLED'])->get() as $camp) {
+            if (($priorImp[$camp->id] ?? 0) >= $minPrior && ($yImp[$camp->id] ?? 0) <= 0) {
+                $acct = AdAccount::find($camp->ad_account_id);
+                static::add($found, 'zero_impressions', $r, ['client_id' => $acct?->client_id, 'ad_account_id' => $camp->ad_account_id,
+                    'entity_type' => 'campaign', 'entity_id' => $camp->id, 'entity_name' => $camp->name,
+                    'title' => 'Active campaign with 0 impressions: '.$camp->name,
+                    'detail' => '0 impressions on '.$d->toDateString().' after '.number_format((int) $priorImp[$camp->id]).' impressions in the previous 7 days.']);
             }
         }
     }
