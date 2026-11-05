@@ -9,7 +9,7 @@ class PlanLimits
 {
     public static function seatsLimit(Agency $a): int
     {
-        return (int) ($a->planModel?->seats ?? 3);
+        return static::capped($a, 'seats', (int) ($a->planModel?->seats ?? 3));
     }
 
     public static function seatsUsed(Agency $a): int
@@ -24,7 +24,23 @@ class PlanLimits
 
     public static function adAccountsLimit(Agency $a): int
     {
-        return (int) ($a->planModel?->ad_accounts ?? 10);
+        return static::capped($a, 'ad_accounts', (int) ($a->planModel?->ad_accounts ?? 10));
+    }
+
+    /** D-61: while the trial runs, the trial cap applies when it is lower than the plan's own limit. */
+    private static function capped(Agency $a, string $key, int $planLimit): int
+    {
+        $cap = Trial::cap($key);
+
+        return ($cap !== null && Trial::isOn($a)) ? min($planLimit, $cap) : $planLimit;
+    }
+
+    /** Whether the limit that applies right now is the trial cap (for the quota notice wording). */
+    public static function isTrialCap(Agency $a, string $key): bool
+    {
+        $cap = Trial::cap($key);
+
+        return $cap !== null && Trial::isOn($a) && ($key === 'seats' ? static::seatsLimit($a) : static::adAccountsLimit($a)) === $cap;
     }
 
     public static function adAccountsUsed(Agency $a): int
@@ -39,10 +55,6 @@ class PlanLimits
 
     public static function trialDaysLeft(Agency $a): ?int
     {
-        if ($a->status !== 'trial' || ! $a->trial_ends_at) {
-            return null;
-        }
-
-        return max(0, (int) ceil(now()->diffInHours($a->trial_ends_at, false) / 24));
+        return Trial::daysLeft($a);
     }
 }

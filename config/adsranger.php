@@ -25,6 +25,30 @@ return [
     'reserved_slugs' => ['new', 'login', 'logout', 'register', 'profile', 'connect', 'password-reset', 'email-verification',
         'multi-factor-authentication', 'two-factor-authentication', 'admin', 'api', 'app', 'auth', 'oauth', 'webhooks', 'livewire', 'filament'],
     'trial_days' => 14,
+    // #158 self-signup. The flag stays OFF until Rami opens it (D-40/D-41/D-42). A super admin's switch in
+    // /admin › Platform settings wins over this env default once it has been saved.
+    'signup' => [
+        'open' => (bool) env('SIGNUP_OPEN', false),
+        'attempts_per_hour' => 5, // per IP
+        'support_email' => 'support@adsranger.com',
+        // Temporary-inbox services refused at signup (small built-in list; extend here).
+        'disposable_domains' => [
+            'mailinator.com', 'guerrillamail.com', 'guerrillamail.net', 'sharklasers.com', 'grr.la', '10minutemail.com',
+            '10minutemail.net', 'tempmail.com', 'temp-mail.org', 'temp-mail.io', 'tempmail.net', 'throwawaymail.com',
+            'yopmail.com', 'yopmail.net', 'getnada.com', 'nada.email', 'trashmail.com', 'trashmail.de', 'dispostable.com',
+            'maildrop.cc', 'mailnesia.com', 'mintemail.com', 'mohmal.com', 'fakeinbox.com', 'emailondeck.com',
+            'tempinbox.com', 'spamgourmet.com', 'mailcatch.com', 'moakt.com', 'tmpmail.org', 'burnermail.io', 'mail.tm',
+            'discard.email', 'inboxkitten.com', 'mytemp.email', 'tempr.email', 'emailfake.com', 'spam4.me',
+        ],
+        // D-61: one trial per email domain applies to business domains only; these shared providers are exempt.
+        'free_mail_domains' => [
+            'gmail.com', 'googlemail.com', 'hotmail.com', 'outlook.com', 'live.com', 'msn.com', 'yahoo.com', 'yahoo.co.uk',
+            'ymail.com', 'icloud.com', 'me.com', 'mac.com', 'aol.com', 'proton.me', 'protonmail.com', 'gmx.com', 'gmx.de',
+            'mail.com', 'zoho.com', 'yandex.com', 'yandex.ru', 'hotmail.fr', 'outlook.sa', 'live.co.uk',
+        ],
+    ],
+    // D-61: while on trial (Pro tier) an agency is capped at these limits; the plan's own limit applies if lower.
+    'trial_caps' => ['ad_accounts' => 5, 'seats' => 3],
     // Panel language when nothing else decides it (UX-3: Arabic first).
     'panel_locale' => 'ar',
     // Networks that start with report import only (no public API yet).

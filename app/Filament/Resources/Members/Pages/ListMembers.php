@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Members\Pages;
 use App\Filament\Resources\Members\MemberResource;
 use App\Models\AgencyInvitation;
 use App\Support\PlanLimits;
+use App\Support\QuotaNotice;
 use App\Support\TeamRoles;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
@@ -35,7 +36,7 @@ class ListMembers extends ListRecords
                         return;
                     }
                     if (! PlanLimits::canAddSeat($agency)) {
-                        Notification::make()->title(__('No free seats'))->body(trans_choice('{1} Your plan includes :count seat (members + pending invites).|[2,*] Your plan includes :count seats (members + pending invites).', PlanLimits::seatsLimit($agency)).' '.__('Revoke an invite, remove a member, or upgrade.'))->warning()->send();
+                        QuotaNotice::make($agency, auth()->user(), 'seats')->send();
 
                         return;
                     }

@@ -11,13 +11,13 @@ use App\Models\User;
  */
 class PlanGate
 {
-    /** The agency's effective tier key: its plan, raised to the trial tier while on trial (D-61). */
+    /** The agency's effective tier key: its plan, raised to the trial tier while the trial runs (D-61; not after its end date). */
     public static function tier(Agency $agency): string
     {
         $tiers = config('plan_features.tiers');
         $tier = array_key_exists($agency->plan, $tiers) ? $agency->plan : 'starter';
 
-        if ($agency->status === 'trial') {
+        if (Trial::isOn($agency)) {
             $trial = config('plan_features.trial_tier', 'starter');
             if (($tiers[$trial] ?? 0) > $tiers[$tier]) {
                 $tier = $trial;

@@ -2,7 +2,7 @@
     <x-filament::section>
         <x-slot name="heading">{{ __(':plan plan', ['plan' => $plan?->name ?? ucfirst($agency->plan)]) }}</x-slot>
         <x-slot name="description">
-            {{ __('Status: :status', ['status' => __(ucfirst($agency->status))]) }}@if (! is_null($trialDays)) · {{ trans_choice(':count day left in your trial|:count days left in your trial', $trialDays) }} @endif
+            {{ __('Status: :status', ['status' => __(ucfirst($agency->status))]) }}@if (! is_null($trialDays)) · {{ trans_choice(':count day left in your trial|:count days left in your trial', $trialDays) }} @endif@if ($trialEnded) · {{ __('Trial ended') }} @endif
         </x-slot>
         <div style="display:grid;gap:14px">
             @foreach ($rows as [$label, $used, $limit])

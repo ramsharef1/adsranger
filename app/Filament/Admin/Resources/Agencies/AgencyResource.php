@@ -9,6 +9,7 @@ use App\Filament\Concerns\TranslatesResourceLabels;
 use App\Models\Agency;
 use App\Models\Plan;
 use App\Support\DemoData;
+use App\Support\Trial;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -73,6 +74,7 @@ class AgencyResource extends Resource
                 Select::make('status')->options(config('adsranger.agency_statuses'))->required()
                     ->helperText(__('Suspended agencies cannot sign in to their workspace.')),
                 DateTimePicker::make('trial_ends_at')->label(__('Trial ends'))->seconds(false),
+                Select::make('signup_source')->label(__('Signup source'))->options(static::sources())->disabled()->dehydrated(false),
             ])->columnSpan(2),
             Section::make(__('Network overrides'))->description(__('Layer 3 of the access rules. "Always allow" turns a network on for this agency even when it is off globally or not in its plan (good for beta tests). "Block" hides it, and wins over everything.'))->columns(2)->schema([
                 CheckboxList::make('allowedNetworks')->label(__('Always allow'))->relationship('allowedNetworks', 'name'),
@@ -96,14 +98,20 @@ class AgencyResource extends Resource
                     'suspended' => 'danger',
                     default => 'gray',
                 }),
+                TextColumn::make('signup_source')->label(__('Signup source'))->badge()
+                    ->formatStateUsing(fn (?string $state) => static::sources()[$state] ?? $state)
+                    ->color(fn (?string $state) => $state === 'self_signup' ? 'info' : 'gray'),
+                TextColumn::make('trial_ends_at')->label(__('Trial ends'))->date('Y-m-d')->placeholder('—'),
                 TextColumn::make('country'),
                 TextColumn::make('created_at')->label(__('Created'))->since(),
             ])
             ->filters([
                 SelectFilter::make('plan')->options(config('adsranger.plans')),
                 SelectFilter::make('status')->options(config('adsranger.agency_statuses')),
+                SelectFilter::make('signup_source')->label(__('Signup source'))->options(static::sources()),
             ])
             ->recordActions([EditAction::make(), ActionGroup::make([
+                static::extendTrialAction(),
                 Action::make('demo')->label(__('Load demo data'))->icon('heroicon-o-beaker')->requiresConfirmation()
                     ->modalDescription(__('Adds 3 sample clients with 90 days of Meta-style results and runs the alert rules. Remove it any time.'))
                     ->action(function (Agency $r) {
@@ -117,6 +125,27 @@ class AgencyResource extends Resource
                         Notification::make()->title(__('Demo data removed'))->success()->send();
                     }),
             ])]);
+    }
+
+    /** @return array<string, string> */
+    public static function sources(): array
+    {
+        return ['invite' => __('Invite'), 'self_signup' => __('Self-signup'), 'admin' => __('Created by admin')];
+    }
+
+    /** #158 / 911 part 3 point 10: extend a trial (days input, confirm with the new end date), audit `agency.trial_extended`. */
+    public static function extendTrialAction(): Action
+    {
+        return Action::make('extendTrial')->label(__('Extend trial'))->icon('heroicon-o-clock')
+            ->visible(fn (Agency $r) => $r->status === 'trial')
+            ->modalHeading(__('Extend trial'))
+            ->modalDescription(fn (Agency $r) => __('Counted from the current end date (:date), or from today if it has passed. You can change it again later.', ['date' => $r->trial_ends_at?->format('Y-m-d') ?? '—']))
+            ->schema([TextInput::make('days')->label(__('Days to add'))->numeric()->integer()->minValue(1)->maxValue(90)->default(7)->required()])
+            ->modalSubmitActionLabel(__('Extend trial'))
+            ->action(function (Agency $r, array $data) {
+                $to = Trial::extend($r, (int) $data['days']);
+                Notification::make()->title(__('Trial extended for :agency until :date', ['agency' => $r->name, 'date' => $to->format('Y-m-d')]))->success()->send();
+            });
     }
 
     public static function getPages(): array

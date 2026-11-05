@@ -6,6 +6,7 @@ use App\Filament\Concerns\TranslatesPageLabels;
 use App\Support\NetworkAccess;
 use App\Support\PlanGate;
 use App\Support\PlanLimits;
+use App\Support\Trial;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Pages\Page;
@@ -37,6 +38,7 @@ class PlanUsage extends Page
             'agency' => $a,
             'plan' => $a->planModel,
             'trialDays' => PlanLimits::trialDaysLeft($a),
+            'trialEnded' => Trial::hasEnded($a),
             'rows' => [
                 [__('Team seats (members + pending invites)'), PlanLimits::seatsUsed($a), PlanLimits::seatsLimit($a)],
                 [__('Tracked ad accounts'), PlanLimits::adAccountsUsed($a), PlanLimits::adAccountsLimit($a)],

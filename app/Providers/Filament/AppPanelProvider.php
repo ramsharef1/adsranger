@@ -2,7 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\EmailVerificationPrompt;
 use App\Filament\Pages\Auth\Login;
+use App\Filament\Pages\Auth\Register;
 use App\Filament\Pages\Auth\RequestPasswordReset;
 use App\Filament\Pages\Auth\ResetPassword;
 use App\Filament\Pages\Tenancy\EditAgencyProfile;
@@ -43,9 +45,14 @@ class AppPanelProvider extends PanelProvider
             ->favicon(asset('brand/favicon.svg'))
             ->login(Login::class)
             ->passwordReset(RequestPasswordReset::class, ResetPassword::class)
+            // #158: /app/register always answers; the page itself shows the invite-only copy while `signup.open` is off.
+            ->registration(Register::class)
+            ->emailVerification(EmailVerificationPrompt::class)
             ->font('IBM Plex Sans Arabic', provider: GoogleFontProvider::class)
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.head'))
             ->renderHook(PanelsRenderHook::SIMPLE_PAGE_END, fn () => view('panels.lang-switch'))
+            // D-61 trial banner (days left / trial ended), under the top bar.
+            ->renderHook(PanelsRenderHook::TOPBAR_AFTER, fn () => view('panels.trial-banner'))
             ->profile(isSimple: false)
             ->tenant(Agency::class, slugAttribute: 'slug')
             ->tenantRegistration(RegisterAgency::class)

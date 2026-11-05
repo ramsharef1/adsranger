@@ -10,6 +10,7 @@ use App\Jobs\SyncAdAccount;
 use App\Models\AdAccount;
 use App\Models\Client;
 use App\Support\PlanLimits;
+use App\Support\QuotaNotice;
 use App\Support\TeamRoles;
 use App\Sync\SyncService;
 use BackedEnum;
@@ -102,7 +103,7 @@ class AdAccountResource extends Resource
                     ->visible(fn (AdAccount $r) => $can() && ! $r->is_active)
                     ->action(function (AdAccount $r) {
                         if (! PlanLimits::canActivateAdAccount($r->agency)) {
-                            Notification::make()->title(__('Plan limit reached'))->body(trans_choice('{1} Your plan tracks up to :count ad account.|[2,*] Your plan tracks up to :count ad accounts.', PlanLimits::adAccountsLimit($r->agency)).' '.__('Stop tracking one, or upgrade.'))->warning()->send();
+                            QuotaNotice::make($r->agency, auth()->user(), 'ad_accounts')->send();
 
                             return;
                         }
