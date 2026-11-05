@@ -5,13 +5,20 @@ namespace App\Filament\Resources\Clients\Pages;
 use App\Filament\Resources\Clients\ClientResource;
 use App\Models\AdSet;
 use App\Models\Alert;
+use App\Models\AuditLog;
 use App\Models\Campaign;
+use App\Models\ClientLink;
 use App\Support\HealthScore;
 use App\Support\MetricsQuery;
 use App\Support\Pacing;
 use App\Support\Periods;
 use App\Support\PlanGate;
+use App\Support\TeamRoles;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
 
 /** Client results: KPIs by goal, 6-month trend, campaigns → ad sets → ads drill-down, top ads. */
@@ -34,7 +41,46 @@ class ViewClient extends ViewRecord
 
     protected function getHeaderActions(): array
     {
-        return [EditAction::make()->label('Settings & targets')];
+        return [
+            // #56 signed client links: owners, admins and managers create and revoke; everyone in the workspace can see them.
+            Action::make('clientLinks')
+                ->label(__('Client links'))
+                ->icon('heroicon-o-link')
+                ->color('gray')
+                ->modalHeading(__('Client links'))
+                ->modalDescription(__('Anyone with a link can see this client\'s results without an account. Revoke a link to stop it working.'))
+                ->modalContent(fn () => view('filament.pages.client-links', [
+                    'links' => $this->record->links()->latest()->get(),
+                    'canManage' => $this->canManageLinks(),
+                ]))
+                ->schema(fn () => $this->canManageLinks() ? [
+                    TextInput::make('label')->label(__('Name (optional)'))->maxLength(80)->placeholder(__('e.g. Monthly review')),
+                    Select::make('days')->label(__('Expires'))->options(['' => __('Never'), '30' => __('In 30 days'), '90' => __('In 90 days')])->default(''),
+                ] : [])
+                ->modalSubmitActionLabel(__('Create link'))
+                ->modalSubmitAction(fn ($action) => $this->canManageLinks() ? $action : false)
+                ->action(function (array $data): void {
+                    abort_unless($this->canManageLinks(), 403);
+                    $link = ClientLink::issue($this->record, auth()->user(), $data['label'] ?? null, ($data['days'] ?? '') !== '' ? (int) $data['days'] : null);
+                    AuditLog::record('client_link.created', $this->record, ['link_id' => $link->id, 'expires_at' => $link->expires_at?->toDateString()]);
+                    Notification::make()->title(__('Client link created'))->body($link->url())->success()->persistent()->send();
+                }),
+            EditAction::make()->label('Settings & targets'),
+        ];
+    }
+
+    public function canManageLinks(): bool
+    {
+        return TeamRoles::canManageData(auth()->user(), $this->record->agency);
+    }
+
+    public function revokeLink(int $id): void
+    {
+        abort_unless($this->canManageLinks(), 403);
+        $link = $this->record->links()->whereKey($id)->firstOrFail();
+        $link->forceFill(['revoked_at' => now()])->save();
+        AuditLog::record('client_link.revoked', $this->record, ['link_id' => $link->id]);
+        Notification::make()->title(__('Link revoked'))->success()->send();
     }
 
     public function setPeriod(string $p): void

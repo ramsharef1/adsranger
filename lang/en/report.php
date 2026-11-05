@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'title' => ':client · results',
+    'by' => 'Prepared by :agency',
+    'periods' => ['7d' => 'Last 7 days', '30d' => 'Last 30 days', 'mtd' => 'This month', 'last_month' => 'Last month'],
+    'range' => ':from to :to',
+    'spend' => 'Spend',
+    'results' => 'Results',
+    'cpr' => 'Cost per result',
+    'roas' => 'Return on ad spend',
+    'impressions' => 'Impressions',
+    'clicks' => 'Link clicks',
+    'vs_prev' => 'vs the previous period',
+    'month' => 'This month',
+    'budget' => 'Monthly budget',
+    'spent' => 'Spent so far',
+    'pace' => 'Pace',
+    'pace_note' => 'Spent compared with the budget expected by now.',
+    'campaigns' => 'Campaigns',
+    'campaign' => 'Campaign',
+    'no_data' => 'No results in this period yet.',
+    'synced' => 'Data updated :ago',
+    'not_synced' => 'Waiting for the first data sync',
+    'footer' => 'This page is read-only and shared by your agency. Figures come from the ad networks and may change for up to 3 days.',
+    'switch' => 'العربية',
+    'switch_lang' => 'ar',
+];

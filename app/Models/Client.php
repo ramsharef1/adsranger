@@ -67,4 +67,9 @@ class Client extends Model
         });
         static::deleted(fn (Client $c) => AuditLog::record('client.deleted', $c->agency, ['client_id' => $c->id, 'name' => $c->name]));
     }
+
+    public function links(): HasMany
+    {
+        return $this->hasMany(ClientLink::class);
+    }
 }
