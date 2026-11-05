@@ -1102,5 +1102,11 @@
     "Last request": "آخر طلب",
     "Suggestion": "اقتراح",
     "Catalog": "الدليل",
-    "Notes from workspaces": "ملاحظات من مساحات العمل"
+    "Notes from workspaces": "ملاحظات من مساحات العمل",
+    "Count calls as": "احتساب المكالمات بحسب",
+    "Meta call ads report calls placed, confirmed and 20 seconds or longer. The one you pick is the result and the cost per result of call campaigns. Other networks report one call count.": "تُبلغ إعلانات الاتصال في Meta عن المكالمات المُجراة والمؤكدة والتي استمرت 20 ثانية فأكثر. ما تختاره يُحتسب نتيجةً وتكلفةً لكل نتيجة في حملات المكالمات. أما المنصات الأخرى فتُبلغ عن عدد واحد للمكالمات.",
+    "Counted as the result: :basis": "المحتسب نتيجةً: :basis",
+    ":pct% of calls placed": ":pct% من المكالمات المُجراة",
+    "A call of 20 seconds or more is the closest sign of a real conversation. Change what counts in the client settings.": "المكالمة التي تستمر 20 ثانية فأكثر هي أقرب مؤشر إلى محادثة حقيقية. يمكنك تغيير ما يُحتسب من إعدادات العميل.",
+    "This network reports one call count.": "تُبلغ هذه المنصة عن عدد واحد للمكالمات."
 }

@@ -92,6 +92,9 @@ class ClientResource extends Resource
                 TextInput::make('target_cpr')->label(__('Target cost per result'))->numeric()->minValue(0),
                 TextInput::make('target_results')->label(__('Target results / month'))->numeric()->integer()->minValue(0),
                 TextInput::make('target_roas')->label(__('Target ROAS'))->numeric()->minValue(0)->helperText(__('e.g. 3 = 3× revenue')),
+                Select::make('call_result')->label(__('Count calls as'))->options(fn () => \App\Support\CallResults::options())
+                    ->default('placed')->selectablePlaceholder(false)->columnSpan(2)
+                    ->helperText(__('Meta call ads report calls placed, confirmed and 20 seconds or longer. The one you pick is the result and the cost per result of call campaigns. Other networks report one call count.')),
             ]),
             Section::make(__('Accounts and access'))->columns(2)->schema([
                 Select::make('ad_account_ids')->label(__('Ad accounts'))->multiple()->searchable()

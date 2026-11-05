@@ -83,7 +83,7 @@ class DataExport
         if ($withSpend) {
             $head[] = __('Cost per result');
         }
-        array_push($head, __('Leads'), __('Messages'), __('Calls'), __('Purchases'), __('Revenue'));
+        array_push($head, __('Leads'), __('Messages'), __('Calls placed'), __('Calls confirmed'), __('Calls 20s+'), __('Purchases'), __('Revenue'));
         static::row($out, $head);
 
         $sum = fn (string $c) => "SUM(m.$c) as $c";
@@ -96,7 +96,7 @@ class DataExport
             ->when($clientIds !== null, fn ($w) => $w->whereIn('m.client_id', $clientIds ?: [0]))
             ->selectRaw(implode(',', ['m.date', 'cl.name as client_name', 'm.network', 'a.name as account_name', 'a.external_id as account_ext',
                 'c.name as campaign_ref_name', 'm.campaign_name', 'm.currency', 'm.result_type',
-                ...array_map($sum, ['spend', 'impressions', 'reach', 'link_clicks', 'clicks', 'results', 'leads', 'messages', 'calls', 'purchases', 'revenue'])]))
+                ...array_map($sum, ['spend', 'impressions', 'reach', 'link_clicks', 'clicks', 'results', 'leads', 'messages', 'calls', 'calls_confirmed', 'calls_20s', 'purchases', 'revenue'])]))
             ->groupBy('m.date', 'cl.name', 'm.network', 'a.name', 'a.external_id', 'c.name', 'm.campaign_name', 'm.currency', 'm.result_type')
             ->orderBy('m.date')->orderBy('cl.name')->orderBy('m.network')->orderBy('a.name')->orderBy('a.external_id')
             ->orderBy('c.name')->orderBy('m.campaign_name')->orderBy('m.currency')->orderBy('m.result_type');
@@ -116,7 +116,7 @@ class DataExport
             if ($withSpend) {
                 $cells[] = (float) $r->results > 0 ? static::money((float) $r->spend / (float) $r->results) : '';
             }
-            array_push($cells, static::num($r->leads), static::num($r->messages), static::num($r->calls), static::num($r->purchases), static::money($r->revenue));
+            array_push($cells, static::num($r->leads), static::num($r->messages), static::num($r->calls), static::num($r->calls_confirmed), static::num($r->calls_20s), static::num($r->purchases), static::money($r->revenue));
             static::row($out, $cells);
             $n++;
         }

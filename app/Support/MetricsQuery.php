@@ -29,7 +29,7 @@ class MetricsQuery
     }
 
     /** Fold grouped rows (with date + currency) into totals in the client's currency. */
-    protected static function fold(iterable $rows, string $cur, ?callable $key = null): array
+    protected static function fold(iterable $rows, string $cur, ?callable $key = null, string $callBasis = 'placed'): array
     {
         $out = [];
         foreach ($rows as $r) {
@@ -39,11 +39,12 @@ class MetricsQuery
             $spend = (float) $r->spend * $rate;
             $o['spend'] += $spend;
             $o['revenue'] += (float) $r->revenue * $rate;
+            $res = CallResults::results($r, $callBasis); // #12: the client's chosen call count
             foreach (self::COUNTS as $c) {
-                $o[$c] += (float) $r->{$c};
+                $o[$c] += $c === 'results' ? $res : (float) $r->{$c};
             }
             $t = $r->result_type ?: 'conversion';
-            $o['by_type'][$t] = ($o['by_type'][$t] ?? 0) + (float) $r->results;
+            $o['by_type'][$t] = ($o['by_type'][$t] ?? 0) + $res;
             $o['type_spend'][$t] = ($o['type_spend'][$t] ?? 0) + $spend;
             if ($r->roas_eligible) {
                 $o['roas_spend'] += $spend;
@@ -72,18 +73,18 @@ class MetricsQuery
 
     public static function totals(Client $c, string $from, string $to): array
     {
-        $rows = static::base($c, $from, $to)->selectRaw(implode(',', array_merge(['date', 'currency', 'result_type', 'roas_eligible'], static::sums())))
-            ->groupBy('date', 'currency', 'result_type', 'roas_eligible')->get();
+        $rows = static::base($c, $from, $to)->selectRaw(implode(',', array_merge(['date', 'currency', 'network', 'result_type', 'roas_eligible'], static::sums())))
+            ->groupBy('date', 'currency', 'network', 'result_type', 'roas_eligible')->get();
 
-        return static::fold($rows, $c->currency)['_'] ?? static::empty();
+        return static::fold($rows, $c->currency, null, CallResults::basis($c->call_result))['_'] ?? static::empty();
     }
 
     /** Per day: [date => totals]. */
     public static function daily(Client $c, string $from, string $to): array
     {
-        $rows = static::base($c, $from, $to)->selectRaw(implode(',', array_merge(['date', 'currency', 'result_type', 'roas_eligible'], static::sums())))
-            ->groupBy('date', 'currency', 'result_type', 'roas_eligible')->orderBy('date')->get();
-        $out = static::fold($rows, $c->currency, fn ($r) => substr((string) $r->date, 0, 10));
+        $rows = static::base($c, $from, $to)->selectRaw(implode(',', array_merge(['date', 'currency', 'network', 'result_type', 'roas_eligible'], static::sums())))
+            ->groupBy('date', 'currency', 'network', 'result_type', 'roas_eligible')->orderBy('date')->get();
+        $out = static::fold($rows, $c->currency, fn ($r) => substr((string) $r->date, 0, 10), CallResults::basis($c->call_result));
         ksort($out);
 
         return $out;
@@ -133,9 +134,9 @@ class MetricsQuery
         if ($parentRef) {
             $q->where($level === 'ad_set' ? 'campaign_ref' : 'ad_set_ref', $parentRef);
         }
-        $rows = $q->selectRaw(implode(',', array_merge(["$col as ref", 'date', 'currency', 'result_type', 'roas_eligible'], static::sums())))
-            ->groupBy($col, 'date', 'currency', 'result_type', 'roas_eligible')->get();
-        $out = static::fold($rows, $c->currency, fn ($r) => (int) $r->ref);
+        $rows = $q->selectRaw(implode(',', array_merge(["$col as ref", 'date', 'currency', 'network', 'result_type', 'roas_eligible'], static::sums())))
+            ->groupBy($col, 'date', 'currency', 'network', 'result_type', 'roas_eligible')->get();
+        $out = static::fold($rows, $c->currency, fn ($r) => (int) $r->ref, CallResults::basis($c->call_result));
         $table = ['campaign' => 'campaigns', 'ad_set' => 'ad_sets', 'ad' => 'ads'][$level];
         $meta = DB::table($table)->whereIn('id', array_keys($out))->get()->keyBy('id');
         $list = [];

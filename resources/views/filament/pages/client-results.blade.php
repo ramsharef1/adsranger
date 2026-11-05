@@ -15,8 +15,8 @@
         [__('Link CTR'), $t['ctr'] ? number_format($t['ctr'], 2).'%' : '–', $delta($t['ctr'], $prev['ctr']), null],
     ];
     $goals = array_filter([
-        'Leads' => $t['leads'], 'Conversations' => $t['messages'], 'Calls placed' => $t['calls'], 'Calls confirmed' => $t['calls_confirmed'],
-        'Calls 20s+' => $t['calls_20s'], 'Purchases' => $t['purchases'], 'Purchase value' => $t['revenue'] > 0 ? R::money($t['revenue'], $cur) : 0,
+        'Leads' => $t['leads'], 'Conversations' => $t['messages'],
+        'Purchases' => $t['purchases'], 'Purchase value' => $t['revenue'] > 0 ? R::money($t['revenue'], $cur) : 0,
         'ThruPlays' => $t['thruplays'], 'Landing page views' => $t['landing_views'], 'Link clicks' => $t['link_clicks'],
     ]);
     $maxSpend = max(1, collect($months)->max('spend'));
@@ -117,6 +117,38 @@
                     <div><div style="{{ $muted }}">{{ __($label) }}</div><div style="font-weight:600">{{ is_numeric($n) ? number_format($n) : $n }}</div></div>
                 @endforeach
             </div>
+        </x-filament::section>
+    @endif
+
+    @php $calls = \App\Support\CallResults::summary($t); $callBasis = \App\Support\CallResults::basis($client->call_result); @endphp
+    @if ($calls)
+        <x-filament::section>
+            <x-slot name="heading">{{ __('Calls') }}</x-slot>
+            <x-slot name="description">{{ __('Counted as the result: :basis', ['basis' => \App\Support\CallResults::options()[$callBasis]]) }}</x-slot>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+                <div><div style="{{ $muted }}">{{ __('Calls placed') }}</div><div style="font-size:20px;font-weight:700">{{ number_format($calls['placed']) }}</div>
+                    @if ($calls['cost_placed'])
+                        <div style="{{ $muted }}">{{ __(':amount each', ['amount' => R::money($calls['cost_placed'], $cur)]) }}</div>
+                    @endif
+                </div>
+                @if ($calls['split'])
+                    <div><div style="{{ $muted }}">{{ __('Calls confirmed') }}</div><div style="font-size:20px;font-weight:700">{{ number_format($calls['confirmed']) }}</div>
+                        @if ($calls['confirm_rate'] !== null)
+                            <div style="{{ $muted }}">{{ __(':pct% of calls placed', ['pct' => number_format($calls['confirm_rate'], 0)]) }}</div>
+                        @endif
+                    </div>
+                    <div><div style="{{ $muted }}">{{ __('Calls 20s+') }}</div><div style="font-size:20px;font-weight:700">{{ number_format($calls['connected']) }}</div>
+                        @php
+                            $connLine = $calls['connect_rate'] !== null ? __(':pct% of calls placed', ['pct' => number_format($calls['connect_rate'], 0)]) : null;
+                            if ($calls['cost_connected']) $connLine = trim(($connLine ? $connLine.' · ' : '').__(':amount each', ['amount' => R::money($calls['cost_connected'], $cur)]));
+                        @endphp
+                        @if ($connLine)
+                            <div style="{{ $muted }}">{{ $connLine }}</div>
+                        @endif
+                    </div>
+                @endif
+            </div>
+            <div style="{{ $muted }};margin-top:8px">{{ $calls['split'] ? __('A call of 20 seconds or more is the closest sign of a real conversation. Change what counts in the client settings.') : __('This network reports one call count.') }}</div>
         </x-filament::section>
     @endif
 
