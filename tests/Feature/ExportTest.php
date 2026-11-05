@@ -228,4 +228,57 @@ class ExportTest extends TestCase
             ->assertHasNoActionErrors()
             ->assertRedirectContains('/app/acme/export/daily-metrics.csv');
     }
+
+    public function test_owner_can_self_serve_delete_workspace_with_password_and_slug(): void
+    {
+        $owner = $this->member('owner');
+        $this->withSession(['locale' => 'en'])->actingAs($owner)->get('/app/acme/export-data')->assertOk()
+            ->assertSee('Delete workspace');
+
+        Filament::setCurrentPanel(Filament::getPanel('app'));
+        Filament::setTenant($this->agency);
+        $this->actingAs($owner);
+
+        Livewire::test(ExportData::class)
+            ->callAction('deleteWorkspace', ['password' => 'wrong-pass', 'confirm_slug' => 'acme'])
+            ->assertHasActionErrors(['password']);
+
+        Livewire::test(ExportData::class)
+            ->callAction('deleteWorkspace', ['password' => 'password', 'confirm_slug' => 'wrong-slug'])
+            ->assertHasActionErrors(['confirm_slug']);
+
+        Livewire::test(ExportData::class)
+            ->callAction('deleteWorkspace', ['password' => 'password', 'confirm_slug' => 'acme'])
+            ->assertHasNoActionErrors()
+            ->assertRedirect('/');
+
+        $this->assertSoftDeleted('agencies', ['id' => $this->agency->id]);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'agency.deleted', 'subject_type' => Agency::class, 'subject_id' => $this->agency->id]);
+    }
+
+    public function test_member_can_self_serve_delete_personal_account(): void
+    {
+        $analyst = $this->member('analyst');
+        $analystId = $analyst->id;
+
+        $this->withSession(['locale' => 'en'])->actingAs($analyst)->get('/app/acme/export-data')->assertOk()
+            ->assertSee('Delete my account')
+            ->assertDontSee('Delete workspace');
+
+        Filament::setCurrentPanel(Filament::getPanel('app'));
+        Filament::setTenant($this->agency);
+        $this->actingAs($analyst);
+
+        Livewire::test(ExportData::class)
+            ->callAction('deleteAccount', ['password' => 'password', 'confirm_word' => 'NOPE'])
+            ->assertHasActionErrors(['confirm_word']);
+
+        Livewire::test(ExportData::class)
+            ->callAction('deleteAccount', ['password' => 'password', 'confirm_word' => 'DELETE'])
+            ->assertHasNoActionErrors()
+            ->assertRedirect('/');
+
+        $this->assertDatabaseMissing('users', ['id' => $analystId]);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'user.deleted', 'subject_type' => User::class, 'subject_id' => $analystId]);
+    }
 }

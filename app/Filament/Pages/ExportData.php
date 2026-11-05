@@ -5,18 +5,25 @@ namespace App\Filament\Pages;
 use App\Filament\Concerns\TranslatesPageLabels;
 use App\Http\Controllers\ExportController;
 use App\Models\Client;
+use App\Support\TrialLifecycle;
 use BackedEnum;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 use UnitEnum;
 
 /**
  * #79 Data › Export data: CSV downloads of what this user can see (daily metrics for a period, clients, ad
- * accounts) and, for the owner, the whole workspace as a ZIP of CSVs ("download my data").
+ * accounts), for the owner the whole workspace as a ZIP of CSVs ("download my data"), and self-serve
+ * workspace / personal account deletion with password confirmation.
  */
 class ExportData extends Page
 {
@@ -98,14 +105,121 @@ class ExportData extends Page
             ->url(fn () => static::exportUrl('workspace'));
     }
 
+    public function deleteWorkspaceAction(): Action
+    {
+        $agency = Filament::getTenant();
+
+        return Action::make('deleteWorkspace')
+            ->label(__('Delete workspace'))
+            ->icon('heroicon-o-trash')
+            ->color('danger')
+            ->visible(fn () => auth()->user()?->roleIn(Filament::getTenant()) === 'owner')
+            ->modalHeading(__('Delete workspace'))
+            ->modalDescription(__('This closes the workspace immediately and schedules all workspace data for deletion. Enter your password and the workspace slug to confirm.'))
+            ->schema([
+                TextInput::make('password')
+                    ->label(__('Current password'))
+                    ->password()
+                    ->required()
+                    ->rule(fn () => function (string $attribute, mixed $value, \Closure $fail): void {
+                        $user = auth()->user();
+                        if (! $user || ! Hash::check((string) $value, $user->password)) {
+                            $fail(__('The password is incorrect.'));
+                        }
+                    }),
+                TextInput::make('confirm_slug')
+                    ->label(__('Workspace slug'))
+                    ->helperText($agency?->slug ?? '')
+                    ->required()
+                    ->rule(fn () => function (string $attribute, mixed $value, \Closure $fail): void {
+                        $tenant = Filament::getTenant();
+                        if (! $tenant || trim((string) $value) !== $tenant->slug) {
+                            $fail(__('The workspace slug does not match.'));
+                        }
+                    }),
+            ])
+            ->modalSubmitActionLabel(__('Delete workspace'))
+            ->action(function () {
+                $user = auth()->user();
+                $tenant = Filament::getTenant();
+                if (! $user || ! $tenant || $user->roleIn($tenant) !== 'owner') {
+                    abort(403);
+                }
+
+                TrialLifecycle::archiveSelfServe($tenant, $user);
+                Notification::make()->title(__('Workspace scheduled for deletion.'))->success()->send();
+                $this->redirect('/');
+            });
+    }
+
+    public function deleteAccountAction(): Action
+    {
+        return Action::make('deleteAccount')
+            ->label(__('Delete my account'))
+            ->icon('heroicon-o-user-minus')
+            ->color('danger')
+            ->visible(function () {
+                $u = auth()->user();
+                $tenant = Filament::getTenant();
+                if (! $u || $u->isSuperAdmin()) {
+                    return false;
+                }
+
+                return $tenant ? $u->roleIn($tenant) !== 'owner' : true;
+            })
+            ->modalHeading(__('Delete my account'))
+            ->modalDescription(__('This permanently removes your user account from AdsRanger. Type DELETE and enter your password to confirm.'))
+            ->schema([
+                TextInput::make('password')
+                    ->label(__('Current password'))
+                    ->password()
+                    ->required()
+                    ->rule(fn () => function (string $attribute, mixed $value, \Closure $fail): void {
+                        $user = auth()->user();
+                        if (! $user || ! Hash::check((string) $value, $user->password)) {
+                            $fail(__('The password is incorrect.'));
+                        }
+                    }),
+                TextInput::make('confirm_word')
+                    ->label(__('Type DELETE to confirm'))
+                    ->required()
+                    ->rule(fn () => function (string $attribute, mixed $value, \Closure $fail): void {
+                        if (strtoupper(trim((string) $value)) !== 'DELETE') {
+                            $fail(__('Please type DELETE to confirm.'));
+                        }
+                        if (auth()->user()?->agencies()->wherePivot('role', 'owner')->exists()) {
+                            $fail(__('Delete your owned workspaces first before deleting your personal account.'));
+                        }
+                    }),
+            ])
+            ->modalSubmitActionLabel(__('Delete my account'))
+            ->action(function () {
+                $user = auth()->user();
+                if (! $user || $user->isSuperAdmin()) {
+                    abort(403);
+                }
+
+                Auth::logout();
+                TrialLifecycle::deletePersonalAccount($user);
+                if (request()?->hasSession()) {
+                    request()->session()->invalidate();
+                    request()->session()->regenerateToken();
+                }
+                $this->redirect('/');
+            });
+    }
+
     protected function getViewData(): array
     {
         $agency = Filament::getTenant();
-        $role = auth()->user()?->roleIn($agency);
+        $user = auth()->user();
+        $role = $user?->roleIn($agency);
 
         return [
-            'restricted' => ! in_array($role, ['owner', 'admin'], true) && ! auth()->user()?->isSuperAdmin(),
-            'canZip' => ExportController::canDownloadWorkspace(auth()->user(), $agency),
+            'restricted' => ! in_array($role, ['owner', 'admin'], true) && ! $user?->isSuperAdmin(),
+            'canZip' => ExportController::canDownloadWorkspace($user, $agency),
+            'canDeleteWorkspace' => $role === 'owner',
+            'canDeleteAccount' => $user && ! $user->isSuperAdmin() && $role !== 'owner',
         ];
     }
 }

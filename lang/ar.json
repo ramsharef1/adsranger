@@ -1173,5 +1173,20 @@
     "All alerts": "كل التنبيهات",
     "Assigned": "أُسند",
     "Reopened": "أُعيد فتحه",
-    "AdsRanger": "AdsRanger"
+    "AdsRanger": "AdsRanger",
+    "Delete data or account": "حذف البيانات أو الحساب",
+    "Download your workspace ZIP above first if you need a copy. Deleting the workspace closes access immediately and schedules all workspace data for permanent removal.": "حمّل ملف ZIP لمساحة العمل أعلاه أولاً إذا كنت بحاجة إلى نسخة. يؤدي حذف مساحة العمل إلى إغلاق الوصول فوراً وجدولة جميع بيانات مساحة العمل للحذف النهائي.",
+    "Permanently remove your personal user account from AdsRanger.": "إزالة حساب المستخدم الشخصي الخاص بك نهائياً من AdsRanger.",
+    "Delete workspace": "حذف مساحة العمل",
+    "This closes the workspace immediately and schedules all workspace data for deletion. Enter your password and the workspace slug to confirm.": "يؤدي هذا إلى إغلاق مساحة العمل فوراً وجدولة جميع بياناتها للحذف. أدخل كلمة المرور ومعرّف مساحة العمل للتأكيد.",
+    "Current password": "كلمة المرور الحالية",
+    "Workspace slug": "معرّف مساحة العمل",
+    "The password is incorrect.": "كلمة المرور غير صحيحة.",
+    "The workspace slug does not match.": "معرّف مساحة العمل غير مطابق.",
+    "Workspace scheduled for deletion.": "تمت جدولة مساحة العمل للحذف.",
+    "Delete my account": "حذف حسابي",
+    "This permanently removes your user account from AdsRanger. Type DELETE and enter your password to confirm.": "يؤدي هذا إلى إزالة حساب المستخدم الخاص بك نهائياً من AdsRanger. اكتب DELETE وأدخل كلمة المرور للتأكيد.",
+    "Type DELETE to confirm": "اكتب DELETE للتأكيد",
+    "Please type DELETE to confirm.": "يرجى كتابة DELETE للتأكيد.",
+    "Delete your owned workspaces first before deleting your personal account.": "احذف مساحات العمل التي تملكها أولاً قبل حذف حسابك الشخصي."
 }

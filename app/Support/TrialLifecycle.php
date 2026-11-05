@@ -119,6 +119,50 @@ class TrialLifecycle
         return $notice && $notice->gt($due) ? $notice : $due;
     }
 
+    /** Self-serve workspace closure by the workspace owner (#79): reversible soft-delete archive + audit log. */
+    public static function archiveSelfServe(Agency $a, User $actor): void
+    {
+        AgencyInvitation::where('agency_id', $a->id)->pending()->update(['expires_at' => now()]);
+        $a->delete();
+        $days = config('trial.purge_after_days');
+        AuditLog::record('agency.deleted', $a, [
+            'mode' => 'self_serve_archive',
+            'by_user_id' => $actor->id,
+            'purge_after_days' => $days === null || $days === '' ? null : (int) $days,
+        ]);
+    }
+
+    /** Self-serve personal account deletion (#79): detaches memberships and removes user row + audit log. */
+    public static function deletePersonalAccount(User $user): void
+    {
+        if ($user->isSuperAdmin()) {
+            throw new \RuntimeException('Super admin accounts cannot be deleted from the workspace panel.');
+        }
+
+        $ownsActive = $user->agencies()->wherePivot('role', 'owner')->exists();
+        if ($ownsActive) {
+            throw new \RuntimeException('Delete or transfer your owned workspaces before deleting your account.');
+        }
+
+        DB::transaction(function () use ($user) {
+            $uid = $user->id;
+            DB::table('agency_user')->where('user_id', $uid)->delete();
+            DB::table('client_user')->where('user_id', $uid)->delete();
+            if (\Illuminate\Support\Facades\Schema::hasTable('push_subscriptions')) {
+                DB::table('push_subscriptions')->where('user_id', $uid)->delete();
+            }
+            AuditLog::create([
+                'user_id' => null,
+                'action' => 'user.deleted',
+                'subject_type' => User::class,
+                'subject_id' => $uid,
+                'meta' => ['mode' => 'self_serve'],
+                'ip' => request()?->ip(),
+            ]);
+            $user->delete();
+        });
+    }
+
     /** Reversible: soft delete, pending invites expired; every row stays until the purge. */
     protected static function archive(Agency $a): void
     {

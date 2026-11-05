@@ -24,4 +24,25 @@
             {{ $this->workspaceAction }}
         </x-filament::section>
     @endif
+
+    @if ($canDeleteWorkspace || $canDeleteAccount)
+        <x-filament::section>
+            <x-slot name="heading">{{ __('Delete data or account') }}</x-slot>
+            <x-slot name="description">
+                @if ($canDeleteWorkspace)
+                    {{ __('Download your workspace ZIP above first if you need a copy. Deleting the workspace closes access immediately and schedules all workspace data for permanent removal.') }}
+                @else
+                    {{ __('Permanently remove your personal user account from AdsRanger.') }}
+                @endif
+            </x-slot>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+                @if ($canDeleteWorkspace)
+                    {{ $this->deleteWorkspaceAction }}
+                @endif
+                @if ($canDeleteAccount)
+                    {{ $this->deleteAccountAction }}
+                @endif
+            </div>
+        </x-filament::section>
+    @endif
 </x-filament-panels::page>
