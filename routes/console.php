@@ -1,9 +1,10 @@
 <?php
 
+use App\Jobs\CheckLandingPages;
 use App\Jobs\DailySync;
+use App\Jobs\QueueScheduledReports;
 use App\Jobs\RunAlerts;
 use App\Jobs\SnapshotHealth;
-use App\Jobs\CheckLandingPages;
 use App\Support\Fx;
 use Illuminate\Support\Facades\Schedule;
 
@@ -13,3 +14,5 @@ Schedule::job(new RunAlerts)->everyFifteenMinutes()->name('alerts')->withoutOver
 Schedule::job(new SnapshotHealth)->dailyAt('04:00')->name('health-snapshot')->withoutOverlapping();
 Schedule::job(new CheckLandingPages)->dailyAt('05:10')->name('landing-pages')->withoutOverlapping();
 Schedule::call(fn () => Fx::pull())->dailyAt('01:15')->name('fx-pull')->withoutOverlapping();
+// #106 scheduled email reports: daily, sends whatever is due on each workspace's date (off with REPORTS_EMAIL_ENABLED=false).
+Schedule::job(new QueueScheduledReports)->dailyAt(config('reports.send_at_utc', '05:20'))->name('scheduled-reports')->withoutOverlapping();

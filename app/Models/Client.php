@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /** An agency's client (a brand or business). Targets live here. */
 class Client extends Model
@@ -71,5 +72,11 @@ class Client extends Model
     public function links(): HasMany
     {
         return $this->hasMany(ClientLink::class);
+    }
+
+    /** #106 scheduled email report (one per client). */
+    public function reportSchedule(): HasOne
+    {
+        return $this->hasOne(ReportSchedule::class);
     }
 }

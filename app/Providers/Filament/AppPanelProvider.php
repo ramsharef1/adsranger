@@ -12,6 +12,7 @@ use App\Filament\Pages\Auth\RequestPasswordReset;
 use App\Filament\Pages\Auth\ResetPassword;
 use App\Filament\Pages\Tenancy\EditAgencyProfile;
 use App\Filament\Pages\Tenancy\RegisterAgency;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\GoogleSignInController;
 use App\Http\Middleware\EnsureAgencyTwoStep;
 use App\Http\Middleware\SetPanelLocale;
@@ -67,6 +68,13 @@ class AppPanelProvider extends PanelProvider
                     ->middleware('throttle:20,1')->name('oauth.google.callback');
                 Route::get('oauth/google/finish', GoogleFinishSignup::class)->name('oauth.google.finish');
                 Route::get('oauth/google/two-step', GoogleTwoStep::class)->name('oauth.google.two-step');
+            })
+            // #79 CSV / ZIP downloads (signed in + member of the workspace; role scoping in the controller).
+            ->authenticatedTenantRoutes(function (): void {
+                Route::get('export/daily-metrics.csv', [ExportController::class, 'metrics'])->middleware('throttle:20,1')->name('export.metrics');
+                Route::get('export/clients.csv', [ExportController::class, 'clients'])->middleware('throttle:20,1')->name('export.clients');
+                Route::get('export/ad-accounts.csv', [ExportController::class, 'adAccounts'])->middleware('throttle:20,1')->name('export.accounts');
+                Route::get('export/workspace.zip', [ExportController::class, 'workspace'])->middleware('throttle:3,1')->name('export.workspace');
             })
             ->livewireComponents([GoogleFinishSignup::class, GoogleTwoStep::class])
             ->font('IBM Plex Sans Arabic', provider: GoogleFontProvider::class)

@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\ClientLink;
+use App\Support\DataExport;
 use App\Support\MetricsQuery;
 use App\Support\MonthlyReport;
 use App\Support\Pacing;
 use App\Support\Periods;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 /** #56: the public, read-only client report behind a signed link. No login; noindex; spend hidden when the client asks. */
 class ClientReportController extends Controller
@@ -63,6 +65,29 @@ class ClientReportController extends Controller
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'attachment; filename="'.MonthlyReport::filename($client, $month, $lang).'"',
             'X-Robots-Tag' => 'noindex, nofollow', 'Cache-Control' => 'private, no-store',
+        ]);
+    }
+
+    /** #79 client-facing CSV: daily metrics for the chosen period, through the same link. Follows hide_spend. */
+    public function csv(Request $request, string $token)
+    {
+        $link = ClientLink::findActive($token);
+        abort_unless($link, 404);
+        $client = $link->client()->with('agency')->first();
+        abort_unless($client && $client->status !== 'archived', 404);
+
+        $lang = in_array($request->query('lang'), ['ar', 'en'], true) ? $request->query('lang') : ($client->agency->language === 'en' ? 'en' : 'ar');
+        app()->setLocale($lang);
+        $period = in_array($request->query('p'), self::PERIODS, true) ? $request->query('p') : '30d';
+        [$from, $to] = Periods::range($period, $client->agency->timezone ?: 'UTC');
+
+        return response()->streamDownload(function () use ($client, $from, $to) {
+            $out = fopen('php://output', 'w');
+            fwrite($out, DataExport::BOM);
+            DataExport::writeMetrics($out, $client->agency, [$client->id], $from, $to, ! $client->hide_spend, false);
+            fclose($out);
+        }, 'adsranger-'.(Str::slug($client->name) ?: 'client')."-{$from}-{$to}.csv", [
+            'Content-Type' => 'text/csv; charset=UTF-8', 'X-Robots-Tag' => 'noindex, nofollow', 'Cache-Control' => 'private, no-store',
         ]);
     }
 }

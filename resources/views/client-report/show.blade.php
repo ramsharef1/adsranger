@@ -140,6 +140,7 @@
             <a class="pill" href="{{ url('/r/'.$link->token.'/pdf').'?'.http_build_query(['m' => $m, 'lang' => $lang]) }}">{{ $label }}</a>
         @endforeach
     </nav>
+    <p><a class="pill" href="{{ url('/r/'.$link->token.'/csv').'?'.http_build_query(['p' => $period, 'lang' => $lang]) }}">{!! __('report.download_csv') !!}</a></p>
 
     <footer>
         {{ $synced ? __('report.synced', ['ago' => $synced->locale($lang)->diffForHumans()]) : __('report.not_synced') }}<br>

@@ -51,6 +51,10 @@ return [
         'alert_rules_pro' => ['tier' => 'pro', 'refs' => [23],
             'name' => ['en' => 'Pro alert rules', 'ar' => 'قواعد التنبيه الاحترافية'],
             'what' => ['en' => 'Extra rules: pacing forecast, ad-set tracking, broken landing pages and wasted search terms.', 'ar' => 'قواعد إضافية: توقع وتيرة الإنفاق، وتتبع المجموعات الإعلانية، وصفحات الهبوط المعطلة، وعبارات البحث المهدرة.']],
+        // Starter = every plan; listed so the send job and the schedule screen follow this map if the tier moves.
+        'scheduled_reports' => ['tier' => 'starter', 'refs' => [106],
+            'name' => ['en' => 'Scheduled email reports', 'ar' => 'تقارير البريد المجدولة'],
+            'what' => ['en' => 'Email each client a monthly PDF report and a weekly summary, in Arabic or English.', 'ar' => 'أرسل لكل عميل تقريرًا شهريًا بصيغة PDF وملخصًا أسبوعيًا بالبريد، بالعربية أو الإنجليزية.']],
         'annual_budget' => ['tier' => 'agency', 'refs' => [45],
             'name' => ['en' => 'Annual budget plan', 'ar' => 'خطة الميزانية السنوية'],
             'what' => ['en' => '12 months per client: plan vs actual vs forecast.', 'ar' => '12 شهرًا لكل عميل: الخطة مقابل الفعلي مقابل التوقع.']],

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ClientReportController;
 use App\Http\Controllers\ConnectController;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\ReportUnsubscribeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,15 @@ foreach (['privacy', 'terms', 'data-deletion'] as $legalPage) {
 Route::get('/r/{token}', [ClientReportController::class, 'show'])->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{40}');
 // #57 monthly PDF behind the same link
 Route::get('/r/{token}/pdf', [ClientReportController::class, 'pdf'])->middleware('throttle:10,1')->where('token', '[A-Za-z0-9]{40}');
+
+// #79 client-facing CSV behind the same link (follows hide_spend)
+Route::get('/r/{token}/csv', [ClientReportController::class, 'csv'])->middleware('throttle:10,1')->where('token', '[A-Za-z0-9]{40}');
+
+// #106 "Stop these emails" for one recipient of a scheduled report (signed; GET asks, POST records)
+Route::get('/reports/unsubscribe/{schedule}', [ReportUnsubscribeController::class, 'show'])->middleware(['signed', 'throttle:30,1'])
+    ->whereNumber('schedule')->name('reports.unsubscribe');
+Route::post('/reports/unsubscribe/{schedule}', [ReportUnsubscribeController::class, 'store'])->middleware(['signed', 'throttle:30,1'])
+    ->whereNumber('schedule');
 
 // Agency invitations
 Route::get('/invite/{token}', [InvitationController::class, 'show']);
