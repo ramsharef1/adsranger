@@ -134,6 +134,7 @@ class ViewClient extends ViewRecord
             'health' => HealthScore::compute($c),
             'pace' => Pacing::month($c),
             'forecastLocked' => PlanGate::locked($c->agency, 'forecast'),
+            'funnelLocked' => PlanGate::locked($c->agency, 'funnel'),
             'canUpgrade' => PlanGate::canUpgrade(auth()->user(), $c->agency),
             'funnel' => MetricsQuery::funnel($t),
             'actions' => MetricsQuery::conversionActions($c, $from, $to),

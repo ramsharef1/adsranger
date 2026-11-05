@@ -136,6 +136,9 @@
     @if (count($funnel) > 1)
         <x-filament::section>
             <x-slot name="heading">{{ __('Funnel') }}</x-slot>
+            @if ($funnelLocked ?? false)
+                <x-locked-state-body feature="funnel" tier="pro" :can-upgrade="$canUpgrade" />
+            @else
             @php $fTop = max(1, $funnel[0]['n']); @endphp
             <div style="display:grid;gap:8px">
                 @foreach ($funnel as $f)
@@ -149,6 +152,7 @@
                 @endforeach
             </div>
             <div style="{{ $muted }};margin-top:6px">{{ __('Bars use a log scale so small steps stay visible. % = share of the step before.') }}</div>
+            @endif
         </x-filament::section>
     @endif
 
