@@ -6,7 +6,7 @@ $t = $ar ? [
   'switch' => 'English', 'switch_url' => '/en',
   'tag' => 'نسخة تجريبية خاصة · لوكالات الشرق الأوسط',
   'h1' => 'كل حملة تُقاس بالنتيجة التي صُممت من أجلها.',
-  'lead' => 'منصة تقارير ميتا وجوجل للوكالات الإعلانية: الرسائل والمكالمات والعملاء المحتملون والتبرعات والمبيعات تُحسب حسب الهدف الحقيقي لكل حملة، مع تنبيهات يومية تكشف هدر الميزانية، وتقارير بالعربية والإنجليزية يفهمها عملاؤك.',
+  'lead' => 'منصة تقارير ميتا وجوجل للوكالات الإعلانية: الرسائل والمكالمات والعملاء المحتملون والحجوزات والمبيعات تُحسب حسب الهدف الحقيقي لكل حملة، مع تنبيهات يومية تكشف هدر الميزانية، وتقارير بالعربية والإنجليزية يفهمها عملاؤك.',
   'cta' => 'افتح المنصة',
   'f' => [
     ['ربط ميتا وجوجل', 'اربط حسابات وكالتك مرة واحدة، وتتحدث البيانات كل صباح.'],
@@ -22,7 +22,7 @@ $t = $ar ? [
   'switch' => 'العربية', 'switch_url' => '/',
   'tag' => 'Private beta · MENA agencies',
   'h1' => 'Every campaign judged by the result it was built for.',
-  'lead' => "Meta and Google Ads reporting for agencies: messages, calls, leads, donations and sales counted by each campaign's real goal, with daily alerts that catch wasted spend and Arabic/English reports your clients understand.",
+  'lead' => "Meta and Google Ads reporting for agencies: messages, calls, leads, bookings and sales counted by each campaign's real goal, with daily alerts that catch wasted spend and Arabic/English reports your clients understand.",
   'cta' => 'Open the platform',
   'f' => [
     ['Connect Meta + Google', "Link your agency's accounts once; data refreshes every morning."],
