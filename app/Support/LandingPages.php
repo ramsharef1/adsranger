@@ -82,7 +82,19 @@ class LandingPages
 
     public static function check(LandingPage $lp): LandingPage
     {
-        $url = $lp->url;
+        $v = static::probe($lp->url);
+
+        return static::save($lp, $v + ($v['status_code'] === null ? [] : static::pagespeed($lp)));
+    }
+
+    /**
+     * Fetch a public http(s) URL the safe way (see the class note) and grade it. Nothing is stored.
+     * Used by the nightly checks (via check()) and by the UTM builder's link check (#86).
+     *
+     * @return array{state: string, status_code: ?int, error: ?string, ms?: int, bytes?: int, redirects?: int, final_url?: string}
+     */
+    public static function probe(string $url): array
+    {
         $redirects = 0;
         $start = microtime(true);
         $res = null;
@@ -98,7 +110,7 @@ class LandingPages
                 }
                 $ip = static::publicIp($host);
                 if (! $ip) {
-                    return static::save($lp, ['state' => 'blocked', 'error' => 'The host does not resolve to a public address.', 'status_code' => null]);
+                    return ['state' => 'blocked', 'error' => 'The host does not resolve to a public address.', 'status_code' => null];
                 }
                 $res = Http::withOptions(['allow_redirects' => false, 'curl' => [CURLOPT_RESOLVE => ["$host:$port:".(str_contains($ip, ':') ? "[$ip]" : $ip)]]])
                     ->withHeaders(['User-Agent' => 'AdsRangerBot/1.0 (+https://adsranger.com/bot)', 'Accept-Language' => 'ar,en;q=0.8'])
@@ -116,7 +128,7 @@ class LandingPages
         }
         $ms = (int) round((microtime(true) - $start) * 1000);
         if (! $res) {
-            return static::save($lp, ['state' => 'broken', 'error' => $error ?: 'No response.', 'ms' => $ms, 'status_code' => null, 'redirects' => $redirects]);
+            return ['state' => 'broken', 'error' => $error ?: 'No response.', 'ms' => $ms, 'status_code' => null, 'redirects' => $redirects];
         }
         $code = $res->status();
         $final = $url;
@@ -129,9 +141,8 @@ class LandingPages
             default => 'ok',
         };
 
-        return static::save($lp, ['state' => $state, 'status_code' => $code, 'ms' => $ms, 'bytes' => strlen((string) $res->body()), 'redirects' => $redirects,
-            'final_url' => mb_substr($final, 0, 1000), 'error' => $state === 'broken' ? 'HTTP '.$code : null]
-            + static::pagespeed($lp));
+        return ['state' => $state, 'status_code' => $code, 'ms' => $ms, 'bytes' => strlen((string) $res->body()), 'redirects' => $redirects,
+            'final_url' => mb_substr($final, 0, 1000), 'error' => $state === 'broken' ? 'HTTP '.$code : null];
     }
 
     protected static function absolute(string $base, string $loc): string
