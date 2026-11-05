@@ -21,7 +21,7 @@ class ReportSchedule extends Model
 
     protected function casts(): array
     {
-        return ['recipients' => 'array', 'attach_pdf' => 'boolean', 'include_link' => 'boolean', 'active' => 'boolean',
+        return ['recipients' => 'array', 'whatsapp_recipients' => 'array', 'attach_pdf' => 'boolean', 'include_link' => 'boolean', 'active' => 'boolean',
             'monthly_day' => 'integer', 'weekly_day' => 'integer', 'last_sent_at' => 'datetime'];
     }
 
@@ -55,6 +55,19 @@ class ReportSchedule extends Model
     public function activeRecipients(): array
     {
         return array_values(array_diff(array_map('strtolower', (array) $this->recipients), $this->unsubscribed()));
+    }
+
+    /** Validated E.164 WhatsApp numbers still receiving this report (#106). */
+    public function activeWhatsAppRecipients(): array
+    {
+        $out = [];
+        foreach ((array) ($this->whatsapp_recipients ?? []) as $raw) {
+            if ($n = \App\Support\WhatsAppReport::normalizePhone((string) $raw)) {
+                $out[$n] = $n;
+            }
+        }
+
+        return array_values(array_diff($out, $this->unsubscribed()));
     }
 
     public function localNow(): CarbonImmutable
@@ -105,7 +118,7 @@ class ReportSchedule extends Model
     /** Next local date an email goes out, or null when the schedule is off. */
     public function nextSendDate(): ?CarbonImmutable
     {
-        if (! $this->active || (! $this->monthly_day && ! $this->weekly_day) || ! $this->activeRecipients()) {
+        if (! $this->active || (! $this->monthly_day && ! $this->weekly_day) || (! $this->activeRecipients() && ! $this->activeWhatsAppRecipients())) {
             return null;
         }
         $now = $this->localNow();

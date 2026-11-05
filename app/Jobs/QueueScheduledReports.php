@@ -12,10 +12,8 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 
 /**
- * #106, daily: find every scheduled report due today (workspace date), log one queued row per recipient and
- * queue one SendScheduledReport per schedule + period. The unique send row makes a second run a no-op.
- * Off when config('reports.email_enabled') is false; skips suspended workspaces, archived clients and plans
- * without `scheduled_reports`.
+ * #106, daily: find every scheduled report due today (workspace date), log one queued row per recipient (email +
+ * WhatsApp) and queue one SendScheduledReport per schedule + period.
  */
 class QueueScheduledReports implements ShouldQueue
 {
@@ -23,8 +21,8 @@ class QueueScheduledReports implements ShouldQueue
 
     public function handle(): void
     {
-        if (! config('reports.email_enabled')) {
-            Log::info('scheduled reports: reports.email_enabled is off, nothing queued');
+        if (! config('reports.email_enabled') && ! config('reports.whatsapp_enabled', true)) {
+            Log::info('scheduled reports: both email_enabled and whatsapp_enabled are off, nothing queued');
 
             return;
         }
@@ -36,19 +34,27 @@ class QueueScheduledReports implements ShouldQueue
                     || PlanGate::locked($agency, 'scheduled_reports')) {
                     return;
                 }
-                $recipients = $s->activeRecipients();
-                if (! $recipients) {
+                $emails = config('reports.email_enabled') ? $s->activeRecipients() : [];
+                $phones = config('reports.whatsapp_enabled', true) ? $s->activeWhatsAppRecipients() : [];
+                if (! $emails && ! $phones) {
                     return;
                 }
                 foreach ($s->dueRuns() as [$kind, $period]) {
                     $created = 0;
-                    foreach ($recipients as $email) {
+                    foreach ($emails as $email) {
                         try {
                             ReportSend::create(['agency_id' => $s->agency_id, 'client_id' => $s->client_id, 'report_schedule_id' => $s->id,
-                                'kind' => $kind, 'period' => $period, 'email' => $email, 'status' => 'queued']);
+                                'kind' => $kind, 'period' => $period, 'channel' => 'email', 'email' => $email, 'status' => 'queued']);
                             $created++;
                         } catch (UniqueConstraintViolationException) {
-                            // already queued by an overlapping run
+                        }
+                    }
+                    foreach ($phones as $phone) {
+                        try {
+                            ReportSend::create(['agency_id' => $s->agency_id, 'client_id' => $s->client_id, 'report_schedule_id' => $s->id,
+                                'kind' => $kind, 'period' => $period, 'channel' => 'whatsapp', 'email' => $phone, 'status' => 'queued']);
+                            $created++;
+                        } catch (UniqueConstraintViolationException) {
                         }
                     }
                     if ($created) {

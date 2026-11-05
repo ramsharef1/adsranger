@@ -6,14 +6,14 @@ use App\Mail\ScheduledReportMail;
 use App\Models\ReportSchedule;
 use App\Models\ReportSend;
 use App\Support\MonthlyReport;
+use App\Support\WhatsAppReport;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 /**
- * #106: send one scheduled report (one schedule, one period) to each queued recipient. The PDF is rendered once.
- * Recipients who unsubscribed since the rows were queued are skipped. Each row ends sent, skipped or failed.
+ * #106: send one scheduled report (one schedule, one period) to each queued email and WhatsApp recipient.
  */
 class SendScheduledReport implements ShouldQueue
 {
@@ -31,7 +31,7 @@ class SendScheduledReport implements ShouldQueue
         if ($rows->isEmpty()) {
             return;
         }
-        if (! $s || ! $s->client || ! $s->active || ! config('reports.email_enabled')) {
+        if (! $s || ! $s->client || ! $s->active || (! config('reports.email_enabled') && ! config('reports.whatsapp_enabled', true))) {
             ReportSend::whereIn('id', $rows->pluck('id'))->update(['status' => 'skipped', 'error' => 'schedule off']);
 
             return;
@@ -39,11 +39,13 @@ class SendScheduledReport implements ShouldQueue
 
         $lang = $s->lang === 'en' ? 'en' : 'ar';
         $pdf = null;
-        if ($this->kind === 'monthly' && $s->attach_pdf && MonthlyReport::validMonth($this->period)) {
+        $hasEmailRows = $rows->contains(fn (ReportSend $r) => ($r->channel ?: 'email') === 'email');
+        if ($hasEmailRows && $this->kind === 'monthly' && $s->attach_pdf && MonthlyReport::validMonth($this->period)) {
             $pdf = MonthlyReport::pdf($s->client, $this->period, $lang);
         }
         $link = $s->include_link ? $s->activeLink()?->url() : null;
         $unsubscribed = $s->unsubscribed();
+        $waText = null;
         $sent = 0;
 
         foreach ($rows as $row) {
@@ -52,8 +54,24 @@ class SendScheduledReport implements ShouldQueue
 
                 continue;
             }
+            $channel = $row->channel ?: (str_starts_with((string) $row->email, '+') ? 'whatsapp' : 'email');
+            if ($channel === 'whatsapp' && ! config('reports.whatsapp_enabled', true)) {
+                $row->update(['status' => 'skipped', 'error' => 'whatsapp off']);
+
+                continue;
+            }
+            if ($channel === 'email' && ! config('reports.email_enabled')) {
+                $row->update(['status' => 'skipped', 'error' => 'schedule off']);
+
+                continue;
+            }
             try {
-                Mail::to($row->email)->locale($lang)->send(new ScheduledReportMail($s, $this->kind, $this->period, $pdf, $link, $s->unsubscribeUrl($row->email)));
+                if ($channel === 'whatsapp') {
+                    $waText ??= WhatsAppReport::message($s, $this->kind, $this->period, $link);
+                    WhatsAppReport::send($row->email, $waText);
+                } else {
+                    Mail::to($row->email)->locale($lang)->send(new ScheduledReportMail($s, $this->kind, $this->period, $pdf, $link, $s->unsubscribeUrl($row->email)));
+                }
                 $row->update(['status' => 'sent', 'sent_at' => now(), 'error' => null]);
                 $sent++;
             } catch (\Throwable $e) {

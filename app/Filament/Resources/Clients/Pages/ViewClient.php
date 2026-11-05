@@ -156,9 +156,10 @@ class ViewClient extends ViewRecord
         return $s ? [
             'monthly' => (bool) $s->monthly_day, 'monthly_day' => $s->monthly_day ?: 1,
             'weekly' => (bool) $s->weekly_day, 'weekly_day' => $s->weekly_day ?: 7,
-            'lang' => $s->lang, 'recipients' => $s->recipients, 'attach_pdf' => $s->attach_pdf, 'include_link' => $s->include_link, 'active' => $s->active,
+            'lang' => $s->lang, 'recipients' => $s->recipients ?? [], 'whatsapp_recipients' => $s->whatsapp_recipients ?? [],
+            'attach_pdf' => $s->attach_pdf, 'include_link' => $s->include_link, 'active' => $s->active,
         ] : ['monthly' => true, 'monthly_day' => 1, 'weekly' => false, 'weekly_day' => 7, 'lang' => $lang, 'recipients' => [],
-            'attach_pdf' => true, 'include_link' => true, 'active' => true];
+            'whatsapp_recipients' => [], 'attach_pdf' => true, 'include_link' => true, 'active' => true];
     }
 
     protected function scheduleSchema(): array
@@ -168,7 +169,10 @@ class ViewClient extends ViewRecord
         return [
             TagsInput::make('recipients')->label(__('Recipients'))->placeholder(__('name@example.com'))
                 ->helperText(__('Up to :n email addresses. Press Enter after each one.', ['n' => $max]))
-                ->splitKeys([',', ' ', ';'])->required()->rules(['array', 'max:'.$max])->nestedRecursiveRules(['email:filter', 'max:190']),
+                ->splitKeys([',', ' ', ';'])->rules(['array', 'max:'.$max])->nestedRecursiveRules(['email:filter', 'max:190']),
+            TagsInput::make('whatsapp_recipients')->label(__('WhatsApp numbers'))->placeholder('+962790000000')
+                ->helperText(__('Optional: up to :n WhatsApp numbers with country code (e.g. +962790000000).', ['n' => $max]))
+                ->splitKeys([',', ' ', ';'])->rules(['array', 'max:'.$max]),
             Toggle::make('monthly')->label(__('Monthly report'))->helperText(__('Last month\'s results, with the monthly PDF if you attach it.'))->live(),
             Select::make('monthly_day')->label(__('Day of the month'))->options(array_combine(range(1, 28), range(1, 28)))
                 ->visible(fn (Get $get) => (bool) $get('monthly'))->required(fn (Get $get) => (bool) $get('monthly')),
@@ -185,11 +189,25 @@ class ViewClient extends ViewRecord
     public function saveSchedule(array $data): void
     {
         abort_unless($this->canManageLinks() && ! $this->reportsLocked(), 403);
-        $recipients = array_values(array_unique(array_map(fn ($e) => strtolower(trim((string) $e)), (array) ($data['recipients'] ?? []))));
+        $recipients = array_values(array_unique(array_filter(array_map(fn ($e) => strtolower(trim((string) $e)), (array) ($data['recipients'] ?? [])))));
+        $rawWa = array_values(array_unique(array_filter(array_map(fn ($p) => trim((string) $p), (array) ($data['whatsapp_recipients'] ?? [])))));
+        $waRecipients = [];
+        $badWa = false;
+        foreach ($rawWa as $p) {
+            if ($norm = \App\Support\WhatsAppReport::normalizePhone($p)) {
+                $waRecipients[$norm] = $norm;
+            } else {
+                $badWa = true;
+            }
+        }
+        $waRecipients = array_values($waRecipients);
         $max = (int) config('reports.max_recipients', 10);
         $bad = array_filter($recipients, fn ($e) => ! filter_var($e, FILTER_VALIDATE_EMAIL));
-        if (! $recipients || count($recipients) > $max || $bad) {
+        if ((! $recipients && ! $waRecipients) || count($recipients) > $max || $bad) {
             throw ValidationException::withMessages(['mountedActions.0.data.recipients' => __('Add 1 to :n valid email addresses.', ['n' => $max])]);
+        }
+        if ($badWa || count($waRecipients) > $max) {
+            throw ValidationException::withMessages(['mountedActions.0.data.whatsapp_recipients' => __('Enter valid WhatsApp numbers with country code (e.g. +962790000000).')]);
         }
         $monthly = ! empty($data['monthly']) ? max(1, min(28, (int) ($data['monthly_day'] ?? 1))) : null;
         $weekly = ! empty($data['weekly']) ? max(1, min(7, (int) ($data['weekly_day'] ?? 7))) : null;
@@ -201,7 +219,7 @@ class ViewClient extends ViewRecord
         $s = $c->reportSchedule ?? new ReportSchedule(['agency_id' => $c->agency_id, 'client_id' => $c->id, 'created_by' => auth()->id()]);
         $s->fill([
             'monthly_day' => $monthly, 'weekly_day' => $weekly, 'lang' => ($data['lang'] ?? 'ar') === 'en' ? 'en' : 'ar',
-            'recipients' => $recipients, 'attach_pdf' => ! empty($data['attach_pdf']), 'include_link' => ! empty($data['include_link']),
+            'recipients' => $recipients, 'whatsapp_recipients' => $waRecipients, 'attach_pdf' => ! empty($data['attach_pdf']), 'include_link' => ! empty($data['include_link']),
             'active' => ! empty($data['active']),
         ]);
         if ($s->include_link && ! $s->activeLink()) {

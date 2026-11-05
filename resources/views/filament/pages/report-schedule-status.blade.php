@@ -4,14 +4,27 @@
     $tz = $client->agency->timezone ?: 'UTC';
     $sends = $s ? $s->sends()->latest('id')->limit(10)->get() : collect();
     $statusColor = ['sent' => 'success', 'queued' => 'info', 'skipped' => 'gray', 'failed' => 'danger'];
+    $waNumbers = $s ? $s->activeWhatsAppRecipients() : [];
+    $waPreviewUrl = null;
+    if ($s && $waNumbers) {
+        $period = $s->monthly_day ? now($tz)->startOfMonth()->subMonthNoOverflow()->format('Y-m') : now($tz)->format('o-\WW');
+        $kind = $s->monthly_day ? 'monthly' : 'weekly';
+        $msg = \App\Support\WhatsAppReport::message($s, $kind, $period, $s->include_link ? $s->activeLink()?->url() : null);
+        $waPreviewUrl = \App\Support\WhatsAppReport::waMeUrl($waNumbers[0], $msg);
+    }
 @endphp
 <div style="display:grid;gap:10px;font-size:14px">
     @if ($s)
-        <div style="display:flex;flex-wrap:wrap;gap:16px">
+        <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
             <div><span style="opacity:.7">{{ __('Last sent') }}:</span>
                 <strong><bdi dir="ltr">{{ $s->last_sent_at ? $s->last_sent_at->setTimezone($tz)->format('Y-m-d H:i') : '–' }}</bdi></strong></div>
             <div><span style="opacity:.7">{{ __('Next send') }}:</span>
                 <strong>@if ($next)<bdi dir="ltr">{{ $next->toDateString() }}</bdi>@else{{ $s->active ? '–' : __('Not sending for now') }}@endif</strong></div>
+            @if ($waPreviewUrl)
+                <a href="{{ $waPreviewUrl }}" target="_blank" rel="noopener" style="color:#14B8A6;font-weight:600;text-decoration:underline">
+                    {{ __('Send via WhatsApp now') }} ↗
+                </a>
+            @endif
         </div>
         @if ($s->include_link && ! $s->activeLink())
             <div style="font-size:13px;color:rgb(217 119 6)">{{ __('The client link for these emails was revoked or expired. Save the schedule to create a new one.') }}</div>

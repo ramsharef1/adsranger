@@ -1209,5 +1209,9 @@
     "Minimum clicks": "الحد الأدنى للنقرات",
     "Minimum impressions per week": "الحد الأدنى لمرات الظهور أسبوعياً",
     "Maximum frequency": "الحد الأقصى للتكرار",
-    "Minimum prior 7d impressions": "الحد الأدنى للظهور في الأيام السبعة السابقة"
+    "Minimum prior 7d impressions": "الحد الأدنى للظهور في الأيام السبعة السابقة",
+    "WhatsApp numbers": "أرقام واتساب",
+    "Optional: up to :n WhatsApp numbers with country code (e.g. +962790000000).": "اختياري: حتى :n أرقام واتساب مع رمز الدولة (مثال +962790000000).",
+    "Enter valid WhatsApp numbers with country code (e.g. +962790000000).": "أدخل أرقام واتساب صحيحة مع رمز الدولة (مثال +962790000000).",
+    "Send via WhatsApp now": "إرسال عبر واتساب الآن"
 }

@@ -270,4 +270,38 @@ class ScheduledReportsTest extends TestCase
         $this->assertContains($this->actingAs($owner)->get('/app/other/clients/'.$otherClient->id)->status(), [403, 404]);
         $this->actingAs($owner)->get('/app/acme/clients/'.$otherClient->id)->assertNotFound();
     }
+
+    public function test_whatsapp_scheduled_report_queues_and_sends(): void
+    {
+        $agency = \App\Models\Agency::create([
+            'name' => 'WA Pro Agency', 'slug' => 'wa-pro-agency', 'plan' => 'pro',
+            'status' => 'active', 'timezone' => 'UTC', 'language' => 'ar',
+        ]);
+        $client = \App\Models\Client::create([
+            'agency_id' => $agency->id, 'name' => 'WA Client', 'currency' => 'USD', 'status' => 'active',
+        ]);
+        $schedule = \App\Models\ReportSchedule::create([
+            'agency_id' => $agency->id,
+            'client_id' => $client->id,
+            'monthly_day' => (int) now('UTC')->day,
+            'lang' => 'ar',
+            'recipients' => ['client@example.com'],
+            'whatsapp_recipients' => ['00962791234567'],
+            'attach_pdf' => false,
+            'include_link' => true,
+            'active' => true,
+            'created_at' => now()->subDays(2),
+        ]);
+
+        $this->assertSame(['+962791234567'], $schedule->activeWhatsAppRecipients());
+
+        (new \App\Jobs\QueueScheduledReports)->handle();
+
+        $this->assertDatabaseHas('report_sends', [
+            'report_schedule_id' => $schedule->id,
+            'channel' => 'whatsapp',
+            'email' => '+962791234567',
+            'status' => 'sent',
+        ]);
+    }
 }
