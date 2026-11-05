@@ -86,8 +86,13 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
         return $this->agencies()->whereKey($tenant->getKey())->exists();
     }
 
-    public function roleIn(Agency $agency): ?string
+    public function rawRoleIn(Agency $agency): ?string
     {
         return $this->agencies()->whereKey($agency->getKey())->first()?->pivot?->role;
+    }
+
+    public function roleIn(Agency $agency): ?string
+    {
+        return \App\Support\ViewAs::effectiveRole($this, $agency);
     }
 }

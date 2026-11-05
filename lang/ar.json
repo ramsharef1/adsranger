@@ -1188,5 +1188,8 @@
     "This permanently removes your user account from AdsRanger. Type DELETE and enter your password to confirm.": "يؤدي هذا إلى إزالة حساب المستخدم الخاص بك نهائياً من AdsRanger. اكتب DELETE وأدخل كلمة المرور للتأكيد.",
     "Type DELETE to confirm": "اكتب DELETE للتأكيد",
     "Please type DELETE to confirm.": "يرجى كتابة DELETE للتأكيد.",
-    "Delete your owned workspaces first before deleting your personal account.": "احذف مساحات العمل التي تملكها أولاً قبل حذف حسابك الشخصي."
+    "Delete your owned workspaces first before deleting your personal account.": "احذف مساحات العمل التي تملكها أولاً قبل حذف حسابك الشخصي.",
+    "View as": "العرض بصفتك",
+    "Myself": "حسابي",
+    "Exit preview": "إنهاء المعاينة"
 }

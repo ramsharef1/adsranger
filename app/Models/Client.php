@@ -46,15 +46,21 @@ class Client extends Model
         return $this->hasMany(Alert::class);
     }
 
-    /** Clients this user may see in this agency. */
+    /** Clients this user may see in this agency (respects #71 ViewAs member/role preview). */
     public function scopeVisibleTo(Builder $q, ?User $user, Agency $agency): Builder
     {
         $q->where('agency_id', $agency->id);
-        if (! $user || in_array($user->roleIn($agency), ['owner', 'admin'], true) || $user->isSuperAdmin()) {
+        if (! $user) {
             return $q;
         }
+        $preview = \App\Support\ViewAs::current($user, $agency);
+        $role = $preview ? $preview['role'] : $user->rawRoleIn($agency);
+        if (in_array($role, ['owner', 'admin'], true) || (! $preview && $user->isSuperAdmin())) {
+            return $q;
+        }
+        $targetUser = ($preview && ! empty($preview['user'])) ? $preview['user'] : $user;
 
-        return $q->where(fn ($w) => $w->whereDoesntHave('users')->orWhereHas('users', fn ($u) => $u->where('users.id', $user->id)));
+        return $q->where(fn ($w) => $w->whereDoesntHave('users')->orWhereHas('users', fn ($u) => $u->where('users.id', $targetUser->id)));
     }
 
     protected static function booted(): void

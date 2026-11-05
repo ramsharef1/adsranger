@@ -70,6 +70,11 @@ class MemberResource extends Resource
                     }),
             ])
             ->recordActions([
+                Action::make('viewAs')->label(__('View as'))->icon('heroicon-o-eye')->color('gray')
+                    ->visible(fn (User $record) => \App\Support\ViewAs::canUse(auth()->user(), Filament::getTenant())
+                        && $record->id !== auth()->id()
+                        && $record->rawRoleIn(Filament::getTenant()) !== 'owner')
+                    ->url(fn (User $record) => route('filament.app.pages.desk', ['tenant' => Filament::getTenant()->slug, 'view_as' => 'u:'.$record->id])),
                 Action::make('changeRole')->label(__('Change role'))->icon('heroicon-o-arrows-right-left')
                     ->visible(fn (User $record) => static::manageable($record))
                     ->schema([
