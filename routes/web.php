@@ -52,3 +52,7 @@ Route::get('/app/connect/{network}/start', function (Request $r, string $network
 Route::get('/app/connect/{network}/callback', function (Request $r, string $network) {
     return $r->user() ? app(ConnectController::class)->callback($r, $network) : redirect()->guest('/app/login');
 })->where('network', '[a-z0-9_]+');
+
+// #54 Creative Studio signed client approval links (no login required)
+Route::get('/studio/brief/{token}', [\App\Http\Controllers\StudioBriefController::class, 'show'])->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{40}');
+Route::post('/studio/brief/{token}', [\App\Http\Controllers\StudioBriefController::class, 'decide'])->middleware('throttle:20,1')->where('token', '[A-Za-z0-9]{40}');

@@ -85,4 +85,9 @@ class Client extends Model
     {
         return $this->hasOne(ReportSchedule::class);
     }
+
+    public function brandKit(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(BrandKit::class);
+    }
 }
