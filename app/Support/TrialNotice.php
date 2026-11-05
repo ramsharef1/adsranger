@@ -49,11 +49,11 @@ class TrialNotice
     {
         $url = config('adsranger.waitlist_url');
         if (filled($url)) {
-            return new HtmlString('<a href="'.e($url).'" style="text-decoration:underline">'.e(__('Join the waitlist', [], $locale)).'</a>');
+            return new HtmlString('<a href="'.e($url).'" style="text-decoration:underline;display:inline-flex;align-items:center;min-height:44px">'.e(__('Join the waitlist', [], $locale)).'</a>');
         }
         $email = e(config('adsranger.signup.support_email'));
 
-        return new HtmlString(e(__('Ask for an invite at', [], $locale)).' <a href="mailto:'.$email.'" style="text-decoration:underline"><bdi dir="ltr">'.$email.'</bdi></a>');
+        return new HtmlString(e(__('Ask for an invite at', [], $locale)).' <a href="mailto:'.$email.'" style="text-decoration:underline;display:inline-flex;align-items:center;min-height:44px"><bdi dir="ltr">'.$email.'</bdi></a>');
     }
 
     /** Help line for trial notices: "Questions? support@…" or the waitlist link. */

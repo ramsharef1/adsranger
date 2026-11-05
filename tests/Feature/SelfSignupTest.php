@@ -81,7 +81,7 @@ class SelfSignupTest extends TestCase
     {
         $this->get('/app/register')->assertOk()
             ->assertSee('التسجيل بالدعوة حاليًا')
-            ->assertSee('أدز رينجر في مرحلة تجريبية خاصة.')
+            ->assertSee('تعمل منصة AdsRanger حاليًا في مرحلة تجريبية خاصة.')
             ->assertSee('mailto:support@adsranger.com', false)
             ->assertSee('<bdi dir="ltr">support@adsranger.com</bdi>', false)
             ->assertDontSee('name="data.password"', false);
