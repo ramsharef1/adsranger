@@ -2,7 +2,14 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\RequestPasswordReset;
+use App\Filament\Pages\Tenancy\EditAgencyProfile;
+use App\Filament\Pages\Tenancy\RegisterAgency;
+use App\Http\Middleware\SetPanelLocale;
+use App\Models\Agency;
+use App\Support\PanelColors;
 use Filament\Actions\Action;
+use Filament\FontProviders\GoogleFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -10,7 +17,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -33,14 +40,23 @@ class AppPanelProvider extends PanelProvider
             ->brandLogoHeight('2rem')
             ->favicon(asset('brand/favicon.svg'))
             ->login()
+            ->passwordReset(RequestPasswordReset::class)
+            ->font('IBM Plex Sans Arabic', provider: GoogleFontProvider::class)
+            ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.head'))
+            ->renderHook(PanelsRenderHook::SIMPLE_PAGE_END, fn () => view('panels.lang-switch'))
             ->profile(isSimple: false)
-            ->tenant(\App\Models\Agency::class, slugAttribute: 'slug')
-            ->tenantRegistration(\App\Filament\Pages\Tenancy\RegisterAgency::class)
-            ->tenantProfile(\App\Filament\Pages\Tenancy\EditAgencyProfile::class)
+            ->tenant(Agency::class, slugAttribute: 'slug')
+            ->tenantRegistration(RegisterAgency::class)
+            ->tenantProfile(EditAgencyProfile::class)
             ->colors([
-                'primary' => Color::Teal,
+                // UX-6: buttons fill with #0F766E (teal-700, white text 5.5:1) in both themes; #14B8A6 stays for accents.
+                'primary' => PanelColors::primary(),
             ])
             ->userMenuItems([
+                Action::make('switch-language')
+                    ->label(fn (): string => __('ui.switch_to'))
+                    ->icon('heroicon-o-language')
+                    ->url(fn (): string => request()->fullUrlWithQuery(['lang' => __('ui.switch_locale')])),
                 Action::make('admin-panel')
                     ->label('Admin panel')
                     ->icon('heroicon-o-shield-check')
@@ -60,6 +76,7 @@ class AppPanelProvider extends PanelProvider
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
+                SetPanelLocale::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
                 PreventRequestForgery::class,

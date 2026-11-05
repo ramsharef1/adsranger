@@ -20,6 +20,12 @@ class PlanGatingTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withSession(['locale' => 'en']); // panels default to Arabic (UX-3); these checks read the English strings
+    }
+
     private function agency(string $plan, string $status = 'active'): Agency
     {
         return Agency::create(['name' => "Acme $plan $status", 'slug' => Agency::uniqueSlug("acme $plan $status"), 'plan' => $plan, 'status' => $status]);
@@ -241,5 +247,17 @@ class PlanGatingTest extends TestCase
                 $this->assertContains($status, [200, 403], "$plan/$role/$page gave $status");
             }
         }
+    }
+
+    public function test_locked_state_in_arabic(): void
+    {
+        $a = $this->agency('starter');
+        $owner = $this->member($a, 'owner');
+
+        $this->withSession(['locale' => 'ar'])->actingAs($owner)->get("/app/{$a->slug}/insights")
+            ->assertOk()
+            ->assertSee('متاحة في الباقة الاحترافية')
+            ->assertSee('ترقية إلى الباقة الاحترافية')
+            ->assertSee('مثال');
     }
 }

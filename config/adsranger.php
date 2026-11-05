@@ -25,6 +25,8 @@ return [
     'reserved_slugs' => ['new', 'login', 'logout', 'register', 'profile', 'connect', 'password-reset', 'email-verification',
         'multi-factor-authentication', 'two-factor-authentication', 'admin', 'api', 'app', 'auth', 'oauth', 'webhooks', 'livewire', 'filament'],
     'trial_days' => 14,
+    // Panel language when nothing else decides it (UX-3: Arabic first).
+    'panel_locale' => 'ar',
     // Networks that start with report import only (no public API yet).
     'import_networks' => [
         'noon' => 'Noon Ads', 'talabat' => 'Talabat Ads', 'careem' => 'Careem Ads', 'arabyads' => 'ArabyAds',

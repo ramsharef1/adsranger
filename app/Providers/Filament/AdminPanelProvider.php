@@ -2,7 +2,10 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\RequestPasswordReset;
+use App\Http\Middleware\SetPanelLocale;
 use Filament\Actions\Action;
+use Filament\FontProviders\GoogleFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -11,6 +14,7 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -32,11 +36,23 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogoHeight('2rem')
             ->favicon(asset('brand/favicon.svg'))
             ->login()
+            ->passwordReset(RequestPasswordReset::class)
+            ->font('IBM Plex Sans Arabic', provider: GoogleFontProvider::class)
+            ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.head'))
+            ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.admin-head'))
+            // UX-5: a permanent "System admin" label on the login and in the panel.
+            ->renderHook(PanelsRenderHook::SIMPLE_PAGE_START, fn () => view('panels.admin-label-auth'))
+            ->renderHook(PanelsRenderHook::TOPBAR_START, fn () => view('panels.admin-label'))
+            ->renderHook(PanelsRenderHook::SIMPLE_PAGE_END, fn () => view('panels.lang-switch'))
             ->profile(isSimple: false)
             ->colors([
-                'primary' => Color::Teal,
+                'primary' => Color::Slate,
             ])
             ->userMenuItems([
+                Action::make('switch-language')
+                    ->label(fn (): string => __('ui.switch_to'))
+                    ->icon('heroicon-o-language')
+                    ->url(fn (): string => request()->fullUrlWithQuery(['lang' => __('ui.switch_locale')])),
                 Action::make('agency-app')
                     ->label('Agency app')
                     ->icon('heroicon-o-squares-2x2')
@@ -55,6 +71,7 @@ class AdminPanelProvider extends PanelProvider
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
+                SetPanelLocale::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
                 PreventRequestForgery::class,
