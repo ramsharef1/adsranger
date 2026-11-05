@@ -73,7 +73,7 @@ footer{border-top:1px solid var(--line);padding:22px 0;color:var(--muted);font-s
 <span class="tag">{{ $t['tag'] }}</span>
 <h1>{{ $t['h1'] }}</h1>
 <p>{!! $t['lead'] !!}</p>{{-- lead holds static <bdi> tags only (D-51, Rami 10:33) --}}
-<a class="btn" href="/app/login">{{ $t['cta'] }}</a>
+<div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn" href="/app/login">{{ $t['cta'] }}</a><a class="btn o" href="{{ $ar ? '' : '/en' }}/waitlist">{{ $ar ? 'انضم لقائمة الانتظار' : 'Join waitlist' }}</a><a class="btn o" href="{{ $ar ? '' : '/en' }}/ramadan-2027">{{ $ar ? 'تخطيط رمضان 2027' : 'Ramadan 2027 planner' }}</a></div>
 </section>
 <section class="g">
 @foreach ($t['f'] as $f)
@@ -82,5 +82,6 @@ footer{border-top:1px solid var(--line);padding:22px 0;color:var(--muted);font-s
 </section>
 <footer><span>© {{ date('Y') }} AdsRanger · {{ $t['foot'] }}</span><span><a href="{{ $ar ? '' : '/en' }}/privacy" style="color:inherit;margin-inline-end:12px">{{ $ar ? 'الخصوصية' : 'Privacy' }}</a><a href="{{ $ar ? '' : '/en' }}/terms" style="color:inherit;margin-inline-end:12px">{{ $ar ? 'الشروط' : 'Terms' }}</a><a href="{{ $ar ? '' : '/en' }}/data-deletion" style="color:inherit;margin-inline-end:12px">{{ $ar ? 'حذف البيانات' : 'Data deletion' }}</a>{{ $t['env'] }}</span></footer>
 </div>
+@include('public.cookie-banner', ['lang' => $ar ? 'ar' : 'en'])
 </body>
 </html>

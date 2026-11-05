@@ -64,5 +64,6 @@ footer a{color:var(--muted);margin-inline-end:14px}
     </span>
 </footer>
 </div>
+@include('public.cookie-banner', ['lang' => $lang])
 </body>
 </html>

@@ -11,6 +11,15 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', fn () => view('welcome', ['lang' => 'ar']));
 Route::get('/en', fn () => view('welcome', ['lang' => 'en']));
 
+// Public Website Phase 1: Waitlist, Ramadan 2027 planner, and XML sitemap
+Route::get('/waitlist', [\App\Http\Controllers\PublicSiteController::class, 'waitlist'])-> defaults('lang', 'ar');
+Route::get('/en/waitlist', [\App\Http\Controllers\PublicSiteController::class, 'waitlist'])->defaults('lang', 'en');
+Route::post('/waitlist', [\App\Http\Controllers\PublicSiteController::class, 'submitWaitlist'])->defaults('lang', 'ar')->middleware('throttle:10,1');
+Route::post('/en/waitlist', [\App\Http\Controllers\PublicSiteController::class, 'submitWaitlist'])->defaults('lang', 'en')->middleware('throttle:10,1');
+Route::get('/ramadan-2027', [\App\Http\Controllers\PublicSiteController::class, 'ramadan'])->defaults('lang', 'ar');
+Route::get('/en/ramadan-2027', [\App\Http\Controllers\PublicSiteController::class, 'ramadan'])->defaults('lang', 'en');
+Route::get('/sitemap.xml', [\App\Http\Controllers\PublicSiteController::class, 'sitemap']);
+
 // Legal pages: Arabic default, English under /en
 foreach (['privacy', 'terms', 'data-deletion'] as $legalPage) {
     Route::get('/'.$legalPage, fn () => view('legal.page', ['lang' => 'ar', 'page' => $legalPage]));
