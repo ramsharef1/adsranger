@@ -1108,5 +1108,21 @@
     "Counted as the result: :basis": "المحتسب نتيجةً: :basis",
     ":pct% of calls placed": ":pct% من المكالمات المُجراة",
     "A call of 20 seconds or more is the closest sign of a real conversation. Change what counts in the client settings.": "المكالمة التي تستمر 20 ثانية فأكثر هي أقرب مؤشر إلى محادثة حقيقية. يمكنك تغيير ما يُحتسب من إعدادات العميل.",
-    "This network reports one call count.": "تُبلغ هذه المنصة عن عدد واحد للمكالمات."
+    "This network reports one call count.": "تُبلغ هذه المنصة عن عدد واحد للمكالمات.",
+    "Your best ads across clients, with their images. Money is shown in each client's currency.": "أفضل إعلاناتك لدى جميع العملاء مع صورها. تظهر المبالغ بعملة كل عميل.",
+    "All ad networks": "كل المنصات الإعلانية",
+    "Sort by": "الترتيب حسب",
+    "Most results": "الأكثر نتائج",
+    "Lowest cost per result": "الأقل تكلفة لكل نتيجة",
+    "Highest link CTR": "الأعلى في نسبة النقر على الرابط",
+    "Most spend": "الأكثر إنفاقًا",
+    "Ranked in :currency at today's rate.": "مرتبة بعملة :currency حسب سعر اليوم.",
+    "No ads with spend or results in this period. Try a longer period or another client.": "لا إعلانات ذات إنفاق أو نتائج في هذه الفترة. جرّب فترة أطول أو عميلًا آخر.",
+    "No clients yet. Add a client and link its ad accounts first.": "لا يوجد عملاء بعد. أضف عميلًا واربط حساباته الإعلانية أولًا.",
+    "No image from :network": "لا توجد صورة من :network",
+    "this ad network": "هذه المنصة الإعلانية",
+    "Open client": "فتح العميل",
+    "Ad network": "المنصة الإعلانية",
+    "Period": "الفترة",
+    "See all ads": "عرض كل الإعلانات"
 }

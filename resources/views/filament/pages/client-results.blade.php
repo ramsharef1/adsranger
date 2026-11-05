@@ -271,6 +271,7 @@
     @if (count($top))
         <x-filament::section>
             <x-slot name="heading">{{ __('Top ads') }}</x-slot>
+            <x-slot name="afterHeader"><a href="{{ \App\Filament\Pages\TopAdsPage::getUrl(['client' => $client->id]) }}" style="display:inline-flex;align-items:center;min-height:44px;color:var(--primary-600);font-size:13px">{{ __('See all ads') }}</a></x-slot>
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px">
                 @foreach ($top as $ad)
                     <div style="{{ $card }};padding:8px">
