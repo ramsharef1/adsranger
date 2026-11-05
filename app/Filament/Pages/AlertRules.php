@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Alerts\AlertEngine;
+use App\Filament\Concerns\TranslatesPageLabels;
 use App\Models\AlertRule;
 use App\Models\AuditLog;
 use App\Support\PlanGate;
@@ -16,6 +17,8 @@ use UnitEnum;
 /** Per-agency alert rule switches and thresholds. Owners, admins and managers can edit. */
 class AlertRules extends Page
 {
+    use TranslatesPageLabels;
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-adjustments-horizontal';
 
     protected static string|UnitEnum|null $navigationGroup = 'Settings';

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\TranslatesPageLabels;
 use BackedEnum;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -10,6 +11,8 @@ use UnitEnum;
 /** Each user's own email choices (both off by default). */
 class MyNotifications extends Page
 {
+    use TranslatesPageLabels;
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-envelope';
 
     protected static string|UnitEnum|null $navigationGroup = 'Settings';

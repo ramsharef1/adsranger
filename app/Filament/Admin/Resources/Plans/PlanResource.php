@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Plans;
 
 use App\Filament\Admin\Resources\Plans\Pages\EditPlan;
 use App\Filament\Admin\Resources\Plans\Pages\ListPlans;
+use App\Filament\Concerns\TranslatesResourceLabels;
 use App\Models\Plan;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -21,6 +22,8 @@ use UnitEnum;
 
 class PlanResource extends Resource
 {
+    use TranslatesResourceLabels;
+
     protected static ?string $model = Plan::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-squares-plus';

@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\AdNetworks;
 
 use App\Filament\Admin\Resources\AdNetworks\Pages\EditAdNetwork;
 use App\Filament\Admin\Resources\AdNetworks\Pages\ListAdNetworks;
+use App\Filament\Concerns\TranslatesResourceLabels;
 use App\Models\AdNetwork;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -26,6 +27,8 @@ use UnitEnum;
 
 class AdNetworkResource extends Resource
 {
+    use TranslatesResourceLabels;
+
     protected static ?string $model = AdNetwork::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-key';

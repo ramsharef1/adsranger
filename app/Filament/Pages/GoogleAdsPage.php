@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Connectors\ConnectorRegistry;
 use App\Filament\Concerns\GatedByPlan;
+use App\Filament\Concerns\TranslatesPageLabels;
 use App\Models\AdAccount;
 use App\Models\AuditLog;
 use App\Models\Client;
@@ -22,6 +23,7 @@ use UnitEnum;
 class GoogleAdsPage extends Page
 {
     use GatedByPlan;
+    use TranslatesPageLabels;
 
     protected static string $planFeature = 'google_depth';
 

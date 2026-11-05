@@ -3,20 +3,19 @@
 namespace App\Filament\Pages;
 
 use App\Connectors\ConnectorRegistry;
+use App\Filament\Concerns\TranslatesPageLabels;
+use App\Http\Controllers\ConnectController;
 use App\Models\AdNetwork;
+use App\Models\AuditLog;
+use App\Models\Connection;
 use App\Support\NetworkAccess;
 use App\Support\TeamRoles;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
-use App\Http\Controllers\ConnectController;
-use App\Models\AuditLog;
-use App\Models\Connection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Str;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\EmbeddedTable;
@@ -25,12 +24,15 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 /** The ad networks this user may use in the current workspace, with Connect buttons. */
 class Networks extends Page implements HasTable
 {
     use InteractsWithTable;
+    use TranslatesPageLabels;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-signal';
 

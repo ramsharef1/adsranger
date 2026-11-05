@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Connectors\ConnectorRegistry;
+use App\Filament\Concerns\TranslatesPageLabels;
 use App\Jobs\SyncAdAccount;
 use App\Models\AdAccount;
 use App\Models\Alert;
@@ -13,12 +14,15 @@ use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use UnitEnum;
 
 /** Daily desk: every client for one day in its own currency, every goal type. */
 class DailyDesk extends Page
 {
+    use TranslatesPageLabels;
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-calendar-days';
 
     protected static string|UnitEnum|null $navigationGroup = 'Results';
@@ -77,7 +81,7 @@ class DailyDesk extends Page
         $synced = AdAccount::where('agency_id', $a->id)->where('is_active', true)->max('last_synced_at');
 
         return [
-            'from' => $from, 'rows' => $rows, 'synced' => $synced ? \Illuminate\Support\Carbon::parse($synced) : null,
+            'from' => $from, 'rows' => $rows, 'synced' => $synced ? Carbon::parse($synced) : null,
             'tz' => $tz,
         ];
     }

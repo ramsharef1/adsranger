@@ -10,7 +10,7 @@ class EditAgencyProfile extends EditTenantProfile
 {
     public static function getLabel(): string
     {
-        return 'Agency settings';
+        return __('Agency settings');
     }
 
     public static function canView(Model $tenant): bool

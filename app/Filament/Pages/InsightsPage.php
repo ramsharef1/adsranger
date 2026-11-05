@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Concerns\GatedByPlan;
+use App\Filament\Concerns\TranslatesPageLabels;
 use App\Models\Client;
 use App\Support\Insights;
 use App\Support\Periods;
@@ -15,6 +16,7 @@ use UnitEnum;
 class InsightsPage extends Page
 {
     use GatedByPlan;
+    use TranslatesPageLabels;
 
     protected static string $planFeature = 'insights';
 

@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Concerns\GatedByPlan;
+use App\Filament\Concerns\TranslatesPageLabels;
 use App\Models\AuditLog;
 use App\Models\BudgetPlan;
 use App\Models\Client;
@@ -19,6 +20,7 @@ use UnitEnum;
 class BudgetPlanner extends Page
 {
     use GatedByPlan;
+    use TranslatesPageLabels;
 
     protected static string $planFeature = 'annual_budget';
 

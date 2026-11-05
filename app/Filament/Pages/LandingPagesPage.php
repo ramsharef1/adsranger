@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Concerns\GatedByPlan;
+use App\Filament\Concerns\TranslatesPageLabels;
 use App\Jobs\CheckLandingPages;
 use App\Models\AuditLog;
 use App\Models\Client;
@@ -20,6 +21,7 @@ use UnitEnum;
 class LandingPagesPage extends Page
 {
     use GatedByPlan;
+    use TranslatesPageLabels;
 
     protected static string $planFeature = 'landing_pages';
 

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\TranslatesPageLabels;
 use App\Models\Client;
 use App\Support\MetricsQuery;
 use App\Support\Periods;
@@ -13,6 +14,8 @@ use UnitEnum;
 /** Compare two clients over 7 / 14 / 30 / 90 days. */
 class CompareClients extends Page
 {
+    use TranslatesPageLabels;
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-scale';
 
     protected static string|UnitEnum|null $navigationGroup = 'Results';

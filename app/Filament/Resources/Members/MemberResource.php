@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Members;
 
+use App\Filament\Concerns\TranslatesResourceLabels;
 use App\Filament\Resources\Members\Pages\ListMembers;
 use App\Models\AuditLog;
 use App\Models\User;
@@ -19,6 +20,8 @@ use UnitEnum;
 /** Members of the current agency workspace. */
 class MemberResource extends Resource
 {
+    use TranslatesResourceLabels;
+
     protected static ?string $model = User::class;
 
     protected static ?string $tenantRelationshipName = 'members';

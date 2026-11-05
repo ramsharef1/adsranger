@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\TranslatesPageLabels;
 use App\Support\NetworkAccess;
 use App\Support\PlanGate;
 use App\Support\PlanLimits;
@@ -12,6 +13,8 @@ use UnitEnum;
 
 class PlanUsage extends Page
 {
+    use TranslatesPageLabels;
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-credit-card';
 
     protected static string|UnitEnum|null $navigationGroup = 'Settings';

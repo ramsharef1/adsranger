@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Concerns\GatedByPlan;
+use App\Filament\Concerns\TranslatesPageLabels;
 use App\Models\AuditLog;
 use App\Models\Client;
 use App\Support\Benchmarks;
@@ -18,6 +19,7 @@ use UnitEnum;
 class BenchmarksPage extends Page
 {
     use GatedByPlan;
+    use TranslatesPageLabels;
 
     protected static string $planFeature = 'benchmarks';
 

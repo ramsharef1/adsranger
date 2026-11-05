@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\TranslatesPageLabels;
 use App\Jobs\SnapshotHealth;
 use App\Models\Client;
 use App\Support\HealthScore;
@@ -18,6 +19,8 @@ use UnitEnum;
 /** Pacing board: every client's month so far, forecast to month end, and health score (#35, #36, #37). */
 class PacingBoard extends Page
 {
+    use TranslatesPageLabels;
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-scale';
 
     protected static string|UnitEnum|null $navigationGroup = 'Planning';

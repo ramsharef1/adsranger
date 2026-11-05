@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\DataImports;
 
+use App\Filament\Concerns\TranslatesResourceLabels;
 use App\Filament\Resources\DataImports\Pages\ListDataImports;
 use App\Models\AdNetwork;
 use App\Models\DataImport;
@@ -13,10 +14,13 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\HtmlString;
 use UnitEnum;
 
 class DataImportResource extends Resource
 {
+    use TranslatesResourceLabels;
+
     protected static ?string $model = DataImport::class;
 
     protected static ?string $tenantRelationshipName = 'dataImports';
@@ -63,7 +67,7 @@ class DataImportResource extends Resource
             ->recordActions([
                 Action::make('mapping')->label('Columns')->icon('heroicon-o-table-cells')->color('gray')
                     ->modalHeading('How columns were matched')->modalSubmitAction(false)
-                    ->modalContent(fn (DataImport $r) => new \Illuminate\Support\HtmlString('<ul style="line-height:1.9">'.collect($r->mapping ?? [])->map(fn ($col, $f) => '<li><strong>'.e($f).'</strong> ← '.e($col).'</li>')->implode('').'</ul>')),
+                    ->modalContent(fn (DataImport $r) => new HtmlString('<ul style="line-height:1.9">'.collect($r->mapping ?? [])->map(fn ($col, $f) => '<li><strong>'.e($f).'</strong> ← '.e($col).'</li>')->implode('').'</ul>')),
                 Action::make('delete')->label('Delete')->icon('heroicon-o-trash')->color('danger')
                     ->visible(fn () => TeamRoles::canManageData(auth()->user(), Filament::getTenant()))
                     ->requiresConfirmation()->modalDescription('Deletes this import and every data row it added.')

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Connections;
 
 use App\Connectors\ConnectorRegistry;
+use App\Filament\Concerns\TranslatesResourceLabels;
 use App\Filament\Resources\Connections\Pages\ListConnections;
 use App\Models\AdAccount;
 use App\Models\Connection;
@@ -20,6 +21,8 @@ use UnitEnum;
 
 class ConnectionResource extends Resource
 {
+    use TranslatesResourceLabels;
+
     protected static ?string $model = Connection::class;
 
     protected static ?string $tenantRelationshipName = 'connections';

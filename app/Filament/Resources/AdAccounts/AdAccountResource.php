@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\AdAccounts;
 
-use App\Filament\Resources\AdAccounts\Pages\ListAdAccounts;
 use App\Connectors\ConnectorRegistry;
+use App\Filament\Concerns\TranslatesResourceLabels;
+use App\Filament\Resources\AdAccounts\Pages\ListAdAccounts;
+use App\Jobs\CheckAccountHealth;
 use App\Jobs\SyncAdAccount;
 use App\Models\AdAccount;
 use App\Models\Client;
-use App\Sync\SyncService;
 use App\Support\PlanLimits;
 use App\Support\TeamRoles;
+use App\Sync\SyncService;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
@@ -20,10 +22,13 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 class AdAccountResource extends Resource
 {
+    use TranslatesResourceLabels;
+
     protected static ?string $model = AdAccount::class;
 
     protected static ?string $tenantRelationshipName = 'adAccounts';
@@ -46,7 +51,7 @@ class AdAccountResource extends Resource
     }
 
     /** Owners and admins see every account; others see unlinked ones and those of clients they can see. */
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    public static function getEloquentQuery(): Builder
     {
         $a = Filament::getTenant();
         $q = parent::getEloquentQuery();
@@ -119,7 +124,7 @@ class AdAccountResource extends Resource
                 Action::make('health')->label('Check health')->icon('heroicon-o-heart')->color('gray')
                     ->visible(fn (AdAccount $r) => $can() && $r->is_active && $r->network && ConnectorRegistry::for($r->network)->supportsSync())
                     ->action(function (AdAccount $r) {
-                        (new \App\Jobs\CheckAccountHealth($r->id))->handle();
+                        (new CheckAccountHealth($r->id))->handle();
                         $r->refresh();
                         Notification::make()->title(empty($r->health) ? 'No problems found' : count($r->health).' issue(s) found')
                             ->body(collect((array) $r->health)->map(fn ($i) => $i[1])->implode("\n") ?: null)->{empty($r->health) ? 'success' : 'warning'}()->send();

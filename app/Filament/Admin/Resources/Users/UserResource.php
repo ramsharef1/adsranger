@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Users;
 
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Filament\Admin\Resources\Users\Pages\ListUsers;
+use App\Filament\Concerns\TranslatesResourceLabels;
 use App\Models\User;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -20,6 +21,8 @@ use UnitEnum;
 
 class UserResource extends Resource
 {
+    use TranslatesResourceLabels;
+
     protected static ?string $model = User::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-user-circle';

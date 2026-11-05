@@ -58,7 +58,7 @@ class AppPanelProvider extends PanelProvider
                     ->icon('heroicon-o-language')
                     ->url(fn (): string => request()->fullUrlWithQuery(['lang' => __('ui.switch_locale')])),
                 Action::make('admin-panel')
-                    ->label('Admin panel')
+                    ->label(fn (): string => __('Admin panel'))
                     ->icon('heroicon-o-shield-check')
                     ->url(fn (): string => url('/admin'))
                     ->visible(fn (): bool => auth()->user()?->role === 'super_admin'),

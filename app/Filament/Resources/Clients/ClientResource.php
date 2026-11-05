@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Clients;
 
+use App\Filament\Concerns\TranslatesResourceLabels;
 use App\Filament\Resources\Clients\Pages\CreateClient;
 use App\Filament\Resources\Clients\Pages\EditClient;
 use App\Filament\Resources\Clients\Pages\ListClients;
@@ -9,6 +10,7 @@ use App\Filament\Resources\Clients\Pages\ViewClient;
 use App\Models\AdAccount;
 use App\Models\Client;
 use App\Models\DailyMetric;
+use App\Support\HealthScore;
 use App\Support\TeamRoles;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -29,6 +31,8 @@ use UnitEnum;
 
 class ClientResource extends Resource
 {
+    use TranslatesResourceLabels;
+
     protected static ?string $model = Client::class;
 
     protected static ?string $tenantRelationshipName = 'clients';
@@ -126,8 +130,8 @@ class ClientResource extends Resource
                 TextColumn::make('market')->toggleable(),
                 TextColumn::make('currency'),
                 TextColumn::make('health_score')->label('Health')->badge()->sortable()
-                    ->formatStateUsing(fn ($state) => $state === null ? '–' : $state.' · '.\App\Support\HealthScore::band((int) $state)[0])
-                    ->color(fn ($state) => \App\Support\HealthScore::band($state === null ? null : (int) $state)[1])
+                    ->formatStateUsing(fn ($state) => $state === null ? '–' : $state.' · '.HealthScore::band((int) $state)[0])
+                    ->color(fn ($state) => HealthScore::band($state === null ? null : (int) $state)[1])
                     ->tooltip(fn ($record) => collect((array) $record->health_parts)->map(fn ($x, $k) => ucfirst($k).': '.$x['points'].'/'.$x['max'].' · '.$x['note'])->implode("\n") ?: 'Scores run nightly.'),
                 TextColumn::make('ad_accounts_count')->counts('adAccounts')->label('Accounts'),
                 TextColumn::make('monthly_budget')->label('Budget / month')->numeric(2)->toggleable(),

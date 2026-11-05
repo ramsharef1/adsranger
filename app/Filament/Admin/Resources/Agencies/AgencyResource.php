@@ -2,20 +2,22 @@
 
 namespace App\Filament\Admin\Resources\Agencies;
 
+use App\Alerts\AlertEngine;
 use App\Filament\Admin\Resources\Agencies\Pages\EditAgency;
 use App\Filament\Admin\Resources\Agencies\Pages\ListAgencies;
+use App\Filament\Concerns\TranslatesResourceLabels;
 use App\Models\Agency;
+use App\Models\Plan;
+use App\Support\DemoData;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
-use Filament\Notifications\Notification;
-use App\Support\DemoData;
-use App\Alerts\AlertEngine;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -27,6 +29,8 @@ use UnitEnum;
 
 class AgencyResource extends Resource
 {
+    use TranslatesResourceLabels;
+
     protected static ?string $model = Agency::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-building-office-2';
@@ -64,7 +68,7 @@ class AgencyResource extends Resource
                 Select::make('currency')->options(collect(config('adsranger.currencies'))->mapWithKeys(fn ($c) => [$c => $c])),
             ])->columnSpan(2),
             Section::make('Plan and status')->columns(2)->schema([
-                Select::make('plan')->options(fn () => \App\Models\Plan::orderBy('sort')->pluck('name', 'key'))->required()
+                Select::make('plan')->options(fn () => Plan::orderBy('sort')->pluck('name', 'key'))->required()
                     ->helperText('Controls which features and networks the agency gets.'),
                 Select::make('status')->options(config('adsranger.agency_statuses'))->required()
                     ->helperText('Suspended agencies cannot sign in to their workspace.'),

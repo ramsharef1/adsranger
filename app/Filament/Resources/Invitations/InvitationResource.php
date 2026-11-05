@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Invitations;
 
+use App\Filament\Concerns\TranslatesResourceLabels;
 use App\Filament\Resources\Invitations\Pages\ListInvitations;
 use App\Models\AgencyInvitation;
 use App\Support\TeamRoles;
@@ -18,6 +19,8 @@ use UnitEnum;
 /** Pending invitations of the current agency workspace. */
 class InvitationResource extends Resource
 {
+    use TranslatesResourceLabels;
+
     protected static ?string $model = AgencyInvitation::class;
 
     protected static ?string $tenantRelationshipName = 'invitations';

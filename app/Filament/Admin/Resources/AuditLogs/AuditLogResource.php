@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\AuditLogs;
 
 use App\Filament\Admin\Resources\AuditLogs\Pages\ListAuditLogs;
+use App\Filament\Concerns\TranslatesResourceLabels;
 use App\Models\AuditLog;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -15,6 +16,8 @@ use UnitEnum;
 /** Read-only view of every audited change on the platform. */
 class AuditLogResource extends Resource
 {
+    use TranslatesResourceLabels;
+
     protected static ?string $model = AuditLog::class;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-list';

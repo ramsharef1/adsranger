@@ -12,7 +12,7 @@ class RegisterAgency extends RegisterTenant
 {
     public static function getLabel(): string
     {
-        return 'Create your agency workspace';
+        return __('Create your agency workspace');
     }
 
     public function form(Schema $schema): Schema

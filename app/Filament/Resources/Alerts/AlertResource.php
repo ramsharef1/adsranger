@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Alerts;
 
+use App\Filament\Concerns\TranslatesResourceLabels;
 use App\Filament\Resources\Alerts\Pages\ListAlerts;
 use App\Models\Alert;
 use App\Models\AuditLog;
@@ -24,6 +25,8 @@ use UnitEnum;
 /** Alerts inbox: assign, snooze, resolve. */
 class AlertResource extends Resource
 {
+    use TranslatesResourceLabels;
+
     protected static ?string $model = Alert::class;
 
     protected static ?string $tenantRelationshipName = 'alerts';

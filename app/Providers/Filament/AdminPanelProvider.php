@@ -54,7 +54,7 @@ class AdminPanelProvider extends PanelProvider
                     ->icon('heroicon-o-language')
                     ->url(fn (): string => request()->fullUrlWithQuery(['lang' => __('ui.switch_locale')])),
                 Action::make('agency-app')
-                    ->label('Agency app')
+                    ->label(fn (): string => __('Agency app'))
                     ->icon('heroicon-o-squares-2x2')
                     ->url(fn (): string => url('/app')),
             ])

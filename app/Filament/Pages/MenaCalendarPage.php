@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\TranslatesPageLabels;
 use App\Models\Client;
 use App\Support\MenaCalendar;
 use App\Support\PlanGate;
@@ -13,6 +14,8 @@ use UnitEnum;
 /** MENA calendar with Hijri dates and seasonality (#40) + Ramadan / Eid scenario planner (#96). */
 class MenaCalendarPage extends Page
 {
+    use TranslatesPageLabels;
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-moon';
 
     protected static string|UnitEnum|null $navigationGroup = 'Planning';
