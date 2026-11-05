@@ -299,6 +299,8 @@ class AlertEngine
                 $stats['resolved']++;
             }
         }
+        // #175: Critical push to subscribed phones (Pro+), before the email so a phone hears first.
+        \App\Support\CriticalPush::dispatch($a, $new);
         $high = collect($new)->where('severity', 'critical');
         if ($high->isNotEmpty()) {
             foreach ($a->members()->where('email_alerts', true)->get() as $u) {

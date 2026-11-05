@@ -20,6 +20,11 @@ class RunAlerts implements ShouldQueue
 
     public function handle(): void
     {
+        // #24: a snoozed alert comes back when its snooze ends, even if the rule hasn't fired again yet.
+        \App\Models\Alert::where('status', 'snoozed')->whereNotNull('snoozed_until')->where('snoozed_until', '<=', now())
+            ->update(['status' => 'open', 'snoozed_until' => null]);
+        // #175: pushes held during quiet hours / the weekend go out as one summary once the user's quiet time ends.
+        \App\Support\CriticalPush::flushHeld();
         Agency::query()->whereIn('status', ['trial', 'active'])->each(function (Agency $a) {
             if (Trial::isReadOnly($a)) {
                 return; // D-61: no alert runs or digests for a read-only trial workspace (status may lag a day)

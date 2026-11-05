@@ -25,6 +25,12 @@ class Severity
         return __(['critical' => 'Critical', 'warning' => 'Warning', 'info' => 'Info'][static::normalize($s)]);
     }
 
+    /** Label in a given language (mails and pushes built outside a request). */
+    public static function labelIn(?string $s, string $locale): string
+    {
+        return __(['critical' => 'Critical', 'warning' => 'Warning', 'info' => 'Info'][static::normalize($s)], [], $locale);
+    }
+
     /** Filament colour name. */
     public static function color(?string $s): string
     {

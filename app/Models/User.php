@@ -38,7 +38,15 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'signup_payload' => 'array',
+            'push_weekend_off' => 'boolean',
+            'push_override_spend' => 'boolean',
         ];
+    }
+
+    /** #175 this user's phones / browsers subscribed to Critical push. */
+    public function pushSubscriptions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(PushSubscription::class);
     }
 
     /** Super admins are created by hand (artisan) and are never held at the verification prompt. */

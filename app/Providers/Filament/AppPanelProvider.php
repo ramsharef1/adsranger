@@ -78,10 +78,16 @@ class AppPanelProvider extends PanelProvider
                 Route::get('export/clients.csv', [ExportController::class, 'clients'])->middleware('throttle:20,1')->name('export.clients');
                 Route::get('export/ad-accounts.csv', [ExportController::class, 'adAccounts'])->middleware('throttle:20,1')->name('export.accounts');
                 Route::get('export/workspace.zip', [ExportController::class, 'workspace'])->middleware('throttle:3,1')->name('export.workspace');
+                // #175 Critical push: subscribe / unsubscribe this device, send a test.
+                Route::post('push/subscribe', [\App\Http\Controllers\PushController::class, 'subscribe'])->middleware('throttle:20,1')->name('push.subscribe');
+                Route::post('push/unsubscribe', [\App\Http\Controllers\PushController::class, 'unsubscribe'])->middleware('throttle:20,1')->name('push.unsubscribe');
+                Route::post('push/test', [\App\Http\Controllers\PushController::class, 'test'])->middleware('throttle:5,1')->name('push.test');
             })
             ->livewireComponents([GoogleFinishSignup::class, GoogleTwoStep::class])
             ->font('IBM Plex Sans Arabic', provider: GoogleFontProvider::class)
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.head'))
+            // #175: PWA manifest + service worker for phone alerts.
+            ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.pwa'))
             ->renderHook(PanelsRenderHook::SIMPLE_PAGE_END, fn () => view('panels.lang-switch'))
             // D-61 trial banner (days left / trial ended), under the top bar.
             ->renderHook(PanelsRenderHook::TOPBAR_AFTER, fn () => view('panels.context-bar'))

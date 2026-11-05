@@ -79,11 +79,63 @@ class AlertResource extends Resource
         AuditLog::record('alert.'.$what, $a->agency, ['alert_id' => $a->id, 'rule' => $a->rule_key]);
     }
 
-    public static function table(Table $table): Table
+    /**
+     * Assign / snooze / resolve / reopen, shared by the inbox rows and the phone alert page (#24, I-X-4).
+     *
+     * @return array<int, Action>
+     */
+    public static function alertActions(): array
     {
         $agency = Filament::getTenant();
         $can = fn () => TeamRoles::canManageData(auth()->user(), $agency);
         $members = fn () => $agency->members()->pluck('name', 'users.id')->all();
+
+        return [
+            Action::make('assign')->label(__('Assign'))->icon('heroicon-o-user-plus')->visible($can)
+                ->schema([Select::make('user')->label(__('Team member'))->options($members)->default(fn (Alert $r) => $r->assigned_to)])
+                ->action(function (Alert $r, array $data) {
+                    $to = $data['user'] ?: null;
+                    $before = $r->assigned_to;
+                    static::act($r, ['assigned_to' => $to], 'assigned');
+                    static::notifyAssignee($r, $to, $before);
+                }),
+            Action::make('snooze')->label(__('Snooze'))->icon('heroicon-o-clock')->color('warning')->visible(fn (Alert $r) => $can() && $r->status === 'open')
+                ->schema([Select::make('days')->options(['1' => trans_choice(':count day|:count days', 1), '3' => trans_choice(':count day|:count days', 3), '7' => trans_choice(':count day|:count days', 7)])->default('1')->required()])
+                ->action(fn (Alert $r, array $data) => static::act($r, ['status' => 'snoozed', 'snoozed_until' => now()->addDays((int) $data['days'])], 'snoozed')),
+            Action::make('resolve')->label(__('Resolve'))->icon('heroicon-o-check')->color('success')->visible(fn (Alert $r) => $can() && $r->status !== 'resolved')
+                ->action(fn (Alert $r) => static::act($r, ['status' => 'resolved', 'resolved_at' => now(), 'resolved_by' => auth()->id()], 'resolved')),
+            Action::make('reopen')->label(__('Reopen'))->icon('heroicon-o-arrow-uturn-left')->color('gray')->visible(fn (Alert $r) => $can() && $r->status !== 'open')
+                ->action(fn (Alert $r) => static::act($r, ['status' => 'open', 'snoozed_until' => null, 'resolved_at' => null, 'resolved_by' => null], 'reopened')),
+        ];
+    }
+
+    /** #24: tell the new assignee (email if they opted in to alert emails; phone push on Pro+ if subscribed). */
+    public static function notifyAssignee(Alert $r, ?int $to, ?int $before): void
+    {
+        if (! $to || $to === $before || $to === auth()->id()) {
+            return;
+        }
+        $u = \App\Models\User::find($to);
+        if (! $u) {
+            return;
+        }
+        $url = \App\Support\CriticalPush::alertUrl($r->agency, $r);
+        if ($u->email_alerts) {
+            \Illuminate\Support\Facades\Mail::to($u->email)->queue(new \App\Mail\AlertAssignedMail($r, $u, (string) auth()->user()?->name, $url));
+        }
+        if (\App\Support\PlanGate::allows($r->agency, 'phone_push') && $u->pushSubscriptions()->exists()) {
+            $l = $r->agency->language === 'en' ? 'en' : 'ar';
+            \App\Support\CriticalPush::push($u, [
+                'title' => \Illuminate\Support\Str::limit(__('Alert assigned to you · :client', ['client' => $r->client?->name ?? $r->agency->name], $l), 60, '…'),
+                'body' => \Illuminate\Support\Str::limit(__(config("alerts.rules.{$r->rule_key}.label") ?? $r->rule_key, [], $l).($r->entity_name ? ' · '.$r->entity_name : ''), 110, '…'),
+            ], $url, 'adsr-assigned-'.$r->id);
+        }
+    }
+
+    public static function table(Table $table): Table
+    {
+        $agency = Filament::getTenant();
+        $can = fn () => TeamRoles::canManageData(auth()->user(), $agency);
 
         return $table
             ->defaultSort('created_at', 'desc')
@@ -106,18 +158,8 @@ class AlertResource extends Resource
                 SelectFilter::make('client_id')->label(__('Client'))->options(fn () => Client::visibleTo(auth()->user(), $agency)->orderBy('name')->pluck('name', 'id')->all()),
                 TernaryFilter::make('mine')->label(__('Assigned to me'))->queries(true: fn ($q) => $q->where('assigned_to', auth()->id()), false: fn ($q) => $q, blank: fn ($q) => $q),
             ])
-            ->recordActions([
-                Action::make('assign')->label(__('Assign'))->icon('heroicon-o-user-plus')->visible($can)
-                    ->schema([Select::make('user')->label(__('Team member'))->options($members)->default(fn (Alert $r) => $r->assigned_to)])
-                    ->action(fn (Alert $r, array $data) => static::act($r, ['assigned_to' => $data['user'] ?: null], 'assigned')),
-                Action::make('snooze')->label(__('Snooze'))->icon('heroicon-o-clock')->color('warning')->visible(fn (Alert $r) => $can() && $r->status === 'open')
-                    ->schema([Select::make('days')->options(['1' => trans_choice(':count day|:count days', 1), '3' => trans_choice(':count day|:count days', 3), '7' => trans_choice(':count day|:count days', 7)])->default('1')->required()])
-                    ->action(fn (Alert $r, array $data) => static::act($r, ['status' => 'snoozed', 'snoozed_until' => now()->addDays((int) $data['days'])], 'snoozed')),
-                Action::make('resolve')->label(__('Resolve'))->icon('heroicon-o-check')->color('success')->visible(fn (Alert $r) => $can() && $r->status !== 'resolved')
-                    ->action(fn (Alert $r) => static::act($r, ['status' => 'resolved', 'resolved_at' => now(), 'resolved_by' => auth()->id()], 'resolved')),
-                Action::make('reopen')->label(__('Reopen'))->icon('heroicon-o-arrow-uturn-left')->color('gray')->visible(fn (Alert $r) => $can() && $r->status !== 'open')
-                    ->action(fn (Alert $r) => static::act($r, ['status' => 'open', 'snoozed_until' => null, 'resolved_at' => null, 'resolved_by' => null], 'reopened')),
-            ])
+            ->recordUrl(fn (Alert $r) => static::getUrl('view', ['record' => $r]))
+            ->recordActions(static::alertActions())
             ->toolbarActions([
                 BulkAction::make('resolveAll')->label(__('Resolve selected'))->icon('heroicon-o-check')->visible($can)
                     ->action(fn (Collection $records) => $records->each(fn (Alert $r) => static::act($r, ['status' => 'resolved', 'resolved_at' => now(), 'resolved_by' => auth()->id()], 'resolved'))),
@@ -126,6 +168,6 @@ class AlertResource extends Resource
 
     public static function getPages(): array
     {
-        return ['index' => ListAlerts::route('/')];
+        return ['index' => ListAlerts::route('/'), 'view' => Pages\ViewAlert::route('/{record}')];
     }
 }

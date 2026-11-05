@@ -58,6 +58,9 @@ return [
         'alert_rules_pro' => ['tier' => 'pro', 'refs' => [23],
             'name' => ['en' => 'Pro alert rules', 'ar' => 'قواعد التنبيه الاحترافية'],
             'what' => ['en' => 'Extra rules: pacing forecast, ad-set tracking, broken landing pages and wasted search terms.', 'ar' => 'قواعد إضافية: توقع وتيرة الإنفاق، وتتبع المجموعات الإعلانية، وصفحات الهبوط المعطلة، وعبارات البحث المهدرة.']],
+        'phone_push' => ['tier' => 'pro', 'refs' => [175, 78],
+            'name' => ['en' => 'Phone alerts', 'ar' => 'تنبيهات الهاتف'],
+            'what' => ['en' => 'Critical alerts arrive on your phone within a minute, with quiet hours you choose.', 'ar' => 'تصل التنبيهات الحرجة إلى هاتفك خلال دقيقة، مع ساعات هدوء تختارها.']],
         // Starter = every plan; listed so the send job and the schedule screen follow this map if the tier moves.
         'scheduled_reports' => ['tier' => 'starter', 'refs' => [106],
             'name' => ['en' => 'Scheduled email reports', 'ar' => 'تقارير البريد المجدولة'],
