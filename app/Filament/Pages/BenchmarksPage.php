@@ -48,8 +48,8 @@ class BenchmarksPage extends Page
         $a->forceFill(['benchmarks_opt_in' => $on, 'benchmarks_opt_in_at' => $on ? now() : null])->save();
         Cache::forget('benchmarks:network:v1');
         AuditLog::record($on ? 'benchmarks.opted_in' : 'benchmarks.opted_out', $a, []);
-        Notification::make()->title($on ? 'Joined the MENA benchmarks network' : 'Left the MENA benchmarks network')
-            ->body($on ? 'Your anonymised medians are included from the next refresh.' : 'Your data is no longer included from the next refresh (within 12 hours).')->success()->send();
+        Notification::make()->title($on ? __('Joined the MENA benchmarks network') : __('Left the MENA benchmarks network'))
+            ->body($on ? __('Your anonymised medians are included from the next refresh.') : __('Your data is no longer included from the next refresh (within 12 hours).'))->success()->send();
     }
 
     protected function getViewData(): array

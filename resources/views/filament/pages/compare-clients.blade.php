@@ -3,25 +3,25 @@
     $muted = 'opacity:.65;font-size:12px';
     $sel = 'padding:6px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.35);background:transparent;font-size:14px';
     $lines = [
-        ['Spend', fn ($s) => R::money($s['t']['spend'], $s['client']->currency)],
-        ['Main result', fn ($s) => number_format($s['t']['main_results']).' '.R::label($s['t']['main_type'])],
-        ['Cost per result', fn ($s) => R::money($s['t']['cpr'], $s['client']->currency)],
-        ['Leads', fn ($s) => number_format($s['t']['leads'])], ['Conversations', fn ($s) => number_format($s['t']['messages'])],
-        ['Calls placed', fn ($s) => number_format($s['t']['calls'])], ['Purchases', fn ($s) => number_format($s['t']['purchases'])],
-        ['ROAS', fn ($s) => $s['t']['roas'] ? number_format($s['t']['roas'], 2).'×' : '–'],
-        ['Impressions', fn ($s) => number_format($s['t']['impressions'])], ['Link CTR', fn ($s) => $s['t']['ctr'] ? number_format($s['t']['ctr'], 2).'%' : '–'],
-        ['Avg. spend / day', fn ($s) => R::money($s['t']['spend'] / max(1, count($s['days'])), $s['client']->currency)],
+        [__('Spend'), fn ($s) => R::money($s['t']['spend'], $s['client']->currency)],
+        [__('Main result'), fn ($s) => number_format($s['t']['main_results']).' '.R::label($s['t']['main_type'], app()->getLocale())],
+        [__('Cost per result'), fn ($s) => R::money($s['t']['cpr'], $s['client']->currency)],
+        [__('Leads'), fn ($s) => number_format($s['t']['leads'])], [__('Conversations'), fn ($s) => number_format($s['t']['messages'])],
+        [__('Calls placed'), fn ($s) => number_format($s['t']['calls'])], [__('Purchases'), fn ($s) => number_format($s['t']['purchases'])],
+        [__('ROAS'), fn ($s) => $s['t']['roas'] ? number_format($s['t']['roas'], 2).'×' : '–'],
+        [__('Impressions'), fn ($s) => number_format($s['t']['impressions'])], [__('Link CTR'), fn ($s) => $s['t']['ctr'] ? number_format($s['t']['ctr'], 2).'%' : '–'],
+        [__('Avg. spend / day'), fn ($s) => R::money($s['t']['spend'] / max(1, count($s['days'])), $s['client']->currency)],
     ];
 @endphp
 <x-filament-panels::page>
     <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
         <select wire:model.live="a" style="{{ $sel }}">@foreach ($list as $c)<option value="{{ $c->id }}">{{ $c->name }}</option>@endforeach</select>
-        <span style="{{ $muted }}">vs</span>
+        <span style="{{ $muted }}">{{ __('vs') }}</span>
         <select wire:model.live="b" style="{{ $sel }}">@foreach ($list as $c)<option value="{{ $c->id }}">{{ $c->name }}</option>@endforeach</select>
         <select wire:model.live="period" style="{{ $sel }}">
-            @foreach (['7d' => 'Last 7 days', '14d' => 'Last 14 days', '30d' => 'Last 30 days', '90d' => 'Last 90 days'] as $k => $l)<option value="{{ $k }}">{{ $l }}</option>@endforeach
+            @foreach (['7d' => 'Last 7 days', '14d' => 'Last 14 days', '30d' => 'Last 30 days', '90d' => 'Last 90 days'] as $k => $l)<option value="{{ $k }}">{{ __($l) }}</option>@endforeach
         </select>
-        <span style="{{ $muted }}">{{ $from }} → {{ $to }} · each in its own currency</span>
+        <span style="{{ $muted }}">{{ $from }} → {{ $to }} · {{ __('each in its own currency') }}</span>
     </div>
     @if ($A && $B)
         <x-filament::section>
@@ -40,6 +40,6 @@
             </table>
         </x-filament::section>
     @else
-        <x-filament::section><div style="{{ $muted }}">Add at least two active clients to compare them.</div></x-filament::section>
+        <x-filament::section><div style="{{ $muted }}">{{ __('Add at least two active clients to compare them.') }}</div></x-filament::section>
     @endif
 </x-filament-panels::page>

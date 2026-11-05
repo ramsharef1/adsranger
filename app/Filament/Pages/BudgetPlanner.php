@@ -126,7 +126,7 @@ class BudgetPlanner extends Page
             $n++;
         }
         AuditLog::record('budget_plan.saved', $a, ['client_id' => $c->id, 'year' => $this->year, 'months' => $n]);
-        Notification::make()->title('Budget plan saved')->success()->send();
+        Notification::make()->title(__('Budget plan saved'))->success()->send();
     }
 
     protected function getViewData(): array

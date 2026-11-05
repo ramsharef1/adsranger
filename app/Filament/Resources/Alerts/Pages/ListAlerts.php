@@ -14,7 +14,7 @@ class ListAlerts extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('rules')->label('Alert rules')->icon('heroicon-o-adjustments-horizontal')->color('gray')->url(fn () => AlertRules::getUrl()),
+            Action::make('rules')->label(__('Alert rules'))->icon('heroicon-o-adjustments-horizontal')->color('gray')->url(fn () => AlertRules::getUrl()),
         ];
     }
 }

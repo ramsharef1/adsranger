@@ -2,7 +2,7 @@
 <style>
     :root { --font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; }
     .fi-simple-layout .fi-input-wrp, .fi-simple-layout .fi-btn { min-height: 44px; }
-    .fi-simple-layout .fi-input-wrp .fi-input { min-height: 42px; }
+    .fi-simple-layout .fi-input-wrp .fi-input { min-height: 44px; } /* UX-46: text inputs at least 44 px */
     .fi-simple-layout .fi-input-wrp .fi-icon-btn { min-width: 44px; min-height: 44px; }
     .fi-simple-layout .fi-fo-checkbox-list-option-label,
     .fi-simple-layout .fi-fo-field-label { min-height: 44px; display: inline-flex; align-items: center; gap: .5rem; cursor: pointer; }

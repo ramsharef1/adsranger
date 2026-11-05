@@ -2,7 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Auth\RequestPasswordReset;
+use App\Filament\Pages\Auth\ResetPassword;
 use App\Filament\Pages\Tenancy\EditAgencyProfile;
 use App\Filament\Pages\Tenancy\RegisterAgency;
 use App\Http\Middleware\SetPanelLocale;
@@ -39,8 +41,8 @@ class AppPanelProvider extends PanelProvider
             ->brandLogo(fn () => view('brand.logo'))
             ->brandLogoHeight('2rem')
             ->favicon(asset('brand/favicon.svg'))
-            ->login()
-            ->passwordReset(RequestPasswordReset::class)
+            ->login(Login::class)
+            ->passwordReset(RequestPasswordReset::class, ResetPassword::class)
             ->font('IBM Plex Sans Arabic', provider: GoogleFontProvider::class)
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.head'))
             ->renderHook(PanelsRenderHook::SIMPLE_PAGE_END, fn () => view('panels.lang-switch'))

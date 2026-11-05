@@ -2,8 +2,8 @@
 
 namespace App\Filament\Admin\Resources\AdNetworks\Pages;
 
-use App\Filament\Admin\Resources\AdNetworks\AdNetworkResource;
 use App\Connectors\ConnectorRegistry;
+use App\Filament\Admin\Resources\AdNetworks\AdNetworkResource;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
@@ -15,7 +15,7 @@ class EditAdNetwork extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('test')->label('Test keys')->icon('heroicon-o-beaker')
+            Action::make('test')->label(__('Test keys'))->icon('heroicon-o-beaker')
                 ->action(function () {
                     $n = $this->record->fresh();
                     $lines = [];
@@ -31,12 +31,12 @@ class EditAdNetwork extends EditRecord
                         $best = $best === false ? false : ($ok === false ? false : ($ok ?? $best));
                     }
                     if (! $lines) {
-                        Notification::make()->title('No keys saved yet')->warning()->send();
+                        Notification::make()->title(__('No keys saved yet'))->warning()->send();
 
                         return;
                     }
                     $n->forceFill(['last_tested_at' => now(), 'last_test_result' => mb_substr(implode(' | ', $lines), 0, 900)])->saveQuietly();
-                    Notification::make()->title($best === false ? 'Key test failed' : ($best ? 'Keys work' : 'Keys saved (cannot be fully tested)'))
+                    Notification::make()->title($best === false ? __('Key test failed') : ($best ? __('Keys work') : __('Keys saved (cannot be fully tested)')))
                         ->body(implode("\n", $lines))->{$best === false ? 'danger' : ($best ? 'success' : 'warning')}()->persistent()->send();
                 }),
         ];
@@ -80,6 +80,6 @@ class EditAdNetwork extends EditRecord
 
     protected function getSavedNotificationTitle(): ?string
     {
-        return 'Keys saved (encrypted)';
+        return __('Keys saved (encrypted)');
     }
 }

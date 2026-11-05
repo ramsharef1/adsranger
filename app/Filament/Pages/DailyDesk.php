@@ -52,7 +52,7 @@ class DailyDesk extends Page
         $a = Filament::getTenant();
         $key = 'desk-today:'.$a->id;
         if (Cache::has($key)) {
-            Notification::make()->title('Today was refreshed less than 10 minutes ago')->body('Numbers update every 10 minutes at most.')->info()->send();
+            Notification::make()->title(__('Today was refreshed less than 10 minutes ago'))->body(__('Numbers update every 10 minutes at most.'))->info()->send();
 
             return;
         }
@@ -66,7 +66,7 @@ class DailyDesk extends Page
                 $n++;
             });
         $this->day = 'today';
-        Notification::make()->title($n ? "Refreshing $n account(s)" : 'No connected accounts to refresh')->body($n ? 'Reload in a minute or two.' : null)->success()->send();
+        Notification::make()->title($n ? trans_choice('{1} Refreshing :count account|[2,*] Refreshing :count accounts', $n) : __('No connected accounts to refresh'))->body($n ? __('Reload in a minute or two.') : null)->success()->send();
     }
 
     protected function getViewData(): array

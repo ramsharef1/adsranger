@@ -64,7 +64,7 @@ class AlertRules extends Page
             AlertRule::updateOrCreate(['agency_id' => $a->id, 'rule_key' => $k], ['enabled' => (bool) ($in['enabled'] ?? true), 'thresholds' => $t]);
         }
         AuditLog::record('alerts.rules_updated', $a, []);
-        Notification::make()->title('Alert rules saved')->body('They apply from the next run (every morning after the sync).')->success()->send();
+        Notification::make()->title(__('Alert rules saved'))->body(__('They apply from the next run (every morning after the sync).'))->success()->send();
     }
 
     public function runNow(): void
@@ -72,7 +72,7 @@ class AlertRules extends Page
         abort_unless($this->canEdit(), 403);
         $a = Filament::getTenant();
         $s = AlertEngine::run($a, now($a->timezone ?: 'UTC')->subDay()->toDateString());
-        Notification::make()->title("Rules ran: {$s['opened']} new, {$s['refreshed']} still open, {$s['resolved']} resolved")->success()->send();
+        Notification::make()->title(__('Rules ran: :new new, :open still open, :resolved resolved', ['new' => $s['opened'], 'open' => $s['refreshed'], 'resolved' => $s['resolved']]))->success()->send();
     }
 
     protected function getViewData(): array

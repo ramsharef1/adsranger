@@ -1,8 +1,8 @@
 <x-filament-panels::page>
     <x-filament::section>
-        <x-slot name="heading">{{ $plan?->name ?? ucfirst($agency->plan) }} plan</x-slot>
+        <x-slot name="heading">{{ __(':plan plan', ['plan' => $plan?->name ?? ucfirst($agency->plan)]) }}</x-slot>
         <x-slot name="description">
-            Status: {{ ucfirst($agency->status) }}@if (! is_null($trialDays)) · {{ $trialDays }} day(s) left in your trial @endif
+            {{ __('Status: :status', ['status' => __(ucfirst($agency->status))]) }}@if (! is_null($trialDays)) · {{ trans_choice(':count day left in your trial|:count days left in your trial', $trialDays) }} @endif
         </x-slot>
         <div style="display:grid;gap:14px">
             @foreach ($rows as [$label, $used, $limit])
@@ -50,8 +50,8 @@
         <p style="font-size:13px;opacity:.7;margin-top:8px">{{ __('plan.contact') }}</p>
     </x-filament::section>
     <x-filament::section>
-        <x-slot name="heading">Networks in your plan</x-slot>
-        <p style="font-size:14px;line-height:1.8">{{ $networks->isEmpty() ? 'None yet — networks appear as they are switched on.' : $networks->implode(' · ') }}</p>
-        <p style="font-size:13px;opacity:.7;margin-top:8px">Need a bigger plan or another network? Contact support@adsranger.com. Online upgrades come with billing.</p>
+        <x-slot name="heading">{{ __('Networks in your plan') }}</x-slot>
+        <p style="font-size:14px;line-height:1.8">{{ $networks->isEmpty() ? __('None yet — networks appear as they are switched on.') : $networks->implode(' · ') }}</p>
+        <p style="font-size:13px;opacity:.7;margin-top:8px">{{ __('Need a bigger plan or another network? Contact support@adsranger.com. Online upgrades come with billing.') }}</p>
     </x-filament::section>
 </x-filament-panels::page>

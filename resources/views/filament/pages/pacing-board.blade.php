@@ -9,17 +9,17 @@
 <x-filament-panels::page>
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between">
         <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
-            <span style="{{ $muted }}">Sort:</span>
-            <button type="button" wire:click="setSort('health')" style="{{ $pill($sort === 'health') }}">Lowest health first</button>
-            <button type="button" wire:click="setSort('pace')" style="{{ $pill($sort === 'pace') }}">Furthest off pace</button>
-            <button type="button" wire:click="setSort('name')" style="{{ $pill($sort === 'name') }}">Name</button>
+            <span style="{{ $muted }}">{{ __('Sort:') }}</span>
+            <button type="button" wire:click="setSort('health')" style="{{ $pill($sort === 'health') }}">{{ __('Lowest health first') }}</button>
+            <button type="button" wire:click="setSort('pace')" style="{{ $pill($sort === 'pace') }}">{{ __('Furthest off pace') }}</button>
+            <button type="button" wire:click="setSort('name')" style="{{ $pill($sort === 'name') }}">{{ __('Name') }}</button>
             @if ($canManage)
-                <x-filament::button size="sm" color="gray" icon="heroicon-o-arrow-path" wire:click="recalc">Recalculate scores</x-filament::button>
+                <x-filament::button size="sm" color="gray" icon="heroicon-o-arrow-path" wire:click="recalc">{{ __('Recalculate scores') }}</x-filament::button>
             @endif
         </div>
         <div style="{{ $muted }}">
-            @if ($first) {{ $first['month_label'] }} · day {{ $first['full_days'] }} of {{ $first['days_in'] }} complete · @endif
-            {{ $tz }} · @if ($scored) scores updated {{ \Illuminate\Support\Carbon::parse($scored)->diffForHumans() }} @else scores run nightly @endif
+            @if ($first) {{ __(':month · day :day of :days complete', ['month' => $first['month_label'], 'day' => $first['full_days'], 'days' => $first['days_in']]) }} · @endif
+            {{ $tz }} · @if ($scored) {{ __('scores updated :when', ['when' => \Illuminate\Support\Carbon::parse($scored)->diffForHumans()]) }} @else {{ __('scores run nightly') }} @endif
         </div>
     </div>
 
@@ -27,15 +27,15 @@
         <div style="overflow-x:auto">
             <table style="width:100%;border-collapse:collapse;font-size:13px">
                 <thead><tr style="{{ $muted }}">
-                    <th style="padding:6px;text-align:start">Client</th>
-                    <th style="padding:6px;text-align:start">Health</th>
-                    <th style="padding:6px;text-align:end">Budget</th>
-                    <th style="padding:6px;text-align:end">Spent</th>
-                    <th style="padding:6px;text-align:end" title="Spent vs the budget expected by now">Pace</th>
-                    <th style="padding:6px;text-align:end">Month-end forecast</th>
-                    <th style="padding:6px;text-align:end">Results · forecast · target</th>
-                    <th style="padding:6px;text-align:end" title="Daily spend needed to land exactly on budget">Needed / day</th>
-                    <th style="padding:6px;text-align:start">Status</th>
+                    <th style="padding:6px;text-align:start">{{ __('Client') }}</th>
+                    <th style="padding:6px;text-align:start">{{ __('Health') }}</th>
+                    <th style="padding:6px;text-align:end">{{ __('Budget') }}</th>
+                    <th style="padding:6px;text-align:end">{{ __('Spent') }}</th>
+                    <th style="padding:6px;text-align:end" title="{{ __('Spent vs the budget expected by now') }}">{{ __('Pace') }}</th>
+                    <th style="padding:6px;text-align:end">{{ __('Month-end forecast') }}</th>
+                    <th style="padding:6px;text-align:end">{{ __('Results · forecast · target') }}</th>
+                    <th style="padding:6px;text-align:end" title="{{ __('Daily spend needed to land exactly on budget') }}">{{ __('Needed / day') }}</th>
+                    <th style="padding:6px;text-align:start">{{ __('Status') }}</th>
                 </tr></thead>
                 <tbody>
                 @forelse ($rows as $r)
@@ -43,9 +43,9 @@
                     <tr style="border-top:1px solid rgba(148,163,184,.2)">
                         <td style="padding:6px"><a href="{{ ClientResource::getUrl('view', ['record' => $c]) }}" style="color:#14B8A6;font-weight:600">{{ $c->name }}</a></td>
                         <td style="padding:6px" title="{{ collect((array) $c->health_parts)->map(fn ($x, $k) => ucfirst($k).': '.$x['points'].'/'.$x['max'].' · '.$x['note'])->implode("\n") }}">
-                            <x-filament::badge :color="$r['band'][1]" style="display:inline-flex">{{ $c->health_score ?? '–' }} · {{ $r['band'][0] }}</x-filament::badge>
+                            <x-filament::badge :color="$r['band'][1]" style="display:inline-flex">{{ $c->health_score ?? '–' }} · {{ __($r['band'][0]) }}</x-filament::badge>
                         </td>
-                        <td style="padding:6px;text-align:end">{{ $p['budget'] ? R::money($p['budget'], $cur) : '–' }}@if ($p['from_plan'])<span style="{{ $muted }}" title="From the budget plan"> · plan</span>@endif</td>
+                        <td style="padding:6px;text-align:end">{{ $p['budget'] ? R::money($p['budget'], $cur) : '–' }}@if ($p['from_plan'])<span style="{{ $muted }}" title="{{ __('From the budget plan') }}"> {{ __('· plan') }}</span>@endif</td>
                         <td style="padding:6px;text-align:end">{{ R::money($p['spent'], $cur) }}</td>
                         <td style="padding:6px;text-align:end">{{ $p['pace'] !== null ? round($p['pace']).'%' : '–' }}</td>
                         @if ($forecastLocked)
@@ -55,20 +55,20 @@
                             <td style="padding:6px;text-align:end">{{ R::money($p['forecast_spend'], $cur) }}@if ($p['forecast_vs_budget'])<span style="{{ $muted }}"> · {{ round($p['forecast_vs_budget']) }}%</span>@endif</td>
                             <td style="padding:6px;text-align:end">{{ number_format($p['results']) }} · {{ number_format($p['forecast_results']) }} · {{ $p['target_results'] ? number_format($p['target_results']) : '–' }}
                         @endif
-                            <div style="{{ $muted }}">{{ R::label($p['main_type']) }}</div></td>
+                            <div style="{{ $muted }}">{{ R::label($p['main_type'], app()->getLocale()) }}</div></td>
                         <td style="padding:6px;text-align:end">{{ $p['daily_needed'] !== null ? R::money($p['daily_needed'], $cur) : '–' }}</td>
-                        <td style="padding:6px"><x-filament::badge :color="$sc" style="display:inline-flex">{{ $sl }}</x-filament::badge></td>
+                        <td style="padding:6px"><x-filament::badge :color="$sc" style="display:inline-flex">{{ __($sl) }}</x-filament::badge></td>
                     </tr>
                 @empty
-                    <tr><td colspan="9" style="padding:12px;{{ $muted }}">No active clients yet. <a href="{{ ClientResource::getUrl('create') }}" style="color:#14B8A6">Add a client</a> with a monthly budget to see pacing.</td></tr>
+                    <tr><td colspan="9" style="padding:12px;{{ $muted }}">{{ __('No active clients yet.') }} <a href="{{ ClientResource::getUrl('create') }}" style="color:#14B8A6">{{ __('Add a client') }}</a> {{ __('with a monthly budget to see pacing.') }}</td></tr>
                 @endforelse
                 </tbody>
             </table>
         </div>
         <div style="{{ $muted }};margin-top:8px">
-            Pace = spend so far vs the budget expected by the end of yesterday (±{{ config('planning.pacing.tolerance') }}% counts as on pace).
-            Forecast = spend so far + the last {{ config('planning.pacing.run_rate_days') }} days' daily average × days left. Budgets come from the budget plan, else the client's monthly budget.
-            Health = results vs target 40 · pacing 20 · 2-week trend 20 · tracking and accounts 20 (hover the score for details).
+            {{ __('Pace = spend so far vs the budget expected by the end of yesterday (±:tolerance% counts as on pace).', ['tolerance' => config('planning.pacing.tolerance')]) }}
+            {{ __('Forecast = spend so far + the last :days days\' daily average × days left. Budgets come from the budget plan, else the client\'s monthly budget.', ['days' => config('planning.pacing.run_rate_days')]) }}
+            {{ __('Health = results vs target 40 · pacing 20 · 2-week trend 20 · tracking and accounts 20 (hover the score for details).') }}
         </div>
     </x-filament::section>
     @if ($forecastLocked)

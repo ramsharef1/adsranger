@@ -40,6 +40,6 @@ class MyNotifications extends Page
     public function save(): void
     {
         auth()->user()->forceFill(['email_alerts' => $this->alerts, 'email_digest' => $this->digest])->save();
-        Notification::make()->title('Saved')->success()->send();
+        Notification::make()->title(__('Saved'))->success()->send();
     }
 }

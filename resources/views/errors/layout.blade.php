@@ -43,7 +43,7 @@
     <p>{{ $t("$code.body") }}</p>
     <div class="actions">
         <a class="btn btn-primary" href="{{ $home }}">{{ $t('home') }}</a>
-        <a class="btn btn-link" href="{{ url('/app') }}">{{ $t('app') }}</a>
+        <a class="btn btn-link" href="{{ $loc === 'en' ? url('/app?lang=en') : url('/app') }}">{{ $t('app') }}</a>
     </div>
     @if ($ref)
         <div class="ref">{{ $t('ref') }}: <bdi dir="ltr">{{ $ref }}</bdi><br>{{ $t('ref_note') }}</div>

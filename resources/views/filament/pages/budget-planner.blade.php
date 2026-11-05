@@ -9,38 +9,38 @@
 <x-filament-panels::page>
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between">
         <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
-            <label style="{{ $muted }}" for="bp-client">Client</label>
+            <label style="{{ $muted }}" for="bp-client">{{ __('Client') }}</label>
             <select id="bp-client" wire:model.live="clientId" style="padding:5px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.35);background:transparent;font-size:13px">
                 @foreach ($clients as $c)
                     <option value="{{ $c->id }}">{{ $c->name }}</option>
                 @endforeach
             </select>
-            <x-filament::button size="sm" color="gray" icon="heroicon-o-chevron-left" wire:click="setYear({{ $year - 1 }})" aria-label="Previous year">{{ $year - 1 }}</x-filament::button>
+            <x-filament::button size="sm" color="gray" icon="heroicon-o-chevron-left" wire:click="setYear({{ $year - 1 }})" aria-label="{{ __('Previous year') }}">{{ $year - 1 }}</x-filament::button>
             <strong style="font-size:15px">{{ $year }}</strong>
-            <x-filament::button size="sm" color="gray" icon="heroicon-o-chevron-right" icon-position="after" wire:click="setYear({{ $year + 1 }})" aria-label="Next year">{{ $year + 1 }}</x-filament::button>
+            <x-filament::button size="sm" color="gray" icon="heroicon-o-chevron-right" icon-position="after" wire:click="setYear({{ $year + 1 }})" aria-label="{{ __('Next year') }}">{{ $year + 1 }}</x-filament::button>
         </div>
         @if ($client && $canManage)
             <div style="display:flex;gap:6px">
-                <x-filament::button size="sm" color="gray" wire:click="fillFromClient">Fill empty months from client budget</x-filament::button>
-                <x-filament::button size="sm" icon="heroicon-o-check" wire:click="save">Save plan</x-filament::button>
+                <x-filament::button size="sm" color="gray" wire:click="fillFromClient">{{ __('Fill empty months from client budget') }}</x-filament::button>
+                <x-filament::button size="sm" icon="heroicon-o-check" wire:click="save">{{ __('Save plan') }}</x-filament::button>
             </div>
         @endif
     </div>
 
     @if (! $client)
-        <x-filament::section><div style="{{ $muted }}">No clients yet. Add a client first, then plan its budget month by month.</div></x-filament::section>
+        <x-filament::section><div style="{{ $muted }}">{{ __('No clients yet. Add a client first, then plan its budget month by month.') }}</div></x-filament::section>
     @else
         <x-filament::section>
             <div style="overflow-x:auto">
                 <table style="width:100%;border-collapse:collapse;font-size:13px">
                     <thead><tr style="{{ $muted }}">
-                        <th style="padding:6px;text-align:start">Month</th>
-                        <th style="padding:6px;text-align:end">Planned budget ({{ $cur }})</th>
-                        <th style="padding:6px;text-align:end">Actual spend</th>
-                        <th style="padding:6px;text-align:end">Spend vs plan</th>
-                        <th style="padding:6px;text-align:end">Target results</th>
-                        <th style="padding:6px;text-align:end">Actual results</th>
-                        <th style="padding:6px;text-align:end">Results vs target</th>
+                        <th style="padding:6px;text-align:start">{{ __('Month') }}</th>
+                        <th style="padding:6px;text-align:end">{{ __('Planned budget (:currency)', ['currency' => $cur]) }}</th>
+                        <th style="padding:6px;text-align:end">{{ __('Actual spend') }}</th>
+                        <th style="padding:6px;text-align:end">{{ __('Spend vs plan') }}</th>
+                        <th style="padding:6px;text-align:end">{{ __('Target results') }}</th>
+                        <th style="padding:6px;text-align:end">{{ __('Actual results') }}</th>
+                        <th style="padding:6px;text-align:end">{{ __('Results vs target') }}</th>
                     </tr></thead>
                     <tbody>
                     @foreach ($plan as $k => $v)
@@ -54,10 +54,10 @@
                             $tot['plan'] += $pb ?? 0; $tot['spend'] += $a['spend'] ?? 0; $tot['tres'] += $pr ?? 0; $tot['res'] += $a['results'] ?? 0;
                         @endphp
                         <tr style="border-top:1px solid rgba(148,163,184,.2);{{ $isNow ? 'background:rgba(20,184,166,.06)' : '' }}">
-                            <td style="padding:6px;font-weight:600">{{ \Carbon\Carbon::parse($k.'-01')->format('M Y') }}@if ($isNow)<div style="{{ $muted }}">this month, forecast</div>@endif</td>
+                            <td style="padding:6px;font-weight:600">{{ \Carbon\Carbon::parse($k.'-01')->format('M Y') }}@if ($isNow)<div style="{{ $muted }}">{{ __('this month, forecast') }}</div>@endif</td>
                             <td style="padding:6px;text-align:end">
                                 @if ($canManage)
-                                    <input type="number" min="0" step="0.01" wire:model.blur="plan.{{ $k }}.budget" style="{{ $input }}" aria-label="Planned budget {{ $k }}">
+                                    <input type="number" min="0" step="0.01" wire:model.blur="plan.{{ $k }}.budget" style="{{ $input }}" aria-label="{{ __('Planned budget :month', ['month' => $k]) }}">
                                 @else {{ $pb !== null ? R::money($pb) : '–' }} @endif
                                 @error("plan.$k.budget")<div style="color:#dc2626;font-size:12px">{{ $message }}</div>@enderror
                             </td>
@@ -65,7 +65,7 @@
                             <td style="padding:6px;text-align:end">{{ $pb && $spend !== null ? round($spend / $pb * 100).'%' : '–' }}</td>
                             <td style="padding:6px;text-align:end">
                                 @if ($canManage)
-                                    <input type="number" min="0" step="1" wire:model.blur="plan.{{ $k }}.results" style="{{ $input }}" aria-label="Target results {{ $k }}">
+                                    <input type="number" min="0" step="1" wire:model.blur="plan.{{ $k }}.results" style="{{ $input }}" aria-label="{{ __('Target results :month', ['month' => $k]) }}">
                                 @else {{ $pr !== null ? number_format($pr) : '–' }} @endif
                                 @error("plan.$k.results")<div style="color:#dc2626;font-size:12px">{{ $message }}</div>@enderror
                             </td>
@@ -74,7 +74,7 @@
                         </tr>
                     @endforeach
                     <tr style="border-top:2px solid rgba(148,163,184,.35);font-weight:700">
-                        <td style="padding:6px">Year</td>
+                        <td style="padding:6px">{{ __('Year') }}</td>
                         <td style="padding:6px;text-align:end">{{ R::money($tot['plan']) }}</td>
                         <td style="padding:6px;text-align:end">{{ R::money($tot['spend']) }}</td>
                         <td style="padding:6px;text-align:end">{{ $tot['plan'] ? round($tot['spend'] / $tot['plan'] * 100).'%' : '–' }}</td>
@@ -86,8 +86,8 @@
                 </table>
             </div>
             <div style="{{ $muted }};margin-top:8px">
-                Amounts in {{ $cur }}. Actuals are converted at each day's rate. Results = the main result type of each day. Year totals use actuals only (no forecast).
-                An empty month uses the client's monthly budget ({{ $client->monthly_budget ? R::money($client->monthly_budget, $cur) : 'not set' }}) for pacing.
+                {{ __('Amounts in :currency. Actuals are converted at each day\'s rate. Results = the main result type of each day. Year totals use actuals only (no forecast).', ['currency' => $cur]) }}
+                {{ __('An empty month uses the client\'s monthly budget (:budget) for pacing.', ['budget' => $client->monthly_budget ? R::money($client->monthly_budget, $cur) : __('not set')]) }}
             </div>
         </x-filament::section>
     @endif

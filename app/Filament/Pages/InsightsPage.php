@@ -64,7 +64,7 @@ class InsightsPage extends Page
     {
         $clients = $this->clients();
         $c = $this->clientId ? $clients->firstWhere('id', $this->clientId)?->loadMissing('agency') : null;
-        $data = ['clients' => $clients, 'client' => $c, 'periods' => ['7d' => 'Last 7 days', '14d' => 'Last 14 days', '30d' => 'Last 30 days', '90d' => 'Last 90 days']];
+        $data = ['clients' => $clients, 'client' => $c, 'periods' => ['7d' => __('Last 7 days'), '14d' => __('Last 14 days'), '30d' => __('Last 30 days'), '90d' => __('Last 90 days')]];
         if (! $c) {
             return $data;
         }

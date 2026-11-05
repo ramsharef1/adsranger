@@ -86,7 +86,7 @@ class ViewClient extends ViewRecord
 
                     return response()->streamDownload(fn () => print ($pdf), MonthlyReport::filename($this->record, $data['month'], $data['lang']), ['Content-Type' => 'application/pdf']);
                 }),
-            EditAction::make()->label('Settings & targets'),
+            EditAction::make()->label(__('Settings & targets')),
         ];
     }
 

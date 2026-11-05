@@ -56,26 +56,26 @@ class InvitationResource extends Resource
     {
         return $table
             ->defaultSort('created_at', 'desc')
-            ->emptyStateHeading('No pending invitations')
-            ->emptyStateDescription('Invite people from Team → Members.')
+            ->emptyStateHeading(__('No pending invitations'))
+            ->emptyStateDescription(__('Invite people from Team → Members.'))
             ->columns([
                 TextColumn::make('email')->searchable()->weight('bold'),
-                TextColumn::make('role')->badge()->formatStateUsing(fn (?string $state) => TeamRoles::label($state)),
-                TextColumn::make('inviter.name')->label('Invited by'),
-                TextColumn::make('expires_at')->label('Expires')->since()
+                TextColumn::make('role')->label(__('Role'))->badge()->formatStateUsing(fn (?string $state) => __(TeamRoles::label($state))),
+                TextColumn::make('inviter.name')->label(__('Invited by')),
+                TextColumn::make('expires_at')->label(__('Expires'))->since()
                     ->color(fn (AgencyInvitation $record) => $record->expires_at->isPast() ? 'danger' : null),
             ])
             ->recordActions([
-                Action::make('resend')->label('Resend')->icon('heroicon-o-paper-airplane')
+                Action::make('resend')->label(__('Resend'))->icon('heroicon-o-paper-airplane')
                     ->action(function (AgencyInvitation $record) {
                         AgencyInvitation::send($record->agency, $record->email, $record->role, auth()->user());
-                        Notification::make()->title('Invitation sent again')->success()->send();
+                        Notification::make()->title(__('Invitation sent again'))->success()->send();
                     }),
-                Action::make('revoke')->label('Revoke')->icon('heroicon-o-x-mark')->color('danger')
+                Action::make('revoke')->label(__('Revoke'))->icon('heroicon-o-x-mark')->color('danger')
                     ->requiresConfirmation()
                     ->action(function (AgencyInvitation $record) {
                         $record->delete();
-                        Notification::make()->title('Invitation revoked')->success()->send();
+                        Notification::make()->title(__('Invitation revoked'))->success()->send();
                     }),
             ]);
     }

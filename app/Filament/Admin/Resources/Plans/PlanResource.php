@@ -52,16 +52,16 @@ class PlanResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->columns(1)->components([
-            Section::make('Plan')->columns(3)->schema([
-                TextInput::make('name')->required()->maxLength(60),
+            Section::make(__('Plan'))->columns(3)->schema([
+                TextInput::make('name')->label(__('Name'))->required()->maxLength(60),
                 TextInput::make('key')->disabled(),
-                TextInput::make('price_usd_month')->label('Price (USD / month)')->numeric()->helperText('Shown later on the pricing page; billing comes later.'),
-                TextInput::make('seats')->label('Team seats')->numeric()->required()->minValue(1),
-                TextInput::make('ad_accounts')->label('Tracked ad accounts')->numeric()->required()->minValue(1),
-                TextInput::make('clients')->label('Clients')->numeric()->required()->minValue(1),
-                Toggle::make('is_active')->label('Available for new agencies'),
+                TextInput::make('price_usd_month')->label(__('Price (USD / month)'))->numeric()->helperText(__('Shown later on the pricing page; billing comes later.')),
+                TextInput::make('seats')->label(__('Team seats'))->numeric()->required()->minValue(1),
+                TextInput::make('ad_accounts')->label(__('Tracked ad accounts'))->numeric()->required()->minValue(1),
+                TextInput::make('clients')->label(__('Clients'))->numeric()->required()->minValue(1),
+                Toggle::make('is_active')->label(__('Available for new agencies')),
             ]),
-            Section::make('Networks in this plan')->schema([
+            Section::make(__('Networks in this plan'))->schema([
                 CheckboxList::make('networks')->hiddenLabel()->relationship('networks', 'name')->columns(3),
             ]),
         ]);
@@ -70,13 +70,13 @@ class PlanResource extends Resource
     public static function table(Table $table): Table
     {
         return $table->defaultSort('sort')->paginated(false)->columns([
-            TextColumn::make('name')->weight('bold'),
-            TextColumn::make('price_usd_month')->label('USD / mo')->placeholder('—'),
+            TextColumn::make('name')->label(__('Name'))->weight('bold'),
+            TextColumn::make('price_usd_month')->label(__('USD / mo'))->placeholder('—'),
             TextColumn::make('seats'),
-            TextColumn::make('ad_accounts')->label('Ad accounts'),
+            TextColumn::make('ad_accounts')->label(__('Ad accounts')),
             TextColumn::make('clients'),
-            TextColumn::make('networks_count')->counts('networks')->label('Networks'),
-            IconColumn::make('is_active')->boolean()->label('Active'),
+            TextColumn::make('networks_count')->counts('networks')->label(__('Networks')),
+            IconColumn::make('is_active')->boolean()->label(__('Active')),
         ])->recordActions([EditAction::make()]);
     }
 

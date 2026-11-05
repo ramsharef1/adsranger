@@ -84,39 +84,39 @@ class AlertResource extends Resource
 
         return $table
             ->defaultSort('created_at', 'desc')
-            ->emptyStateHeading('No alerts')
-            ->emptyStateDescription('Alert rules run every morning after the overnight sync.')
+            ->emptyStateHeading(__('No alerts'))
+            ->emptyStateDescription(__('Alert rules run every morning after the overnight sync.'))
             ->columns([
                 TextColumn::make('severity')->badge()->color(fn ($state) => ['high' => 'danger', 'medium' => 'warning', 'low' => 'gray'][$state] ?? 'gray')
-                    ->formatStateUsing(fn ($state) => ucfirst($state)),
+                    ->formatStateUsing(fn ($state) => __(ucfirst($state))),
                 TextColumn::make('title')->wrap()->weight('bold')->description(fn (Alert $r) => $r->detail)->searchable(),
-                TextColumn::make('client.name')->label('Client')->toggleable(),
-                TextColumn::make('rule_key')->label('Rule')->formatStateUsing(fn ($state) => config("alerts.rules.$state.label") ?? $state)->toggleable(),
-                TextColumn::make('assignee.name')->label('Assigned to')->placeholder('—'),
-                TextColumn::make('status')->badge()->color(fn ($state) => ['open' => 'danger', 'snoozed' => 'warning', 'resolved' => 'success'][$state] ?? 'gray')
-                    ->description(fn (Alert $r) => $r->status === 'snoozed' && $r->snoozed_until ? 'until '.$r->snoozed_until->format('M j') : null),
-                TextColumn::make('created_at')->label('Raised')->since(),
+                TextColumn::make('client.name')->label(__('Client'))->toggleable(),
+                TextColumn::make('rule_key')->label(__('Rule'))->formatStateUsing(fn ($state) => __(config("alerts.rules.$state.label") ?? $state))->toggleable(),
+                TextColumn::make('assignee.name')->label(__('Assigned to'))->placeholder('—'),
+                TextColumn::make('status')->label(__('Status'))->badge()->formatStateUsing(fn ($state) => __($state))->color(fn ($state) => ['open' => 'danger', 'snoozed' => 'warning', 'resolved' => 'success'][$state] ?? 'gray')
+                    ->description(fn (Alert $r) => $r->status === 'snoozed' && $r->snoozed_until ? __('until :date', ['date' => $r->snoozed_until->format('M j')]) : null),
+                TextColumn::make('created_at')->label(__('Raised'))->since(),
             ])
             ->filters([
-                SelectFilter::make('status')->options(['open' => 'Open', 'snoozed' => 'Snoozed', 'resolved' => 'Resolved'])->default('open'),
+                SelectFilter::make('status')->options(['open' => __('Open'), 'snoozed' => __('Snoozed'), 'resolved' => __('Resolved')])->default('open'),
                 SelectFilter::make('severity')->options(config('alerts.severities')),
-                SelectFilter::make('client_id')->label('Client')->options(fn () => Client::visibleTo(auth()->user(), $agency)->orderBy('name')->pluck('name', 'id')->all()),
-                TernaryFilter::make('mine')->label('Assigned to me')->queries(true: fn ($q) => $q->where('assigned_to', auth()->id()), false: fn ($q) => $q, blank: fn ($q) => $q),
+                SelectFilter::make('client_id')->label(__('Client'))->options(fn () => Client::visibleTo(auth()->user(), $agency)->orderBy('name')->pluck('name', 'id')->all()),
+                TernaryFilter::make('mine')->label(__('Assigned to me'))->queries(true: fn ($q) => $q->where('assigned_to', auth()->id()), false: fn ($q) => $q, blank: fn ($q) => $q),
             ])
             ->recordActions([
-                Action::make('assign')->label('Assign')->icon('heroicon-o-user-plus')->visible($can)
-                    ->schema([Select::make('user')->label('Team member')->options($members)->default(fn (Alert $r) => $r->assigned_to)])
+                Action::make('assign')->label(__('Assign'))->icon('heroicon-o-user-plus')->visible($can)
+                    ->schema([Select::make('user')->label(__('Team member'))->options($members)->default(fn (Alert $r) => $r->assigned_to)])
                     ->action(fn (Alert $r, array $data) => static::act($r, ['assigned_to' => $data['user'] ?: null], 'assigned')),
-                Action::make('snooze')->label('Snooze')->icon('heroicon-o-clock')->color('warning')->visible(fn (Alert $r) => $can() && $r->status === 'open')
-                    ->schema([Select::make('days')->options(['1' => '1 day', '3' => '3 days', '7' => '7 days'])->default('1')->required()])
+                Action::make('snooze')->label(__('Snooze'))->icon('heroicon-o-clock')->color('warning')->visible(fn (Alert $r) => $can() && $r->status === 'open')
+                    ->schema([Select::make('days')->options(['1' => trans_choice(':count day|:count days', 1), '3' => trans_choice(':count day|:count days', 3), '7' => trans_choice(':count day|:count days', 7)])->default('1')->required()])
                     ->action(fn (Alert $r, array $data) => static::act($r, ['status' => 'snoozed', 'snoozed_until' => now()->addDays((int) $data['days'])], 'snoozed')),
-                Action::make('resolve')->label('Resolve')->icon('heroicon-o-check')->color('success')->visible(fn (Alert $r) => $can() && $r->status !== 'resolved')
+                Action::make('resolve')->label(__('Resolve'))->icon('heroicon-o-check')->color('success')->visible(fn (Alert $r) => $can() && $r->status !== 'resolved')
                     ->action(fn (Alert $r) => static::act($r, ['status' => 'resolved', 'resolved_at' => now(), 'resolved_by' => auth()->id()], 'resolved')),
-                Action::make('reopen')->label('Reopen')->icon('heroicon-o-arrow-uturn-left')->color('gray')->visible(fn (Alert $r) => $can() && $r->status !== 'open')
+                Action::make('reopen')->label(__('Reopen'))->icon('heroicon-o-arrow-uturn-left')->color('gray')->visible(fn (Alert $r) => $can() && $r->status !== 'open')
                     ->action(fn (Alert $r) => static::act($r, ['status' => 'open', 'snoozed_until' => null, 'resolved_at' => null, 'resolved_by' => null], 'reopened')),
             ])
             ->toolbarActions([
-                BulkAction::make('resolveAll')->label('Resolve selected')->icon('heroicon-o-check')->visible($can)
+                BulkAction::make('resolveAll')->label(__('Resolve selected'))->icon('heroicon-o-check')->visible($can)
                     ->action(fn (Collection $records) => $records->each(fn (Alert $r) => static::act($r, ['status' => 'resolved', 'resolved_at' => now(), 'resolved_by' => auth()->id()], 'resolved'))),
             ]);
     }

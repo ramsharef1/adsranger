@@ -20,27 +20,27 @@ class ListMembers extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('invite')->label('Invite member')->icon('heroicon-o-envelope')
+            Action::make('invite')->label(__('Invite member'))->icon('heroicon-o-envelope')
                 ->visible(fn () => TeamRoles::canManageTeam(auth()->user(), Filament::getTenant()))
                 ->schema([
-                    TextInput::make('email')->label('Email address')->email()->required()->maxLength(190),
+                    TextInput::make('email')->label(__('Email address'))->email()->required()->maxLength(190),
                     Select::make('role')->options(TeamRoles::invitable())->default('manager')->required()
-                        ->helperText('Admin: everything except billing. Account manager: clients, ads and reports. Analyst: view only.'),
+                        ->helperText(__('Admin: everything except billing. Account manager: clients, ads and reports. Analyst: view only.')),
                 ])
                 ->action(function (array $data) {
                     $agency = Filament::getTenant();
                     if ($agency->members()->where('email', strtolower(trim($data['email'])))->exists()) {
-                        Notification::make()->title('Already a member of this workspace')->warning()->send();
+                        Notification::make()->title(__('Already a member of this workspace'))->warning()->send();
 
                         return;
                     }
                     if (! PlanLimits::canAddSeat($agency)) {
-                        Notification::make()->title('No free seats')->body('Your plan includes '.PlanLimits::seatsLimit($agency).' seats (members + pending invites). Revoke an invite, remove a member, or upgrade.')->warning()->send();
+                        Notification::make()->title(__('No free seats'))->body(trans_choice('{1} Your plan includes :count seat (members + pending invites).|[2,*] Your plan includes :count seats (members + pending invites).', PlanLimits::seatsLimit($agency)).' '.__('Revoke an invite, remove a member, or upgrade.'))->warning()->send();
 
                         return;
                     }
                     AgencyInvitation::send($agency, $data['email'], $data['role'], auth()->user());
-                    Notification::make()->title('Invitation sent')->body('It is valid for 7 days. Ask them to check spam if it does not arrive.')->success()->send();
+                    Notification::make()->title(__('Invitation sent'))->body(__('It is valid for 7 days. Ask them to check spam if it does not arrive.'))->success()->send();
                 }),
         ];
     }

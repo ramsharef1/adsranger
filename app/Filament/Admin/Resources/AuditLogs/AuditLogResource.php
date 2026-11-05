@@ -43,14 +43,14 @@ class AuditLogResource extends Resource
     public static function table(Table $table): Table
     {
         return $table->defaultSort('id', 'desc')->columns([
-            TextColumn::make('created_at')->label('When')->dateTime('Y-m-d H:i')->sortable(),
-            TextColumn::make('user.email')->label('By')->placeholder('system')->searchable(),
+            TextColumn::make('created_at')->label(__('When'))->dateTime('Y-m-d H:i')->sortable(),
+            TextColumn::make('user.email')->label(__('By'))->placeholder(__('system'))->searchable(),
             TextColumn::make('action')->badge()->searchable(),
-            TextColumn::make('subject')->label('On')
+            TextColumn::make('subject')->label(__('On'))
                 ->state(fn (AuditLog $r) => $r->subject_type ? class_basename($r->subject_type).' #'.$r->subject_id : '—'),
-            TextColumn::make('details')->label('Details')->wrap()
+            TextColumn::make('details')->label(__('Details'))->wrap()
                 ->state(fn (AuditLog $r) => Str::limit(collect($r->meta ?? [])->map(fn ($v, $k) => $k.': '.(is_array($v) ? implode(', ', $v) : $v))->implode(' · '), 140)),
-            TextColumn::make('ip')->label('IP')->toggleable(isToggledHiddenByDefault: true),
+            TextColumn::make('ip')->label(__('IP'))->toggleable(isToggledHiddenByDefault: true),
         ])->filters([
             SelectFilter::make('action')->options(fn () => AuditLog::query()->distinct()->orderBy('action')->pluck('action', 'action')->all()),
         ]);

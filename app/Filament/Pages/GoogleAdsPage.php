@@ -124,8 +124,8 @@ class GoogleAdsPage extends Page
         AuditLog::record('google.negatives_added', $a, ['client_id' => $c->id, 'count' => $ok, 'match' => $match, 'errors' => count($errors)]);
         $this->selected = [];
         $errors
-            ? Notification::make()->title('Some negatives were not added')->body(implode(' · ', array_unique($errors)))->danger()->send()
-            : Notification::make()->title("$ok negative keyword(s) added as ".strtolower($match).' match')->success()->send();
+            ? Notification::make()->title(__('Some negatives were not added'))->body(implode(' · ', array_unique($errors)))->danger()->send()
+            : Notification::make()->title(trans_choice('{1} :count negative keyword added (:match)|[2,*] :count negative keywords added (:match)', $ok, ['match' => __($match === 'PHRASE' ? 'Phrase match' : 'Exact match')]))->success()->send();
     }
 
     protected function getViewData(): array

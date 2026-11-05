@@ -13,7 +13,7 @@ class EditClient extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [ViewAction::make()->label('Results'), DeleteAction::make()];
+        return [ViewAction::make()->label(__('Results')), DeleteAction::make()];
     }
 
     protected function getRedirectUrl(): string

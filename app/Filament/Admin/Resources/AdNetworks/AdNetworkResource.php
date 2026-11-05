@@ -68,7 +68,7 @@ class AdNetworkResource extends Resource
             .collect($def['steps'] ?? [])->map(fn ($s) => '<li>'.e($s).'</li>')->implode('')
             .'</ol>';
         if (! empty($def['console'])) {
-            $steps .= '<p style="margin-top:.75rem"><a href="'.e($def['console']).'" target="_blank" rel="noopener noreferrer" style="color:#14B8A6;font-weight:600;text-decoration:underline">Open the '.e($def['name'] ?? '').' developer console &#8599;</a></p>';
+            $steps .= '<p style="margin-top:.75rem"><a href="'.e($def['console']).'" target="_blank" rel="noopener noreferrer" style="color:#14B8A6;font-weight:600;text-decoration:underline">'.e(__('Open the :network developer console', ['network' => $def['name'] ?? ''])).' &#8599;</a></p>';
         }
 
         $redirect = url('/app/connect/'.$key.'/callback');
@@ -77,38 +77,38 @@ class AdNetworkResource extends Resource
             $fields = collect($def['fields'] ?? [])->map(fn (array $f) => static::keyField($env, $f))->all();
 
             return Tab::make($label)->schema($fields ?: [
-                Placeholder::make('none_'.$env)->hiddenLabel()->content('This network needs no keys.'),
+                Placeholder::make('none_'.$env)->hiddenLabel()->content(__('This network needs no keys.')),
             ]);
         };
 
         return $schema->columns(1)->components([
-            Section::make('How to get these keys')
-                ->description(($def['category'] ?? '').' network · build stage '.($def['stage'] ?? '-'))
+            Section::make(__('How to get these keys'))
+                ->description(__(':category network · build stage :stage', ['category' => $def['category'] ?? '', 'stage' => $def['stage'] ?? '-']))
                 ->icon('heroicon-o-question-mark-circle')
                 ->collapsible()
                 ->schema([
                     Placeholder::make('how_to')->hiddenLabel()->content(new HtmlString($steps)),
                     Placeholder::make('redirect_url')
-                        ->label('Redirect URL (paste this into the network console)')
+                        ->label(__('Redirect URL (paste this into the network console)'))
                         ->content(new HtmlString('<code style="user-select:all;font-size:.85rem">'.e($redirect).'</code>')),
                 ]),
-            Section::make('Status')->columns(3)->schema([
+            Section::make(__('Status'))->columns(3)->schema([
                 Select::make('status')->options(AdNetwork::STATUSES)->required()
-                    ->helperText('Set to Approved / Live once the network approves the app.'),
-                Select::make('environment')->label('Keys in use')
-                    ->options(['sandbox' => 'Sandbox / test', 'live' => 'Live'])->required()
-                    ->helperText('Which key set AdsRanger uses for this network.'),
-                Toggle::make('enabled')->label('Visible to agencies')
-                    ->helperText('When off, agencies cannot connect this network.'),
+                    ->helperText(__('Set to Approved / Live once the network approves the app.')),
+                Select::make('environment')->label(__('Keys in use'))
+                    ->options(['sandbox' => __('Sandbox / test'), 'live' => __('Live')])->required()
+                    ->helperText(__('Which key set AdsRanger uses for this network.')),
+                Toggle::make('enabled')->label(__('Visible to agencies'))
+                    ->helperText(__('When off, agencies cannot connect this network.')),
             ]),
-            Section::make('Plans')->description('Which plans include this network (layer 2 of the access rules).')->schema([
+            Section::make(__('Plans'))->description(__('Which plans include this network (layer 2 of the access rules).'))->schema([
                 CheckboxList::make('plans')->hiddenLabel()->relationship('plans', 'name')->columns(3),
-                Placeholder::make('last_test')->label('Last key test')
-                    ->content(fn ($record) => $record?->last_tested_at ? $record->last_tested_at->diffForHumans().' · '.$record->last_test_result : 'Not tested yet. Use "Test keys" at the top.'),
+                Placeholder::make('last_test')->label(__('Last key test'))
+                    ->content(fn ($record) => $record?->last_tested_at ? $record->last_tested_at->diffForHumans().' · '.$record->last_test_result : __('Not tested yet. Use "Test keys" at the top.')),
             ]),
             Tabs::make('keys')->tabs([
-                $keysTab('live', 'Live keys'),
-                $keysTab('sandbox', 'Sandbox / test keys'),
+                $keysTab('live', __('Live keys')),
+                $keysTab('sandbox', __('Sandbox / test keys')),
             ]),
         ]);
     }
@@ -128,7 +128,7 @@ class AdNetworkResource extends Resource
                 ->placeholder(function ($record) use ($env, $name) {
                     $value = $record?->{"credentials_{$env}"}[$name] ?? null;
 
-                    return $value ? 'Saved ••••'.mb_substr($value, -4).' · type to replace' : 'Not set';
+                    return $value ? __('Saved ••••:last · type to replace', ['last' => mb_substr($value, -4)]) : __('Not set');
                 });
         }
 
@@ -141,22 +141,22 @@ class AdNetworkResource extends Resource
             ->defaultSort('stage')
             ->paginated(false)
             ->columns([
-                TextColumn::make('name')->searchable()->weight('bold'),
-                TextColumn::make('category')->badge()->color('gray'),
+                TextColumn::make('name')->label(__('Name'))->searchable()->weight('bold'),
+                TextColumn::make('category')->label(__('Category'))->badge()->color('gray'),
                 TextColumn::make('stage')->sortable(),
-                TextColumn::make('status')->badge()
-                    ->formatStateUsing(fn (?string $state) => AdNetwork::STATUSES[$state] ?? $state)
+                TextColumn::make('status')->label(__('Status'))->badge()
+                    ->formatStateUsing(fn (?string $state) => __(AdNetwork::STATUSES[$state] ?? $state))
                     ->color(fn (?string $state) => match ($state) {
                         'live' => 'success',
                         'testing' => 'warning',
                         default => 'gray',
                     }),
-                TextColumn::make('environment')->label('Keys in use'),
-                ToggleColumn::make('enabled')->label('Visible'),
-                TextColumn::make('updated_at')->label('Updated')->since(),
+                TextColumn::make('environment')->label(__('Keys in use')),
+                ToggleColumn::make('enabled')->label(__('Visible')),
+                TextColumn::make('updated_at')->label(__('Updated'))->since(),
             ])
             ->recordActions([
-                EditAction::make()->label('Keys'),
+                EditAction::make()->label(__('Keys')),
             ]);
     }
 

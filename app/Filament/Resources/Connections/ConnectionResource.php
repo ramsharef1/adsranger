@@ -50,20 +50,20 @@ class ConnectionResource extends Resource
 
         return $table
             ->defaultSort('created_at', 'desc')
-            ->emptyStateHeading('No connections yet')
-            ->emptyStateDescription('Go to Data → Networks and click Connect.')
+            ->emptyStateHeading(__('No connections yet'))
+            ->emptyStateDescription(__('Go to Data → Networks and click Connect.'))
             ->columns([
-                TextColumn::make('network.name')->label('Network')->weight('bold'),
-                TextColumn::make('external_user_name')->label('Connected as'),
-                TextColumn::make('status')->badge()->color(fn (string $state) => match ($state) {
+                TextColumn::make('network.name')->label(__('Network'))->weight('bold'),
+                TextColumn::make('external_user_name')->label(__('Connected as')),
+                TextColumn::make('status')->label(__('Status'))->badge()->formatStateUsing(fn (string $state) => __($state))->color(fn (string $state) => match ($state) {
                     'active' => 'success', 'error' => 'danger', default => 'gray',
                 }),
-                TextColumn::make('ad_accounts_count')->counts('adAccounts')->label('Accounts'),
-                TextColumn::make('last_synced_at')->label('Last sync')->since(),
-                TextColumn::make('last_error')->label('Last error')->limit(60)->color('danger'),
+                TextColumn::make('ad_accounts_count')->counts('adAccounts')->label(__('Accounts')),
+                TextColumn::make('last_synced_at')->label(__('Last sync'))->since(),
+                TextColumn::make('last_error')->label(__('Last error'))->limit(60)->color('danger'),
             ])
             ->recordActions([
-                Action::make('refresh')->label('Refresh accounts')->icon('heroicon-o-arrow-path')
+                Action::make('refresh')->label(__('Refresh accounts'))->icon('heroicon-o-arrow-path')
                     ->visible(fn (Connection $r) => $can() && $r->status !== 'disconnected')
                     ->action(function (Connection $r) {
                         try {
@@ -78,19 +78,19 @@ class ConnectionResource extends Resource
                                 $n++;
                             }
                             $r->update(['status' => 'active', 'last_synced_at' => now(), 'last_error' => null]);
-                            Notification::make()->title($n.' account(s) found')->success()->send();
+                            Notification::make()->title(trans_choice('{0} No accounts found.|{1} :count account found.|[2,*] :count accounts found.', $n))->success()->send();
                         } catch (\Throwable $e) {
                             $r->update(['status' => 'error', 'last_error' => Str::limit($e->getMessage(), 500)]);
-                            Notification::make()->title('Refresh failed')->body(Str::limit($e->getMessage(), 200))->danger()->send();
+                            Notification::make()->title(__('Refresh failed'))->body(Str::limit($e->getMessage(), 200))->danger()->send();
                         }
                     }),
-                Action::make('disconnect')->label('Disconnect')->icon('heroicon-o-x-circle')->color('danger')
+                Action::make('disconnect')->label(__('Disconnect'))->icon('heroicon-o-x-circle')->color('danger')
                     ->visible(fn (Connection $r) => $can() && $r->status !== 'disconnected')
                     ->requiresConfirmation()
-                    ->modalDescription('AdsRanger deletes the access token now and stops syncing. You can also remove AdsRanger in the network\'s own settings.')
+                    ->modalDescription(__('AdsRanger deletes the access token now and stops syncing. You can also remove AdsRanger in the network\'s own settings.'))
                     ->action(function (Connection $r) {
                         $r->disconnect();
-                        Notification::make()->title('Disconnected')->success()->send();
+                        Notification::make()->title(__('Disconnected'))->success()->send();
                     }),
             ]);
     }

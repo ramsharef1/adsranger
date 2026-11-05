@@ -53,12 +53,12 @@ class UserResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->columns(1)->components([
-            Section::make('User')->columns(2)->schema([
-                TextInput::make('name')->required()->maxLength(120),
+            Section::make(__('User'))->columns(2)->schema([
+                TextInput::make('name')->label(__('Name'))->required()->maxLength(120),
                 TextInput::make('email')->disabled(),
-                Select::make('role')->label('Platform role')->options(['member' => 'Member', 'super_admin' => 'Super admin'])->required()
+                Select::make('role')->label(__('Platform role'))->options(['member' => __('Member'), 'super_admin' => __('Super admin')])->required()
                     ->disabled(fn ($record) => $record?->id === auth()->id())
-                    ->helperText('Super admins can open /admin and manage the whole platform. You cannot change your own role.'),
+                    ->helperText(__('Super admins can open /admin and manage the whole platform. You cannot change your own role.')),
             ]),
         ]);
     }
@@ -66,14 +66,14 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         return $table->defaultSort('created_at', 'desc')->columns([
-            TextColumn::make('name')->searchable()->weight('bold'),
+            TextColumn::make('name')->label(__('Name'))->searchable()->weight('bold'),
             TextColumn::make('email')->searchable(),
             TextColumn::make('role')->badge()->color(fn (?string $state) => $state === 'super_admin' ? 'danger' : 'gray'),
-            TextColumn::make('agencies_count')->counts('agencies')->label('Agencies'),
-            TextColumn::make('last_login_at')->label('Last sign-in')->since()->placeholder('—'),
-            TextColumn::make('created_at')->label('Joined')->since(),
+            TextColumn::make('agencies_count')->counts('agencies')->label(__('Agencies')),
+            TextColumn::make('last_login_at')->label(__('Last sign-in'))->since()->placeholder('—'),
+            TextColumn::make('created_at')->label(__('Joined'))->since(),
         ])->filters([
-            SelectFilter::make('role')->options(['member' => 'Member', 'super_admin' => 'Super admin']),
+            SelectFilter::make('role')->options(['member' => __('Member'), 'super_admin' => __('Super admin')]),
         ])->recordActions([EditAction::make()]);
     }
 

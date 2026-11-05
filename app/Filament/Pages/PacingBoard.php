@@ -51,14 +51,14 @@ class PacingBoard extends Page
         }
         $key = 'health-recalc:'.$a->id;
         if (Cache::has($key)) {
-            Notification::make()->title('Scores were recalculated less than 10 minutes ago')->info()->send();
+            Notification::make()->title(__('Scores were recalculated less than 10 minutes ago'))->info()->send();
 
             return;
         }
         Cache::put($key, 1, 600);
         $today = now($a->timezone ?: 'UTC')->startOfDay();
         Client::visibleTo(auth()->user(), $a)->where('status', 'active')->get()->each(fn ($c) => SnapshotHealth::store($c, $today));
-        Notification::make()->title('Health scores updated')->success()->send();
+        Notification::make()->title(__('Health scores updated'))->success()->send();
     }
 
     protected function getViewData(): array

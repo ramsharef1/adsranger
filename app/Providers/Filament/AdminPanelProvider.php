@@ -2,7 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\AdminLogin;
 use App\Filament\Pages\Auth\RequestPasswordReset;
+use App\Filament\Pages\Auth\ResetPassword;
 use App\Http\Middleware\SetPanelLocale;
 use Filament\Actions\Action;
 use Filament\FontProviders\GoogleFontProvider;
@@ -31,12 +33,13 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->id('admin')
             ->path('admin')
-            ->brandName('AdsRanger Admin')
+            // UX-48: browser titles read «AdsRanger · مدير النظام» / "AdsRanger · System admin".
+            ->brandName(fn (): string => __('AdsRanger · System admin'))
             ->brandLogo(fn () => view('brand.logo-admin'))
             ->brandLogoHeight('2rem')
             ->favicon(asset('brand/favicon.svg'))
-            ->login()
-            ->passwordReset(RequestPasswordReset::class)
+            ->login(AdminLogin::class)
+            ->passwordReset(RequestPasswordReset::class, ResetPassword::class)
             ->font('IBM Plex Sans Arabic', provider: GoogleFontProvider::class)
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.head'))
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.admin-head'))

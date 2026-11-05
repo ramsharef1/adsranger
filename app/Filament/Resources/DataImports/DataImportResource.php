@@ -54,26 +54,26 @@ class DataImportResource extends Resource
     {
         return $table
             ->defaultSort('created_at', 'desc')
-            ->emptyStateHeading('No imports yet')
-            ->emptyStateDescription('Import a CSV export or a Google Sheet from any network, including ones without an API.')
+            ->emptyStateHeading(__('No imports yet'))
+            ->emptyStateDescription(__('Import a CSV export or a Google Sheet from any network, including ones without an API.'))
             ->columns([
-                TextColumn::make('created_at')->label('When')->since(),
-                TextColumn::make('network')->formatStateUsing(fn (string $state) => static::networkOptions()[$state] ?? $state)->weight('bold'),
+                TextColumn::make('created_at')->label(__('When'))->since(),
+                TextColumn::make('network')->label(__('Network'))->formatStateUsing(fn (string $state) => static::networkOptions()[$state] ?? $state)->weight('bold'),
                 TextColumn::make('source')->badge()->color('gray'),
-                TextColumn::make('filename')->label('File / sheet')->limit(40),
+                TextColumn::make('filename')->label(__('File / sheet'))->limit(40),
                 TextColumn::make('rows')->numeric(),
-                TextColumn::make('user.name')->label('By'),
+                TextColumn::make('user.name')->label(__('By')),
             ])
             ->recordActions([
-                Action::make('mapping')->label('Columns')->icon('heroicon-o-table-cells')->color('gray')
-                    ->modalHeading('How columns were matched')->modalSubmitAction(false)
+                Action::make('mapping')->label(__('Columns'))->icon('heroicon-o-table-cells')->color('gray')
+                    ->modalHeading(__('How columns were matched'))->modalSubmitAction(false)
                     ->modalContent(fn (DataImport $r) => new HtmlString('<ul style="line-height:1.9">'.collect($r->mapping ?? [])->map(fn ($col, $f) => '<li><strong>'.e($f).'</strong> ← '.e($col).'</li>')->implode('').'</ul>')),
-                Action::make('delete')->label('Delete')->icon('heroicon-o-trash')->color('danger')
+                Action::make('delete')->label(__('Delete'))->icon('heroicon-o-trash')->color('danger')
                     ->visible(fn () => TeamRoles::canManageData(auth()->user(), Filament::getTenant()))
-                    ->requiresConfirmation()->modalDescription('Deletes this import and every data row it added.')
+                    ->requiresConfirmation()->modalDescription(__('Deletes this import and every data row it added. This can\'t be undone.'))
                     ->action(function (DataImport $r) {
                         $r->delete();
-                        Notification::make()->title('Import deleted')->success()->send();
+                        Notification::make()->title(__('Import deleted'))->success()->send();
                     }),
             ]);
     }

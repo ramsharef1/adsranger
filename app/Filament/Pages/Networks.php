@@ -8,6 +8,7 @@ use App\Http\Controllers\ConnectController;
 use App\Models\AdNetwork;
 use App\Models\AuditLog;
 use App\Models\Connection;
+use App\Support\Bidi;
 use App\Support\NetworkAccess;
 use App\Support\TeamRoles;
 use BackedEnum;
@@ -67,7 +68,7 @@ class Networks extends Page implements HasTable
 
         $key = 'connect-keys:'.$user->id;
         if (RateLimiter::tooManyAttempts($key, 6)) {
-            Notification::make()->title('Too many attempts. Try again in a few minutes.')->danger()->send();
+            Notification::make()->title(__('Too many attempts. Try again in a few minutes.'))->danger()->send();
 
             return;
         }
@@ -82,7 +83,7 @@ class Networks extends Page implements HasTable
         try {
             $t = $connector->connectWithKeys($input);
         } catch (\Throwable $e) {
-            Notification::make()->title('Could not connect '.$net->name)->body(Str::limit($e->getMessage(), 220))->danger()->persistent()->send();
+            Notification::make()->title(__('Could not connect :network.', ['network' => Bidi::isolate($net->name)]))->body(Str::limit($e->getMessage(), 220))->danger()->persistent()->send();
 
             return;
         }
@@ -97,7 +98,8 @@ class Networks extends Page implements HasTable
         AuditLog::record('connection.created', $agency, ['network' => $net->key, 'connection_id' => $connection->id, 'method' => 'api_keys']);
         $found = ConnectController::importAccounts($connector, $connection, $agency);
         RateLimiter::clear($key);
-        $n = Notification::make()->title($net->name.' connected')->body($found.' account(s) found.'.($connection->fresh()->status === 'error' ? ' Listing accounts failed: '.Str::limit((string) $connection->fresh()->last_error, 160) : ''));
+        $n = Notification::make()->title(__(':network connected', ['network' => Bidi::isolate($net->name)]))
+            ->body(trans_choice('{0} No accounts found.|{1} :count account found.|[2,*] :count accounts found.', $found).($connection->fresh()->status === 'error' ? ' '.__('Listing accounts failed: :error', ['error' => Str::limit((string) $connection->fresh()->last_error, 160)]) : ''));
         ($found ? $n->success() : $n->warning())->send();
     }
 
@@ -109,44 +111,45 @@ class Networks extends Page implements HasTable
         return $table
             ->query(AdNetwork::query()->whereIn('id', $ids)->orderBy('stage')->orderBy('name'))
             ->paginated(false)
-            ->emptyStateHeading('No networks available yet')
-            ->emptyStateDescription('Your plan or your workspace admin decides which networks you can connect.')
+            ->emptyStateHeading(__('No networks available yet'))
+            ->emptyStateDescription(__('Your plan or your workspace admin decides which networks you can connect.'))
             ->columns([
-                TextColumn::make('name')->weight('bold'),
-                TextColumn::make('category')->badge()->color('gray'),
-                TextColumn::make('availability')->label('Status')->badge()
+                TextColumn::make('name')->label(__('Name'))->weight('bold'),
+                TextColumn::make('category')->label(__('Category'))->badge()->color('gray'),
+                TextColumn::make('availability')->label(__('Status'))->badge()
                     ->state(fn (AdNetwork $r) => ConnectorRegistry::for($r)->supportsConnect() ? (ConnectorRegistry::for($r)->connectMode() === 'keys' ? 'Connect with your API keys' : 'Ready to connect') : ($r->hasKeys() ? 'Connector coming soon' : 'Waiting for setup'))
+                    ->formatStateUsing(fn (string $state) => __($state))
                     ->color(fn (string $state) => str_starts_with($state, 'Ready') || str_starts_with($state, 'Connect with') ? 'success' : 'gray'),
-                TextColumn::make('connected')->label('Connected')
+                TextColumn::make('connected')->label(__('Connected'))
                     ->state(fn (AdNetwork $r) => $agency->connections()->where('ad_network_id', $r->id)->where('status', '!=', 'disconnected')->count()),
-                TextColumn::make('who')->label('Who can use')
-                    ->state(fn (AdNetwork $r) => count(NetworkAccess::limitedTo($agency, $r)) ? count(NetworkAccess::limitedTo($agency, $r)).' chosen member(s)' : 'Everyone'),
+                TextColumn::make('who')->label(__('Who can use'))
+                    ->state(fn (AdNetwork $r) => count(NetworkAccess::limitedTo($agency, $r)) ? trans_choice('{1} :count chosen member|[2,*] :count chosen members', count(NetworkAccess::limitedTo($agency, $r))) : __('Everyone')),
             ])
             ->recordActions([
-                Action::make('connect')->label('Connect')->icon('heroicon-o-link')->button()
+                Action::make('connect')->label(__('Connect'))->icon('heroicon-o-link')->button()
                     ->visible(fn (AdNetwork $r) => TeamRoles::canManageData(auth()->user(), $agency) && ConnectorRegistry::for($r)->connectMode() === 'oauth' && ConnectorRegistry::for($r)->supportsConnect())
                     ->url(fn (AdNetwork $r) => url('/app/connect/'.$r->key.'/start?agency='.$agency->slug)),
-                Action::make('connectKeys')->label('Connect')->icon('heroicon-o-key')->button()
+                Action::make('connectKeys')->label(__('Connect'))->icon('heroicon-o-key')->button()
                     ->visible(fn (AdNetwork $r) => TeamRoles::canManageData(auth()->user(), $agency) && ConnectorRegistry::for($r)->connectMode() === 'keys')
-                    ->modalHeading(fn (AdNetwork $r) => 'Connect '.$r->name)
-                    ->modalDescription(fn (AdNetwork $r) => ConnectorRegistry::for($r)->keyHelp().' Your credentials are stored encrypted and used only to read your ad data.')
-                    ->modalSubmitActionLabel('Connect')
+                    ->modalHeading(fn (AdNetwork $r) => __('Connect :network', ['network' => Bidi::isolate($r->name)]))
+                    ->modalDescription(fn (AdNetwork $r) => ConnectorRegistry::for($r)->keyHelp().' '.__('Your credentials are stored encrypted and used only to read your ad data.'))
+                    ->modalSubmitActionLabel(__('Connect'))
                     ->schema(fn (AdNetwork $r) => collect(ConnectorRegistry::for($r)->keyFields())->map(fn (array $f) => ($f[4] ?? 'text') === 'textarea'
                         ? Textarea::make('k_'.$f[0])->label($f[1])->helperText($f[3])->rows(5)->maxLength(8000)->required(empty($f[5]))->extraInputAttributes(['dir' => 'ltr', 'autocomplete' => 'off', 'spellcheck' => 'false'])
                         : TextInput::make('k_'.$f[0])->label($f[1])->helperText($f[3])->maxLength(500)->required(empty($f[5]))->password($f[2])->revealable($f[2])
                             ->extraInputAttributes(['dir' => 'ltr', 'autocomplete' => $f[2] ? 'new-password' : 'off']))->all())
                     ->action(fn (AdNetwork $r, array $data) => $this->connectWithKeys($r, $data)),
-                Action::make('who')->label('Who can use')->icon('heroicon-o-user-group')
+                Action::make('who')->label(__('Who can use'))->icon('heroicon-o-user-group')
                     ->visible(fn () => TeamRoles::canManageTeam(auth()->user(), $agency))
                     ->schema([
-                        Select::make('users')->label('Limit to these members')->multiple()
+                        Select::make('users')->label(__('Limit to these members'))->multiple()
                             ->options(fn () => $agency->members()->pluck('name', 'users.id'))
                             ->default(fn (AdNetwork $r) => NetworkAccess::limitedTo($agency, $r))
-                            ->helperText('Leave empty so everyone in the workspace can use it. Owners and admins always can.'),
+                            ->helperText(__('Leave empty so everyone in the workspace can use it. Owners and admins always can.')),
                     ])
                     ->action(function (AdNetwork $r, array $data) use ($agency) {
                         NetworkAccess::setLimitedTo($agency, $r, $data['users'] ?? []);
-                        Notification::make()->title('Saved')->success()->send();
+                        Notification::make()->title(__('Saved'))->success()->send();
                     }),
             ]);
     }

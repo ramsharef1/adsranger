@@ -80,7 +80,7 @@ class CompetitorsPage extends Page
             'form.website' => 'nullable|url:http,https|max:200',
             'form.countries' => 'array|max:12',
             'form.countries.*' => 'string|size:2',
-        ], ['form.facebook_page_id.regex' => 'The Facebook page ID is the number in the Ad Library link (view_all_page_id=…).'],
+        ], ['form.facebook_page_id.regex' => __('The Facebook page ID is the number in the Ad Library link (view_all_page_id=…).')],
             ['form.name' => 'name', 'form.website' => 'website']);
         $valid = array_keys(config('adsranger.countries'));
         $c = Competitor::create(['agency_id' => $a->id, 'client_id' => $this->clientId, 'name' => trim($this->form['name']),
@@ -88,7 +88,7 @@ class CompetitorsPage extends Page
             'countries' => array_values(array_intersect($this->form['countries'], $valid)) ?: null, 'created_by' => auth()->id()]);
         AuditLog::record('competitor.added', $a, ['competitor_id' => $c->id, 'client_id' => $this->clientId]);
         $this->form = ['name' => '', 'facebook_page_id' => '', 'website' => '', 'countries' => []];
-        Notification::make()->title('Competitor added')->success()->send();
+        Notification::make()->title(__('Competitor added'))->success()->send();
     }
 
     public function saveNotes(int $id): void
@@ -99,7 +99,7 @@ class CompetitorsPage extends Page
         $c = $this->competitor($id);
         $text = mb_substr((string) ($this->notes[$id] ?? ''), 0, 5000);
         $c->update(['notes' => $text, 'reviewed_at' => now()]);
-        Notification::make()->title('Notes saved')->success()->send();
+        Notification::make()->title(__('Notes saved'))->success()->send();
     }
 
     public function markReviewed(int $id): void

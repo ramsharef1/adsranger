@@ -61,22 +61,22 @@ class AgencyResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->columns(2)->components([
-            Section::make('Agency')->columns(2)->schema([
-                TextInput::make('name')->required()->maxLength(120),
-                TextInput::make('slug')->disabled()->helperText('Used in the agency\'s /app URL.'),
-                Select::make('country')->options(config('adsranger.countries'))->searchable(),
+            Section::make(__('Agency'))->columns(2)->schema([
+                TextInput::make('name')->label(__('Name'))->required()->maxLength(120),
+                TextInput::make('slug')->disabled()->helperText(__('Used in the agency\'s /app URL.')),
+                Select::make('country')->label(__('Country'))->options(config('adsranger.countries'))->searchable(),
                 Select::make('currency')->options(collect(config('adsranger.currencies'))->mapWithKeys(fn ($c) => [$c => $c])),
             ])->columnSpan(2),
-            Section::make('Plan and status')->columns(2)->schema([
+            Section::make(__('Plan and status'))->columns(2)->schema([
                 Select::make('plan')->options(fn () => Plan::orderBy('sort')->pluck('name', 'key'))->required()
-                    ->helperText('Controls which features and networks the agency gets.'),
+                    ->helperText(__('Controls which features and networks the agency gets.')),
                 Select::make('status')->options(config('adsranger.agency_statuses'))->required()
-                    ->helperText('Suspended agencies cannot sign in to their workspace.'),
-                DateTimePicker::make('trial_ends_at')->label('Trial ends')->seconds(false),
+                    ->helperText(__('Suspended agencies cannot sign in to their workspace.')),
+                DateTimePicker::make('trial_ends_at')->label(__('Trial ends'))->seconds(false),
             ])->columnSpan(2),
-            Section::make('Network overrides')->description('Layer 3 of the access rules. "Always allow" turns a network on for this agency even when it is off globally or not in its plan (good for beta tests). "Block" hides it, and wins over everything.')->columns(2)->schema([
-                CheckboxList::make('allowedNetworks')->label('Always allow')->relationship('allowedNetworks', 'name'),
-                CheckboxList::make('blockedNetworks')->label('Block')->relationship('blockedNetworks', 'name'),
+            Section::make(__('Network overrides'))->description(__('Layer 3 of the access rules. "Always allow" turns a network on for this agency even when it is off globally or not in its plan (good for beta tests). "Block" hides it, and wins over everything.'))->columns(2)->schema([
+                CheckboxList::make('allowedNetworks')->label(__('Always allow'))->relationship('allowedNetworks', 'name'),
+                CheckboxList::make('blockedNetworks')->label(__('Block'))->relationship('blockedNetworks', 'name'),
             ])->columnSpan(2),
         ]);
     }
@@ -86,35 +86,35 @@ class AgencyResource extends Resource
         return $table
             ->defaultSort('created_at', 'desc')
             ->columns([
-                TextColumn::make('name')->searchable()->weight('bold'),
-                TextColumn::make('owner.email')->label('Owner')->searchable(),
-                TextColumn::make('members_count')->counts('members')->label('Members'),
+                TextColumn::make('name')->label(__('Name'))->searchable()->weight('bold'),
+                TextColumn::make('owner.email')->label(__('Owner'))->searchable(),
+                TextColumn::make('members_count')->counts('members')->label(__('Members')),
                 TextColumn::make('plan')->badge()->formatStateUsing(fn (?string $state) => config('adsranger.plans')[$state] ?? $state),
-                TextColumn::make('status')->badge()->color(fn (?string $state) => match ($state) {
+                TextColumn::make('status')->label(__('Status'))->badge()->color(fn (?string $state) => match ($state) {
                     'active' => 'success',
                     'trial' => 'warning',
                     'suspended' => 'danger',
                     default => 'gray',
                 }),
                 TextColumn::make('country'),
-                TextColumn::make('created_at')->label('Created')->since(),
+                TextColumn::make('created_at')->label(__('Created'))->since(),
             ])
             ->filters([
                 SelectFilter::make('plan')->options(config('adsranger.plans')),
                 SelectFilter::make('status')->options(config('adsranger.agency_statuses')),
             ])
             ->recordActions([EditAction::make(), ActionGroup::make([
-                Action::make('demo')->label('Load demo data')->icon('heroicon-o-beaker')->requiresConfirmation()
-                    ->modalDescription('Adds 3 sample clients with 90 days of Meta-style results and runs the alert rules. Remove it any time.')
+                Action::make('demo')->label(__('Load demo data'))->icon('heroicon-o-beaker')->requiresConfirmation()
+                    ->modalDescription(__('Adds 3 sample clients with 90 days of Meta-style results and runs the alert rules. Remove it any time.'))
                     ->action(function (Agency $r) {
                         $rows = array_sum(DemoData::seed($r));
                         $s = AlertEngine::run($r, now($r->timezone ?: 'UTC')->subDay()->toDateString());
-                        Notification::make()->title("Demo data loaded: $rows rows, {$s['opened']} alerts")->success()->send();
+                        Notification::make()->title(__('Demo data loaded: :rows rows, :alerts alerts', ['rows' => $rows, 'alerts' => $s['opened']]))->success()->send();
                     }),
-                Action::make('undemo')->label('Remove demo data')->icon('heroicon-o-trash')->color('danger')->requiresConfirmation()
+                Action::make('undemo')->label(__('Remove demo data'))->icon('heroicon-o-trash')->color('danger')->requiresConfirmation()
                     ->action(function (Agency $r) {
                         DemoData::remove($r);
-                        Notification::make()->title('Demo data removed')->success()->send();
+                        Notification::make()->title(__('Demo data removed'))->success()->send();
                     }),
             ])]);
     }

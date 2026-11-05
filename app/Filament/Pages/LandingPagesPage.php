@@ -67,7 +67,7 @@ class LandingPagesPage extends Page
         }
         $url = LandingPages::normalize($this->newUrl);
         if (! $url) {
-            $this->addError('newUrl', 'Enter a full http(s) address.');
+            $this->addError('newUrl', __('Enter a full http(s) address.'));
 
             return;
         }
@@ -75,7 +75,7 @@ class LandingPagesPage extends Page
         LandingPages::check($lp);
         AuditLog::record('landing_page.added', $a, ['landing_page_id' => $lp->id]);
         $this->newUrl = '';
-        Notification::make()->title('Added and checked')->success()->send();
+        Notification::make()->title(__('Added and checked'))->success()->send();
     }
 
     public function checkOne(int $id): void
@@ -86,13 +86,13 @@ class LandingPagesPage extends Page
         $lp = $this->row($id);
         $key = 'lp-check:'.$lp->id;
         if (Cache::has($key)) {
-            Notification::make()->title('Checked less than a minute ago')->info()->send();
+            Notification::make()->title(__('Checked less than a minute ago'))->info()->send();
 
             return;
         }
         Cache::put($key, 1, 60);
         LandingPages::check($lp);
-        Notification::make()->title('Checked: '.LandingPages::stateLabel($lp->state)[0])->send();
+        Notification::make()->title(__('Checked: :state', ['state' => __(LandingPages::stateLabel($lp->state)[0])]))->send();
     }
 
     public function checkAll(): void
@@ -103,13 +103,13 @@ class LandingPagesPage extends Page
         }
         $key = 'lp-check-all:'.$a->id;
         if (Cache::has($key)) {
-            Notification::make()->title('A full check ran less than 30 minutes ago')->info()->send();
+            Notification::make()->title(__('A full check ran less than 30 minutes ago'))->info()->send();
 
             return;
         }
         Cache::put($key, 1, 1800);
         CheckLandingPages::dispatch($a->id);
-        Notification::make()->title('Checking all pages in the background')->body('Reload in a few minutes.')->success()->send();
+        Notification::make()->title(__('Checking all pages in the background'))->body(__('Reload in a few minutes.'))->success()->send();
     }
 
     public function remove(int $id): void

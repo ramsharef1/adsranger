@@ -58,10 +58,10 @@ class MemberResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')->searchable()->weight('bold'),
+                TextColumn::make('name')->label(__('Name'))->searchable()->weight('bold'),
                 TextColumn::make('email')->searchable(),
-                TextColumn::make('team_role')->label('Role')->badge()
-                    ->state(fn (User $record) => TeamRoles::label($record->roleIn(Filament::getTenant())))
+                TextColumn::make('team_role')->label(__('Role'))->badge()
+                    ->state(fn (User $record) => __(TeamRoles::label($record->roleIn(Filament::getTenant()))))
                     ->color(fn (User $record) => match ($record->roleIn(Filament::getTenant())) {
                         'owner' => 'success',
                         'admin' => 'info',
@@ -70,7 +70,7 @@ class MemberResource extends Resource
                     }),
             ])
             ->recordActions([
-                Action::make('changeRole')->label('Change role')->icon('heroicon-o-arrows-right-left')
+                Action::make('changeRole')->label(__('Change role'))->icon('heroicon-o-arrows-right-left')
                     ->visible(fn (User $record) => static::manageable($record))
                     ->schema([
                         Select::make('role')->options(TeamRoles::invitable())->required()
@@ -80,17 +80,17 @@ class MemberResource extends Resource
                         $agency = Filament::getTenant();
                         $agency->members()->updateExistingPivot($record->id, ['role' => $data['role']]);
                         AuditLog::record('team.role_changed', $agency, ['user_id' => $record->id, 'role' => $data['role']]);
-                        Notification::make()->title('Role updated')->success()->send();
+                        Notification::make()->title(__('Role updated'))->success()->send();
                     }),
-                Action::make('remove')->label('Remove')->icon('heroicon-o-user-minus')->color('danger')
+                Action::make('remove')->label(__('Remove'))->icon('heroicon-o-user-minus')->color('danger')
                     ->visible(fn (User $record) => static::manageable($record))
                     ->requiresConfirmation()
-                    ->modalDescription('They lose access to this workspace straight away. Their account itself is not deleted.')
+                    ->modalDescription(__('They lose access to this workspace straight away. Their account itself is not deleted.'))
                     ->action(function (User $record) {
                         $agency = Filament::getTenant();
                         $agency->members()->detach($record->id);
                         AuditLog::record('team.removed', $agency, ['user_id' => $record->id]);
-                        Notification::make()->title('Member removed')->success()->send();
+                        Notification::make()->title(__('Member removed'))->success()->send();
                     }),
             ]);
     }

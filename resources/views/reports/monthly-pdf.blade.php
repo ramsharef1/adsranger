@@ -8,7 +8,8 @@
         if (! $before || $now === null) { return null; }
         return round(($now - $before) / $before * 100);
     };
-    $sign = fn ($d) => ($d >= 0 ? '+' : '').$d.'%';
+    // A true minus (U+2212) inside <bdo dir="ltr">: mPDF keeps "−4%" in order in Arabic, and copied text stays "−4%".
+    $sign = fn ($d) => \App\Support\Bidi::signedPct($d);
     $num = fn ($v) => number_format((float) $v);
     $typeLabel = R::label($t['main_type'], $lang) ?: __('report.results');
     $budgetPct = ($budget && ! $hideSpend) ? round($t['spend'] / $budget * 100) : null;
