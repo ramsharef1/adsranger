@@ -23,7 +23,7 @@ class WhatsNewTest extends TestCase
         return [$agency, $user];
     }
 
-    public function test_whats_new_renders_default_feed_in_arabic_and_english_on_starter(): void
+    public function test_whats_new_renders_empty_state_in_arabic_and_english_on_starter(): void
     {
         [$agency, $analyst] = $this->workspace('starter', 'analyst');
 
@@ -32,14 +32,13 @@ class WhatsNewTest extends TestCase
             ->assertOk()
             ->assertSee('ما الجديد')
             ->assertSee('المزايا الجديدة وتحديثات الربط والتحسينات في AdsRanger.')
-            ->assertSee('v1.4')
-            ->assertSee('التقارير الدورية بالبريد، وتصدير البيانات CSV/ZIP، والتحقق بخطوتين');
+            ->assertSee('لم يُنشر أي إصدار بعد.');
 
         $this->withSession(['locale' => 'en'])->actingAs($analyst)
             ->get("/app/{$agency->slug}/whats-new")
             ->assertOk()
             ->assertSee("What's new")
-            ->assertSee('Scheduled email reports, CSV/ZIP data exports & two-step verification');
+            ->assertSee('No releases published yet.');
     }
 
     public function test_published_database_releases_render_and_unpublished_stay_hidden(): void
@@ -73,6 +72,7 @@ class WhatsNewTest extends TestCase
             ->assertSee('v2.0')
             ->assertSee('عنوان إصدار مخصص من قاعدة البيانات')
             ->assertSee('النقطة الأولى بالعربية')
+            ->assertDontSee('لم يُنشر أي إصدار بعد.')
             ->assertDontSee('v2.1-draft')
             ->assertDontSee('إصدار مسودة سري');
 
@@ -81,6 +81,7 @@ class WhatsNewTest extends TestCase
             ->assertOk()
             ->assertSee('Custom DB release title')
             ->assertSee('First English item')
+            ->assertDontSee('No releases published yet.')
             ->assertDontSee('Secret draft release');
     }
 

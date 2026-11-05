@@ -1,12 +1,11 @@
 @php
     $muted = 'opacity:.68;font-size:13px';
-    $badge = 'display:inline-flex;align-items:center;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600;background:rgba(20,184,166,.14);color:#0F766E;border:1px solid rgba(20,184,166,.35)';
 @endphp
 <x-filament-panels::page>
     <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:4px">
         <div style="{{ $muted }}">{{ __('New features, connector updates, and improvements across AdsRanger.') }}</div>
         @if ($isSuperAdmin)
-            <a href="{{ url('/admin/releases') }}" style="font-size:13px;color:#0F766E;font-weight:600;text-decoration:none">
+            <a href="{{ url('/admin/releases') }}" class="text-primary-600 dark:text-primary-400" style="font-size:13px;font-weight:600;text-decoration:none">
                 {{ __('Manage releases') }} →
             </a>
         @endif
@@ -17,7 +16,7 @@
             <x-slot name="heading">
                 <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between">
                     <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
-                        <span style="{{ $badge }}"><bdo dir="ltr">{{ $release->version }}</bdo></span>
+                        <x-filament::badge color="primary"><bdo dir="ltr">{{ $release->version }}</bdo></x-filament::badge>
                         <span>{{ $release->title() }}</span>
                     </div>
                     <span style="{{ $muted }}">
