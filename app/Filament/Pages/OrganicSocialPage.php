@@ -4,8 +4,10 @@ namespace App\Filament\Pages;
 
 use App\Models\Client;
 use App\Models\SocialInboxMessage;
+use App\Models\SocialModerationRule;
 use App\Models\SocialPost;
 use App\Support\CurrentClient;
+use App\Support\OrganicCalendarManager;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Pages\Page;
@@ -56,11 +58,25 @@ class OrganicSocialPage extends Page
             ->limit(20)
             ->get() : collect();
 
+        $rulesCount = $agency ? SocialModerationRule::query()
+            ->where('agency_id', $agency->id)
+            ->when($current, fn ($q) => $q->where('client_id', $current->id))
+            ->where('is_active', true)
+            ->count() : 0;
+
+        $bestTime = $current ? OrganicCalendarManager::recommendBestTimeToPost($current) : [
+            'best_day' => 'Thursday',
+            'recommended_hour' => '19:00',
+            'avg_engagements' => 0.0,
+        ];
+
         return [
             'clients' => $clients,
             'currentClient' => $current,
             'posts' => $posts,
             'inbox' => $inbox,
+            'rulesCount' => $rulesCount,
+            'bestTime' => $bestTime,
         ];
     }
 }

@@ -1,6 +1,6 @@
 <x-filament-panels::page>
     <div class="space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div class="p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
                 <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('Scheduled & published posts') }}</div>
                 <div class="text-2xl font-bold text-teal-600 dark:text-teal-400 mt-1">{{ $posts->count() }}</div>
@@ -10,8 +10,12 @@
                 <div class="text-2xl font-bold text-teal-600 dark:text-teal-400 mt-1">{{ $inbox->where('status', 'open')->count() }} {{ __('open') }}</div>
             </div>
             <div class="p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
-                <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('Connected organic channels') }}</div>
-                <div class="text-sm font-medium mt-2">Meta · TikTok · X · LinkedIn · Snapchat</div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('Best time to post') }}</div>
+                <div class="text-lg font-bold text-teal-600 dark:text-teal-400 mt-1">{{ __($bestTime['best_day']) }} · {{ $bestTime['recommended_hour'] }}</div>
+            </div>
+            <div class="p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+                <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('Auto-moderation rules') }}</div>
+                <div class="text-2xl font-bold text-teal-600 dark:text-teal-400 mt-1">{{ $rulesCount }}</div>
             </div>
         </div>
 

@@ -1281,5 +1281,14 @@
     "Connected organic channels": "قنوات التواصل المتصلة",
     "No organic posts scheduled yet.": "لا توجد منشورات عضوية مجدولة بعد.",
     "No inbox messages yet.": "لا توجد رسائل في صندوق الوارد بعد.",
-    "Create & plan": "الإنشاء والتخطيط"
+    "Create & plan": "الإنشاء والتخطيط",
+    "Best time to post": "أفضل وقت للنشر",
+    "Auto-moderation rules": "قواعد الإشراف التلقائي",
+    "Monday": "الإثنين",
+    "Tuesday": "الثلاثاء",
+    "Wednesday": "الأربعاء",
+    "Thursday": "الخميس",
+    "Friday": "الجمعة",
+    "Saturday": "السبت",
+    "Sunday": "الأحد"
 }
