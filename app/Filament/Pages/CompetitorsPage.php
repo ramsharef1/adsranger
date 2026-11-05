@@ -21,6 +21,7 @@ use UnitEnum;
 class CompetitorsPage extends Page
 {
     use GatedByPlan;
+    use \App\Filament\Concerns\FollowsCurrentClient;
     use TranslatesPageLabels;
 
     protected static string $planFeature = 'competitors';
@@ -48,7 +49,7 @@ class CompetitorsPage extends Page
 
     public function mount(): void
     {
-        $this->clientId = (int) request()->query('client') ?: $this->clients()->first()?->id;
+        $this->clientId = \App\Support\CurrentClient::id() ?: $this->clients()->first()?->id;
     }
 
     protected function clients()

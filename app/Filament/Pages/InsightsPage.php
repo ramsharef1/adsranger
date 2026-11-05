@@ -16,6 +16,7 @@ use UnitEnum;
 class InsightsPage extends Page
 {
     use GatedByPlan;
+    use \App\Filament\Concerns\FollowsCurrentClient;
     use TranslatesPageLabels;
 
     protected static string $planFeature = 'insights';
@@ -42,7 +43,7 @@ class InsightsPage extends Page
 
     public function mount(): void
     {
-        $this->clientId = (int) request()->query('client') ?: $this->clients()->first()?->id;
+        $this->clientId = \App\Support\CurrentClient::id() ?: $this->clients()->first()?->id;
     }
 
     protected function clients()

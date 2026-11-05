@@ -64,7 +64,7 @@ class PacingBoard extends Page
     protected function getViewData(): array
     {
         $a = Filament::getTenant();
-        $clients = Client::visibleTo(auth()->user(), $a)->where('status', 'active')->with('agency')->orderBy('name')->get();
+        $clients = \App\Support\CurrentClient::apply(Client::visibleTo(auth()->user(), $a)->where('status', 'active'), 'clients.id', $a)->with('agency')->orderBy('name')->get();
         $rows = $clients->map(fn (Client $c) => ['client' => $c, 'p' => Pacing::month($c), 'band' => HealthScore::band($c->health_score)])->all();
         usort($rows, match ($this->sort) {
             'pace' => fn ($x, $y) => abs(($y['p']['pace'] ?? 100) - 100) <=> abs(($x['p']['pace'] ?? 100) - 100),

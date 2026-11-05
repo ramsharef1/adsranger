@@ -1129,5 +1129,11 @@
     "Warning": "تحذير",
     "Info": "للعلم",
     "Level": "المستوى",
-    "{1} Too many attempts. Try again in :count minute.|[2,*] Too many attempts. Try again in :count minutes.": "{1} محاولات كثيرة. حاول مرة أخرى بعد دقيقة واحدة.|{2} محاولات كثيرة. حاول مرة أخرى بعد دقيقتين.|[3,10] محاولات كثيرة. حاول مرة أخرى بعد :count دقائق.|[11,*] محاولات كثيرة. حاول مرة أخرى بعد :count دقيقة."
+    "{1} Too many attempts. Try again in :count minute.|[2,*] Too many attempts. Try again in :count minutes.": "{1} محاولات كثيرة. حاول مرة أخرى بعد دقيقة واحدة.|{2} محاولات كثيرة. حاول مرة أخرى بعد دقيقتين.|[3,10] محاولات كثيرة. حاول مرة أخرى بعد :count دقائق.|[11,*] محاولات كثيرة. حاول مرة أخرى بعد :count دقيقة.",
+    "Where you are": "أين أنت",
+    "Current client": "العميل الحالي",
+    "Oldest account: :account": "أقدم حساب: :account",
+    "No linked ad accounts yet": "لا توجد حسابات إعلانية مربوطة بعد",
+    "Data updated :when": "آخر تحديث للبيانات :when",
+    "An account has not synced yet": "أحد الحسابات لم يُزامَن بعد"
 }

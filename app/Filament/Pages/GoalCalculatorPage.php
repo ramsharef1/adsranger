@@ -54,7 +54,7 @@ class GoalCalculatorPage extends Page
 
     public function mount(): void
     {
-        $this->clientId = (int) request()->query('client') ?: $this->clients()->first()?->id;
+        $this->clientId = \App\Support\CurrentClient::id() ?: $this->clients()->first()?->id;
         $this->resetInputs();
     }
 
@@ -70,6 +70,7 @@ class GoalCalculatorPage extends Page
 
     public function updatedClientId(): void
     {
+        \App\Support\CurrentClient::remember($this->clientId);
         $this->resetInputs();
     }
 

@@ -66,8 +66,11 @@ class AlertResource extends Resource
         $a = Filament::getTenant();
         $ids = Client::visibleTo(auth()->user(), $a)->pluck('id');
 
-        return parent::getEloquentQuery()->where('agency_id', $a->id)
+        $q = parent::getEloquentQuery()->where('agency_id', $a->id)
             ->where(fn ($q) => $q->whereNull('client_id')->orWhereIn('client_id', $ids));
+
+        // UX-81: with a current client chosen in the top bar, only that client's alerts.
+        return \App\Support\CurrentClient::apply($q, 'client_id', $a);
     }
 
     protected static function act(Alert $a, array $set, string $what): void

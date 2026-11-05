@@ -74,7 +74,7 @@ class DailyDesk extends Page
         $a = Filament::getTenant();
         $tz = $a->timezone ?: 'UTC';
         [$from, $to] = Periods::range($this->day, $tz, $this->date);
-        $clients = Client::visibleTo(auth()->user(), $a)->where('status', 'active')->orderBy('name')->get();
+        $clients = \App\Support\CurrentClient::apply(Client::visibleTo(auth()->user(), $a)->where('status', 'active'), 'clients.id', $a)->orderBy('name')->get();
         $alerts = Alert::where('agency_id', $a->id)->where('status', 'open')->whereIn('client_id', $clients->pluck('id'))
             ->selectRaw('client_id, severity, count(*) as n')->groupBy('client_id', 'severity')->get()->groupBy('client_id');
         $rows = $clients->map(fn (Client $c) => ['client' => $c, 't' => MetricsQuery::totals($c, $from, $to), 'alerts' => $alerts[$c->id] ?? collect()]);

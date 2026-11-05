@@ -17,6 +17,7 @@ use UnitEnum;
 class TopAdsPage extends Page
 {
     use TranslatesPageLabels;
+    use \App\Filament\Concerns\FollowsCurrentClient;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-photo';
 
@@ -43,7 +44,7 @@ class TopAdsPage extends Page
 
     public function mount(): void
     {
-        $this->clientId = (int) request()->query('client') ?: null;
+        $this->clientId = \App\Support\CurrentClient::id() ?: null;
     }
 
     protected function clients()
