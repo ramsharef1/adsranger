@@ -23,7 +23,7 @@ trait GatedByPlan
 
     public static function getNavigationBadge(): ?string
     {
-        return static::planLocked() ? PlanGate::tierLabel(PlanGate::requiredTier(static::$planFeature)) : null;
+        return static::planLocked() ? PlanGate::tierShort(PlanGate::requiredTier(static::$planFeature)) : null;
     }
 
     public static function getNavigationBadgeColor(): string|array|null

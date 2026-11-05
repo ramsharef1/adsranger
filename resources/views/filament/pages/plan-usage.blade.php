@@ -1,6 +1,6 @@
 <x-filament-panels::page>
     <x-filament::section>
-        <x-slot name="heading">{{ __(':plan plan', ['plan' => $plan?->name ?? ucfirst($agency->plan)]) }}</x-slot>
+        <x-slot name="heading">{{ __(':plan plan', ['plan' => \App\Support\PlanGate::tierLabel($agency->plan)]) }}</x-slot>
         <x-slot name="description">
             {{ __('Status: :status', ['status' => __(config('adsranger.agency_statuses')[$agency->status] ?? ucfirst($agency->status))]) }}@if (! is_null($trialDays)) · {{ trans_choice(':count day left in your trial|:count days left in your trial', $trialDays) }} @endif@if ($trialEnded) · {{ __('Trial ended') }} @endif
         </x-slot>

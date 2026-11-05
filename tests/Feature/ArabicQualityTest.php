@@ -18,6 +18,9 @@ class ArabicQualityTest extends TestCase
     private const BANNED = [
         'أدز رينجر' => 'AdsRanger (D-51)',
         'الشبكات الإعلانية' => 'المنصات الإعلانية (D-43)',
+        // UX-65: tier names already carry «الباقة» / «باقة», so templates must not add it again.
+        'الباقة :tier' => ':tier (UX-65)',
+        'باقة :plan' => ':plan (UX-65)',
     ];
 
     private function ar(): array
@@ -62,7 +65,7 @@ class ArabicQualityTest extends TestCase
     {
         $bad = [];
         foreach ($this->ar() as $k => $v) {
-            if (preg_match('/(?<![\x{0600}-\x{06FF}])[وبلك](?=[A-Za-z:<])/u', (string) $v)) {
+            if (preg_match('/(?<![\x{0600}-\x{06FF}])[وبلك]\x{0640}?(?=[A-Za-z:<])/u', (string) $v)) {
                 $bad[$k] = $v;
             }
         }
@@ -100,5 +103,15 @@ class ArabicQualityTest extends TestCase
             }
         }
         $this->assertSame([], $bad, 'Arabic plural strings need the zero/one/two/few/many/other forms');
+    }
+
+    public function test_tier_names_read_as_full_glossary_names(): void
+    {
+        $this->assertSame('باقة الوكالات', \App\Support\PlanGate::tierLabel('agency', 'ar'));
+        $this->assertSame('الوكالات', \App\Support\PlanGate::tierShort('agency', 'ar'));
+        app()->setLocale('ar');
+        $this->assertSame('متاحة في باقة الوكالات', __('plan.available_on', ['tier' => \App\Support\PlanGate::tierLabel('agency')]));
+        $this->assertSame('الترقية إلى الباقة الاحترافية', __('plan.upgrade_to', ['tier' => \App\Support\PlanGate::tierLabel('pro')]));
+        $this->assertSame('Pro', \App\Support\PlanGate::tierShort('pro', 'en'));
     }
 }

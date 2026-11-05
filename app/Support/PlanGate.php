@@ -62,6 +62,14 @@ class PlanGate
         return config("plan_features.tier_labels.$tier.$locale") ?? ucfirst((string) $tier);
     }
 
+    /** Short tier name for badges (UX-65): «الاحترافية», not «الباقة الاحترافية». */
+    public static function tierShort(?string $tier, ?string $locale = null): string
+    {
+        $locale = $locale ?? (app()->getLocale() === 'ar' ? 'ar' : 'en');
+
+        return config("plan_features.tier_short.$tier.$locale") ?? static::tierLabel($tier, $locale);
+    }
+
     public static function featureText(string $feature, string $field, ?string $locale = null): string
     {
         $locale = $locale ?? (app()->getLocale() === 'ar' ? 'ar' : 'en');

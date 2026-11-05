@@ -58,7 +58,7 @@ class GoogleTwoStep extends SimplePage
 
         $key = 'adsr:google-2fa:'.$user->getKey();
         if (RateLimiter::tooManyAttempts($key, 5)) {
-            Notification::make()->title(__('Too many attempts. Try again in :minutes minutes.', ['minutes' => max(1, (int) ceil(RateLimiter::availableIn($key) / 60))]))->danger()->send();
+            Notification::make()->title(trans_choice('{1} Too many attempts. Try again in :count minute.|[2,*] Too many attempts. Try again in :count minutes.', max(1, (int) ceil(RateLimiter::availableIn($key) / 60))))->danger()->send();
 
             return;
         }

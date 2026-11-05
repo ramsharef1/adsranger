@@ -11,6 +11,13 @@ return [
     'tiers' => ['starter' => 1, 'pro' => 2, 'agency' => 3],
 
     'tier_labels' => [
+        // Full glossary names (EX-61, UX-65): used inside sentences, so templates never add «الباقة».
+        'starter' => ['en' => 'Starter', 'ar' => 'الباقة الأساسية'],
+        'pro' => ['en' => 'Pro', 'ar' => 'الباقة الاحترافية'],
+        'agency' => ['en' => 'Agency', 'ar' => 'باقة الوكالات'],
+    ],
+    // Short forms for badges (PlanBadge, nav badge, locked buttons).
+    'tier_short' => [
         'starter' => ['en' => 'Starter', 'ar' => 'الأساسية'],
         'pro' => ['en' => 'Pro', 'ar' => 'الاحترافية'],
         'agency' => ['en' => 'Agency', 'ar' => 'الوكالات'],
@@ -35,10 +42,10 @@ return [
             'what' => ['en' => 'Budget curves, reallocation tips, best hours, placements, audiences and cities for each client.', 'ar' => 'منحنيات الميزانية واقتراحات إعادة التوزيع وأفضل الساعات والمواضع والجماهير والمدن لكل عميل.']],
         'benchmarks' => ['tier' => 'pro', 'refs' => [41, 42],
             'name' => ['en' => 'Benchmarks', 'ar' => 'المقارنات المرجعية'],
-            'what' => ['en' => 'Compare each client with your own portfolio and with anonymised MENA medians.', 'ar' => 'قارن كل عميل بمحفظتك وبمتوسطات المنطقة المجهولة الهوية.']],
+            'what' => ['en' => 'Compare each client with your own portfolio and with anonymised MENA medians.', 'ar' => 'قارن كل عميل بمحفظتك وبالقيم الوسيطة المجهولة الهوية في المنطقة.']],
         'google_depth' => ['tier' => 'pro', 'refs' => [46, 47, 48],
             'name' => ['en' => 'Google Ads depth', 'ar' => 'تفاصيل Google Ads'],
-            'what' => ['en' => 'Search terms, negative keywords, impression share, Quality Score and Performance Max asset groups.', 'ar' => 'عبارات البحث والكلمات السلبية وحصة الظهور ونقاط الجودة ومجموعات أصول Performance Max.']],
+            'what' => ['en' => 'Search terms, negative keywords, impression share, Quality Score and Performance Max asset groups.', 'ar' => 'عبارات البحث والكلمات الرئيسية السلبية وحصة الظهور ونقاط الجودة ومجموعات أصول Performance Max.']],
         'landing_pages' => ['tier' => 'pro', 'refs' => [49],
             'name' => ['en' => 'Landing page health', 'ar' => 'صحة صفحات الهبوط'],
             'what' => ['en' => 'Nightly checks for broken, slow, redirecting or insecure pages behind your ads.', 'ar' => 'فحص ليلي للصفحات المعطلة أو البطيئة أو المحوّلة أو غير الآمنة خلف إعلاناتك.']],

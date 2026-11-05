@@ -107,7 +107,7 @@ class ArabicBodyCopyTest extends TestCase
     public function test_placeholder_sentences(): void
     {
         app()->setLocale('ar');
-        $this->assertSame('تعذّر الربط بـMeta.', __('Could not connect :network.', ['network' => 'Meta']));
+        $this->assertSame('تعذّر ربط Meta.', __('Could not connect :network.', ['network' => 'Meta']));
         app()->setLocale('en');
         $this->assertSame('Could not connect Meta.', __('Could not connect :network.', ['network' => 'Meta']));
         $this->assertSame("Deletes this import and every data row it added. This can't be undone.", __("Deletes this import and every data row it added. This can't be undone."));
