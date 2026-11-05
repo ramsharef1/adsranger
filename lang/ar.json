@@ -750,7 +750,7 @@
     "Not yet": "ليس بعد",
     "ok": "سليم",
     "On pace": "ضمن الوتيرة",
-    "open": "مفتوح",
+    "open": "مفتوحة",
     "Over-pacing": "إنفاق أسرع من المخطط",
     "Pacing": "الوتيرة",
     "paused": "متوقفة",
@@ -1273,5 +1273,13 @@
     "Email": "البريد الإلكتروني",
     "Notes": "ملاحظات",
     "Title": "العنوان",
-    "Tools": "الأدوات"
+    "Tools": "الأدوات",
+    "Organic social": "النشر العضوي",
+    "Organic social & inbox": "النشر العضوي وصندوق الوارد",
+    "Scheduled & published posts": "المنشورات المجدولة والمنشورة",
+    "Unified social inbox": "صندوق الوارد الموحد",
+    "Connected organic channels": "قنوات التواصل المتصلة",
+    "No organic posts scheduled yet.": "لا توجد منشورات عضوية مجدولة بعد.",
+    "No inbox messages yet.": "لا توجد رسائل في صندوق الوارد بعد.",
+    "Create & plan": "الإنشاء والتخطيط"
 }
