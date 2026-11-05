@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ClientLink;
 use App\Support\MetricsQuery;
+use App\Support\MonthlyReport;
 use App\Support\Pacing;
 use App\Support\Periods;
 use Illuminate\Http\Request;
@@ -40,6 +41,28 @@ class ClientReportController extends Controller
             'campaigns' => array_slice(MetricsQuery::breakdown($client, $from, $to, 'campaign'), 0, 10),
             'synced' => MetricsQuery::lastSynced($client),
             'hideSpend' => (bool) $client->hide_spend,
+            'pdfMonths' => MonthlyReport::months(3, $lang, $tz),
         ])->header('X-Robots-Tag', 'noindex, nofollow')->header('Referrer-Policy', 'no-referrer')->header('Cache-Control', 'private, no-store');
+    }
+
+    /** #57: the monthly PDF for a full month (default: last month), through the same signed link. */
+    public function pdf(Request $request, string $token)
+    {
+        $link = ClientLink::findActive($token);
+        abort_unless($link, 404);
+        $client = $link->client()->with('agency')->first();
+        abort_unless($client && $client->status !== 'archived', 404);
+
+        $lang = in_array($request->query('lang'), ['ar', 'en'], true) ? $request->query('lang') : ($client->agency->language === 'en' ? 'en' : 'ar');
+        $month = $request->query('m');
+        if (! MonthlyReport::validMonth($month)) {
+            $month = now($client->agency->timezone ?: 'UTC')->startOfMonth()->subMonthNoOverflow()->format('Y-m');
+        }
+
+        return response(MonthlyReport::pdf($client, $month, $lang), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="'.MonthlyReport::filename($client, $month, $lang).'"',
+            'X-Robots-Tag' => 'noindex, nofollow', 'Cache-Control' => 'private, no-store',
+        ]);
     }
 }

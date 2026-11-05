@@ -25,4 +25,11 @@ return [
     'footer' => 'This page is read-only and shared by your agency. Figures come from the ad networks and may change for up to 3 days.',
     'switch' => 'العربية',
     'switch_lang' => 'ar',
+    'pdf_title' => ':client · monthly report',
+    'monthly_heading' => 'Monthly report · :month',
+    'vs_month' => 'vs :month',
+    'of_budget' => ':pct% of the monthly budget',
+    'generated' => 'Generated :date',
+    'pdf_note' => 'Figures come from the ad networks and may still change for up to 3 days after the month ends.',
+    'download_pdf' => 'Monthly PDF',
 ];

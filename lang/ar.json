@@ -86,5 +86,10 @@
     "No expiry": "بلا انتهاء",
     "last": "آخرها",
     "No links yet.": "لا روابط بعد.",
-    ":count view|:count views": ":count مشاهدة"
+    ":count view|:count views": ":count مشاهدة",
+    "Monthly PDF": "التقرير الشهري PDF",
+    "Monthly PDF report": "التقرير الشهري بصيغة PDF",
+    "Month": "الشهر",
+    "Language": "اللغة",
+    "Download PDF": "تنزيل PDF"
 }

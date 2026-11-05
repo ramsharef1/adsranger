@@ -134,6 +134,13 @@
         </div>
     @endif
 
+    <h2>{{ __('report.download_pdf') }}</h2>
+    <nav class="pills">
+        @foreach ($pdfMonths as $m => $label)
+            <a class="pill" href="{{ url('/r/'.$link->token.'/pdf').'?'.http_build_query(['m' => $m, 'lang' => $lang]) }}">{{ $label }}</a>
+        @endforeach
+    </nav>
+
     <footer>
         {{ $synced ? __('report.synced', ['ago' => $synced->locale($lang)->diffForHumans()]) : __('report.not_synced') }}<br>
         {{ __('report.footer') }}<br>

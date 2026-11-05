@@ -10,6 +10,7 @@ use App\Models\Campaign;
 use App\Models\ClientLink;
 use App\Support\HealthScore;
 use App\Support\MetricsQuery;
+use App\Support\MonthlyReport;
 use App\Support\Pacing;
 use App\Support\Periods;
 use App\Support\PlanGate;
@@ -64,6 +65,26 @@ class ViewClient extends ViewRecord
                     $link = ClientLink::issue($this->record, auth()->user(), $data['label'] ?? null, ($data['days'] ?? '') !== '' ? (int) $data['days'] : null);
                     AuditLog::record('client_link.created', $this->record, ['link_id' => $link->id, 'expires_at' => $link->expires_at?->toDateString()]);
                     Notification::make()->title(__('Client link created'))->body($link->url())->success()->persistent()->send();
+                }),
+            // #57 monthly PDF report (AR / EN), any role that can see the client.
+            Action::make('monthlyPdf')
+                ->label(__('Monthly PDF'))
+                ->icon('heroicon-o-document-arrow-down')
+                ->color('gray')
+                ->modalHeading(__('Monthly PDF report'))
+                ->schema([
+                    Select::make('month')->label(__('Month'))->options(fn () => MonthlyReport::months(12, app()->getLocale() === 'ar' ? 'ar' : 'en', $this->record->agency->timezone ?: 'UTC'))
+                        ->default(fn () => array_key_first(MonthlyReport::months(1)))->required(),
+                    Select::make('lang')->label(__('Language'))->options(['ar' => 'العربية', 'en' => 'English'])
+                        ->default(fn () => $this->record->agency->language === 'en' ? 'en' : 'ar')->required(),
+                ])
+                ->modalSubmitActionLabel(__('Download PDF'))
+                ->action(function (array $data) {
+                    abort_unless(MonthlyReport::validMonth($data['month'] ?? null) && in_array($data['lang'] ?? null, ['ar', 'en'], true), 422);
+                    AuditLog::record('report.monthly_pdf', $this->record, ['month' => $data['month'], 'lang' => $data['lang']]);
+                    $pdf = MonthlyReport::pdf($this->record, $data['month'], $data['lang']);
+
+                    return response()->streamDownload(fn () => print ($pdf), MonthlyReport::filename($this->record, $data['month'], $data['lang']), ['Content-Type' => 'application/pdf']);
                 }),
             EditAction::make()->label('Settings & targets'),
         ];
