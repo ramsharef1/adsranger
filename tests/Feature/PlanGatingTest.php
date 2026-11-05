@@ -260,4 +260,25 @@ class PlanGatingTest extends TestCase
             ->assertSee('ترقية إلى الباقة الاحترافية')
             ->assertSee('مثال');
     }
+
+    public function test_calendar_plan_button_renders_in_english_and_arabic_without_plan_group_collision(): void
+    {
+        $starter = $this->agency('starter');
+        $starterOwner = $this->member($starter, 'owner');
+
+        $this->withSession(['locale' => 'en'])->actingAs($starterOwner)->get("/app/{$starter->slug}/calendar")
+            ->assertOk()
+            ->assertSee('Plan season');
+
+        $this->withSession(['locale' => 'ar'])->actingAs($starterOwner)->get("/app/{$starter->slug}/calendar")
+            ->assertOk()
+            ->assertSee('الخطة');
+
+        $pro = $this->agency('pro');
+        $proOwner = $this->member($pro, 'owner');
+
+        $this->withSession(['locale' => 'en'])->actingAs($proOwner)->get("/app/{$pro->slug}/calendar")
+            ->assertOk()
+            ->assertSee('Plan season');
+    }
 }

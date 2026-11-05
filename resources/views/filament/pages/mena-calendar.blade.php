@@ -53,9 +53,9 @@
                         <td style="padding:6px;{{ $muted }}">{{ $e['tip'] }}</td>
                         <td style="padding:6px;text-align:end">
                             @if ($scenarioLocked)
-                                <x-locked-button feature="scenario_planner" :label="__('Plan')" />
+                                <x-locked-button feature="scenario_planner" :label="__('Plan season')" />
                             @else
-                                <x-filament::button size="xs" color="gray" wire:click="plan('{{ $e['key'] }}', '{{ $e['start'] }}')">{{ __('Plan') }}</x-filament::button>
+                                <x-filament::button size="xs" color="gray" wire:click="plan('{{ $e['key'] }}', '{{ $e['start'] }}')">{{ __('Plan season') }}</x-filament::button>
                             @endif
                         </td>
                     </tr>

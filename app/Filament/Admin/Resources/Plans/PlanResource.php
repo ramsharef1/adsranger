@@ -52,7 +52,7 @@ class PlanResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->columns(1)->components([
-            // Own key: «الباقة» (glossary D-43); the bare "Plan" key stays «الخطة» (the calendar's "Plan" button).
+            // Own key: «الباقة» (glossary D-43 via plan.plan); the calendar's button uses "Plan season" («الخطة») so bare "Plan" never collides with lang/en/plan.php.
             Section::make(__('plan.plan'))->columns(3)->schema([
                 TextInput::make('name')->label(__('Name'))->required()->maxLength(60),
                 TextInput::make('key')->disabled(),
