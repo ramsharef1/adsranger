@@ -985,5 +985,20 @@
     "Trial running": "الفترة التجريبية سارية",
     "Read-only (trial ended)": "للعرض فقط (انتهت الفترة التجريبية)",
     "Closed (trial ended)": "مغلقة (انتهت الفترة التجريبية)",
-    "Budgets look balanced: moving 20% between campaigns would gain less than :pct% results.": "الميزانيات تبدو متوازنة: نقل 20% بين الحملات سيزيد النتائج بأقل من :pct%."
+    "Budgets look balanced: moving 20% between campaigns would gain less than :pct% results.": "الميزانيات تبدو متوازنة: نقل 20% بين الحملات سيزيد النتائج بأقل من :pct%.",
+    "What's new": "ما الجديد",
+    "release": "إصدار",
+    "Releases": "الإصدارات",
+    "New features, connector updates, and improvements across AdsRanger.": "المزايا الجديدة وتحديثات الربط والتحسينات في AdsRanger.",
+    "Manage releases": "إدارة الإصدارات",
+    "No release notes listed for this version.": "لا توجد ملاحظات مسجّلة لهذا الإصدار.",
+    "No releases published yet.": "لم يُنشر أي إصدار بعد.",
+    "Release details": "تفاصيل الإصدار",
+    "Version": "الإصدار",
+    "Release date": "تاريخ الإصدار",
+    "Published": "منشور",
+    "Title (Arabic)": "العنوان (بالعربية)",
+    "Title (English)": "العنوان (بالإنجليزية)",
+    "Highlights (Arabic, one per line)": "أبرز التحديثات (بالعربية، سطر لكل نقطة)",
+    "Highlights (English, one per line)": "أبرز التحديثات (بالإنجليزية، سطر لكل نقطة)"
 }

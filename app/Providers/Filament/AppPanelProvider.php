@@ -12,6 +12,7 @@ use App\Filament\Pages\Auth\RequestPasswordReset;
 use App\Filament\Pages\Auth\ResetPassword;
 use App\Filament\Pages\Tenancy\EditAgencyProfile;
 use App\Filament\Pages\Tenancy\RegisterAgency;
+use App\Filament\Pages\WhatsNewPage;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\GoogleSignInController;
 use App\Http\Middleware\EnsureAgencyTwoStep;
@@ -20,6 +21,7 @@ use App\Http\Middleware\TrialLifecycleGate;
 use App\Models\Agency;
 use App\Support\PanelColors;
 use Filament\Actions\Action;
+use Filament\Facades\Filament;
 use Filament\FontProviders\GoogleFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -97,6 +99,11 @@ class AppPanelProvider extends PanelProvider
                 'primary' => PanelColors::primary(),
             ])
             ->userMenuItems([
+                Action::make('whats-new')
+                    ->label(fn (): string => __("What's new"))
+                    ->icon('heroicon-o-sparkles')
+                    ->url(fn (): string => Filament::getTenant() ? WhatsNewPage::getUrl(tenant: Filament::getTenant()) : url('/app'))
+                    ->visible(fn (): bool => Filament::getTenant() !== null),
                 Action::make('switch-language')
                     ->label(fn (): string => __('ui.switch_to'))
                     ->icon('heroicon-o-language')
