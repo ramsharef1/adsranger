@@ -340,7 +340,9 @@ class SelfSignupTest extends TestCase
 
     public function test_admin_toggles_the_flag_and_it_is_audit_logged(): void
     {
+        // #74: /admin requires two-step verification, so this admin has it set up.
         $admin = User::factory()->create(['role' => 'super_admin']);
+        $admin->forceFill(['app_authentication_secret' => 'JBSWY3DPEHPK3PXP'])->save();
         $this->actingAs($admin);
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         $this->get('/admin/platform-settings')->assertOk();

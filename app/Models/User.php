@@ -3,6 +3,10 @@
 namespace App\Models;
 
 use Database\Factories\UserFactory;
+use Filament\Auth\MultiFactor\App\Concerns\InteractsWithAppAuthentication;
+use Filament\Auth\MultiFactor\App\Concerns\InteractsWithAppAuthenticationRecovery;
+use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthentication;
+use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthenticationRecovery;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
@@ -17,12 +21,16 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 
 #[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
-/** Email verification gates /app (#158); accounts that existed before were backfilled as verified. */
-class User extends Authenticatable implements FilamentUser, HasTenants, MustVerifyEmail
+#[Hidden(['password', 'remember_token', 'google_id'])]
+/**
+ * Email verification gates /app (#158); accounts that existed before were backfilled as verified.
+ * #74: two-step verification with an authenticator app + recovery codes (Filament app authentication; secret and
+ * codes are stored encrypted and hidden), and `google_id` once the user has signed in with Google.
+ */
+class User extends Authenticatable implements FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery, HasTenants, MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, InteractsWithAppAuthentication, InteractsWithAppAuthenticationRecovery, Notifiable;
 
     protected function casts(): array
     {
@@ -42,6 +50,11 @@ class User extends Authenticatable implements FilamentUser, HasTenants, MustVeri
     public function canAccessPanel(Panel $panel): bool
     {
         return $panel->getId() === 'admin' ? $this->role === 'super_admin' : true;
+    }
+
+    public function hasTwoStep(): bool
+    {
+        return filled($this->app_authentication_secret);
     }
 
     public function isSuperAdmin(): bool

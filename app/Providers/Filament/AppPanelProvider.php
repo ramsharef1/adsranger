@@ -2,13 +2,18 @@
 
 namespace App\Providers\Filament;
 
+use App\Auth\AppAuthentication;
 use App\Filament\Pages\Auth\EmailVerificationPrompt;
+use App\Filament\Pages\Auth\GoogleFinishSignup;
+use App\Filament\Pages\Auth\GoogleTwoStep;
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Auth\Register;
 use App\Filament\Pages\Auth\RequestPasswordReset;
 use App\Filament\Pages\Auth\ResetPassword;
 use App\Filament\Pages\Tenancy\EditAgencyProfile;
 use App\Filament\Pages\Tenancy\RegisterAgency;
+use App\Http\Controllers\GoogleSignInController;
+use App\Http\Middleware\EnsureAgencyTwoStep;
 use App\Http\Middleware\SetPanelLocale;
 use App\Models\Agency;
 use App\Support\PanelColors;
@@ -28,6 +33,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Route;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 /** Agency app (adsranger.com/app): agencies, their clients and connected ad accounts. */
@@ -48,6 +54,21 @@ class AppPanelProvider extends PanelProvider
             // #158: /app/register always answers; the page itself shows the invite-only copy while `signup.open` is off.
             ->registration(Register::class)
             ->emailVerification(EmailVerificationPrompt::class)
+            // #74 two-step verification (authenticator app + recovery codes), optional per user in /app/profile.
+            // "Required" here only registers Filament's set-up screen: EnsureAgencyTwoStep enforces it for the
+            // members of an agency that turned on "Require two-step verification for all members".
+            ->multiFactorAuthentication([AppAuthentication::configured()], isRequired: true)
+            ->multiFactorAuthenticationRequiredMiddlewareName(EnsureAgencyTwoStep::class)
+            // #74 "Continue with Google" (/app only; 404 + hidden button while GOOGLE_CLIENT_ID/SECRET are empty).
+            ->routes(function (): void {
+                Route::get('oauth/google/redirect', [GoogleSignInController::class, 'redirect'])
+                    ->middleware('throttle:20,1')->name('oauth.google.redirect');
+                Route::get('oauth/google/callback', [GoogleSignInController::class, 'callback'])
+                    ->middleware('throttle:20,1')->name('oauth.google.callback');
+                Route::get('oauth/google/finish', GoogleFinishSignup::class)->name('oauth.google.finish');
+                Route::get('oauth/google/two-step', GoogleTwoStep::class)->name('oauth.google.two-step');
+            })
+            ->livewireComponents([GoogleFinishSignup::class, GoogleTwoStep::class])
             ->font('IBM Plex Sans Arabic', provider: GoogleFontProvider::class)
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.head'))
             ->renderHook(PanelsRenderHook::SIMPLE_PAGE_END, fn () => view('panels.lang-switch'))

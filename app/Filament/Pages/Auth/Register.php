@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages\Auth;
 
+use App\Support\GoogleSignIn;
 use App\Support\Signup;
 use Closure;
 use Filament\Actions\Action;
@@ -16,6 +17,7 @@ use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\RenderHook;
 use Filament\Schemas\Components\Text;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Contracts\Support\Htmlable;
@@ -178,6 +180,8 @@ class Register extends BaseRegister
             $this->getFormContentComponent(),
             // ADSR-031 part 2 (D-61): the trial line under the button.
             Text::make(__('14 days on Pro · up to 5 ad accounts and 3 team members · no card needed')),
+            // #74: sign up with Google instead (same trial rules; only while signup is open and the keys are set).
+            View::make('auth.google-button')->visible(fn (): bool => GoogleSignIn::enabled()),
             RenderHook::make(PanelsRenderHook::AUTH_REGISTER_FORM_AFTER),
         ]);
     }

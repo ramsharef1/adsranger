@@ -21,4 +21,10 @@ class AdminLogin extends Login
 
         return __('AdsRanger · System admin');
     }
+
+    /** #74: super admins sign in with password + two-step verification only. */
+    protected function showsGoogle(): bool
+    {
+        return false;
+    }
 }

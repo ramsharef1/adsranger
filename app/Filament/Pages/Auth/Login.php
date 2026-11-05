@@ -2,9 +2,12 @@
 
 namespace App\Filament\Pages\Auth;
 
+use App\Support\GoogleSignIn;
 use App\Support\Signup;
 use Filament\Auth\Pages\Login as BaseLogin;
 use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\View;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 
 /** Agency app sign-in: email and password type left to right in both languages (UX-45); labels stay RTL. */
@@ -28,5 +31,21 @@ class Login extends BaseLogin
         }
 
         return null;
+    }
+
+    /** #74: "Continue with Google" under the form on /app/login (not during the code step, never on /admin). */
+    public function content(Schema $schema): Schema
+    {
+        $schema = parent::content($schema);
+
+        return $schema->components([
+            ...$schema->getComponents(withHidden: true),
+            View::make('auth.google-button')->visible(fn (): bool => $this->showsGoogle() && blank($this->userUndertakingMultiFactorAuthentication)),
+        ]);
+    }
+
+    protected function showsGoogle(): bool
+    {
+        return GoogleSignIn::enabled();
     }
 }

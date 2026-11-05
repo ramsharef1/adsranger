@@ -15,7 +15,7 @@ class Agency extends Model
 
     protected function casts(): array
     {
-        return ['trial_ends_at' => 'datetime', 'digest_sent_on' => 'date', 'alerts_run_on' => 'date', 'benchmarks_opt_in' => 'boolean', 'benchmarks_opt_in_at' => 'datetime'];
+        return ['trial_ends_at' => 'datetime', 'digest_sent_on' => 'date', 'alerts_run_on' => 'date', 'benchmarks_opt_in' => 'boolean', 'benchmarks_opt_in_at' => 'datetime', 'require_two_factor' => 'boolean'];
     }
 
     public function owner(): BelongsTo

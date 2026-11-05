@@ -855,5 +855,16 @@
     "United Kingdom": "المملكة المتحدة",
     "United States": "الولايات المتحدة",
     "Canada": "كندا",
-    "Other": "أخرى"
+    "Other": "أخرى",
+    "Continue with Google": "المتابعة باستخدام Google",
+    "or": "أو",
+    "Google sign-in didn't finish. Try again.": "لم يكتمل تسجيل الدخول باستخدام Google. حاول مرة أخرى.",
+    "No AdsRanger account uses this Google email.": "لا يوجد حساب في AdsRanger بهذا البريد من Google.",
+    "Confirm your email with the link we sent you first. Then you can continue with Google.": "أكّد بريدك الإلكتروني أولًا من الرابط الذي أرسلناه إليك، ثم تابع باستخدام Google.",
+    "This account signs in with its password and two-step verification.": "يُسجَّل الدخول إلى هذا الحساب بكلمة المرور والتحقق بخطوتين.",
+    "Google says this email isn't verified, so we can't use it to sign in.": "لم يؤكّد Google هذا البريد، لذلك لا يمكن استخدامه لتسجيل الدخول.",
+    "Signed in with Google as": "سجّلت الدخول باستخدام Google بالبريد",
+    "Almost done": "خطوة أخيرة",
+    "Require two-step verification for all members": "اشترط التحقق بخطوتين لجميع الأعضاء",
+    "Members who haven't set it up are asked to add an authenticator app before they can open this workspace. This includes you.": "يُطلب من الأعضاء الذين لم يفعّلوه إضافة تطبيق المصادقة قبل فتح مساحة العمل هذه، وهذا يشملك أنت أيضًا."
 }

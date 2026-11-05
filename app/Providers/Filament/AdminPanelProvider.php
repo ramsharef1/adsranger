@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Auth\AppAuthentication;
 use App\Filament\Pages\Auth\AdminLogin;
 use App\Filament\Pages\Auth\RequestPasswordReset;
 use App\Filament\Pages\Auth\ResetPassword;
@@ -40,6 +41,10 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(asset('brand/favicon.svg'))
             ->login(AdminLogin::class)
             ->passwordReset(RequestPasswordReset::class, ResetPassword::class)
+            // #74 super admins must use two-step verification. No lock-out at deploy: an admin without it signs in
+            // with the password as before and is then held on the set-up screen (QR + code + recovery codes)
+            // until it is on; every /admin page redirects there until then. Afterwards each sign-in asks for a code.
+            ->multiFactorAuthentication([AppAuthentication::configured()], isRequired: true)
             ->font('IBM Plex Sans Arabic', provider: GoogleFontProvider::class)
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.head'))
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.admin-head'))
