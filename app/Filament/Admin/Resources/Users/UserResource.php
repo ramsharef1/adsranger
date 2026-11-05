@@ -5,11 +5,15 @@ namespace App\Filament\Admin\Resources\Users;
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Filament\Admin\Resources\Users\Pages\ListUsers;
 use App\Filament\Concerns\TranslatesResourceLabels;
+use App\Mail\TwoStepResetMail;
+use App\Models\AuditLog;
 use App\Models\User;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -17,6 +21,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Mail;
 use UnitEnum;
 
 class UserResource extends Resource
@@ -74,7 +79,30 @@ class UserResource extends Resource
             TextColumn::make('created_at')->label(__('Joined'))->since(),
         ])->filters([
             SelectFilter::make('role')->options(['member' => __('Member'), 'super_admin' => __('Super admin')]),
-        ])->recordActions([EditAction::make()]);
+        ])->recordActions([EditAction::make(), static::resetTwoStepAction()]);
+    }
+
+    /**
+     * Super admin: "Reset two-step verification" for a user who lost their authenticator and recovery codes.
+     * EX-32 confirm naming what changes; never for your own account; audit `auth.2fa_reset_by_admin`; the user is
+     * told by email. An agency that requires two-step sends them to set it up again at the next sign-in.
+     */
+    public static function resetTwoStepAction(): Action
+    {
+        return Action::make('resetTwoStep')->label(__('Reset two-step verification'))->icon('heroicon-o-shield-exclamation')->color('danger')
+            ->visible(fn (User $record) => $record->hasTwoStep() && $record->id !== auth()->id())
+            ->requiresConfirmation()
+            ->modalHeading(fn (User $record) => __('Reset two-step verification for :email?', ['email' => $record->email]))
+            ->modalDescription(__('This turns off two-step verification and deletes the recovery codes. They sign in with their password only until they set it up again; a workspace that requires it asks them at the next sign-in. We email them about the reset. Check who is asking before you do this.'))
+            ->modalSubmitActionLabel(__('Reset two-step verification'))
+            ->action(function (User $record) {
+                abort_if($record->id === auth()->id() || auth()->user()?->role !== 'super_admin', 403);
+                $record->forceFill(['app_authentication_secret' => null, 'app_authentication_recovery_codes' => null])->save();
+                AuditLog::record('auth.2fa_reset_by_admin', $record, ['by' => auth()->id()]);
+                $lang = $record->agencies()->first()?->language === 'en' ? 'en' : 'ar';
+                Mail::to($record->email)->queue(new TwoStepResetMail($record, $lang, url($record->isSuperAdmin() ? '/admin/login' : '/app/login')));
+                Notification::make()->title(__('Two-step verification reset for :email', ['email' => $record->email]))->success()->send();
+            });
     }
 
     public static function getPages(): array

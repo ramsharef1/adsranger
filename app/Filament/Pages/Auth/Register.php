@@ -4,6 +4,7 @@ namespace App\Filament\Pages\Auth;
 
 use App\Support\GoogleSignIn;
 use App\Support\Signup;
+use App\Support\TrialNotice;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Auth\Events\Registered;
@@ -167,11 +168,10 @@ class Register extends BaseRegister
     public function content(Schema $schema): Schema
     {
         if (! $this->open) {
-            $email = e(config('adsranger.signup.support_email'));
-
+            // D-53: the support@ mailto until /waitlist is live (config adsranger.waitlist_url), then the waitlist link.
             return $schema->components([
                 Text::make(__('AdsRanger is in a private beta.')),
-                Text::make(new HtmlString(e(__('Ask for an invite at')).' <a href="mailto:'.$email.'" style="text-decoration:underline"><bdi dir="ltr">'.$email.'</bdi></a>')),
+                Text::make(TrialNotice::contactHtml()),
             ]);
         }
 

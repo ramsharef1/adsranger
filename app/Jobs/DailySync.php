@@ -4,6 +4,8 @@ namespace App\Jobs;
 
 use App\Connectors\ConnectorRegistry;
 use App\Models\AdAccount;
+use App\Support\Trial;
+use App\Sync\SyncService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -17,6 +19,8 @@ class DailySync implements ShouldQueue
         AdAccount::with(['network', 'connection'])->where('is_active', true)
             ->whereHas('connection', fn ($q) => $q->where('status', '!=', 'disconnected'))
             ->get()
+            // D-61: no syncs for read-only / closed / archived trial workspaces (self-signup only).
+            ->filter(fn (AdAccount $a) => ! Trial::jobsStopped($a->agency))
             ->filter(fn (AdAccount $a) => $a->network && ConnectorRegistry::for($a->network)->supportsSync())
             ->each(function (AdAccount $a) {
                 $tz = $a->timezone ?: ($a->agency->timezone ?? 'UTC');
@@ -24,7 +28,7 @@ class DailySync implements ShouldQueue
                 SyncAdAccount::dispatch($a->id, $today->copy()->subDays(3)->toDateString(), $today->toDateString(), 'daily');
                 CheckAccountHealth::dispatch($a->id);
                 if (! $a->backfilled_at) {
-                    \App\Sync\SyncService::queueBackfill($a);
+                    SyncService::queueBackfill($a);
                 }
             });
     }

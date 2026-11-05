@@ -121,6 +121,7 @@ class Insights
 
     /**
      * Spend → results curve (#38): results/day = a · spend^b, fitted on log–log daily points of the last N days.
+     *
      * @param  ?int  $campaignRef  limit to one campaign
      */
     public static function curve(Client $c, ?int $campaignRef = null, ?string $to = null): ?array
@@ -210,7 +211,8 @@ class Insights
             'results_before' => $before * 30, 'results_after' => $after * 30,
         ] : null;
 
-        return ['suggestion' => $s, 'campaigns' => $fits, 'reason' => $s ? null : 'Budgets look balanced: moving 20% between campaigns would gain less than '.config('insights.reallocation.min_gain_pct').'% results.'];
+        return ['suggestion' => $s, 'campaigns' => $fits, 'reason' => $s ? null : 'Budgets look balanced: moving 20% between campaigns would gain less than :pct% results.',
+            'reason_params' => ['pct' => config('insights.reallocation.min_gain_pct')]];
     }
 
     /** Saturation per ad set (#98): 30-day frequency + CTR last 7 days vs the 7 days 3 weeks earlier; overlap estimate from 30-day reach. */

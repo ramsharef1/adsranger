@@ -80,7 +80,7 @@
                     {!! __('Move about :amount a day from :from to :to: about :more more results a month (+:gain%) for the same spend.', ['amount' => '<strong><bdi>'.e(R::money($sg['amount'], $cur)).'</bdi></strong>', 'from' => '<strong><bdi>'.e($sg['from']).'</bdi></strong>', 'to' => '<strong><bdi>'.e($sg['to']).'</bdi></strong>', 'more' => '<strong>'.e(number_format($sg['results_after'] - $sg['results_before'])).'</strong>', 'gain' => e(number_format($sg['gain_pct'], 1))]) !!}
                 </div>
             @else
-                <div style="{{ $muted }}">{{ __($realloc['reason']) }}</div>
+                <div style="{{ $muted }}">{{ __($realloc['reason'], $realloc['reason_params'] ?? []) }}</div>
             @endif
             @if (count($realloc['campaigns']))
                 <table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:10px">

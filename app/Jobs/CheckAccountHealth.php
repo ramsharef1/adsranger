@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Connectors\ConnectorRegistry;
 use App\Models\Ad;
 use App\Models\AdAccount;
+use App\Support\Trial;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Str;
@@ -23,7 +24,7 @@ class CheckAccountHealth implements ShouldQueue
     public function handle(): void
     {
         $a = AdAccount::with(['network', 'connection'])->find($this->adAccountId);
-        if (! $a || ! $a->is_active || ! $a->network) {
+        if (! $a || ! $a->is_active || ! $a->network || Trial::jobsStopped($a->agency)) {
             return;
         }
         try {

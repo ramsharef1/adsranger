@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Connectors\Connector;
 use App\Connectors\ConnectorRegistry;
 use App\Models\AdAccount;
 use App\Models\AdNetwork;
@@ -11,6 +12,7 @@ use App\Models\Connection;
 use App\Support\NetworkAccess;
 use App\Support\PlanLimits;
 use App\Support\TeamRoles;
+use App\Support\Trial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -25,6 +27,10 @@ class ConnectController extends Controller
 
         abort_unless($user->canAccessTenant($agency) && TeamRoles::canManageData($user, $agency), 403);
         abort_unless(NetworkAccess::allows($user, $agency, $net), 403, 'This network is not available for your workspace.');
+        // D-61: a read-only (trial ended) workspace can't connect networks.
+        if (Trial::isReadOnly($agency)) {
+            return redirect('/app/'.$agency->slug.'/networks')->with('connect_error', __('Your trial ended — choose a plan'));
+        }
 
         $connector = ConnectorRegistry::for($net);
         if (! $connector->supportsConnect()) {
@@ -77,7 +83,7 @@ class ConnectController extends Controller
     }
 
     /** Save the ad accounts a new connection can reach. New accounts are tracked while the plan allows. Returns how many were found. */
-    public static function importAccounts(\App\Connectors\Connector $connector, Connection $connection, Agency $agency): int
+    public static function importAccounts(Connector $connector, Connection $connection, Agency $agency): int
     {
         $found = 0;
         try {

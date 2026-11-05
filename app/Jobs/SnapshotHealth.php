@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Agency;
 use App\Models\Client;
 use App\Support\HealthScore;
+use App\Support\Trial;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -25,6 +26,9 @@ class SnapshotHealth implements ShouldQueue
     public function handle(): void
     {
         Agency::query()->when($this->agencyId, fn ($q) => $q->whereKey($this->agencyId))->with('clients')->each(function (Agency $a) {
+            if (Trial::isReadOnly($a)) {
+                return; // D-61: frozen while read-only
+            }
             $today = now($a->timezone ?: 'UTC')->startOfDay();
             foreach ($a->clients->where('status', 'active') as $c) {
                 try {

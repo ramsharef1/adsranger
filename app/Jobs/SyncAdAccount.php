@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\AdAccount;
+use App\Support\Trial;
 use App\Sync\SyncService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -25,7 +26,7 @@ class SyncAdAccount implements ShouldQueue
     public function handle(): void
     {
         $a = AdAccount::with(['network', 'connection'])->find($this->adAccountId);
-        if (! $a || ! $a->is_active || $a->connection?->status === 'disconnected') {
+        if (! $a || ! $a->is_active || $a->connection?->status === 'disconnected' || Trial::jobsStopped($a->agency)) {
             return;
         }
         SyncService::sync($a, $this->from, $this->to, $this->kind);

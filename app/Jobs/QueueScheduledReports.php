@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\ReportSchedule;
 use App\Models\ReportSend;
 use App\Support\PlanGate;
+use App\Support\Trial;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Foundation\Queue\Queueable;
@@ -31,7 +32,7 @@ class QueueScheduledReports implements ShouldQueue
         ReportSchedule::query()->where('active', true)->with(['agency', 'client'])->orderBy('id')
             ->each(function (ReportSchedule $s) {
                 $agency = $s->agency;
-                if (! $agency || ! in_array($agency->status, ['active', 'trial'], true) || ! $s->client || $s->client->status === 'archived'
+                if (! $agency || ! in_array($agency->status, ['active', 'trial'], true) || Trial::isReadOnly($agency) || ! $s->client || $s->client->status === 'archived'
                     || PlanGate::locked($agency, 'scheduled_reports')) {
                     return;
                 }

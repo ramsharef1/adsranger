@@ -6,16 +6,25 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
-/** An agency workspace (a tenant of the /app panel). */
+/**
+ * An agency workspace (a tenant of the /app panel).
+ * Soft deletes: only the D-61 trial lifecycle archives an agency (App\Support\TrialLifecycle); an archived
+ * agency can't be opened (tenant routes 404) and no job touches it, until an admin restores it or it is purged.
+ */
 class Agency extends Model
 {
+    use SoftDeletes;
+
     protected $guarded = [];
 
     protected function casts(): array
     {
-        return ['trial_ends_at' => 'datetime', 'digest_sent_on' => 'date', 'alerts_run_on' => 'date', 'benchmarks_opt_in' => 'boolean', 'benchmarks_opt_in_at' => 'datetime', 'require_two_factor' => 'boolean'];
+        return ['trial_ends_at' => 'datetime', 'digest_sent_on' => 'date', 'alerts_run_on' => 'date', 'benchmarks_opt_in' => 'boolean', 'benchmarks_opt_in_at' => 'datetime', 'require_two_factor' => 'boolean',
+            'trial_readonly_at' => 'datetime', 'trial_expired_at' => 'datetime', 'trial_ending_notified_at' => 'datetime',
+            'trial_ended_notified_at' => 'datetime', 'deletion_notified_at' => 'datetime'];
     }
 
     public function owner(): BelongsTo
@@ -93,7 +102,7 @@ class Agency extends Model
         }
         $slug = $base;
         $i = 2;
-        while (static::where('slug', $slug)->exists()) {
+        while (static::withTrashed()->where('slug', $slug)->exists()) { // archived agencies keep their slug
             $slug = $base.'-'.$i++;
         }
 

@@ -17,7 +17,7 @@
 <p>Hello,</p>
 <p><strong>{{ $inviter?->name ?? 'A team member' }}</strong> invited you to join the <strong>{{ $agency->name }}</strong> workspace on AdsRanger as <strong>{{ $roleLabel }}</strong>.</p>
 <p style="padding:12px 0"><a href="{{ $url }}" style="background:#14B8A6;color:#0B1020;text-decoration:none;font-weight:bold;padding:12px 22px;border-radius:8px;display:inline-block">Accept invitation</a></p>
-<p style="font-size:13px;color:#4A5473">This invitation expires on {{ $expires->format('j M Y') }}. If you were not expecting it, you can ignore this email.</p>
+<p style="font-size:13px;color:#4A5473">This invitation expires on {{ $expires->copy()->locale('en')->translatedFormat('j M Y') }}. If you were not expecting it, you can ignore this email.</p>
 </td></tr>
 @endif
 <tr><td style="font-size:12px;color:#4A5473;padding-top:14px;border-top:1px solid #E5E8F0;direction:ltr">{{ $url }}</td></tr>

@@ -16,6 +16,7 @@ use App\Http\Controllers\ExportController;
 use App\Http\Controllers\GoogleSignInController;
 use App\Http\Middleware\EnsureAgencyTwoStep;
 use App\Http\Middleware\SetPanelLocale;
+use App\Http\Middleware\TrialLifecycleGate;
 use App\Models\Agency;
 use App\Support\PanelColors;
 use Filament\Actions\Action;
@@ -82,10 +83,15 @@ class AppPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::SIMPLE_PAGE_END, fn () => view('panels.lang-switch'))
             // D-61 trial banner (days left / trial ended), under the top bar.
             ->renderHook(PanelsRenderHook::TOPBAR_AFTER, fn () => view('panels.trial-banner'))
+            // EX-50 point 6: usage warning at 80 % of the ad-account / seat limit (owner/admin).
+            ->renderHook(PanelsRenderHook::TOPBAR_AFTER, fn () => view('panels.usage-warning'))
             ->profile(isSimple: false)
             ->tenant(Agency::class, slugAttribute: 'slug')
             ->tenantRegistration(RegisterAgency::class)
             ->tenantProfile(EditAgencyProfile::class)
+            // D-61 trial lifecycle (self-signup only): read-only pages refuse create/edit; closed workspaces open only
+            // the "trial ended" page, Plan & usage and the exports. Livewire calls: App\Support\ReadOnlyGuard.
+            ->tenantMiddleware([TrialLifecycleGate::class])
             ->colors([
                 // UX-6: buttons fill with #0F766E (teal-700, white text 5.5:1) in both themes; #14B8A6 stays for accents.
                 'primary' => PanelColors::primary(),

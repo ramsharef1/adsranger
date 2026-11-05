@@ -185,7 +185,7 @@
                         <div style="width:14px;border-radius:4px 4px 0 0;background:#14B8A6;height:{{ max(2, round($v['spend'] / $maxSpend * 130)) }}px"></div>
                         <div style="width:14px;border-radius:4px 4px 0 0;background:#6366f1;height:{{ max(2, round($v['main_results'] / $maxRes * 130)) }}px"></div>
                     </div>
-                    <div style="{{ $muted }}">{{ \Carbon\Carbon::parse($m.'-01')->format('M') }}</div>
+                    <div style="{{ $muted }}">{{ \Carbon\Carbon::parse($m.'-01')->translatedFormat('M') }}</div>
                 </div>
             @endforeach
         </div>

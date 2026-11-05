@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\User;
 use App\Notifications\VerifyEmail;
 use App\Support\ErrorRef;
+use App\Support\ReadOnlyGuard;
 use App\Support\Signup;
 use Filament\Auth\Notifications\VerifyEmail as FilamentVerifyEmail;
 use Illuminate\Auth\Events\PasswordReset;
@@ -42,5 +43,8 @@ class AppServiceProvider extends ServiceProvider
                 Signup::completeVerified($e->user);
             }
         });
+
+        // D-61: read-only (trial ended) workspaces refuse every Livewire write call with the EX-50 style notice.
+        ReadOnlyGuard::register();
     }
 }

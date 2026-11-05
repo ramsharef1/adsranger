@@ -52,7 +52,8 @@ class PlanResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->columns(1)->components([
-            Section::make(__('Plan'))->columns(3)->schema([
+            // Own key: «الباقة» (glossary D-43); the bare "Plan" key stays «الخطة» (the calendar's "Plan" button).
+            Section::make(__('plan.plan'))->columns(3)->schema([
                 TextInput::make('name')->label(__('Name'))->required()->maxLength(60),
                 TextInput::make('key')->disabled(),
                 TextInput::make('price_usd_month')->label(__('Price (USD / month)'))->numeric()->helperText(__('Shown later on the pricing page; billing comes later.')),

@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\LandingPage;
 use App\Support\LandingPages;
+use App\Support\Trial;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
@@ -22,7 +23,9 @@ class CheckLandingPages implements ShouldQueue
     {
         LandingPage::query()->when($this->agencyId, fn ($q) => $q->where('agency_id', $this->agencyId))
             ->where(fn ($q) => $q->where('source', 'manual')->orWhere('last_seen_at', '>=', now()->subDays(30)))
-            ->orderBy('checked_at')->limit(2000)->get()
+            ->whereHas('agency') // archived agencies excluded
+            ->with('agency')->orderBy('checked_at')->limit(2000)->get()
+            ->reject(fn (LandingPage $lp) => Trial::jobsStopped($lp->agency))
             ->each(function (LandingPage $lp) {
                 try {
                     LandingPages::check($lp);

@@ -42,13 +42,13 @@
                     <tr style="border-top:1px solid rgba(148,163,184,.2)">
                         <td style="padding:6px"><strong>{{ $e['label'] }}</strong> <span dir="rtl" lang="ar" style="{{ $muted }}">{{ $e['ar'] }}</span>
                             @if ($e['markets'])<div style="{{ $muted }}">{{ implode(', ', $e['markets']) }}</div>@endif</td>
-                        <td style="padding:6px;white-space:nowrap">{{ \Carbon\Carbon::parse($e['start'])->format('D j M Y') }}@if ($e['days'] > 1) → {{ \Carbon\Carbon::parse($e['end'])->format('j M') }}@endif
+                        <td style="padding:6px;white-space:nowrap">{{ \Carbon\Carbon::parse($e['start'])->translatedFormat('D j M Y') }}@if ($e['days'] > 1) → {{ \Carbon\Carbon::parse($e['end'])->translatedFormat('j M') }}@endif
                             @if ($e['kind'] === 'hijri')<div style="{{ $muted }}">{{ $e['estimated'] ? __('estimated') : __('±1 day') }}</div>@endif</td>
                         <td style="padding:6px;white-space:nowrap">{{ $e['kind'] === 'hijri' ? M::hijriLabel($e['start']) : '' }}</td>
                         <td style="padding:6px;text-align:end;white-space:nowrap">{{ $in <= 0 ? __('now') : trans_choice(':count day|:count days', $in) }}</td>
                         @if ($client)
                             <td style="padding:6px;text-align:end">{{ $s ? $pct($s['spend']).' · '.$pct($s['cpr']) : '–' }}
-                                @if ($s)<div style="{{ $muted }}">{{ \Carbon\Carbon::parse($s['start'])->format('M Y') }}</div>@endif</td>
+                                @if ($s)<div style="{{ $muted }}">{{ \Carbon\Carbon::parse($s['start'])->translatedFormat('M Y') }}</div>@endif</td>
                         @endif
                         <td style="padding:6px;{{ $muted }}">{{ $e['tip'] }}</td>
                         <td style="padding:6px;text-align:end">
@@ -69,7 +69,7 @@
 
     @if ($picked)
         <x-filament::section>
-            <x-slot name="heading">{{ __('Scenario: :event (:from → :to, :days days)', ['event' => $picked['label'], 'from' => \Carbon\Carbon::parse($picked['start'])->format('j M'), 'to' => \Carbon\Carbon::parse($picked['end'])->format('j M Y'), 'days' => $picked['days']]) }}</x-slot>
+            <x-slot name="heading">{{ __('Scenario: :event (:from → :to, :days days)', ['event' => $picked['label'], 'from' => \Carbon\Carbon::parse($picked['start'])->translatedFormat('j M'), 'to' => \Carbon\Carbon::parse($picked['end'])->translatedFormat('j M Y'), 'days' => $picked['days']]) }}</x-slot>
             <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px">
                 <label style="{{ $muted }}" for="mc-client2">{{ __('Client') }}</label>
                 <select id="mc-client2" wire:model.live="clientId" style="{{ $field }}">
@@ -96,7 +96,7 @@
                 <div style="{{ $muted }};margin-top:10px">
                     {{ __('Estimate only. Baseline = the last 28 days (:amount a day).', ['amount' => R::money($sc['baseline_day_spend'], $cur)]) }}
                     @if ($sc['source'] === 'history')
-                        {{ __('Event effect on cost per result: :pct from this client\'s own :event in :month.', ['pct' => $pct($sc['cpr_index']), 'event' => $picked['label'], 'month' => \Carbon\Carbon::parse($sc['history']['start'])->format('M Y')]) }}
+                        {{ __('Event effect on cost per result: :pct from this client\'s own :event in :month.', ['pct' => $pct($sc['cpr_index']), 'event' => $picked['label'], 'month' => \Carbon\Carbon::parse($sc['history']['start'])->translatedFormat('M Y')]) }}
                     @else
                         {{ __('Event effect on cost per result: :pct — a starting assumption until this client has data from a past :event.', ['pct' => $pct($sc['cpr_index']), 'event' => $picked['label']]) }}
                     @endif

@@ -54,7 +54,7 @@
                             $tot['plan'] += $pb ?? 0; $tot['spend'] += $a['spend'] ?? 0; $tot['tres'] += $pr ?? 0; $tot['res'] += $a['results'] ?? 0;
                         @endphp
                         <tr style="border-top:1px solid rgba(148,163,184,.2);{{ $isNow ? 'background:rgba(20,184,166,.06)' : '' }}">
-                            <td style="padding:6px;font-weight:600">{{ \Carbon\Carbon::parse($k.'-01')->format('M Y') }}@if ($isNow)<div style="{{ $muted }}">{{ __('this month, forecast') }}</div>@endif</td>
+                            <td style="padding:6px;font-weight:600">{{ \Carbon\Carbon::parse($k.'-01')->translatedFormat('M Y') }}@if ($isNow)<div style="{{ $muted }}">{{ __('this month, forecast') }}</div>@endif</td>
                             <td style="padding:6px;text-align:end">
                                 @if ($canManage)
                                     <input type="number" min="0" step="0.01" wire:model.blur="plan.{{ $k }}.budget" style="{{ $input }}" aria-label="{{ __('Planned budget :month', ['month' => $k]) }}">

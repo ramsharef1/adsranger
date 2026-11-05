@@ -51,7 +51,7 @@ class Pacing
         };
 
         return [
-            'month' => $start->format('Y-m'), 'month_label' => $start->format('F Y'), 'days_in' => $daysIn, 'full_days' => $full, 'days_left' => $left,
+            'month' => $start->format('Y-m'), 'month_label' => $start->translatedFormat('F Y'), 'days_in' => $daysIn, 'full_days' => $full, 'days_left' => $left,
             'budget' => $budget, 'from_plan' => (bool) $plan?->budget, 'target_results' => $target,
             'spent' => $spent, 'expected' => $expected, 'pace' => $pace, 'status' => $status,
             'main_type' => $mtd['main_type'] ?? $recent['main_type'], 'results' => $results,

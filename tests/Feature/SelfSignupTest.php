@@ -279,6 +279,11 @@ class SelfSignupTest extends TestCase
         $this->assertTrue(Trial::hasEnded($a));
         $this->assertSame(10, PlanLimits::adAccountsLimit($a));
         $this->assertSame('starter', PlanGate::tier($a));
+        // D-61: a self-signup workspace is read-only after its end date (TrialLifecycleTest covers the lifecycle).
+        $this->actingAs($owner)->withSession(['locale' => 'en'])->get('/app/trial-co')->assertOk()
+            ->assertSee('Your trial ended — choose a plan');
+        // An invited / admin-created workspace keeps the old behaviour: Starter, nothing locked.
+        $a->forceFill(['signup_source' => 'admin'])->save();
         $this->actingAs($owner)->withSession(['locale' => 'en'])->get('/app/trial-co')->assertOk()
             ->assertSee('Your Pro trial has ended. Your workspace is on Starter now.');
     }

@@ -18,13 +18,17 @@ return [
     ],
     'languages' => ['ar' => 'العربية', 'en' => 'English'],
     'plans' => ['starter' => 'Starter', 'pro' => 'Pro', 'agency' => 'Agency'],
-    'agency_statuses' => ['active' => 'Active', 'trial' => 'Trial', 'suspended' => 'Suspended'],
+    // `read_only` and `expired` are set only by the D-61 trial lifecycle (self-signup agencies; config/trial.php).
+    'agency_statuses' => ['active' => 'Active', 'trial' => 'Trial', 'read_only' => 'Read-only (trial ended)', 'expired' => 'Closed (trial ended)', 'suspended' => 'Suspended'],
     // Slugs an agency may not use (they clash with /app routes).
     // Agency slugs that would collide with panel-level /app routes (Filament: login, logout, new, profile,
     // password-reset, email-verification, register, multi-factor-authentication; ours: connect). Tenant-route check 2026-11-05.
     'reserved_slugs' => ['new', 'login', 'logout', 'register', 'profile', 'connect', 'password-reset', 'email-verification',
         'multi-factor-authentication', 'two-factor-authentication', 'admin', 'api', 'app', 'auth', 'oauth', 'webhooks', 'livewire', 'filament'],
     'trial_days' => 14,
+    // D-53: the public waitlist page. Null until /waitlist is live (it waits for Brevo, D-22): the invite-only page
+    // and the trial notices then show the support@ mailto link instead.
+    'waitlist_url' => env('WAITLIST_URL'),
     // #158 self-signup. The flag stays OFF until Rami opens it (D-40/D-41/D-42). A super admin's switch in
     // /admin › Platform settings wins over this env default once it has been saved.
     'signup' => [

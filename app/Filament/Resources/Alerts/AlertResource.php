@@ -94,7 +94,7 @@ class AlertResource extends Resource
                 TextColumn::make('rule_key')->label(__('Rule'))->formatStateUsing(fn ($state) => __(config("alerts.rules.$state.label") ?? $state))->toggleable(),
                 TextColumn::make('assignee.name')->label(__('Assigned to'))->placeholder('—'),
                 TextColumn::make('status')->label(__('Status'))->badge()->formatStateUsing(fn ($state) => __($state))->color(fn ($state) => ['open' => 'danger', 'snoozed' => 'warning', 'resolved' => 'success'][$state] ?? 'gray')
-                    ->description(fn (Alert $r) => $r->status === 'snoozed' && $r->snoozed_until ? __('until :date', ['date' => $r->snoozed_until->format('M j')]) : null),
+                    ->description(fn (Alert $r) => $r->status === 'snoozed' && $r->snoozed_until ? __('until :date', ['date' => $r->snoozed_until->translatedFormat('j M')]) : null),
                 TextColumn::make('created_at')->label(__('Raised'))->since(),
             ])
             ->filters([

@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Alerts\AlertEngine;
 use App\Mail\AlertsDigestMail;
 use App\Models\Agency;
+use App\Support\Trial;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Mail;
@@ -20,6 +21,9 @@ class RunAlerts implements ShouldQueue
     public function handle(): void
     {
         Agency::query()->whereIn('status', ['trial', 'active'])->each(function (Agency $a) {
+            if (Trial::isReadOnly($a)) {
+                return; // D-61: no alert runs or digests for a read-only trial workspace (status may lag a day)
+            }
             $local = now($a->timezone ?: 'UTC');
             $today = $local->toDateString();
             if ($local->hour >= 7 && optional($a->alerts_run_on)->toDateString() !== $today) {

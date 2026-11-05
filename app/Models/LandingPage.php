@@ -15,6 +15,11 @@ class LandingPage extends Model
         return ['checked_at' => 'datetime', 'last_seen_at' => 'datetime'];
     }
 
+    public function agency(): BelongsTo
+    {
+        return $this->belongsTo(Agency::class);
+    }
+
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
