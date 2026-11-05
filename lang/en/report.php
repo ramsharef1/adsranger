@@ -50,4 +50,14 @@ return [
     'unsub_done' => 'Done. :email will not get :client\'s scheduled reports any more.',
     'unsub_note' => 'If this was a mistake, ask :agency to add you again.',
     'download_csv' => 'Daily figures (CSV)',
+    // #100 ad gallery
+    'ads_title' => ':client · ads',
+    'ads' => 'Ads',
+    'see_ads' => 'See the ads',
+    'ads_intro' => 'The ads that ran in this period, with their results.',
+    'no_ads' => 'No ads ran in this period.',
+    'no_image' => 'No image from :network',
+    'ctr' => 'Link CTR',
+    'back' => 'Back to the report',
+    'this_network' => 'this ad network',
 ];

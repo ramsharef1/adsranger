@@ -20,6 +20,7 @@ foreach (['privacy', 'terms', 'data-deletion'] as $legalPage) {
 // #56 signed client links: read-only client report, no login
 Route::get('/r/{token}', [ClientReportController::class, 'show'])->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{40}');
 // #57 monthly PDF behind the same link
+Route::get('/r/{token}/ads', [ClientReportController::class, 'ads'])->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{40}');
 Route::get('/r/{token}/pdf', [ClientReportController::class, 'pdf'])->middleware('throttle:10,1')->where('token', '[A-Za-z0-9]{40}');
 
 // #79 client-facing CSV behind the same link (follows hide_spend)
