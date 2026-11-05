@@ -22,9 +22,19 @@ class MetricsImporter
         'campaign_id' => ['campaign id', 'معرف الحملة'],
         'spend' => ['spend', 'cost', 'amount spent', 'amount', 'budget spent', 'الإنفاق', 'المبلغ المنفق', 'التكلفة'],
         'impressions' => ['impressions', 'impr', 'impr.', 'views', 'مرات الظهور', 'الظهور'],
-        'clicks' => ['clicks', 'link clicks', 'all clicks', 'النقرات', 'نقرات الرابط'],
-        'conversions' => ['conversions', 'results', 'leads', 'purchases', 'installs', 'actions', 'النتائج', 'التحويلات', 'العملاء المحتملون'],
+        'reach' => ['reach', 'unique users', 'الوصول'],
+        'clicks' => ['clicks', 'all clicks', 'النقرات'],
+        'link_clicks' => ['link clicks', 'inline link clicks', 'outbound clicks', 'نقرات الرابط'],
+        'conversions' => ['conversions', 'results', 'installs', 'actions', 'النتائج', 'التحويلات'],
+        'leads' => ['leads', 'lead', 'العملاء المحتملون'],
+        'purchases' => ['purchases', 'purchase', 'orders', 'المشتريات', 'الطلبات'],
+        'messages' => ['messages', 'conversations', 'المحادثات', 'الرسائل'],
+        'calls' => ['calls', 'phone calls', 'المكالمات'],
+        'landing_views' => ['landing page views', 'landing views', 'مشاهدات الصفحة'],
+        'add_to_cart' => ['add to cart', 'adds to cart', 'الإضافة إلى السلة'],
+        'checkouts' => ['checkouts', 'checkouts initiated', 'initiate checkout', 'بدء الدفع'],
         'revenue' => ['revenue', 'conversion value', 'purchase value', 'purchases conversion value', 'sales', 'الإيرادات', 'قيمة التحويل'],
+        'result_type' => ['result type', 'optimization goal', 'objective', 'نوع النتيجة', 'الهدف'],
         'currency' => ['currency', 'العملة'],
     ];
 
@@ -152,13 +162,42 @@ class MetricsImporter
                 if (! $d) {
                     continue; // skip totals / blank rows
                 }
+                $clicksVal = (int) static::num($get($r, 'clicks'));
+                $linkClicksVal = (int) static::num($get($r, 'link_clicks')) ?: $clicksVal;
+                $leadsVal = static::num($get($r, 'leads'));
+                $purchasesVal = static::num($get($r, 'purchases'));
+                $messagesVal = static::num($get($r, 'messages'));
+                $callsVal = static::num($get($r, 'calls'));
+                $convVal = static::num($get($r, 'conversions'));
+                $rawType = strtolower(trim((string) $get($r, 'result_type')));
+                $inferredType = $rawType ?: ($purchasesVal > 0 ? 'purchase' : ($leadsVal > 0 ? 'lead' : ($messagesVal > 0 ? 'message' : ($callsVal > 0 ? 'call' : 'conversion'))));
+                $norm = ResultResolver::normalizeRow([
+                    'result_type' => $inferredType,
+                    'spend' => static::num($get($r, 'spend')),
+                    'impressions' => (int) static::num($get($r, 'impressions')),
+                    'reach' => (int) static::num($get($r, 'reach')),
+                    'clicks' => $clicksVal ?: $linkClicksVal,
+                    'link_clicks' => $linkClicksVal,
+                    'results' => $convVal,
+                    'leads' => $leadsVal,
+                    'purchases' => $purchasesVal,
+                    'messages' => $messagesVal,
+                    'calls' => $callsVal,
+                    'landing_views' => static::num($get($r, 'landing_views')),
+                    'add_to_cart' => static::num($get($r, 'add_to_cart')),
+                    'checkouts' => static::num($get($r, 'checkouts')),
+                    'revenue' => static::num($get($r, 'revenue')),
+                ]);
                 $batch[] = [
-                    'agency_id' => $agency->id, 'client_id' => $clientId, 'level' => 'campaign', 'result_type' => 'conversion', 'data_import_id' => $import->id, 'network' => $network, 'date' => $d,
+                    'agency_id' => $agency->id, 'client_id' => $clientId, 'level' => 'campaign', 'result_type' => $norm['result_type'], 'roas_eligible' => $norm['roas_eligible'],
+                    'data_import_id' => $import->id, 'network' => $network, 'date' => $d,
                     'campaign_id' => Str::limit((string) $get($r, 'campaign_id'), 190, '') ?: null,
                     'campaign_name' => Str::limit((string) $get($r, 'campaign_name'), 250, '') ?: null,
-                    'spend' => static::num($get($r, 'spend')), 'impressions' => (int) static::num($get($r, 'impressions')),
-                    'clicks' => (int) static::num($get($r, 'clicks')), 'conversions' => static::num($get($r, 'conversions')), 'results' => static::num($get($r, 'conversions')),
-                    'revenue' => static::num($get($r, 'revenue')),
+                    'spend' => $norm['spend'], 'impressions' => $norm['impressions'], 'reach' => $norm['reach'],
+                    'clicks' => $norm['clicks'], 'link_clicks' => $norm['link_clicks'], 'conversions' => $norm['results'], 'results' => $norm['results'],
+                    'leads' => $norm['leads'], 'purchases' => $norm['purchases'], 'messages' => $norm['messages'], 'calls' => $norm['calls'],
+                    'landing_views' => $norm['landing_views'], 'add_to_cart' => $norm['add_to_cart'], 'checkouts' => $norm['checkouts'],
+                    'revenue' => $norm['revenue'],
                     'currency' => Str::upper(Str::limit((string) ($get($r, 'currency') ?: $agency->currency), 8, '')),
                     'source' => 'import', 'created_at' => $now, 'updated_at' => $now,
                 ];

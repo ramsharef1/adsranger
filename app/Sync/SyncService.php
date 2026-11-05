@@ -101,7 +101,7 @@ class SyncService
             // A connector may cover less than asked (history limits): it then returns 'range' => [from, to], or null for nothing.
             $range = array_key_exists('range', $payload) ? $payload['range'] : [$from, $to];
             if ($range) {
-                DailyMetric::where('ad_account_id', $account->id)->where('source', 'api')->whereBetween('date', [$range[0], $range[1]])->delete();
+                DailyMetric::where('ad_account_id', $account->id)->where('source', 'api')->whereDate('date', '>=', $range[0])->whereDate('date', '<=', $range[1])->delete();
             }
 
             $cols = ['spend', 'impressions', 'reach', 'clicks', 'link_clicks', 'results', 'calls', 'calls_confirmed', 'calls_20s', 'messages',
@@ -109,7 +109,8 @@ class SyncService
             $names = Campaign::where('ad_account_id', $account->id)->pluck('name', 'external_id');
             $batch = [];
             $count = 0;
-            foreach ($payload['rows'] ?? [] as $r) {
+            foreach ($payload['rows'] ?? [] as $rawRow) {
+                $r = \App\Support\ResultResolver::normalizeRow($rawRow);
                 $row = $base + [
                     'client_id' => $account->client_id, 'network' => $account->network->key, 'level' => $r['level'] ?? 'campaign',
                     'date' => $r['date'], 'campaign_id' => $r['campaign'] ?? null, 'campaign_name' => Str::limit((string) ($names[$r['campaign'] ?? ''] ?? ''), 250, '') ?: null,

@@ -139,6 +139,80 @@ class ResultResolver
         return $m;
     }
 
+    /**
+     * #128: Normalise any connector or CSV metric row so cross-network queries, funnels and ROAS work uniformly.
+     */
+    public static function normalizeRow(array $r): array
+    {
+        $type = strtolower(trim((string) ($r['result_type'] ?? ''))) ?: 'conversion';
+        $clicks = (int) ($r['clicks'] ?? 0);
+        $linkClicks = (int) ($r['link_clicks'] ?? 0) ?: $clicks;
+        $results = (float) ($r['results'] ?? ($r['conversions'] ?? 0));
+        $leads = (float) ($r['leads'] ?? 0);
+        $purchases = (float) ($r['purchases'] ?? 0);
+        $messages = (float) ($r['messages'] ?? 0);
+        $calls = (float) ($r['calls'] ?? 0);
+        $thruplays = (float) ($r['thruplays'] ?? 0);
+        $landingViews = (float) ($r['landing_views'] ?? 0);
+        $addToCart = (float) ($r['add_to_cart'] ?? 0);
+        $checkouts = (float) ($r['checkouts'] ?? 0);
+        $revenue = (float) ($r['revenue'] ?? 0);
+
+        if ($type === 'lead' && $leads <= 0 && $results > 0) {
+            $leads = $results;
+        } elseif ($type === 'purchase' && $purchases <= 0 && $results > 0) {
+            $purchases = $results;
+        } elseif ($type === 'message' && $messages <= 0 && $results > 0) {
+            $messages = $results;
+        } elseif ($type === 'call' && $calls <= 0 && $results > 0) {
+            $calls = $results;
+        } elseif ($type === 'thruplay' && $thruplays <= 0 && $results > 0) {
+            $thruplays = $results;
+        } elseif ($type === 'landing_page_view' && $landingViews <= 0 && $results > 0) {
+            $landingViews = $results;
+        } elseif ($type === 'add_to_cart' && $addToCart <= 0 && $results > 0) {
+            $addToCart = $results;
+        } elseif ($type === 'checkout' && $checkouts <= 0 && $results > 0) {
+            $checkouts = $results;
+        }
+
+        if ($results <= 0) {
+            $results = match ($type) {
+                'purchase' => $purchases,
+                'lead' => $leads,
+                'message' => $messages,
+                'call' => $calls ?: (float) ($r['calls_confirmed'] ?? 0),
+                'link_click' => (float) $linkClicks,
+                'landing_page_view' => $landingViews,
+                'thruplay' => $thruplays,
+                'add_to_cart' => $addToCart,
+                'checkout' => $checkouts,
+                default => $purchases ?: ($leads ?: ($messages ?: $calls)),
+            };
+        }
+
+        $roasEligible = (bool) ($r['roas_eligible'] ?? false)
+            || $revenue > 0
+            || in_array($type, (array) config('results.roas_types', ['purchase', 'conversion']), true);
+
+        return array_merge($r, [
+            'result_type' => $type,
+            'clicks' => $clicks,
+            'link_clicks' => $linkClicks,
+            'results' => $results,
+            'leads' => $leads,
+            'purchases' => $purchases,
+            'messages' => $messages,
+            'calls' => $calls,
+            'thruplays' => $thruplays,
+            'landing_views' => $landingViews,
+            'add_to_cart' => $addToCart,
+            'checkouts' => $checkouts,
+            'revenue' => $revenue,
+            'roas_eligible' => $roasEligible,
+        ]);
+    }
+
     public static function label(?string $type, string $locale = 'en'): string
     {
         $l = config('results.labels')[$type] ?? [ucfirst(str_replace('_', ' ', (string) $type)), (string) $type];
