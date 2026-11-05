@@ -11,6 +11,7 @@
     ];
 @endphp
 <x-filament-panels::page>
+    <style>.ar-err{color:var(--danger-600)}.dark .ar-err{color:var(--danger-400)}.ar-warn{color:var(--warning-700)}.dark .ar-warn{color:var(--warning-400)}.ar-tap{min-height:44px;min-width:44px}</style>
     <div style="{{ $muted }}">{{ __('Add tracking to a landing page address so GA4 and your reports show which network, campaign and ad brought each visit.') }}</div>
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px;align-items:start">
@@ -21,10 +22,10 @@
                     <label for="utm-base" style="{{ $label }}">{{ __('Landing page address') }}</label>
                     <div style="display:flex;gap:8px;flex-wrap:wrap">
                         <input id="utm-base" type="url" wire:model.live.debounce.400ms="baseUrl" placeholder="https://example.com/offer" dir="ltr" style="{{ $field }};flex:1;min-width:200px">
-                        <x-filament::button size="sm" color="gray" icon="heroicon-o-signal" wire:click="checkLink" wire:loading.attr="disabled" wire:target="checkLink">{{ __('Check page') }}</x-filament::button>
+                        <x-filament::button class="ar-tap" color="gray" icon="heroicon-o-signal" wire:click="checkLink" wire:loading.attr="disabled" wire:target="checkLink">{{ __('Check page') }}</x-filament::button>
                     </div>
-                    @error('baseUrl')<div style="color:#dc2626;font-size:12px;margin-top:4px">{{ $message }}</div>@enderror
-                    @if ($invalid)<div style="color:#dc2626;font-size:12px;margin-top:4px">{{ __('Enter a full http(s) address.') }}</div>@endif
+                    @error('baseUrl')<div class="ar-err" style="font-size:12px;margin-top:4px">{{ $message }}</div>@enderror
+                    @if ($invalid)<div class="ar-err" style="font-size:12px;margin-top:4px">{{ __('Enter a full http(s) address.') }}</div>@endif
                 </div>
 
                 <div>
@@ -58,8 +59,8 @@
                 <x-slot name="heading">{{ __('Your links') }}</x-slot>
                 @forelse ($links as $i => $link)
                     <div x-data="{ copied: false }" style="display:flex;gap:8px;align-items:flex-start;padding:8px 0;{{ $i ? 'border-top:1px solid rgba(148,163,184,.2)' : '' }}">
-                        <code id="utm-link-{{ $i }}" dir="ltr" style="flex:1;min-width:0;font-size:12px;word-break:break-all;text-align:left">{{ $link }}</code>
-                        <x-filament::button size="xs" color="gray" icon="heroicon-o-clipboard"
+                        <code id="utm-link-{{ $i }}" dir="ltr" style="flex:1;min-width:0;font-size:12px;word-break:break-all;text-align:start">{{ $link }}</code>
+                        <x-filament::button class="ar-tap" size="sm" color="gray" icon="heroicon-o-clipboard" :aria-label="__('Copy link :n', ['n' => $i + 1])"
                             x-on:click="navigator.clipboard.writeText(@js($link)).then(() => { copied = true; setTimeout(() => copied = false, 1500) }).catch(() => { const r = document.createRange(); r.selectNodeContents(document.getElementById('utm-link-{{ $i }}')); const s = window.getSelection(); s.removeAllRanges(); s.addRange(r) })">
                             <span x-show="! copied">{{ __('Copy') }}</span><span x-show="copied" x-cloak>{{ __('Copied') }}</span>
                         </x-filament::button>
@@ -69,7 +70,7 @@
                 @endforelse
 
                 @if (count($warnings))
-                    <ul style="margin:10px 0 0;padding-inline-start:18px;display:grid;gap:4px;font-size:12px;color:#b45309">
+                    <ul class="ar-warn" style="margin:10px 0 0;padding-inline-start:18px;display:grid;gap:4px;font-size:12px">
                         @foreach ($warnings as $w)<li>{{ __($w) }}</li>@endforeach
                     </ul>
                 @endif
@@ -89,7 +90,7 @@
                     @endif
                     @if ($check['error'])<div style="{{ $muted }};margin-top:6px">{{ $check['error'] }}</div>@endif
                     @if (in_array($check['state'], ['redirects', 'broken'], true))
-                        <div style="font-size:12px;margin-top:6px;color:#b45309">{{ __('Redirects can drop UTM parameters. Use the final address as the landing page if you can.') }}</div>
+                        <div class="ar-warn" style="font-size:12px;margin-top:6px">{{ __('Redirects can drop UTM parameters. Use the final address as the landing page if you can.') }}</div>
                     @endif
                 </x-filament::section>
             @endif

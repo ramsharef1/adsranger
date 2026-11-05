@@ -63,6 +63,9 @@ class UtmBuilderTest extends TestCase
         $this->assertContains('The address already had UTM parameters; they were replaced.', $w);
         $this->assertContains('The page is not HTTPS: browsers warn visitors and some networks reject it.', $w);
 
+        $this->assertContains('Arabic letters work, but reports show them encoded; use Latin, e.g. ramadan_2027.',
+            UtmBuilder::warnings('https://example.com/', ['source' => 'google', 'medium' => 'cpc', 'campaign' => 'رمضان']));
+
         $this->assertSame([], UtmBuilder::warnings('https://example.com/', UtmBuilder::presets()['google'] + ['campaign' => 'brand']));
     }
 

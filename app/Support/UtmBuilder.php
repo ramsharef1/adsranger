@@ -113,6 +113,13 @@ class UtmBuilder
                 break;
             }
         }
+        foreach (self::FIELDS as $f) {
+            $v = trim((string) ($utm[$f] ?? $utm[substr($f, 4)] ?? ''));
+            if ($v !== '' && ! static::isPlaceholder($v) && preg_match('/[^\x00-\x7F]/', $v)) {
+                $out[] = 'Arabic letters work, but reports show them encoded; use Latin, e.g. ramadan_2027.';
+                break;
+            }
+        }
         if (preg_match('/[?&]utm_/i', $base)) {
             $out[] = 'The address already had UTM parameters; they were replaced.';
         }
