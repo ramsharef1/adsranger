@@ -22,6 +22,7 @@ class LaunchReadinessAuditor
         'blended_roas_metrics',
         'intent_keyword_maps',
         'psychological_hook_scores',
+        'budget_reallocation_logs',
     ];
 
     /**
