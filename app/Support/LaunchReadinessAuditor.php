@@ -27,6 +27,7 @@ class LaunchReadinessAuditor
         'ux_funnel_heatmaps',
         'network_accelerator_events',
         'agency_operational_audits',
+        'influencer_campaigns',
     ];
 
     /**
