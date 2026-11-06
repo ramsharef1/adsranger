@@ -34,6 +34,6 @@ class Wave12PsychologicalHookScoringTest extends TestCase
 
         $audit = LaunchReadinessAuditor::audit();
         $this->assertTrue($audit['ready']);
-        $this->assertSame(17, $audit['tenant_tables_verified']);
+        $this->assertSame(18, $audit['tenant_tables_verified']);
     }
 }

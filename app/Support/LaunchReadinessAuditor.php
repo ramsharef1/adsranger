@@ -24,6 +24,7 @@ class LaunchReadinessAuditor
         'psychological_hook_scores',
         'budget_reallocation_logs',
         'competitor_creative_radars',
+        'ux_funnel_heatmaps',
     ];
 
     /**
