@@ -20,6 +20,7 @@ class LaunchReadinessAuditor
         'custom_audience_syncs',
         'conversion_health_checks',
         'blended_roas_metrics',
+        'intent_keyword_maps',
     ];
 
     /**
