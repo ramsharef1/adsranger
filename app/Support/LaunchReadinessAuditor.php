@@ -19,6 +19,7 @@ class LaunchReadinessAuditor
         'social_moderation_rules',
         'custom_audience_syncs',
         'conversion_health_checks',
+        'blended_roas_metrics',
     ];
 
     /**
