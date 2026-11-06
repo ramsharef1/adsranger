@@ -35,6 +35,6 @@ class Wave16NetworkAcceleratorsTest extends TestCase
 
         $audit = LaunchReadinessAuditor::audit();
         $this->assertTrue($audit['ready']);
-        $this->assertSame(19, $audit['tenant_tables_verified']);
+        $this->assertSame(20, $audit['tenant_tables_verified']);
     }
 }

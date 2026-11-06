@@ -26,6 +26,7 @@ class LaunchReadinessAuditor
         'competitor_creative_radars',
         'ux_funnel_heatmaps',
         'network_accelerator_events',
+        'agency_operational_audits',
     ];
 
     /**
