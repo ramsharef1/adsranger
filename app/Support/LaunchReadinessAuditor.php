@@ -23,6 +23,7 @@ class LaunchReadinessAuditor
         'intent_keyword_maps',
         'psychological_hook_scores',
         'budget_reallocation_logs',
+        'competitor_creative_radars',
     ];
 
     /**

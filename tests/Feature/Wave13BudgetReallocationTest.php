@@ -34,6 +34,6 @@ class Wave13BudgetReallocationTest extends TestCase
 
         $audit = LaunchReadinessAuditor::audit();
         $this->assertTrue($audit['ready']);
-        $this->assertSame(16, $audit['tenant_tables_verified']);
+        $this->assertSame(17, $audit['tenant_tables_verified']);
     }
 }
