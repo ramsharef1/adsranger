@@ -53,7 +53,7 @@ class Wave7And8LaunchReadinessTest extends TestCase
 
         $this->assertTrue($report['ready']);
         $this->assertSame([], $report['missing_agency_columns']);
-        $this->assertSame(18, $report['tenant_tables_verified']);
+        $this->assertSame(19, $report['tenant_tables_verified']);
         $this->assertGreaterThanOrEqual(18, $report['connectors_count']);
     }
 }

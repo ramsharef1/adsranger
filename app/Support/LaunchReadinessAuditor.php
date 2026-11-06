@@ -25,6 +25,7 @@ class LaunchReadinessAuditor
         'budget_reallocation_logs',
         'competitor_creative_radars',
         'ux_funnel_heatmaps',
+        'network_accelerator_events',
     ];
 
     /**
