@@ -56,6 +56,11 @@ class CurrentClient
         $id ? session([static::key($a) => $id]) : session()->forget(static::key($a));
     }
 
+    public static function resolve(?Agency $a = null): ?Client
+    {
+        return static::get($a);
+    }
+
     public static function get(?Agency $a = null): ?Client
     {
         $id = static::id($a);
