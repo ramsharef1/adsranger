@@ -55,14 +55,7 @@ footer a{color:var(--muted);margin-inline-end:14px}
     <p class="updated">{{ $updated }}</p>
     @include('legal.'.$page.'-'.$lang)
 </main>
-<footer>
-    <span>© {{ date('Y') }} AdsRanger</span>
-    <span>
-        <a href="{{ $base }}/privacy">{{ $titles['privacy'][$lang] }}</a>
-        <a href="{{ $base }}/terms">{{ $titles['terms'][$lang] }}</a>
-        <a href="{{ $base }}/data-deletion">{{ $titles['data-deletion'][$lang] }}</a>
-    </span>
-</footer>
+@include('public.footer', ['lang' => $ar ? 'ar' : 'en'])
 </div>
 @include('public.cookie-banner', ['lang' => $lang])
 </body>
