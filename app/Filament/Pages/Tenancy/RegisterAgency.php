@@ -45,6 +45,7 @@ class RegisterAgency extends RegisterTenant
                 'status' => 'trial',
                 'trial_ends_at' => now()->addDays((int) config('adsranger.trial_days', 14)),
                 'signup_source' => $user->isSuperAdmin() ? 'admin' : 'invite',
+                'onboarding_required' => ! $user->isSuperAdmin(),
             ]);
             $agency->members()->attach($user->id, ['role' => 'owner']);
 

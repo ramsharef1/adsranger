@@ -5,6 +5,7 @@
     $pill = fn ($on) => 'padding:5px 12px;border-radius:99px;font-size:13px;cursor:pointer;border:1px solid '.($on ? '#14B8A6' : 'rgba(148,163,184,.35)').';background:'.($on ? 'rgba(20,184,166,.12)' : 'transparent');
 @endphp
 <x-filament-panels::page>
+    @include('filament.partials.onboarding-checklist')
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between">
         <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
             <button type="button" wire:click="setDay('yesterday')" style="{{ $pill($day === 'yesterday') }}">{{ __('Yesterday') }}</button>

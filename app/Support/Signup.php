@@ -93,6 +93,7 @@ class Signup
                 'status' => 'trial',
                 'trial_ends_at' => now()->addDays((int) config('adsranger.trial_days', 14)),
                 'signup_source' => 'self_signup',
+                'onboarding_required' => true,
             ]);
             $agency->members()->attach($user->id, ['role' => 'owner']);
             $user->forceFill(['signup_payload' => null])->save();

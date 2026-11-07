@@ -15,7 +15,9 @@ use App\Filament\Pages\Tenancy\RegisterAgency;
 use App\Filament\Pages\WhatsNewPage;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\GoogleSignInController;
+use App\Http\Controllers\PushController;
 use App\Http\Middleware\EnsureAgencyTwoStep;
+use App\Http\Middleware\EnsureOnboarded;
 use App\Http\Middleware\SetPanelLocale;
 use App\Http\Middleware\TrialLifecycleGate;
 use App\Models\Agency;
@@ -79,9 +81,9 @@ class AppPanelProvider extends PanelProvider
                 Route::get('export/ad-accounts.csv', [ExportController::class, 'adAccounts'])->middleware('throttle:20,1')->name('export.accounts');
                 Route::get('export/workspace.zip', [ExportController::class, 'workspace'])->middleware('throttle:3,1')->name('export.workspace');
                 // #175 Critical push: subscribe / unsubscribe this device, send a test.
-                Route::post('push/subscribe', [\App\Http\Controllers\PushController::class, 'subscribe'])->middleware('throttle:20,1')->name('push.subscribe');
-                Route::post('push/unsubscribe', [\App\Http\Controllers\PushController::class, 'unsubscribe'])->middleware('throttle:20,1')->name('push.unsubscribe');
-                Route::post('push/test', [\App\Http\Controllers\PushController::class, 'test'])->middleware('throttle:5,1')->name('push.test');
+                Route::post('push/subscribe', [PushController::class, 'subscribe'])->middleware('throttle:20,1')->name('push.subscribe');
+                Route::post('push/unsubscribe', [PushController::class, 'unsubscribe'])->middleware('throttle:20,1')->name('push.unsubscribe');
+                Route::post('push/test', [PushController::class, 'test'])->middleware('throttle:5,1')->name('push.test');
             })
             ->livewireComponents([GoogleFinishSignup::class, GoogleTwoStep::class])
             ->font('IBM Plex Sans Arabic', provider: GoogleFontProvider::class)
@@ -100,7 +102,7 @@ class AppPanelProvider extends PanelProvider
             ->tenantProfile(EditAgencyProfile::class)
             // D-61 trial lifecycle (self-signup only): read-only pages refuse create/edit; closed workspaces open only
             // the "trial ended" page, Plan & usage and the exports. Livewire calls: App\Support\ReadOnlyGuard.
-            ->tenantMiddleware([TrialLifecycleGate::class])
+            ->tenantMiddleware([TrialLifecycleGate::class, EnsureOnboarded::class])
             ->colors([
                 // UX-6: buttons fill with #0F766E (teal-700, white text 5.5:1) in both themes; #14B8A6 stays for accents.
                 'primary' => PanelColors::primary(),

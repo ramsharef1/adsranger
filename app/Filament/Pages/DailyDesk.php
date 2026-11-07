@@ -8,6 +8,7 @@ use App\Jobs\SyncAdAccount;
 use App\Models\AdAccount;
 use App\Models\Alert;
 use App\Models\Client;
+use App\Support\CurrentClient;
 use App\Support\MetricsQuery;
 use App\Support\Periods;
 use BackedEnum;
@@ -40,6 +41,15 @@ class DailyDesk extends Page
     public string $day = 'yesterday';
 
     public ?string $date = null;
+
+    /** D-188: the owner hides the "Finish setup" checklist. */
+    public function hideOnboardingChecklist(): void
+    {
+        $a = Filament::getTenant();
+        if ($a->members()->whereKey(auth()->id())->wherePivotIn('role', ['owner', 'admin'])->exists()) {
+            $a->forceFill(['onboarding_checklist_hidden' => true])->save();
+        }
+    }
 
     public function setDay(string $d): void
     {
@@ -74,7 +84,7 @@ class DailyDesk extends Page
         $a = Filament::getTenant();
         $tz = $a->timezone ?: 'UTC';
         [$from, $to] = Periods::range($this->day, $tz, $this->date);
-        $clients = \App\Support\CurrentClient::apply(Client::visibleTo(auth()->user(), $a)->where('status', 'active'), 'clients.id', $a)->orderBy('name')->get();
+        $clients = CurrentClient::apply(Client::visibleTo(auth()->user(), $a)->where('status', 'active'), 'clients.id', $a)->orderBy('name')->get();
         $alerts = Alert::where('agency_id', $a->id)->where('status', 'open')->whereIn('client_id', $clients->pluck('id'))
             ->selectRaw('client_id, severity, count(*) as n')->groupBy('client_id', 'severity')->get()->groupBy('client_id');
         $rows = $clients->map(fn (Client $c) => ['client' => $c, 't' => MetricsQuery::totals($c, $from, $to), 'alerts' => $alerts[$c->id] ?? collect()]);

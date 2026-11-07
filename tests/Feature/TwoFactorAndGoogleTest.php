@@ -328,7 +328,8 @@ class TwoFactorAndGoogleTest extends TestCase
         $this->assertTrue(AuditLog::where('action', 'agency.self_signup')->exists());
         $this->assertTrue(AuditLog::where('action', 'auth.google_login')->where('user_id', $user->id)->exists());
 
-        // Tenant isolation unaffected.
+        // Tenant isolation unaffected (once past the D-188 onboarding).
+        $agency->forceFill(['onboarding_completed_at' => now()])->save();
         $this->assertFalse($user->canAccessTenant($other));
         $this->actingAs($user)->get('/app/other')->assertNotFound();
         $this->actingAs($user)->get("/app/{$agency->slug}/clients/{$secretClient->id}/edit")->assertNotFound();

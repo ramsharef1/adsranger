@@ -132,6 +132,11 @@ class SelfSignupTest extends TestCase
         $this->assertTrue(PlanGate::allows($agency, 'insights'));
         $this->assertTrue(AuditLog::where('action', 'agency.self_signup')->where('subject_id', $agency->id)->exists());
 
+        // D-188: a new self-signup workspace opens on the required onboarding first.
+        $this->assertTrue((bool) $agency->onboarding_required);
+        $this->actingAs($user)->get('/app/'.$agency->slug)->assertRedirect('/app/'.$agency->slug.'/onboarding');
+        $agency->forceFill(['onboarding_completed_at' => now()])->save();
+
         // Into the workspace (onboarding checklist on the dashboard), with the trial banner and the plans link.
         $this->actingAs($user)->withSession(['locale' => 'en'])->get('/app/'.$agency->slug)->assertOk()
             ->assertSee('14 days left in your Pro trial')->assertSee('See plans');
@@ -371,6 +376,7 @@ class SelfSignupTest extends TestCase
         $user = User::where('email', 'new@fresh-agency.test')->firstOrFail();
         $this->verify($user);
         $mine = $user->agencies()->firstOrFail();
+        $mine->forceFill(['onboarding_completed_at' => now()])->save(); // D-188: past onboarding
 
         $this->assertFalse($user->canAccessTenant($other));
         $this->actingAs($user)->get('/app/other')->assertNotFound();
