@@ -8,7 +8,7 @@
 @if ($ar)
 <tr><td style="font-size:16px;line-height:1.8;text-align:right">
 <p>مرحبًا،</p>
-<p>دعاك <strong>{{ $inviter?->name ?? 'أحد أعضاء الفريق' }}</strong> للانضمام إلى مساحة عمل <strong>{{ $agency->name }}</strong> على أدز رينجر بدور <strong>{{ $roleLabel }}</strong>.</p>
+<p>دعاك <strong>{{ $inviter?->name ?? 'أحد أعضاء الفريق' }}</strong> للانضمام إلى مساحة عمل <strong>{{ $agency->name }}</strong> على <bdi dir="ltr">AdsRanger</bdi> بدور <strong>{{ $roleLabel }}</strong>.</p>
 <p style="padding:12px 0"><a href="{{ $url }}" style="background:#14B8A6;color:#0B1020;text-decoration:none;font-weight:bold;padding:12px 22px;border-radius:8px;display:inline-block">قبول الدعوة</a></p>
 <p style="font-size:13px;color:#4A5473">تنتهي صلاحية الدعوة في {{ $expires->format('Y-m-d') }}. إذا لم تكن تتوقع هذه الرسالة فيمكنك تجاهلها.</p>
 </td></tr>

@@ -17,7 +17,7 @@ class AgencyInvitationMail extends Mailable
         $ar = $this->invite->agency->language === 'ar';
 
         return new Envelope(subject: $ar
-            ? 'دعوة للانضمام إلى '.$this->invite->agency->name.' على أدز رينجر'
+            ? 'دعوة للانضمام إلى '.$this->invite->agency->name.' على AdsRanger'
             : 'You are invited to join '.$this->invite->agency->name.' on AdsRanger');
     }
 

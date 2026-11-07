@@ -5,6 +5,7 @@
     $label = 'display:block;font-size:12px;font-weight:600;margin-bottom:4px';
     $card = 'border:1px solid rgba(148,163,184,.25);border-radius:12px;padding:14px;display:grid;gap:8px';
     $days = (int) config('audit.window_days');
+    $daysPhrase = \App\Support\ArabicCount::phrase($days, 'days');
     $bdi = fn ($v) => '<bdi dir="auto">'.e((string) $v).'</bdi>';
     $ltr = fn ($v) => '<bdi dir="ltr">'.e((string) $v).'</bdi>';
     $money = fn ($amount, $cur) => $ltr(number_format((float) $amount, 0).' '.$cur);
@@ -18,23 +19,23 @@
             default => __($k.'.title', ['name' => $bdi($f->entity_name ?? '—')]),
         };
     };
-    $detail = function ($f) use ($bdi, $ltr, $days) {
+    $detail = function ($f) use ($bdi, $ltr, $days, $daysPhrase) {
         $p = $f->params ?? [];
         $k = 'audit.checks.'.$f->check_key;
 
         return match ($f->check_key) {
-            'rejected_ads' => __($k.'.detail', ['status' => $ltr($p['status'] ?? ''), 'ad_set' => $bdi($p['ad_set'] ?? '—'), 'days' => $days]),
+            'rejected_ads' => __($k.'.detail', ['status' => $ltr($p['status'] ?? ''), 'ad_set' => $bdi($p['ad_set'] ?? '—'), 'days' => $days, 'days_phrase' => $daysPhrase]),
             'tired_ad_set' => ($p['ctr_drop'] ?? null) !== null
                 ? __($k.'.detail_drop', ['frequency' => $ltr($p['frequency'] ?? ''), 'ctr_drop' => $ltr($p['ctr_drop'])])
                 : __($k.'.detail', ['frequency' => $ltr($p['frequency'] ?? '')]),
             'pacing' => __($k.'.detail', ['pace' => $ltr($p['pace'] ?? '')]),
-            'learning_limited' => __($k.'.detail', ['results' => $ltr($p['results'] ?? ''), 'target' => $ltr($p['target'] ?? ''), 'days' => $ltr($p['days'] ?? $days)]),
-            default => __($k.'.detail', ['days' => $days]),
+            'learning_limited' => __($k.'.detail', ['results' => $ltr($p['results'] ?? ''), 'target' => $ltr($p['target'] ?? ''), 'days' => $ltr($p['days'] ?? $days), 'days_phrase' => \App\Support\ArabicCount::phrase((int) ($p['days'] ?? $days), 'days')]),
+            default => __($k.'.detail', ['days' => $days, 'days_phrase' => $daysPhrase]),
         };
     };
 @endphp
 <x-filament-panels::page>
-    <div style="{{ $muted }};font-size:13px;line-height:1.7">{{ __('audit.intro', ['days' => $days]) }}</div>
+    <div style="{{ $muted }};font-size:13px;line-height:1.7">{{ __('audit.intro', ['days' => $days, 'days_phrase' => $daysPhrase]) }}</div>
 
     <div style="display:flex;gap:12px;align-items:end;flex-wrap:wrap">
         <div style="min-width:220px;flex:1;max-width:360px">
@@ -67,7 +68,7 @@
         </div>
 
         @if ($shown->isEmpty() && $hiddenCount === 0)
-            <div style="{{ $card }}">{{ __('audit.none', ['days' => $days]) }}</div>
+            <div style="{{ $card }}">{{ __('audit.none', ['days' => $days, 'days_phrase' => $daysPhrase]) }}</div>
         @endif
 
         @php $dismissedCount = $shown->whereNotNull('dismissed_at')->count(); @endphp

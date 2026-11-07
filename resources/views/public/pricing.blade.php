@@ -46,7 +46,7 @@
             <div class="tier-tag">{{ $lang === 'ar' ? 'أساسيات الربط والتقارير اليومية' : 'Core Connectors & Daily Reporting' }}</div>
             <ul>
                 <li>✓ {{ $lang === 'ar' ? 'لوحة المتابعة اليومية + نقاط الصحة والأهداف' : 'Daily Desk + Health Score & Targets' }}</li>
-                <li>✓ {{ $lang === 'ar' ? 'ربط Meta وGoogle Ads وسجل عملات 13 شهراً' : 'Meta & Google Ads + 13-Month Backfill & FX' }}</li>
+                <li>✓ {{ $lang === 'ar' ? 'ربط Meta و Google Ads وسجل عملات 13 شهرًا' : 'Meta & Google Ads + 13-Month Backfill & FX' }}</li>
                 <li>✓ {{ $lang === 'ar' ? '7 قواعد تنبيه أساسية + ملخص الصباح البريدي' : '7 Core Alert Rules + Morning Email Digest' }}</li>
                 <li>✓ {{ $lang === 'ar' ? 'تقارير شهرية PDF (عربي/إنجليزي) وروابط مشاركة موقعة' : 'Bilingual Monthly PDF Reports & Signed Links' }}</li>
                 <li>✓ {{ $lang === 'ar' ? 'أداة بناء UTM وفحص الروابط + حاسبة الأهداف' : 'UTM Builder, Link Checker & Goal Calculator' }}</li>
@@ -82,7 +82,7 @@
                 <li>○ {{ $lang === 'ar' ? 'مخطط له: نطاق مخصص وألوان وكالتك على تقارير العملاء' : 'Planned: custom domain and your colours on client reports' }}</li>
                 <li>○ {{ $lang === 'ar' ? 'مخطط له: عمليات الوكالة والمالية وحملات المؤثرين' : 'Planned: agency operations, finance and influencer campaigns' }}</li>
                 <li>✓ {{ $lang === 'ar' ? 'خطة الميزانية السنوية مقابل الفعلي' : 'Annual budget plan vs actual' }}</li>
-                <li>○ {{ $lang === 'ar' ? 'مخطط له: Webhooks وتغذية Looker Studio وSheets' : 'Planned: webhooks and a Looker Studio / Sheets feed' }}</li>
+                <li>○ {{ $lang === 'ar' ? 'مخطط له: Webhooks وتغذية Looker Studio و Sheets' : 'Planned: webhooks and a Looker Studio / Sheets feed' }}</li>
             </ul>
         </div>
         <a href="{{ $lang === 'ar' ? '/waitlist' : '/en/waitlist' }}" class="cta">{{ $lang === 'ar' ? 'اطلب دعوة لباقة الوكالات' : 'Request Agency Tier Access' }}</a>

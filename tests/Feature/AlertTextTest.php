@@ -6,6 +6,7 @@ use App\Alerts\AlertEngine;
 use App\Alerts\AlertText;
 use App\Models\Agency;
 use App\Models\Alert;
+use App\Support\ArabicCount;
 use App\Support\DemoData;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -49,5 +50,16 @@ class AlertTextTest extends TestCase
                 $this->assertMatchesRegularExpression('/\p{Arabic}/u', $al->localDetail('ar'), 'No Arabic for: '.$al->detail);
             }
         }
+    }
+
+    public function test_counts_use_the_right_arabic_plural_form(): void
+    {
+        $this->assertSame('أُنفق 50 USD خلال آخر 30 يومًا دون أي نتيجة.', $this->plain(AlertText::detail('50 USD spent in the last 30 days with 0 results.', 'ar')));
+        $this->assertSame('أُنفق 50 USD خلال آخر يومين دون أي نتيجة.', $this->plain(AlertText::detail('50 USD spent in the last 2 days with 0 results.', 'ar')));
+        $this->assertSame('فشلت المزامنة 12 مرة متتالية: timeout', $this->plain(AlertText::detail('Sync failed 12 times in a row: timeout', 'ar')));
+        $this->assertSame('فشلت المزامنة 3 مرات متتالية: timeout', $this->plain(AlertText::detail('Sync failed 3 times in a row: timeout', 'ar')));
+        $this->assertStringContainsString('على 4 عبارات بحث دون', $this->plain(AlertText::detail('20 USD on 4 search terms with no conversions in the last 7 days. Review them in Google Ads → Search terms.', 'ar')));
+        $this->assertStringContainsString('أرسلت الإعلانات 150 نقرة', $this->plain(AlertText::detail('https://x.test — 404. Ads sent 150 clicks here in 30 days.', 'ar')));
+        $this->assertSame('300 يوم', $this->plain(ArabicCount::phrase(300, 'days')));
     }
 }

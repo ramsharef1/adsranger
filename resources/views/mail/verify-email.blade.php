@@ -8,7 +8,7 @@
 @if ($ar)
 <tr><td dir="rtl" lang="ar" style="font-size:16px;line-height:1.8;text-align:right">
 <p>مرحبًا {{ $name }}،</p>
-<p>أنشأت حسابًا على أدز رينجر. أكّد بريدك الإلكتروني لبدء الفترة التجريبية وإعداد مساحة عملك.</p>
+<p>أنشأت حسابًا على <bdi dir="ltr">AdsRanger</bdi>. أكّد بريدك الإلكتروني لبدء الفترة التجريبية وإعداد مساحة عملك.</p>
 <p style="padding:12px 0"><a href="{{ $url }}" style="background:#0F766E;color:#ffffff;text-decoration:none;font-weight:bold;padding:14px 24px;border-radius:8px;display:inline-block;min-height:16px">أكّد بريدي الإلكتروني</a></p>
 <p style="font-size:13px;color:#4A5473">الرابط صالح لمدة 60 دقيقة.</p>
 <p style="font-size:13px;color:#4A5473">إن لم تطلب ذلك، تجاهل هذه الرسالة؛ لن يتغير شيء.</p>

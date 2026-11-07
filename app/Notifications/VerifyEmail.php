@@ -23,7 +23,7 @@ class VerifyEmail extends FilamentVerifyEmail
         $ar = $this->locale !== 'en';
 
         return (new MailMessage)
-            ->subject($ar ? 'أكّد بريدك الإلكتروني لبدء استخدام أدز رينجر' : 'Confirm your email to start using AdsRanger')
+            ->subject($ar ? 'أكّد بريدك الإلكتروني لبدء استخدام AdsRanger' : 'Confirm your email to start using AdsRanger')
             ->replyTo(config('adsranger.signup.support_email'))
             ->view('mail.verify-email', ['url' => $url, 'ar' => $ar, 'name' => $notifiable->name]);
     }

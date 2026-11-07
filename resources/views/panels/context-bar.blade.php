@@ -17,7 +17,7 @@
         $current = CurrentClient::id($agency);
         $fresh = CurrentClient::freshness($agency);
         $amber = 'background:rgba(245,158,11,.16);border-color:rgba(245,158,11,.55)';
-        $chip = 'display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:2px 10px;border-radius:99px;border:1px solid rgba(148,163,184,.35);font-size:13px';
+        $chip = 'display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:2px 10px;border-radius:99px;border:1px solid rgba(148,163,184,.35);font-size:13px';
         $teamMembers = $canViewAs ? $agency->members()->where('users.id', '!=', $user->id)->orderBy('users.name')->get(['users.id', 'users.name']) : collect();
     @endphp
     @if ($viewAs)
@@ -27,7 +27,7 @@
                 <strong>{{ __('Viewing as :target', ['target' => $viewAs['label']]) }}</strong>
                 · {{ __('Preview mode is read-only') }}
             </span>
-            <a href="?view_as=off" style="font-weight:700;text-decoration:underline;min-height:32px;display:inline-flex;align-items:center">{{ __('Exit preview') }}</a>
+            <a href="?view_as=off" style="font-weight:700;text-decoration:underline;min-height:44px;display:inline-flex;align-items:center">{{ __('Exit preview') }}</a>
         </div>
     @endif
     <div data-context-bar role="region" aria-label="{{ __('Where you are') }}"
@@ -45,7 +45,7 @@
             <span>{{ __('Client') }}:</span>
             <select aria-label="{{ __('Current client') }}"
                     onchange="(function (v) { var u = new URL(window.location.href); u.searchParams.set('client', v); window.location.href = u.toString(); })(this.value)"
-                    style="min-height:32px;border:0;background:transparent;font:inherit;font-weight:600;max-width:220px;cursor:pointer">
+                    style="min-height:44px;border:0;background:transparent;font:inherit;font-weight:600;max-width:220px;cursor:pointer">
                 <option value="all" @selected(! $current)>{{ __('All clients') }}</option>
                 @foreach ($clients as $c)
                     <option value="{{ $c->id }}" @selected($current === $c->id)>{{ $c->name }}</option>
@@ -71,7 +71,7 @@
                 <span>{{ __('View as') }}:</span>
                 <select aria-label="{{ __('View as') }}"
                         onchange="(function (v) { var u = new URL(window.location.href); u.searchParams.set('view_as', v); window.location.href = u.toString(); })(this.value)"
-                        style="min-height:32px;border:0;background:transparent;font:inherit;font-weight:600;max-width:210px;cursor:pointer">
+                        style="min-height:44px;border:0;background:transparent;font:inherit;font-weight:600;max-width:210px;cursor:pointer">
                     <option value="off" @selected(! $viewAs)>{{ __('Myself') }}</option>
                     @foreach (['admin', 'manager', 'analyst'] as $rOpt)
                         @if (ViewAs::mayPreviewRole($user, $agency, $rOpt))

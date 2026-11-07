@@ -34,7 +34,7 @@
         .btn-secondary { background:rgba(30,41,59,0.7); color:var(--text-main); border:1px solid var(--border-color); padding:14px 28px; border-radius:12px; font-weight:600; text-decoration:none; font-size:1rem; transition:all 0.2s; }
         .btn-secondary:hover { background:rgba(30,41,59,1); border-color:#475569; }
 
-        .metrics-bar { max-width:1040px; margin:0 auto 70px; padding:0 24px; display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:16px; }
+        .metrics-bar { max-width:1040px; margin:0 auto 70px; padding:0 24px; display:grid; grid-template-columns:repeat(auto-fit, minmax(min(210px, 100%), 1fr)); gap:16px; }
         .metric-card { background:rgba(17,24,39,0.7); border:1px solid var(--border-color); border-radius:14px; padding:20px; text-align:center; backdrop-filter:blur(8px); }
         .metric-val { font-size:1.75rem; font-weight:700; color:#5EEAD4; margin-bottom:4px; }
         .metric-lbl { font-size:0.88rem; color:var(--text-muted); }
@@ -44,12 +44,12 @@
         .section-header h2 { font-size:2.2rem; font-weight:700; margin:0 0 12px; }
         .section-header p { color:var(--text-muted); font-size:1.05rem; }
 
-        .grid-3 { display:grid; grid-template-columns:repeat(auto-fit, minmax(340px, 1fr)); gap:24px; }
+        .grid-3 { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap:24px; }
         .card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:18px; padding:32px 28px; display:flex; flex-direction:column; justify-content:space-between; transition:transform 0.2s, border-color 0.2s; }
         .card:hover { transform:translateY(-4px); border-color:rgba(20,184,166,0.4); }
         .card h3 { font-size:1.3rem; margin:0 0 12px; }
         .card p { color:var(--text-muted); font-size:0.95rem; margin:0 0 20px; }
-        .card-link { color:#5EEAD4; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-size:0.92rem; }
+        .card-link { color:#5EEAD4; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-size:0.92rem; min-height:44px; }
         .card-link:hover { text-decoration:underline; }
 
         .networks-ticker { background:rgba(15,23,42,0.8); border-top:1px solid var(--border-color); border-bottom:1px solid var(--border-color); padding:28px 0; overflow:hidden; white-space:nowrap; }
@@ -96,7 +96,7 @@
             <span class="net-pill">{{ $net }}</span>
         @endforeach
         @foreach (['Meta', 'Google Ads', 'TikTok', 'Snapchat', 'Google Analytics 4', 'Microsoft Ads', 'LinkedIn', 'X', 'Pinterest', 'Reddit', 'Apple Ads', 'Amazon Ads', 'Taboola', 'Outbrain'] as $net)
-            <span class="net-pill">{{ $net }}</span>
+            <span class="net-pill" aria-hidden="true">{{ $net }}</span>
         @endforeach
     </div>
 </div>

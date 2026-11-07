@@ -16,7 +16,7 @@
 <p>Other platforms (Google, TikTok, Snapchat, Microsoft, LinkedIn, X) let you remove connected apps from their security or app settings in the same way.</p>
 
 <h2>3. Ask us to delete all your data</h2>
-<p>Workspace owners can also close and delete their workspace directly inside AdsRanger under <strong>Data &gt; Export data &gt; Delete workspace</strong>, and team members can delete their personal account under <strong>Data &gt; Export data &gt; Delete my account</strong>.</p>
+<p>When an owner deletes a workspace, we close access at once and keep the data for 30 days, during which it can be restored through support. After that, our team deletes it for good.</p>
 <p>Email <a href="mailto:privacy@adsranger.com?subject=Data%20deletion%20request">privacy@adsranger.com</a> from the address on your account with the subject "Data deletion request". Tell us whether you want one platform's data or your whole account deleted.</p>
 <ul>
 <li>We confirm within 3 working days and give you a reference code.</li>

@@ -39,6 +39,7 @@ p,li{color:#d6dbeb;font-size:16px}
 ul,ol{padding-inline-start:22px}
 li{margin:4px 0}
 a{color:var(--acc)}
+main a[href^="mailto:"]{display:inline-flex;align-items:center;min-height:44px}
 .note{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:18px 0}
 footer{border-top:1px solid var(--line);padding:22px 0;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
 footer a{color:var(--muted);margin-inline-end:14px}
