@@ -18,8 +18,8 @@ Route::get('/en', fn () => view('welcome', ['lang' => 'en']));
 // Public Website Phase 1 & Phase 2: Waitlist, Ramadan 2027, Pricing, Integrations, Demo Report, MENA Calendar, Security, Sitemap
 Route::get('/waitlist', [PublicSiteController::class, 'waitlist'])->defaults('lang', 'ar');
 Route::get('/en/waitlist', [PublicSiteController::class, 'waitlist'])->defaults('lang', 'en');
-Route::post('/waitlist', [PublicSiteController::class, 'submitWaitlist'])->defaults('lang', 'ar')->middleware('throttle:10,1');
-Route::post('/en/waitlist', [PublicSiteController::class, 'submitWaitlist'])->defaults('lang', 'en')->middleware('throttle:10,1');
+Route::post('/waitlist', [PublicSiteController::class, 'submitWaitlist'])->defaults('lang', 'ar');
+Route::post('/en/waitlist', [PublicSiteController::class, 'submitWaitlist'])->defaults('lang', 'en');
 
 Route::get('/ramadan-2027', [PublicSiteController::class, 'ramadan'])->defaults('lang', 'ar');
 Route::get('/en/ramadan-2027', [PublicSiteController::class, 'ramadan'])->defaults('lang', 'en');

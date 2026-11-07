@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\WaitlistEntry;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class PublicSiteController extends Controller
@@ -14,29 +16,63 @@ class PublicSiteController extends Controller
         return view('public.waitlist', ['lang' => $lang === 'en' ? 'en' : 'ar']);
     }
 
+    /** P-1 waitlist (D-152, D-159, D-172, D-173): consent is recorded; the same success message shows for new and existing emails (UX-33). */
     public function submitWaitlist(Request $request, string $lang = 'ar')
     {
         $lang = $lang === 'en' ? 'en' : 'ar';
+        $target = $lang === 'en' ? '/en/waitlist' : '/waitlist';
+        $ar = $lang === 'ar';
+
+        $limiterKey = 'waitlist:'.$request->ip();
+        if (RateLimiter::tooManyAttempts($limiterKey, 5)) {
+            return redirect($target)->withInput()->withErrors([
+                'form' => $ar ? 'محاولات كثيرة. انتظر ساعة ثم حاول مجددًا.' : 'Too many tries. Please wait an hour and try again.',
+            ]);
+        }
+        RateLimiter::hit($limiterKey, 3600);
+
+        if (filled($request->input('website'))) {
+            return redirect($target)->with('waitlist_saved', true);
+        }
+
+        $agencyMessage = $ar ? 'أدخل اسم وكالتك (حرفان على الأقل).' : 'Enter your agency name (at least 2 characters).';
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:120'],
-            'agency_name' => ['nullable', 'string', 'max:140'],
             'email' => ['required', 'email:filter', 'max:190'],
-            'monthly_spend' => ['nullable', 'string', 'max:60'],
-            'notes' => ['nullable', 'string', 'max:500'],
+            'agency_name' => ['required', 'string', 'min:2', 'max:140'],
+            'country' => ['required', Rule::in(WaitlistEntry::COUNTRIES)],
+            'consent' => ['accepted'],
+            'name' => ['nullable', 'string', 'max:120'],
+            'monthly_spend' => ['nullable', Rule::in(WaitlistEntry::SPEND_RANGES)],
+            'networks' => ['nullable', 'array'],
+            'networks.*' => [Rule::in(WaitlistEntry::NETWORKS)],
+        ], [
+            'email.required' => $ar ? 'أدخل بريدك الإلكتروني للعمل.' : 'Enter your work email.',
+            'email.email' => $ar ? 'أدخل بريدًا بصيغة name@agency.com.' : 'Enter an email like name@agency.com.',
+            'email.max' => $ar ? 'أدخل بريدًا بصيغة name@agency.com.' : 'Enter an email like name@agency.com.',
+            'agency_name.required' => $agencyMessage,
+            'agency_name.min' => $agencyMessage,
+            'agency_name.max' => $agencyMessage,
+            'country.required' => $ar ? 'اختر دولتك.' : 'Choose your country.',
+            'country.in' => $ar ? 'اختر دولتك.' : 'Choose your country.',
+            'consent.accepted' => $ar ? 'ضع علامة في المربع للموافقة على رسائل الإطلاق.' : 'Tick the box to agree to launch emails.',
         ]);
+
+        $name = trim((string) ($data['name'] ?? ''));
+        $networks = array_values(array_unique($data['networks'] ?? []));
 
         WaitlistEntry::updateOrCreate(
             ['email' => strtolower(trim($data['email']))],
             [
-                'name' => trim($data['name']),
-                'agency_name' => isset($data['agency_name']) ? trim((string) $data['agency_name']) : null,
+                'name' => $name !== '' ? $name : null,
+                'agency_name' => trim($data['agency_name']),
+                'country' => $data['country'],
                 'monthly_spend' => $data['monthly_spend'] ?? null,
+                'networks' => $networks !== [] ? implode(',', $networks) : null,
                 'lang' => $lang,
-                'notes' => isset($data['notes']) ? trim((string) $data['notes']) : null,
+                'consent_at' => now(),
+                'consent_text_version' => WaitlistEntry::CONSENT_TEXT_VERSION,
             ]
         );
-
-        $target = $lang === 'en' ? '/en/waitlist' : '/waitlist';
 
         return redirect($target)->with('waitlist_saved', true);
     }

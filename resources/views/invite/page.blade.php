@@ -25,7 +25,7 @@ button,.btn{display:inline-block;width:100%;margin-top:18px;padding:11px;border:
 </head>
 <body>
 <div class="card">
-    <div class="logo"><img src="/brand/adsranger-mark-teal.svg" alt=""><span>Ads<b>Ranger</b></span></div>
+    <div class="logo" role="img" aria-label="AdsRanger" translate="no"><img src="/brand/adsranger-mark-teal.svg" alt=""><span aria-hidden="true">Ads<b>Ranger</b></span></div>
 
     @if ($state === 'invalid')
         <h1>{{ $t('الدعوة غير صالحة', 'This invitation is not valid') }}</h1>

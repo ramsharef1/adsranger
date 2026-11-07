@@ -47,7 +47,7 @@ footer a{color:var(--muted);margin-inline-end:14px}
 <body>
 <div class="wrap">
 <header>
-    <a class="logo" href="{{ $base ?: '/' }}"><img src="/brand/adsranger-mark-teal.svg" alt=""><span>Ads<b>Ranger</b></span></a>
+    <a class="logo" href="{{ $base ?: '/' }}" aria-label="AdsRanger" translate="no"><img src="/brand/adsranger-mark-teal.svg" alt=""><span aria-hidden="true">Ads<b>Ranger</b></span></a>
     <a class="lang" href="{{ $other }}">{{ $ar ? 'English' : 'العربية' }}</a>
 </header>
 <main>

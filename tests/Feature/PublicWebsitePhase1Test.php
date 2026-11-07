@@ -20,24 +20,73 @@ class PublicWebsitePhase1Test extends TestCase
 
     public function test_waitlist_pages_render_and_store_entries_in_ar_and_en(): void
     {
-        $this->get('/waitlist')->assertOk()->assertSee('قائمة الانتظار');
-        $this->get('/en/waitlist')->assertOk()->assertSee('Join the waitlist');
+        $this->get('/waitlist')->assertOk()->assertSee('قائمة انتظار')->assertSee('name="consent"', false)->assertSee('name="country"', false);
+        $this->get('/en/waitlist')->assertOk()->assertSee('Join the AdsRanger waitlist');
 
         $this->post('/waitlist', [
-            'name' => 'رامي الشريف',
             'agency_name' => 'وكالة عمان الرقمية',
-            'email' => 'rami@example.com',
+            'email' => 'Rami@Example.com',
+            'country' => 'JO',
+            'consent' => '1',
             'monthly_spend' => '50k_200k',
-            'notes' => 'Meta, Google, TikTok',
-        ])->assertRedirect('/waitlist');
+            'networks' => ['meta', 'tiktok'],
+        ])->assertRedirect('/waitlist')->assertSessionHas('waitlist_saved');
 
-        $this->assertDatabaseHas('waitlist_entries', [
-            'email' => 'rami@example.com',
-            'agency_name' => 'وكالة عمان الرقمية',
-            'lang' => 'ar',
-        ]);
+        $entry = WaitlistEntry::sole();
+        $this->assertSame('rami@example.com', $entry->email);
+        $this->assertSame('JO', $entry->country);
+        $this->assertSame('meta,tiktok', $entry->networks);
+        $this->assertNull($entry->name);
+        $this->assertSame(WaitlistEntry::CONSENT_TEXT_VERSION, $entry->consent_text_version);
+        $this->assertTrue($entry->mayBeEmailed());
 
+        $this->followingRedirects()->post('/en/waitlist', [
+            'agency_name' => 'Amman Digital', 'email' => 'rami@example.com', 'country' => 'JO', 'consent' => '1',
+        ])->assertSee('Thanks, you&#039;re on the list', false);
         $this->assertSame(1, WaitlistEntry::count());
+    }
+
+    /** D-152 / D-159: country and an unticked consent box are required; the honeypot saves nothing. */
+    public function test_waitlist_requires_country_and_consent_and_ignores_bots(): void
+    {
+        $this->post('/en/waitlist', ['agency_name' => 'A', 'email' => 'bad'])
+            ->assertSessionHasErrors(['email', 'agency_name', 'country', 'consent']);
+
+        $this->post('/waitlist', ['agency_name' => 'وكالة', 'email' => 'a@b.co', 'country' => 'ZZ'])
+            ->assertSessionHasErrors(['country' => 'اختر دولتك.', 'consent' => 'ضع علامة في المربع للموافقة على رسائل الإطلاق.']);
+
+        $this->post('/waitlist', [
+            'agency_name' => 'Bot', 'email' => 'bot@example.com', 'country' => 'JO', 'consent' => '1', 'website' => 'http://spam.test',
+        ])->assertRedirect('/waitlist')->assertSessionHas('waitlist_saved');
+
+        $this->assertSame(0, WaitlistEntry::count());
+    }
+
+    public function test_waitlist_allows_five_submits_per_ip_per_hour(): void
+    {
+        for ($i = 0; $i < 5; $i++) {
+            $this->post('/en/waitlist', ['agency_name' => 'Agency', 'email' => "a{$i}@example.com", 'country' => 'AE', 'consent' => '1']);
+        }
+
+        $this->post('/en/waitlist', ['agency_name' => 'Agency', 'email' => 'a6@example.com', 'country' => 'AE', 'consent' => '1'])
+            ->assertSessionHasErrors(['form' => 'Too many tries. Please wait an hour and try again.']);
+        $this->assertSame(5, WaitlistEntry::count());
+    }
+
+    /** P-0 shared checks: no banned strings; AdsRanger is one word. */
+    public function test_public_pages_avoid_banned_strings(): void
+    {
+        $banned = ['Ads Ranger', 'Sep 2027', 'سبتمبر 2027', '14+', 'الشبكات الإعلانية', 'Staging environment', 'بيئة تجريبية', 'أدز رينجر'];
+
+        foreach (['/waitlist', '/en/waitlist', '/ramadan-2027', '/en/ramadan-2027'] as $url) {
+            $html = $this->get($url)->assertOk()->getContent();
+            foreach ($banned as $phrase) {
+                $this->assertStringNotContainsString($phrase, $html, "{$url} contains {$phrase}");
+            }
+        }
+
+        $this->get('/ramadan-2027')->assertSee('8 فبراير 2027')->assertSee('أم القرى')->assertDontSee('2027-02-08')->assertDontSee('/app/login" class', false);
+        $this->get('/en/ramadan-2027')->assertSee('8 February 2027')->assertSee('3,600 USD')->assertDontSee('Open MENA Calendar in App');
     }
 
     public function test_ramadan_2027_planner_renders_in_ar_and_en(): void

@@ -1372,5 +1372,7 @@
     "The file is too large: the limit is 200 KB.": "الملف كبير جدًا: الحد 200 كيلوبايت.",
     "This SVG has scripts or links to other files. Export a plain SVG or use a PNG.": "ملف SVG هذا يحتوي على نصوص برمجية أو روابط لملفات أخرى. صدّر ملف SVG بسيطًا أو استخدم PNG.",
     "Use an SVG or PNG file.": "استخدم ملف SVG أو PNG.",
-    "Use an image at least 400 px wide.": "استخدم صورة بعرض 400 بكسل على الأقل."
+    "Use an image at least 400 px wide.": "استخدم صورة بعرض 400 بكسل على الأقل.",
+    "Consent": "الموافقة",
+    "None, do not email": "لا توجد، لا ترسل له بريدًا"
 }
