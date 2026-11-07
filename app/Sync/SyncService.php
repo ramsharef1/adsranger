@@ -3,13 +3,18 @@
 namespace App\Sync;
 
 use App\Connectors\ConnectorRegistry;
+use App\Jobs\RunAccountAudit;
+use App\Jobs\SyncAdAccount;
 use App\Models\Ad;
 use App\Models\AdAccount;
 use App\Models\AdSet;
+use App\Models\Audit;
 use App\Models\AuditLog;
 use App\Models\Campaign;
 use App\Models\DailyMetric;
 use App\Models\SyncRun;
+use App\Support\LandingPages;
+use App\Support\ResultResolver;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -32,6 +37,7 @@ class SyncService
             $run->update(['status' => 'ok', 'rows' => $rows, 'finished_at' => now()]);
             $account->update(['sync_status' => 'ok', 'sync_error' => null, 'sync_failures' => 0, 'last_synced_at' => now()]);
             $account->connection?->update(['last_synced_at' => now(), 'status' => 'active', 'last_error' => null]);
+            static::queueFirstAudit($account);
         } catch (ReportPending $e) {
             // Asynchronous report not ready yet: try again in 10 minutes, for up to about 4 hours.
             $run->update(['status' => 'pending', 'error' => Str::limit($e->getMessage(), 500), 'finished_at' => now()]);
@@ -39,7 +45,7 @@ class SyncService
             $tries = SyncRun::where('ad_account_id', $account->id)->where('from', $from)->where('to', $to)->where('status', 'pending')
                 ->where('created_at', '>', now()->subHours(5))->count();
             if ($tries < 24) {
-                \App\Jobs\SyncAdAccount::dispatch($account->id, $from, $to, $kind)->delay(now()->addMinutes(10));
+                SyncAdAccount::dispatch($account->id, $from, $to, $kind)->delay(now()->addMinutes(10));
             } else {
                 $run->update(['status' => 'error', 'error' => 'The network did not finish the report within 4 hours.']);
                 $account->update(['sync_status' => 'error', 'sync_error' => 'The network did not finish the report within 4 hours.', 'sync_failures' => $account->sync_failures + 1]);
@@ -54,6 +60,19 @@ class SyncService
         }
 
         return $run;
+    }
+
+    /** #173: the first successful sync of a client's account queues its day-1 audit (once per client). */
+    public static function queueFirstAudit(AdAccount $account): void
+    {
+        if (! $account->client_id || Audit::where('client_id', $account->client_id)->exists()) {
+            return;
+        }
+        try {
+            RunAccountAudit::dispatch($account->client_id, 'first_sync')->delay(now()->addMinute());
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 
     /** Store a normalised payload. Re-pulling a date range replaces that range. Returns metric rows written. */
@@ -110,7 +129,7 @@ class SyncService
             $batch = [];
             $count = 0;
             foreach ($payload['rows'] ?? [] as $rawRow) {
-                $r = \App\Support\ResultResolver::normalizeRow($rawRow);
+                $r = ResultResolver::normalizeRow($rawRow);
                 $row = $base + [
                     'client_id' => $account->client_id, 'network' => $account->network->key, 'level' => $r['level'] ?? 'campaign',
                     'date' => $r['date'], 'campaign_id' => $r['campaign'] ?? null, 'campaign_name' => Str::limit((string) ($names[$r['campaign'] ?? ''] ?? ''), 250, '') ?: null,
@@ -139,7 +158,7 @@ class SyncService
                 GoogleStore::store($account, $payload['google'], $from, $to);
             }
             if (! empty($payload['landing_urls'])) {
-                \App\Support\LandingPages::register($account, $payload['landing_urls'], $account->network->key === 'meta' ? 'meta' : 'google');
+                LandingPages::register($account, $payload['landing_urls'], $account->network->key === 'meta' ? 'meta' : 'google');
             }
 
             return $count;
@@ -163,7 +182,7 @@ class SyncService
     public static function queueBackfill(AdAccount $account): void
     {
         foreach (static::backfillRanges() as [$from, $to]) {
-            \App\Jobs\SyncAdAccount::dispatch($account->id, $from, $to, 'backfill');
+            SyncAdAccount::dispatch($account->id, $from, $to, 'backfill');
         }
         $account->update(['backfilled_at' => now()]);
         AuditLog::record('sync.backfill_queued', $account->agency, ['ad_account_id' => $account->id, 'months' => self::BACKFILL_MONTHS]);

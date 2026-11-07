@@ -1374,5 +1374,8 @@
     "Use an SVG or PNG file.": "استخدم ملف SVG أو PNG.",
     "Use an image at least 400 px wide.": "استخدم صورة بعرض 400 بكسل على الأقل.",
     "Consent": "الموافقة",
-    "None, do not email": "لا توجد، لا ترسل له بريدًا"
+    "None, do not email": "لا توجد، لا ترسل له بريدًا",
+    "Account audit": "تدقيق الحساب",
+    "Audit finished": "انتهى التدقيق",
+    "You can run the audit again in a few minutes.": "يمكنك تشغيل التدقيق مرة أخرى بعد دقائق."
 }

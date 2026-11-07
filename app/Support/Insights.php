@@ -249,7 +249,7 @@ class Insights
             $drop = $ctrNow !== null && $ctrThen ? (1 - $ctrNow / $ctrThen) * 100 : null;
             $status = $freq >= $cfg['frequency'] && $drop !== null && $drop >= $cfg['ctr_drop_pct'] ? 'saturating'
                 : ($freq >= $cfg['frequency'] ? 'high_frequency' : 'ok');
-            $rows[] = ['name' => $set->name ?? $set->external_id, 'status_api' => $set->status, 'reach' => (int) $r->reach, 'frequency' => $freq,
+            $rows[] = ['ref' => $set->id, 'name' => $set->name ?? $set->external_id, 'status_api' => $set->status, 'reach' => (int) $r->reach, 'frequency' => $freq,
                 'ctr_now' => $ctrNow, 'ctr_then' => $ctrThen, 'ctr_drop' => $drop, 'state' => $status];
         }
         usort($rows, fn ($a, $b) => $b['frequency'] <=> $a['frequency']);

@@ -31,6 +31,10 @@ return [
 
     'features' => [
         // key => tier, register row(s), names and one-line descriptions (EN / AR) for the locked state (EX-50).
+        // #173 (FR-016): every plan gets the audit; Starter sees the top 3 findings, Pro and up see all of them.
+        'account_audit_full' => ['tier' => 'pro', 'refs' => [173, 31, 32, 33, 34],
+            'name' => ['en' => 'Full account audit', 'ar' => 'تدقيق الحساب الكامل'],
+            'what' => ['en' => 'See every finding of the account audit, up to 10, ranked by money at risk.', 'ar' => 'اطّلع على كل نتائج تدقيق الحساب، حتى 10 نتائج، مرتبة حسب المبلغ المعرّض للخطر.']],
         'forecast' => ['tier' => 'pro', 'refs' => [37],
             'name' => ['en' => 'Month-end forecast', 'ar' => 'توقع نهاية الشهر'],
             'what' => ['en' => 'See where spend and results will land by the end of the month.', 'ar' => 'اعرف أين سيصل الإنفاق والنتائج في نهاية الشهر.']],

@@ -134,7 +134,7 @@ Before relying on a package's API, confirm its installed version:
 ## Recent Architecture Additions (Wave 19)
 - #69 Ask the Platform (AR/EN natural language analyst in IntelligenceHubPage).
 - #99 Weekly AI Account Review (Top 3 actions per client).
-- #105 & #62 Shareable Client Onboarding & Prospect Audit Links (/onboard/{token}).
+- #105 Shareable client onboarding form (/onboard/{token}, module agency_ops_hub, off). It is not the #62 prospect audit: that is #173b, not built yet.
 - #77 & #115 Outbound Webhooks & Looker Studio / Google Sheets JSON Feed (/api/v1/export/{token}).
 - /pricing UX-65 & D-07 canonical tier name alignment.
 
@@ -148,3 +148,8 @@ Before relying on a package's API, confirm its installed version:
 - Certified MENA Agency Partner Directory (/partners & /en/partners).
 - Regional Performance Case Studies & Playbooks Hub (/resources & /en/resources).
 - Client Churn Risk & Health Scorecards (#110) & Agency Partner Listings.
+
+## Recent Architecture Additions (E1 #173 - Day-1 account audit)
+- App\Audit\AccountAudit::run(Client, trigger, ?User): read-only checks (rejected ads, spending limit, spend with no results, tired ad sets, pacing, learning-limited estimate, default names), up to 10 findings ranked by money at risk; thresholds in config/audit.php.
+- Tables audits + audit_findings; finding text is built at view time from check_key + params (lang/*/audit.php).
+- SyncService::queueFirstAudit queues RunAccountAudit after a client's first successful sync; Results › Account audit page (Starter top 3, plan feature account_audit_full = Pro).
