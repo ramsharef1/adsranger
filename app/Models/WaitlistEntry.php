@@ -16,6 +16,9 @@ class WaitlistEntry extends Model
     public const SPEND_RANGES = ['under_10k', '10k_50k', '50k_200k', 'over_200k'];
 
     /** @var list<string> */
+    /** D-189: agency · freelancer · a business running its own ads (optional). */
+    public const AUDIENCES = ['agency', 'freelancer', 'business'];
+
     public const NETWORKS = ['meta', 'google', 'tiktok', 'snapchat', 'microsoft', 'linkedin', 'x', 'other'];
 
     protected $guarded = [];

@@ -12,6 +12,7 @@
                         <tr style="text-align:start;border-bottom:1px solid rgba(148,163,184,.25)">
                             <th style="padding:8px">{{ __('Name') }}</th>
                             <th style="padding:8px">{{ __('Agency') }}</th>
+                            <th style="padding:8px">{{ __('onboarding.step1.title') }}</th>
                             <th style="padding:8px">{{ __('Email') }}</th>
                             <th style="padding:8px">{{ __('Monthly spend') }}</th>
                             <th style="padding:8px">{{ __('Language') }}</th>
@@ -26,6 +27,7 @@
                             <tr style="border-top:1px solid rgba(148,163,184,.18)">
                                 <td style="padding:8px;font-weight:600">{{ $e->name ?: '—' }}</td>
                                 <td style="padding:8px">{{ $e->agency_name ?: '—' }}</td>
+                                <td style="padding:8px">{{ $e->audience ? __('onboarding.audience.'.$e->audience) : '—' }}</td>
                                 <td style="padding:8px"><bdi dir="ltr">{{ $e->email }}</bdi></td>
                                 <td style="padding:8px"><bdi dir="ltr">{{ $e->monthly_spend ?: '—' }}</bdi></td>
                                 <td style="padding:8px">{{ strtoupper($e->lang) }}</td>

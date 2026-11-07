@@ -4,7 +4,7 @@ $base = $ar ? '' : '/en';
 $self = 'https://adsranger.com'.($ar ? '/waitlist' : '/en/waitlist');
 $t = $ar ? [
     'title' => 'قائمة انتظار AdsRanger: نخبرك عند الإطلاق',
-    'meta' => 'اترك بريدك واسم وكالتك ودولتك، وسنراسلك عند إطلاق AdsRanger، مساحة العمل العربية أولاً لوكالات المنطقة، في 2027.',
+    'meta' => 'اترك بريدك واسم وكالتك أو شركتك ودولتك، وسنراسلك عند إطلاق AdsRanger، مساحة العمل العربية أولاً لوكالات المنطقة، في 2027.',
     'switch_url' => '/en/waitlist',
     'h1' => 'انضم إلى قائمة انتظار <bdi dir="ltr">AdsRanger</bdi>',
     'lead' => '<bdi dir="ltr">AdsRanger</bdi> قيد التطوير، والإطلاق في 2027. اترك بياناتك وسنراسلك عند الإطلاق. لا رسائل مزعجة، ويمكنك مغادرة القائمة في أي وقت.',
@@ -12,7 +12,9 @@ $t = $ar ? [
     'saved_p' => 'حفظنا بياناتك. قبل أن نرسل إليك أي أخبار، سنراسلك مرة واحدة لتأكيد بريدك.',
     'errors_h' => 'راجع الحقول التالية:',
     'email' => 'البريد الإلكتروني للعمل',
-    'agency' => 'اسم الوكالة',
+    'agency' => 'اسم الوكالة أو الشركة',
+    'audience' => 'من أنت؟ (اختياري)',
+    'audience_opts' => ['agency' => 'وكالة إعلانية', 'freelancer' => 'مستقل', 'business' => 'شركة تدير إعلاناتها بنفسها'],
     'country' => 'الدولة',
     'country_pick' => 'اختر دولتك',
     'countries' => ['JO' => 'الأردن', 'SA' => 'السعودية', 'AE' => 'الإمارات', 'KW' => 'الكويت', 'QA' => 'قطر', 'BH' => 'البحرين', 'OM' => 'عُمان', 'EG' => 'مصر', 'IQ' => 'العراق', 'LB' => 'لبنان', 'PS' => 'فلسطين', 'SY' => 'سوريا', 'MA' => 'المغرب', 'DZ' => 'الجزائر', 'TN' => 'تونس', 'LY' => 'ليبيا', 'SD' => 'السودان', 'XX' => 'دولة أخرى'],
@@ -26,11 +28,11 @@ $t = $ar ? [
     'policy' => 'سياسة الخصوصية',
     'new_tab' => '(يفتح في علامة تبويب جديدة)',
     'submit' => 'انضم إلى قائمة الانتظار',
-    'privacy_line' => 'نستخدم بريدك واسم وكالتك ودولتك لنتواصل معك بخصوص إطلاق <bdi dir="ltr">AdsRanger</bdi>. الاسم ونطاق الإنفاق والمنصات التي تديرها اختيارية، وتساعدنا على دعوة الوكالات المناسبة أولًا. لا نشارك هذه البيانات مع أي جهة، ويمكنك إلغاء الاشتراك أو طلب حذفها في أي وقت.',
+    'privacy_line' => 'نستخدم بريدك واسم شركتك أو وكالتك ودولتك فقط لإبلاغك بإطلاق <bdi dir="ltr">AdsRanger</bdi>. الاسم ونطاق الإنفاق والمنصات التي تديرها وإجابة «من أنت؟» اختيارية، وتساعدنا على دعوة المناسبين أولًا. لا نشارك هذه البيانات مع أي جهة، ويمكنك إلغاء الاشتراك أو طلب حذفها في أي وقت.',
     'privacy_link' => 'اطّلع على سياسة الخصوصية.',
 ] : [
     'title' => 'AdsRanger Waitlist: Hear When We Launch',
-    'meta' => 'Get an email when AdsRanger, the Arabic-first workspace for MENA agencies, launches in 2027. Leave your email, agency name and country.',
+    'meta' => 'Get an email when AdsRanger, the Arabic-first workspace for MENA agencies, launches in 2027. Leave your email, agency or company name and country.',
     'switch_url' => '/waitlist',
     'h1' => 'Join the AdsRanger waitlist',
     'lead' => 'AdsRanger is in development and launching in 2027. Leave your details and we\'ll email you when it launches. No spam, and you can leave the list at any time.',
@@ -38,7 +40,9 @@ $t = $ar ? [
     'saved_p' => 'We\'ve saved your details. Before we send you any news, we\'ll email you once to confirm your address.',
     'errors_h' => 'Please check these fields:',
     'email' => 'Work email',
-    'agency' => 'Agency name',
+    'agency' => 'Agency or company name',
+    'audience' => 'You are… (optional)',
+    'audience_opts' => ['agency' => 'Ad agency', 'freelancer' => 'Freelancer', 'business' => 'A business running its own ads'],
     'country' => 'Country',
     'country_pick' => 'Choose your country',
     'countries' => ['JO' => 'Jordan', 'SA' => 'Saudi Arabia', 'AE' => 'United Arab Emirates', 'KW' => 'Kuwait', 'QA' => 'Qatar', 'BH' => 'Bahrain', 'OM' => 'Oman', 'EG' => 'Egypt', 'IQ' => 'Iraq', 'LB' => 'Lebanon', 'PS' => 'Palestine', 'SY' => 'Syria', 'MA' => 'Morocco', 'DZ' => 'Algeria', 'TN' => 'Tunisia', 'LY' => 'Libya', 'SD' => 'Sudan', 'XX' => 'Other'],
@@ -52,7 +56,7 @@ $t = $ar ? [
     'policy' => 'Privacy policy',
     'new_tab' => '(opens in a new tab)',
     'submit' => 'Join the waitlist',
-    'privacy_line' => 'We use your email, agency and country to contact you about AdsRanger\'s launch. Name, spend range and the networks you run are optional; they help us invite the right agencies first. We don\'t share this with anyone, and you can unsubscribe or ask us to delete it at any time.',
+    'privacy_line' => 'We use your email, company name and country only to tell you about AdsRanger\'s launch. Name, spend range, the networks you run and "You are…" are optional; they help us invite the right people first. We don\'t share this with anyone, and you can unsubscribe or ask us to delete it at any time.',
     'privacy_link' => 'See our privacy policy.',
 ];
 $networkLabels = ['meta' => 'Meta', 'google' => 'Google', 'tiktok' => 'TikTok', 'snapchat' => 'Snapchat', 'microsoft' => 'Microsoft Advertising', 'linkedin' => 'LinkedIn', 'x' => 'X', 'other' => null];
@@ -143,6 +147,15 @@ input[aria-invalid=true],select[aria-invalid=true]{border-color:var(--bad)}
             @endforeach
         </select>
         @error('country')<div class="err" id="wl-country-err">{{ $message }}</div>@enderror
+
+        <fieldset style="border:0;padding:0;margin:16px 0 0">
+            <legend class="lbl">{{ $t['audience'] }}</legend>
+            <div class="nets">
+                @foreach ($t['audience_opts'] as $key => $label)
+                    <label class="check"><input type="radio" name="audience" value="{{ $key }}" @checked(old('audience') === $key)> {{ $label }}</label>
+                @endforeach
+            </div>
+        </fieldset>
 
         <label for="wl-name">{{ $t['name'] }}</label>
         <input id="wl-name" name="name" type="text" autocomplete="name" maxlength="120" value="{{ old('name') }}">

@@ -46,6 +46,23 @@ class PublicWebsitePhase1Test extends TestCase
         $this->assertSame(1, WaitlistEntry::count());
     }
 
+    /** O-230 / D-189: "agency or company" label, the optional "You are…" choice, the new privacy line. */
+    public function test_waitlist_asks_who_you_are_and_stores_the_answer(): void
+    {
+        $this->get('/waitlist')->assertOk()->assertSee('اسم الوكالة أو الشركة')->assertSee('من أنت؟ (اختياري)')
+            ->assertSee('شركة تدير إعلاناتها بنفسها')->assertSee('نستخدم بريدك واسم شركتك أو وكالتك ودولتك فقط لإبلاغك بإطلاق', false);
+        $this->get('/en/waitlist')->assertOk()->assertSee('Agency or company name')->assertSee('A business running its own ads');
+
+        $this->post('/waitlist', ['agency_name' => 'متجر سوق', 'email' => 'owner@souq.test', 'country' => 'SA', 'consent' => '1', 'audience' => 'business'])
+            ->assertRedirect('/waitlist');
+        $this->assertSame('business', WaitlistEntry::where('email', 'owner@souq.test')->value('audience'));
+
+        $this->post('/waitlist', ['agency_name' => 'X Co', 'email' => 'x@co.test', 'country' => 'SA', 'consent' => '1', 'audience' => 'reseller'])
+            ->assertSessionHasErrors('audience');
+        $this->post('/waitlist', ['agency_name' => 'A', 'email' => 'y@co.test', 'country' => 'SA', 'consent' => '1'])
+            ->assertSessionHasErrors(['agency_name' => 'أدخل اسم وكالتك أو شركتك (حرفان على الأقل).']);
+    }
+
     /** D-152 / D-159: country and an unticked consent box are required; the honeypot saves nothing. */
     public function test_waitlist_requires_country_and_consent_and_ignores_bots(): void
     {

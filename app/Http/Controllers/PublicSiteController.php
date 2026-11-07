@@ -35,13 +35,14 @@ class PublicSiteController extends Controller
             return redirect($target)->with('waitlist_saved', true);
         }
 
-        $agencyMessage = $ar ? 'أدخل اسم وكالتك (حرفان على الأقل).' : 'Enter your agency name (at least 2 characters).';
+        $agencyMessage = $ar ? 'أدخل اسم وكالتك أو شركتك (حرفان على الأقل).' : 'Enter your agency or company name (at least 2 characters).';
         $data = $request->validate([
             'email' => ['required', 'email:filter', 'max:190'],
             'agency_name' => ['required', 'string', 'min:2', 'max:140'],
             'country' => ['required', Rule::in(WaitlistEntry::COUNTRIES)],
             'consent' => ['accepted'],
             'name' => ['nullable', 'string', 'max:120'],
+            'audience' => ['nullable', Rule::in(WaitlistEntry::AUDIENCES)],
             'monthly_spend' => ['nullable', Rule::in(WaitlistEntry::SPEND_RANGES)],
             'networks' => ['nullable', 'array'],
             'networks.*' => [Rule::in(WaitlistEntry::NETWORKS)],
@@ -65,6 +66,7 @@ class PublicSiteController extends Controller
             [
                 'name' => $name !== '' ? $name : null,
                 'agency_name' => trim($data['agency_name']),
+                'audience' => $data['audience'] ?? null,
                 'country' => $data['country'],
                 'monthly_spend' => $data['monthly_spend'] ?? null,
                 'networks' => $networks !== [] ? implode(',', $networks) : null,
