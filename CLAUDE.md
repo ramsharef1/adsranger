@@ -129,3 +129,11 @@ Before relying on a package's API, confirm its installed version:
 - Run `vendor/bin/phpunit` to call the test runner directly. It accepts the same file path and `--filter=testName` arguments.
 
 </laravel-boost-guidelines>
+
+
+## Recent Architecture Additions (Wave 19)
+- #69 Ask the Platform (AR/EN natural language analyst in IntelligenceHubPage).
+- #99 Weekly AI Account Review (Top 3 actions per client).
+- #105 & #62 Shareable Client Onboarding & Prospect Audit Links (/onboard/{token}).
+- #77 & #115 Outbound Webhooks & Looker Studio / Google Sheets JSON Feed (/api/v1/export/{token}).
+- /pricing UX-65 & D-07 canonical tier name alignment.
