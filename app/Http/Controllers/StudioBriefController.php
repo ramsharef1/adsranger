@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
 use App\Models\CreativeBrief;
+use App\Support\Modules;
 use Illuminate\Http\Request;
 
 /** #54: Signed no-login client approval screen for Creative Studio briefs. */
@@ -12,6 +13,7 @@ class StudioBriefController extends Controller
     public function show(string $token)
     {
         $brief = CreativeBrief::with(['client.brandKit', 'agency'])->where('share_token', $token)->firstOrFail();
+        abort_unless(Modules::on('studio', null, $brief->agency), 404); // ADSR-110 0.2: Studio held back
 
         return view('public.studio-brief', ['brief' => $brief, 'kit' => $brief->client?->brandKit]);
     }
@@ -19,6 +21,7 @@ class StudioBriefController extends Controller
     public function decide(Request $request, string $token)
     {
         $brief = CreativeBrief::with(['client', 'agency'])->where('share_token', $token)->firstOrFail();
+        abort_unless(Modules::on('studio', null, $brief->agency), 404); // ADSR-110 0.2: Studio held back
         $data = $request->validate([
             'decision' => ['required', 'in:approved,changes_requested'],
             'client_feedback' => ['nullable', 'string', 'max:1000'],

@@ -55,7 +55,7 @@ class SendScheduledReport implements ShouldQueue
                 continue;
             }
             $channel = $row->channel ?: (str_starts_with((string) $row->email, '+') ? 'whatsapp' : 'email');
-            if ($channel === 'whatsapp' && ! config('reports.whatsapp_enabled', true)) {
+            if ($channel === 'whatsapp' && (! config('reports.whatsapp_enabled', false) || ! \App\Support\Modules::enabled('whatsapp_reports'))) {
                 $row->update(['status' => 'skipped', 'error' => 'whatsapp off']);
 
                 continue;

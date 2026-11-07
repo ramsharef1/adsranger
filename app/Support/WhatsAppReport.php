@@ -83,7 +83,8 @@ class WhatsAppReport
         $phoneId = config('reports.whatsapp_phone_id');
         $token = config('reports.whatsapp_token');
         if (! $phoneId || ! $token) {
-            return true; // Simulated/logged cleanly until Cloud API keys are added in .env
+            // ADSR-110 rule: no fake success. Without Cloud API keys nothing is sent, so say so.
+            throw new \RuntimeException('WhatsApp not configured (no Cloud API keys); nothing was sent.');
         }
         $res = Http::withToken($token)->timeout(15)
             ->post("https://graph.facebook.com/v21.0/{$phoneId}/messages", [

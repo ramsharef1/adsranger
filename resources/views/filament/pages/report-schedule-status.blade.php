@@ -4,7 +4,7 @@
     $tz = $client->agency->timezone ?: 'UTC';
     $sends = $s ? $s->sends()->latest('id')->limit(10)->get() : collect();
     $statusColor = ['sent' => 'success', 'queued' => 'info', 'skipped' => 'gray', 'failed' => 'danger'];
-    $waNumbers = $s ? $s->activeWhatsAppRecipients() : [];
+    $waNumbers = $s && \App\Support\Modules::on('whatsapp_reports') ? $s->activeWhatsAppRecipients() : [];
     $waPreviewUrl = null;
     if ($s && $waNumbers) {
         $period = $s->monthly_day ? now($tz)->startOfMonth()->subMonthNoOverflow()->format('Y-m') : now($tz)->format('o-\WW');

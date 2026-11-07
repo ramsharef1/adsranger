@@ -21,7 +21,7 @@ class QueueScheduledReports implements ShouldQueue
 
     public function handle(): void
     {
-        if (! config('reports.email_enabled') && ! config('reports.whatsapp_enabled', true)) {
+        if (! config('reports.email_enabled') && ! (config('reports.whatsapp_enabled', false) && \App\Support\Modules::enabled('whatsapp_reports'))) {
             Log::info('scheduled reports: both email_enabled and whatsapp_enabled are off, nothing queued');
 
             return;
@@ -35,7 +35,7 @@ class QueueScheduledReports implements ShouldQueue
                     return;
                 }
                 $emails = config('reports.email_enabled') ? $s->activeRecipients() : [];
-                $phones = config('reports.whatsapp_enabled', true) ? $s->activeWhatsAppRecipients() : [];
+                $phones = (config('reports.whatsapp_enabled', false) && \App\Support\Modules::enabled('whatsapp_reports')) ? $s->activeWhatsAppRecipients() : [];
                 if (! $emails && ! $phones) {
                     return;
                 }

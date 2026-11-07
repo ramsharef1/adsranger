@@ -9,6 +9,7 @@ use App\Models\InfluencerCampaign;
 use App\Support\AgencyOperationsHub;
 use App\Support\CurrentClient;
 use App\Support\InfluencerCampaignTracker;
+use App\Filament\Concerns\HeldBackModule;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
@@ -16,6 +17,10 @@ use Filament\Pages\Page;
 
 class AgencyOpsHubPage extends Page
 {
+    use HeldBackModule;
+
+    protected static string $module = 'agency_ops_hub';
+
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-building-office-2';
 
     protected static ?string $slug = 'agency-ops';

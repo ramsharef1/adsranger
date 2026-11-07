@@ -231,6 +231,7 @@ class ExportTest extends TestCase
 
     public function test_owner_can_self_serve_delete_workspace_with_password_and_slug(): void
     {
+        config(['modules.enabled.self_serve_deletion' => true]); // ADSR-110 0.2: held back by default
         $owner = $this->member('owner');
         $this->withSession(['locale' => 'en'])->actingAs($owner)->get('/app/acme/export-data')->assertOk()
             ->assertSee('Delete workspace');
@@ -258,6 +259,7 @@ class ExportTest extends TestCase
 
     public function test_member_can_self_serve_delete_personal_account(): void
     {
+        config(['modules.enabled.self_serve_deletion' => true]); // ADSR-110 0.2: held back by default
         $analyst = $this->member('analyst');
         $analystId = $analyst->id;
 

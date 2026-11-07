@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Filament\Concerns\TranslatesPageLabels;
 use App\Http\Controllers\ExportController;
 use App\Models\Client;
+use App\Support\Modules;
 use App\Support\TrialLifecycle;
 use BackedEnum;
 use Carbon\CarbonImmutable;
@@ -113,7 +114,7 @@ class ExportData extends Page
             ->label(__('Delete workspace'))
             ->icon('heroicon-o-trash')
             ->color('danger')
-            ->visible(fn () => auth()->user()?->roleIn(Filament::getTenant()) === 'owner')
+            ->visible(fn () => auth()->user()?->roleIn(Filament::getTenant()) === 'owner' && Modules::on('self_serve_deletion'))
             ->modalHeading(__('Delete workspace'))
             ->modalDescription(__('This closes the workspace immediately and schedules all workspace data for deletion. Enter your password and the workspace slug to confirm.'))
             ->schema([
@@ -142,7 +143,7 @@ class ExportData extends Page
             ->action(function () {
                 $user = auth()->user();
                 $tenant = Filament::getTenant();
-                if (! $user || ! $tenant || $user->roleIn($tenant) !== 'owner') {
+                if (! $user || ! $tenant || $user->roleIn($tenant) !== 'owner' || ! Modules::on('self_serve_deletion')) {
                     abort(403);
                 }
 
@@ -161,7 +162,7 @@ class ExportData extends Page
             ->visible(function () {
                 $u = auth()->user();
                 $tenant = Filament::getTenant();
-                if (! $u || $u->isSuperAdmin()) {
+                if (! $u || $u->isSuperAdmin() || ! Modules::on('self_serve_deletion')) {
                     return false;
                 }
 
@@ -195,7 +196,7 @@ class ExportData extends Page
             ->modalSubmitActionLabel(__('Delete my account'))
             ->action(function () {
                 $user = auth()->user();
-                if (! $user || $user->isSuperAdmin()) {
+                if (! $user || $user->isSuperAdmin() || ! Modules::on('self_serve_deletion')) {
                     abort(403);
                 }
 
@@ -218,8 +219,8 @@ class ExportData extends Page
         return [
             'restricted' => ! in_array($role, ['owner', 'admin'], true) && ! $user?->isSuperAdmin(),
             'canZip' => ExportController::canDownloadWorkspace($user, $agency),
-            'canDeleteWorkspace' => $role === 'owner',
-            'canDeleteAccount' => $user && ! $user->isSuperAdmin() && $role !== 'owner',
+            'canDeleteWorkspace' => $role === 'owner' && Modules::on('self_serve_deletion'),
+            'canDeleteAccount' => $user && ! $user->isSuperAdmin() && $role !== 'owner' && Modules::on('self_serve_deletion'),
         ];
     }
 }

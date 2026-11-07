@@ -15,6 +15,12 @@ class Wave18InfluencerAndDashboardsTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        config(['modules.enabled.studio' => true, 'modules.enabled.organic' => true, 'modules.enabled.intelligence_hub' => true, 'modules.enabled.agency_ops_hub' => true]); // ADSR-110 0.2: these tests exercise the held-back modules
+    }
+
     public function test_influencer_campaign_tracker_and_filament_hubs_are_configured(): void
     {
         $agency = Agency::create(['name' => 'Gulf Creators Agency', 'slug' => 'gulf-creators', 'plan' => 'agency', 'status' => 'active']);

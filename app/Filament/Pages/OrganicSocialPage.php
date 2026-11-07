@@ -8,12 +8,17 @@ use App\Models\SocialModerationRule;
 use App\Models\SocialPost;
 use App\Support\CurrentClient;
 use App\Support\OrganicCalendarManager;
+use App\Filament\Concerns\HeldBackModule;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Pages\Page;
 
 class OrganicSocialPage extends Page
 {
+    use HeldBackModule;
+
+    protected static string $module = 'organic';
+
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-calendar-days';
 
     protected static ?string $slug = 'organic-social';

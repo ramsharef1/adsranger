@@ -273,6 +273,10 @@ class ScheduledReportsTest extends TestCase
 
     public function test_whatsapp_scheduled_report_queues_and_sends(): void
     {
+        // ADSR-110 0.2: WhatsApp reports are held back by default; this test runs with the module on and Cloud API keys set.
+        config(['modules.enabled.whatsapp_reports' => true, 'reports.whatsapp_enabled' => true,
+            'reports.whatsapp_phone_id' => 'test-phone', 'reports.whatsapp_token' => 'test-token']);
+        \Illuminate\Support\Facades\Http::fake(['graph.facebook.com/*' => \Illuminate\Support\Facades\Http::response(['messages' => [['id' => 'wamid.1']]], 200)]);
         $agency = \App\Models\Agency::create([
             'name' => 'WA Pro Agency', 'slug' => 'wa-pro-agency', 'plan' => 'pro',
             'status' => 'active', 'timezone' => 'UTC', 'language' => 'ar',
@@ -303,5 +307,42 @@ class ScheduledReportsTest extends TestCase
             'email' => '+962791234567',
             'status' => 'sent',
         ]);
+    }
+
+    /** ADSR-110 0.2: with the module off (default) no WhatsApp row is queued and nothing is called; email still goes. */
+    public function test_whatsapp_reports_are_held_back_by_default(): void
+    {
+        \Illuminate\Support\Facades\Http::fake();
+        [$schedule] = $this->waSchedule('wa-off-agency');
+        (new \App\Jobs\QueueScheduledReports)->handle();
+
+        $this->assertDatabaseMissing('report_sends', ['report_schedule_id' => $schedule->id, 'channel' => 'whatsapp']);
+        $this->assertDatabaseHas('report_sends', ['report_schedule_id' => $schedule->id, 'channel' => 'email']);
+        \Illuminate\Support\Facades\Http::assertNothingSent();
+    }
+
+    /** ADSR-110 rule (no fake success): without Cloud API keys a WhatsApp row is never marked sent. */
+    public function test_whatsapp_without_keys_is_not_marked_sent(): void
+    {
+        config(['modules.enabled.whatsapp_reports' => true, 'reports.whatsapp_enabled' => true,
+            'reports.whatsapp_phone_id' => null, 'reports.whatsapp_token' => null]);
+        [$schedule] = $this->waSchedule('wa-nokeys-agency');
+        (new \App\Jobs\QueueScheduledReports)->handle();
+
+        $this->assertDatabaseMissing('report_sends', ['report_schedule_id' => $schedule->id, 'channel' => 'whatsapp', 'status' => 'sent']);
+        $this->assertDatabaseHas('report_sends', ['report_schedule_id' => $schedule->id, 'channel' => 'whatsapp', 'status' => 'failed']);
+    }
+
+    private function waSchedule(string $slug): array
+    {
+        $agency = \App\Models\Agency::create(['name' => $slug, 'slug' => $slug, 'plan' => 'pro', 'status' => 'active', 'timezone' => 'UTC', 'language' => 'ar']);
+        $client = \App\Models\Client::create(['agency_id' => $agency->id, 'name' => 'WA Client', 'currency' => 'USD', 'status' => 'active']);
+        $schedule = \App\Models\ReportSchedule::create([
+            'agency_id' => $agency->id, 'client_id' => $client->id, 'monthly_day' => (int) now('UTC')->day, 'lang' => 'ar',
+            'recipients' => ['client@example.com'], 'whatsapp_recipients' => ['00962791234567'],
+            'attach_pdf' => false, 'include_link' => true, 'active' => true, 'created_at' => now()->subDays(2),
+        ]);
+
+        return [$schedule, $client, $agency];
     }
 }

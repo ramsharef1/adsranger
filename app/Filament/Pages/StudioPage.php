@@ -12,6 +12,7 @@ use App\Models\CreativeBrief;
 use App\Support\Trial;
 use App\Support\StudioCopyGenerator;
 use App\Support\TeamRoles;
+use App\Filament\Concerns\HeldBackModule;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
@@ -23,6 +24,10 @@ use UnitEnum;
  */
 class StudioPage extends Page
 {
+    use HeldBackModule;
+
+    protected static string $module = 'studio';
+
     use TranslatesPageLabels;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-sparkles';

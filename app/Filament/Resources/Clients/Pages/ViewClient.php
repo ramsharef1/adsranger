@@ -172,7 +172,8 @@ class ViewClient extends ViewRecord
                 ->splitKeys([',', ' ', ';'])->rules(['array', 'max:'.$max])->nestedRecursiveRules(['email:filter', 'max:190']),
             TagsInput::make('whatsapp_recipients')->label(__('WhatsApp numbers'))->placeholder('+962790000000')
                 ->helperText(__('Optional: up to :n WhatsApp numbers with country code (e.g. +962790000000).', ['n' => $max]))
-                ->splitKeys([',', ' ', ';'])->rules(['array', 'max:'.$max]),
+                ->splitKeys([',', ' ', ';'])->rules(['array', 'max:'.$max])
+                ->visible(fn () => \App\Support\Modules::on('whatsapp_reports')), // ADSR-110 0.2
             Toggle::make('monthly')->label(__('Monthly report'))->helperText(__('Last month\'s results, with the monthly PDF if you attach it.'))->live(),
             Select::make('monthly_day')->label(__('Day of the month'))->options(array_combine(range(1, 28), range(1, 28)))
                 ->visible(fn (Get $get) => (bool) $get('monthly'))->required(fn (Get $get) => (bool) $get('monthly')),
@@ -190,7 +191,7 @@ class ViewClient extends ViewRecord
     {
         abort_unless($this->canManageLinks() && ! $this->reportsLocked(), 403);
         $recipients = array_values(array_unique(array_filter(array_map(fn ($e) => strtolower(trim((string) $e)), (array) ($data['recipients'] ?? [])))));
-        $rawWa = array_values(array_unique(array_filter(array_map(fn ($p) => trim((string) $p), (array) ($data['whatsapp_recipients'] ?? [])))));
+        $rawWa = \App\Support\Modules::on('whatsapp_reports') ? array_values(array_unique(array_filter(array_map(fn ($p) => trim((string) $p), (array) ($data['whatsapp_recipients'] ?? []))))) : [];
         $waRecipients = [];
         $badWa = false;
         foreach ($rawWa as $p) {

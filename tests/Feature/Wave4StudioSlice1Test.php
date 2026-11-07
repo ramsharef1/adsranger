@@ -20,6 +20,12 @@ class Wave4StudioSlice1Test extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        config(['modules.enabled.studio' => true, 'modules.enabled.organic' => true, 'modules.enabled.intelligence_hub' => true, 'modules.enabled.agency_ops_hub' => true]); // ADSR-110 0.2: these tests exercise the held-back modules
+    }
+
     public function test_dialect_copy_generator_and_brand_kit_banned_word_detection(): void
     {
         $agency = Agency::create(['name' => 'Studio Co', 'slug' => 'studio-co', 'plan' => 'agency', 'status' => 'active', 'currency' => 'USD']);

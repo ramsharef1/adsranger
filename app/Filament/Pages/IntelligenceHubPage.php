@@ -13,6 +13,7 @@ use App\Support\BlendedRoasCalculator;
 use App\Support\CurrentClient;
 use App\Support\KeywordMappingManager;
 use App\Support\PsychologicalTriggerAnalyzer;
+use App\Filament\Concerns\HeldBackModule;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
@@ -20,6 +21,10 @@ use Filament\Pages\Page;
 
 class IntelligenceHubPage extends Page
 {
+    use HeldBackModule;
+
+    protected static string $module = 'intelligence_hub';
+
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-sparkles';
 
     protected static ?string $slug = 'intelligence-hub';
