@@ -5,7 +5,7 @@
     $loc = in_array($loc, ['ar', 'en'], true) ? $loc : 'ar';
     $dir = $loc === 'ar' ? 'rtl' : 'ltr';
     $t = fn (string $k) => __("ui.errors.$k", [], $loc);
-    $home = $loc === 'en' ? url('/en') : url('/');
+    $home = $loc === 'en' ? '/en/' : '/';
     $ref = $showRef ?? false ? app(\App\Support\ErrorRef::class)->id() : null;
 @endphp
 <!DOCTYPE html>
@@ -20,7 +20,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #ffffff; --fg: #0f172a; --muted: #475569; --card: #f8fafc; --line: #e2e8f0; --btn: #0F766E; --btn-fg: #ffffff; --link: #0F766E; }
-        @media (prefers-color-scheme: dark) { :root { --bg: #0b1020; --fg: #f1f5f9; --muted: #a3aec2; --card: #121933; --line: #24304f; --link: #5EEAD4; } }
+        @media (prefers-color-scheme: dark) { :root { --bg: #0b1020; --fg: #f1f5f9; --muted: #a3aec2; --card: #121933; --line: #24304f; --link: #5EEAD4; } .ar-word-acc { color: #5EEAD4 !important; } }
         * { box-sizing: border-box; }
         body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--fg); font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif; padding: 24px 16px; }
         main { width: 100%; max-width: 520px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 32px 24px; text-align: center; }

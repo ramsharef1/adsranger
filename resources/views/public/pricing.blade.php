@@ -1,95 +1,100 @@
-<!DOCTYPE html>
-<html lang="{{ $lang === 'ar' ? 'ar' : 'en' }}" dir="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="robots" content="noindex">
-    <title>{{ $lang === 'ar' ? 'AdsRanger — الباقات ومزايا الوكالات' : 'AdsRanger — Agency Plans & Capabilities' }}</title>
-    <link rel="canonical" href="{{ url($lang === 'ar' ? '/pricing' : '/en/pricing') }}">
-    <style>
-        body { margin:0; font-family:'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif; background:#0B1120; color:#F8FAFC; line-height:1.65; }
-        .hero { max-width:1080px; margin:0 auto; padding:56px 24px 28px; text-align:center; }
-        .badge { display:inline-block; padding:5px 14px; border-radius:999px; background:rgba(20,184,166,0.14); color:#5EEAD4; font-size:0.84rem; font-weight:700; margin-bottom:14px; }
-        h1 { font-size:2.35rem; margin:0 0 12px; letter-spacing:-0.02em; }
-        .sub { color:#94A3B8; max-width:700px; margin:0 auto; font-size:1.05rem; }
-        .grid { max-width:1180px; margin:36px auto 64px; padding:0 24px; display:grid; grid-template-columns:repeat(auto-fit, minmax(310px, 1fr)); gap:22px; }
-        .tier { background:#111827; border:1px solid #1E293B; border-radius:18px; padding:30px 26px; display:flex; flex-direction:column; justify-content:space-between; }
-        .tier.featured { border-color:#14B8A6; box-shadow:0 16px 40px -15px rgba(20,184,166,0.28); position:relative; }
-        .tier h2 { margin:0 0 6px; font-size:1.4rem; }
-        .tier-tag { font-size:1.05rem; font-weight:700; color:#5EEAD4; margin:12px 0 4px; }
-        .tier ul { list-style:none; padding:0; margin:20px 0 28px; color:#CBD5E1; font-size:0.93rem; }
-        .tier li { padding:7px 0; border-bottom:1px solid rgba(148,163,184,0.12); }
-        .cta { display:block; text-align:center; padding:12px 18px; border-radius:10px; font-weight:700; text-decoration:none; background:#0F766E; color:#fff; }
-        .tier.featured .cta { background:#14B8A6; color:#0B1120; }
-        .faq { max-width:920px; margin:0 auto 72px; padding:0 24px; }
-        .faq-item { background:#111827; border:1px solid #1E293B; border-radius:14px; padding:20px 24px; margin-bottom:14px; }
-    </style>
-</head>
-<body>
-@include('public.nav', ['lang' => $lang])
+@php
+// Website P-6 "Plans" (U-16, UX-155, UX-116; D-07 no prices before launch, D-180 Solo card, D-199 founding line).
+$ar = ($lang ?? 'ar') === 'ar';
+$arPath = '/pricing';
+$u = fn (string $p) => \App\Support\PublicUrl::path($p, $ar ? 'ar' : 'en');
+$title = $ar ? 'باقات AdsRanger للوكالات والمستقلين' : 'AdsRanger Plans for Agencies and Freelancers';
+$meta = $ar
+    ? 'ما تخطط باقات AdsRanger لتقديمه، من الأساسية إلى باقة الوكالات. قيد التطوير، والأسعار تُعلن عند الإطلاق في 2027.'
+    : 'What each AdsRanger plan is planned to include, from Starter to Agency. In development; prices are shared at launch in 2027.';
+$schema = [['@type' => 'WebPage', 'name' => $title, 'url' => \App\Support\PublicUrl::absolute($arPath, $ar ? 'ar' : 'en'), 'inLanguage' => $ar ? 'ar' : 'en']];
+$dev = $ar ? 'قيد التطوير' : 'In development';
+$planned = $ar ? 'مخطط له' : 'Planned';
+// [title, one line, [[line, planned?], …]]
+$plans = $ar ? [
+    ['باقة المستقل', 'للمستقلين الذين يديرون عددًا قليلًا من العملاء: روابط العملاء والتقارير الأساسية.', null],
+    ['الباقة الأساسية', 'للوكالات الناشئة وفرق الأداء الصغيرة.', [
+        ['المكتب اليومي ومؤشر الصحة والمستهدفات', false],
+        ['تقارير <bdi dir="ltr">Meta</bdi>، <bdi dir="ltr">Google Ads</bdi> (تكاملات مخطط لها)، وسجل 13 شهرًا، وعملات متعددة', true],
+        ['قواعد التنبيه الأساسية وملخص الصباح بالبريد', false],
+        ['تقرير شهري بالعربية أو الإنجليزية وروابط للعملاء', false],
+        ['منشئ روابط التتبّع وفحص الروابط وحاسبة الأهداف', false],
+    ]],
+    ['الباقة الاحترافية', 'للوكالات المتنامية التي تدير عدة منصات وميزانيات.', [
+        ['كل ما في الباقة الأساسية، مع قواعد التنبيه المتقدمة', false],
+        ['تنبيهات حرجة على هاتفك، مع ساعات الهدوء', false],
+        ['توقع نهاية الشهر ومخطِّط سيناريوهات رمضان والعيد', false],
+        ['تفاصيل إعلانات البحث وفحص صفحات الهبوط ومتابعة المنافسين', false],
+        ['جدولة المنشورات العضوية وصندوق وارد موحد', true],
+    ]],
+    ['باقة الوكالات', 'للوكالات الكبيرة متعددة الفرق.', [
+        ['كل ما في الباقة الاحترافية، مع منصات إعلانية إضافية في مرحلة لاحقة', true],
+        ['خطة الميزانية السنوية مقابل الفعلي', false],
+        ['نطاق مخصص وألوان وكالتك على تقارير العملاء', true],
+        ['عمليات الوكالة والمالية وحملات المؤثرين', true],
+    ]],
+] : [
+    ['Solo', 'For freelancers who manage a few clients: client links and core reporting.', null],
+    ['Starter', 'For new agencies and small performance teams.', [
+        ['Daily desk, health score and targets', false],
+        ['Meta and Google Ads reporting (planned integrations), 13 months of history and multi-currency', true],
+        ['Core alert rules and a morning email digest', false],
+        ['Monthly report in Arabic or English, and client links', false],
+        ['UTM builder, link checker and goal calculator', false],
+    ]],
+    ['Pro', 'For growing agencies running several platforms and budgets.', [
+        ['Everything in Starter, with advanced alert rules', false],
+        ['Critical alerts on your phone, with quiet hours', false],
+        ['Month-end forecast and a Ramadan and Eid scenario planner', false],
+        ['Search ads detail, landing-page checks and competitor watch', false],
+        ['Organic post scheduling and a unified inbox', true],
+    ]],
+    ['Agency', 'For large agencies with several teams.', [
+        ['Everything in Pro, with more ad platforms at a later stage', true],
+        ['Annual budget plan vs actual', false],
+        ['Custom domain and your colours on client reports', true],
+        ['Agency operations, finance and influencer campaigns', true],
+    ]],
+];
+@endphp
+@extends('layouts.public')
 
-<section class="hero">
-    <span class="badge">{{ $lang === 'ar' ? 'ثلاث باقات مصممة لوكالات التسويق في المنطقة' : '3 Tiers Built for MENA Marketing Agencies' }}</span>
-    <h1>{{ $lang === 'ar' ? 'الباقات ومزايا المنصة حسب حجم وكالتك' : 'Plans Structured Around Your Agency Growth' }}</h1>
-    <p class="sub">
-        {{ $lang === 'ar'
-            ? 'تشمل جميع الباقات فترة تجربة مجانية لمدة 14 يومًا على مزايا الباقة الاحترافية، مع عرض تفاصيل الأسعار والفوترة داخل إعدادات مساحة العمل بعد التفعيل.'
-            : 'Every workspace starts with a 14-day Pro trial. Exact billing and seat options are managed directly inside Settings › Plan & usage after onboarding.' }}
-    </p>
+@push('styles')
+<style>
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(250px,100%),1fr));gap:14px;list-style:none;padding:0;margin:24px 0}
+.plans>li{display:flex;flex-direction:column;justify-content:space-between;gap:16px}
+.plans ul{list-style:none;padding:0;margin:12px 0 0}
+.plans ul li{padding:8px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.plans ul li .badge{align-self:flex-start}
+</style>
+@endpush
+
+@section('content')
+<section style="padding-top:24px;max-width:820px">
+    <h1>{{ $ar ? 'باقات تناسب كل حجم من الوكالات' : 'Plans for every size of agency' }}</h1>
+    <p class="muted" style="font-size:17px">{!! $ar
+        ? '<bdi dir="ltr">AdsRanger</bdi> قيد التطوير، والإطلاق في 2027. هذا ما تخطط كل باقة لتقديمه، والأسعار تُعلن عند الإطلاق.'
+        : 'AdsRanger is in development and launching in 2027. Here is what each plan is planned to include. Prices are shared at launch.' !!}</p>
+    <p>{{ $ar ? 'عند الإطلاق، تبدأ كل مساحة عمل جديدة بتجربة لمدة 14 يومًا على الباقة الاحترافية.' : 'At launch, each new workspace starts with a 14-day trial of Pro.' }}</p>
 </section>
-
-<p style="text-align:center;color:#94A3B8;font-size:0.9rem">{{ $lang === 'ar' ? '✓ قيد التطوير · ○ مخطط له. المنصة قيد التطوير والإطلاق في 2027.' : '✓ in development · ○ planned. AdsRanger is in development, launching 2027.' }}</p>
-<section class="grid">
-    <div class="tier">
-        <div>
-            <h2>{{ $lang === 'ar' ? 'الباقة الأساسية' : 'Starter' }}</h2>
-            <p style="color:#94A3B8; margin:0; font-size:0.9rem;">{{ $lang === 'ar' ? 'للوكالات الناشئة وفرق إدارة الأداء المستقلة' : 'For boutique agencies & performance teams' }}</p>
-            <div class="tier-tag">{{ $lang === 'ar' ? 'أساسيات الربط والتقارير اليومية' : 'Core Connectors & Daily Reporting' }}</div>
-            <ul>
-                <li>✓ {{ $lang === 'ar' ? 'لوحة المتابعة اليومية + نقاط الصحة والأهداف' : 'Daily Desk + Health Score & Targets' }}</li>
-                <li>✓ {{ $lang === 'ar' ? 'ربط Meta و Google Ads وسجل عملات 13 شهرًا' : 'Meta & Google Ads + 13-Month Backfill & FX' }}</li>
-                <li>✓ {{ $lang === 'ar' ? '7 قواعد تنبيه أساسية + ملخص الصباح البريدي' : '7 Core Alert Rules + Morning Email Digest' }}</li>
-                <li>✓ {{ $lang === 'ar' ? 'تقارير شهرية PDF (عربي/إنجليزي) وروابط مشاركة موقعة' : 'Bilingual Monthly PDF Reports & Signed Links' }}</li>
-                <li>✓ {{ $lang === 'ar' ? 'أداة بناء UTM وفحص الروابط + حاسبة الأهداف' : 'UTM Builder, Link Checker & Goal Calculator' }}</li>
-            </ul>
-        </div>
-        <a href="{{ $lang === 'ar' ? '/waitlist' : '/en/waitlist' }}" class="cta">{{ $lang === 'ar' ? 'اطلب دعوة للباقة الأساسية' : 'Request Starter Access' }}</a>
-    </div>
-
-    <div class="tier featured">
-        <div>
-            <span class="badge" style="margin-bottom:8px;">{{ $lang === 'ar' ? 'تشملها التجربة المجانية' : 'Included in the 14-day trial' }}</span>
-            <h2>{{ $lang === 'ar' ? 'الباقة الاحترافية' : 'Pro' }}</h2>
-            <p style="color:#94A3B8; margin:0; font-size:0.9rem;">{{ $lang === 'ar' ? 'للوكالات المتنامية التي تدير قنوات وميزانيات متعددة' : 'For growing agencies managing multi-channel budgets' }}</p>
-            <div class="tier-tag">{{ $lang === 'ar' ? 'ذكاء القنوات والتنبيهات المتقدمة' : 'Full-Funnel Intelligence & Pro Alerts' }}</div>
-            <ul>
-                <li>✓ {{ $lang === 'ar' ? 'جميع مزايا الباقة الأساسية + 18 قاعدة تنبيه احترافية' : 'Everything in Starter + All 18 Pro Alert Rules' }}</li>
-                <li>✓ {{ $lang === 'ar' ? 'تنبيهات الهاتف الحرجة (PWA Push) مع ساعات الهدوء' : 'Critical Phone Push Alerts with Quiet Hours' }}</li>
-                <li>✓ {{ $lang === 'ar' ? 'توقع نهاية الشهر + مخطط سيناريوهات رمضان والعيد' : 'Month-End Forecast + Ramadan/Eid Scenario Planner' }}</li>
-                <li>✓ {{ $lang === 'ar' ? 'تفاصيل Google Ads + فحص صفحات الهبوط ومراقبة المنافسين' : 'Google Ads Depth, Landing Page Health & Competitor Watch' }}</li>
-                <li>○ {{ $lang === 'ar' ? 'مخطط له: جدولة المنشورات العضوية وصندوق الوارد الموحد' : 'Planned: organic post scheduler and unified inbox' }}</li>
-            </ul>
-        </div>
-        <a href="{{ $lang === 'ar' ? '/waitlist' : '/en/waitlist' }}" class="cta">{{ $lang === 'ar' ? 'اطلب دعوة للباقة الاحترافية' : 'Request Pro Trial Invite' }}</a>
-    </div>
-
-    <div class="tier">
-        <div>
-            <h2>{{ $lang === 'ar' ? 'باقة الوكالات' : 'Agency' }}</h2>
-            <p style="color:#94A3B8; margin:0; font-size:0.9rem;">{{ $lang === 'ar' ? 'للوكالات الكبرى متعددة الفرق والمنصات' : 'For large agencies with many teams and networks' }}</p>
-            <div class="tier-tag">{{ $lang === 'ar' ? 'كل المنصات والتخطيط السنوي' : 'All networks and annual planning' }}</div>
-            <ul>
-                <li>✓ {{ $lang === 'ar' ? 'جميع مزايا الباقة الاحترافية + منصات المرحلة الثانية (قيد الربط)' : 'Everything in Pro + stage 2 ad networks (in development)' }}</li>
-                <li>○ {{ $lang === 'ar' ? 'مخطط له: نطاق مخصص وألوان وكالتك على تقارير العملاء' : 'Planned: custom domain and your colours on client reports' }}</li>
-                <li>○ {{ $lang === 'ar' ? 'مخطط له: عمليات الوكالة والمالية وحملات المؤثرين' : 'Planned: agency operations, finance and influencer campaigns' }}</li>
-                <li>✓ {{ $lang === 'ar' ? 'خطة الميزانية السنوية مقابل الفعلي' : 'Annual budget plan vs actual' }}</li>
-                <li>○ {{ $lang === 'ar' ? 'مخطط له: Webhooks وتغذية Looker Studio و Sheets' : 'Planned: webhooks and a Looker Studio / Sheets feed' }}</li>
-            </ul>
-        </div>
-        <a href="{{ $lang === 'ar' ? '/waitlist' : '/en/waitlist' }}" class="cta">{{ $lang === 'ar' ? 'اطلب دعوة لباقة الوكالات' : 'Request Agency Tier Access' }}</a>
-    </div>
-</section>
-
-@include('public.footer', ['lang' => $lang])
-</body>
-</html>
+<ul class="plans">
+    @foreach ($plans as [$name, $line, $features])
+        <li class="card">
+            <div>
+                <h2 style="margin:0 0 4px;font-size:21px">{{ $name }}</h2>
+                @if ($features === null)<span class="badge badge-neutral">{{ $planned }}</span>@endif
+                <p class="muted" style="margin:8px 0 0">{{ $line }}</p>
+                @if ($features)
+                    <ul>
+                        @foreach ($features as [$feature, $isPlanned])
+                            <li><span>{!! $feature !!}</span><span class="badge {{ $isPlanned ? 'badge-neutral' : '' }}">{{ $isPlanned ? $planned : $dev }}</span></li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
+            <a class="btn" href="{{ $u('/waitlist') }}">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a>
+        </li>
+    @endforeach
+</ul>
+<p class="muted">{{ $ar ? 'تحتفظ الوكالات المؤسِّسة بسعر الإطلاق.' : 'Founding agencies keep their launch price.' }}</p>
+@endsection

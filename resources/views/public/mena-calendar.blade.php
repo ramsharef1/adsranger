@@ -1,88 +1,175 @@
 @php
+// Website P-9 "MENA ad calendar 2027" (U-19, UX-158; D-95 sourced table in config/mena_calendar_2027.php; D-176, D-190).
 $ar = ($lang ?? 'ar') === 'ar';
-$base = $ar ? '' : '/en';
+$lang = $ar ? 'ar' : 'en';
+$arPath = '/mena-calendar';
+$u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
+$title = $ar ? 'تقويم مواسم الإعلانات 2027 في المنطقة | AdsRanger' : 'MENA Ad Calendar 2027: Ramadan, Eid and Sale Dates | AdsRanger';
+$meta = $ar
+    ? 'أهم مواعيد الإعلان في المنطقة لعام 2027، من رمضان والعيد إلى مواسم التخفيضات، مع موعد بدء التخطيط ومصدر لكل موعد.'
+    : 'Key 2027 advertising dates across MENA, from Ramadan and Eid to sales seasons, with when to start planning and a source for each date.';
+$selfUrl = \App\Support\PublicUrl::absolute($arPath, $lang);
+$schema = [
+    ['@type' => 'WebPage', 'name' => $title, 'url' => $selfUrl, 'inLanguage' => $lang],
+    ['@type' => 'BreadcrumbList', 'itemListElement' => [
+        ['@type' => 'ListItem', 'position' => 1, 'name' => $ar ? 'الرئيسية' : 'Home', 'item' => \App\Support\PublicUrl::absolute('/', $lang)],
+        ['@type' => 'ListItem', 'position' => 2, 'name' => $ar ? 'تقويم المواسم' : 'Seasons calendar', 'item' => $selfUrl],
+    ]],
+];
+$months = $ar
+    ? ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+    : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+$fmt = function (?string $iso, ?string $alt = null) use ($months, $ar): string {
+    if (! $iso) {
+        return '';
+    }
+    [$y, $m, $d] = array_map('intval', explode('-', $iso));
+    if ($alt) {
+        [, $m2, $d2] = array_map('intval', explode('-', $alt));
+        $days = $m2 === $m ? $d.($ar ? ' أو ' : ' or ').$d2 : $d.' '.$months[$m - 1].($ar ? ' أو ' : ' or ').$d2;
+        return $days.' '.$months[($m2 ?: $m) - 1].' '.$y;
+    }
+    return $d.' '.$months[$m - 1].' '.$y;
+};
+$countryNames = $ar
+    ? ['JO' => 'الأردن', 'SA' => 'السعودية', 'AE' => 'الإمارات', 'KW' => 'الكويت', 'QA' => 'قطر', 'BH' => 'البحرين', 'OM' => 'عُمان', 'EG' => 'مصر', 'IQ' => 'العراق', 'LB' => 'لبنان', 'PS' => 'فلسطين', 'SY' => 'سوريا', 'MA' => 'المغرب', 'DZ' => 'الجزائر', 'TN' => 'تونس', 'LY' => 'ليبيا', 'SD' => 'السودان']
+    : ['JO' => 'Jordan', 'SA' => 'Saudi Arabia', 'AE' => 'UAE', 'KW' => 'Kuwait', 'QA' => 'Qatar', 'BH' => 'Bahrain', 'OM' => 'Oman', 'EG' => 'Egypt', 'IQ' => 'Iraq', 'LB' => 'Lebanon', 'PS' => 'Palestine', 'SY' => 'Syria', 'MA' => 'Morocco', 'DZ' => 'Algeria', 'TN' => 'Tunisia', 'LY' => 'Libya', 'SD' => 'Sudan'];
+$today = now('Asia/Amman')->toDateString();
+$rows = collect(config('mena_calendar_2027.rows', []))
+    ->filter(fn ($r) => ! empty($r['date']) && max($r['end'] ?? $r['date'], $r['alt_date'] ?? $r['date']) >= $today)
+    ->sortBy('date')->values();
+$usedCodes = $rows->pluck('country_codes')->flatten()->unique()->sort()->values();
+$countriesOf = function (array $r) use ($ar, $countryNames): string {
+    if ($r['country_codes'] === []) {
+        return $ar ? 'كل دول المنطقة' : 'All MENA';
+    }
+    if (! $ar) {
+        return $r['countries_en'] ?? implode(', ', array_map(fn ($c) => $countryNames[$c] ?? $c, $r['country_codes']));
+    }
+    return implode('، ', array_map(fn ($c) => $countryNames[$c] ?? $c, $r['country_codes']));
+};
+$noteOf = function (array $r) use ($ar): ?string {
+    if (! $ar) {
+        return $r['note_en'] ?? null;
+    }
+    if (! empty($r['note_ar'])) {
+        return $r['note_ar'];
+    }
+    return ($r['note_en'] ?? null) === 'Falls in Ramadan' ? 'يقع في رمضان' : null;
+};
 $t = $ar ? [
-    'title' => 'تقويم مواسم الإعلانات والتسوق في الشرق الأوسط 2026–2027 · AdsRanger',
-    'switch_url' => '/en/mena-calendar',
-    'tag' => 'تخطيط المواسم · الخليج والمشرق ومصر 2026–2027',
-    'h1' => 'التقويم الإعلاني لمواسم الذروة في الشرق الأوسط وشمال أفريقيا.',
-    'lead' => 'تتغير تكلفة الألف ظهور (CPM) وتكلفة النتيجة (CPR) بشكل كبير خلال المواسم الوطنية والدينية ومواسم التخفيضات الكبرى. خطّط ميزانيات عملائك وموادهم الإعلانية قبل كل موسم. التواريخ تقريبية وقد تتغير مواعيد المناسبات الهجرية حسب رؤية الهلال.',
-    'events' => [
-        ['اليوم الوطني السعودي 96', '23 سبتمبر 2026', 'ذروة التجزئة والضيافة والعطور في السعودية', 'ابدأ التجهيز: 10 سبتمبر'],
-        ['الجمعة البيضاء وتخفيضات نوفمبر (White Friday)', '20 – 30 نوفمبر 2026', 'أعلى منافسة سنوية للتجارة الإلكترونية في الخليج ومصر والأردن', 'ابدأ التجهيز: 1 نوفمبر'],
-        ['عيد الاتحاد الإماراتي 55 (UAE National Day)', '2 – 3 ديسمبر 2026', 'ذروة السياحة والفعاليات والتسوق في الإمارات', 'ابدأ التجهيز: 20 نوفمبر'],
-        ['موسم شهر رمضان المبارك 1448 هـ', '8 فبراير – 8 مارس 2027', 'ذروة التفاعل المسائي والسحور عبر الفيديو والرسائل', 'ابدأ التجهيز: 18 يناير'],
-        ['العشر الأواخر وعيد الفطر 2027', '28 فبراير – 12 مارس 2027', 'ذروة الأزياء والهدايا والحلويات والتوصيل السريع', 'ابدأ التجهيز: 20 فبراير'],
-        ['موسم الحج وعيد الأضحى 2027', '10 – 20 مايو 2027', 'ذروة السفر والضيافة والأضاحي وتجارة التجزئة', 'ابدأ التجهيز: 25 أبريل'],
-        ['موسم العودة إلى المدارس والجامعات', '15 أغسطس – 10 سبتمبر 2027', 'ذروة الإلكترونيات والقرطاسية والتعليم', 'ابدأ التجهيز: 1 أغسطس'],
-    ],
-    'cta_ramadan' => 'افتح حاسبة ميزانية رمضان 2027 التفاعلية',
-    'cta_waitlist' => 'انضم لقائمة الانتظار',
+    'h1' => 'تقويم مواسم الإعلانات في المنطقة 2027',
+    'lead' => 'أهم مواعيد المعلنين في المنطقة، مع موعد بدء التخطيط لكل منها. المواعيد الهجرية متوقعة وتعتمد على رؤية الهلال في كل دولة، ولكل موعد رابط لمصدره.',
+    'country' => 'الدولة', 'all_countries' => 'كل الدول', 'period' => 'الفترة',
+    'periods' => ['all' => 'الكل', 'month' => 'هذا الشهر', '3m' => 'الأشهر الثلاثة القادمة'],
+    'cols' => ['التاريخ', 'المناسبة', 'الدول', 'الحالة', 'ابدأ التخطيط', 'المصدر'],
+    'expected' => 'متوقع', 'fixed' => 'ثابت', 'table' => 'جدول المواعيد', 'none' => 'لا مواعيد تطابق هذا الاختيار.',
+    'guide' => 'دليل رمضان 2027', 'calc' => 'حاسبة ميزانية رمضان', 'plan_each' => '4 أسابيع قبل كل موعد',
 ] : [
-    'title' => 'MENA Retail & Ad Seasonality Calendar 2026–2027 · AdsRanger',
-    'switch_url' => '/mena-calendar',
-    'tag' => 'MENA Seasonality · GCC, Levant & Egypt 2026–2027',
-    'h1' => '2026–2027 MENA advertising & retail peak calendar for agencies.',
-    'lead' => 'Auction CPMs and conversion rates shift dramatically during national holidays, White Friday, Ramadan, and Eid. Plan client budgets and creative ahead of each season. Dates are approximate; Hijri dates depend on the moon sighting.',
-    'events' => [
-        ['Saudi National Day 96', '23 Sep 2026', 'KSA retail, F&B, fragrances & travel surge', 'Warm-up starts: 10 Sep'],
-        ['White Friday & Cyber November', '20 – 30 Nov 2026', 'Peak e-commerce auction pressure across GCC, Egypt & Jordan', 'Warm-up starts: 1 Nov'],
-        ['UAE National Day (Eid Al Etihad 55)', '2 – 3 Dec 2026', 'UAE luxury retail, hospitality & events peak', 'Warm-up starts: 20 Nov'],
-        ['Ramadan 1448 AH Core Flight', '8 Feb – 8 Mar 2027', 'Evening & Suhoor prime-time video & messaging surge', 'Warm-up starts: 18 Jan'],
-        ['Last 10 Days & Eid al-Fitr 2027', '28 Feb – 12 Mar 2027', 'Peak gifting, fashion, beauty & express delivery cutoffs', 'Warm-up starts: 20 Feb'],
-        ['Eid al-Adha & Hajj Season 2027', '10 – 20 May 2027', 'Travel, hospitality, gifting & retail conversions', 'Warm-up starts: 25 Apr'],
-        ['Back to School & University', '15 Aug – 10 Sep 2027', 'Electronics, apparel & education lead generation', 'Warm-up starts: 1 Aug'],
-    ],
-    'cta_ramadan' => 'Open Interactive Ramadan 2027 Calculator',
-    'cta_waitlist' => 'Join the Agency Waitlist',
+    'h1' => 'MENA ad calendar 2027',
+    'lead' => 'Key dates for advertisers across the region, with when to start planning. Hijri dates are expected and depend on each country\'s moon sighting. Every date links to its source.',
+    'country' => 'Country', 'all_countries' => 'All countries', 'period' => 'Period',
+    'periods' => ['all' => 'All', 'month' => 'This month', '3m' => 'Next 3 months'],
+    'cols' => ['Date', 'Event', 'Countries', 'Status', 'Start planning', 'Source'],
+    'expected' => 'expected', 'fixed' => 'fixed', 'table' => 'Calendar table', 'none' => 'No dates match this choice.',
+    'guide' => 'Ramadan 2027 guide', 'calc' => 'Ramadan budget calculator', 'plan_each' => '4 weeks before each',
 ];
 @endphp
-<!doctype html>
-<html lang="{{ $ar ? 'ar' : 'en' }}" dir="{{ $ar ? 'rtl' : 'ltr' }}">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex">
-<link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
-<title>{{ $t['title'] }}</title>
-<link rel="alternate" hreflang="ar" href="https://adsranger.com/mena-calendar">
-<link rel="alternate" hreflang="en" href="https://adsranger.com/en/mena-calendar">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+@extends('layouts.public')
+
+@push('styles')
 <style>
-:root{--bg:#0b1020;--card:#121933;--ink:#eef1fb;--muted:#9aa3c0;--acc:#5EEAD4;--line:#232c4d}
-*{box-sizing:border-box}body{margin:0;font-family:{!! $ar ? '"IBM Plex Sans Arabic",' : '' !!}system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--ink);line-height:{{ $ar ? '1.8' : '1.55' }}}
-.w{max-width:1080px;margin:0 auto;padding:0 20px}
-.btn{display:inline-block;padding:10px 18px;border-radius:10px;background:var(--acc);color:#0B1020;text-decoration:none;font-weight:600}
-.btn.o{background:transparent;border:1px solid var(--line);color:var(--ink)}
-.tag{display:inline-block;font-size:13px;color:var(--acc);border:1px solid var(--line);padding:4px 10px;border-radius:99px;margin-bottom:14px}
-.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;padding:24px 0 40px}
-.c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.mc-filters{display:flex;flex-wrap:wrap;gap:12px;margin:16px 0}
+.mc-filters>div{min-width:200px}
+.mc-filters label{margin:0 0 6px}
+.mc-table{overflow-x:auto}
+.mc-table table{width:100%;border-collapse:collapse;font-size:15px}
+.mc-table th,.mc-table td{padding:10px;border-bottom:1px solid var(--line);text-align:start;vertical-align:top}
+.mc-table thead th{color:var(--muted);font-weight:600;font-size:14px}
+.mc-cards{display:none;list-style:none;padding:0;margin:0}
+.mc-cards li{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px}
+.mc-cards p{margin:4px 0}
+.mc-note{display:block;font-size:13px;color:var(--muted)}
+.mc-table a,.mc-cards a,.mc-links a{display:inline-flex;align-items:center;min-height:44px}
+@media (max-width:599px){.mc-table{display:none}.mc-cards{display:block}}
 </style>
-</head>
-<body>
-<div class="w">
-    @include('public.nav', ['lang' => $lang, 'switch_url' => $t['switch_url']])
-    <section style="padding:36px 0 12px">
-        <span class="tag">{{ $t['tag'] }}</span>
-        <h1 style="font-size:clamp(28px,4.5vw,44px);margin:0 0 12px">{{ $t['h1'] }}</h1>
-        <p style="color:var(--muted);font-size:17px;max-width:760px;margin:0">{{ $t['lead'] }}</p>
-    </section>
-    <section class="g">
-        @foreach ($t['events'] as $ev)
-            <div class="c">
-                <div style="font-size:13px;color:var(--acc);font-weight:600">{{ $ev[1] }}</div>
-                <h3 style="margin:6px 0 8px;font-size:17px">{{ $ev[0] }}</h3>
-                <p style="margin:0 0 10px;color:var(--muted);font-size:14px">{{ $ev[2] }}</p>
-                <span style="font-size:12.5px;color:var(--ink);border:1px solid var(--line);padding:3px 9px;border-radius:8px;display:inline-block">{{ $ev[3] }}</span>
-            </div>
-        @endforeach
-    </section>
-    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;padding-bottom:48px">
-        <a class="btn" href="{{ $base }}/ramadan-2027">{{ $t['cta_ramadan'] }}</a>
-        <a class="btn o" href="{{ $base }}/waitlist">{{ $t['cta_waitlist'] }}</a>
+@endpush
+
+@section('content')
+<section style="padding-top:24px;max-width:820px">
+    <h1>{{ $t['h1'] }}</h1>
+    <p class="muted" style="font-size:17px">{{ $t['lead'] }}</p>
+    <p class="mc-links"><a href="{{ $u('/ramadan-2027') }}">{{ $t['guide'] }}</a> · <a href="{{ $u('/tools/ramadan-budget-calculator') }}">{{ $t['calc'] }}</a></p>
+</section>
+
+<div class="mc-filters" id="mc-filters" hidden>
+    <div>
+        <label for="mc-country">{{ $t['country'] }}</label>
+        <select id="mc-country">
+            <option value="">{{ $t['all_countries'] }}</option>
+            @foreach ($usedCodes as $code)<option value="{{ $code }}">{{ $countryNames[$code] ?? $code }}</option>@endforeach
+        </select>
     </div>
-    @include('public.footer', ['lang' => $lang])
+    <div>
+        <label for="mc-period">{{ $t['period'] }}</label>
+        <select id="mc-period">
+            @foreach ($t['periods'] as $k => $label)<option value="{{ $k }}">{{ $label }}</option>@endforeach
+        </select>
+    </div>
 </div>
-@include('public.cookie-banner', ['lang' => $lang])
-</body>
-</html>
+<p id="mc-none" hidden role="status">{{ $t['none'] }}</p>
+
+<div class="mc-table" tabindex="0" role="region" aria-label="{{ $t['table'] }}">
+    <table>
+        <thead><tr>@foreach ($t['cols'] as $col)<th scope="col">{{ $col }}</th>@endforeach</tr></thead>
+        <tbody>
+            @foreach ($rows as $r)
+                @php $note = $noteOf($r); @endphp
+                <tr data-mc data-date="{{ $r['date'] }}" data-codes="{{ implode(',', $r['country_codes']) }}">
+                    <td>{{ $fmt($r['date'], $r['alt_date']) }}@if ($r['end']) – {{ $fmt($r['end']) }}@endif</td>
+                    <th scope="row" style="font-weight:600">{{ $ar ? $r['event_ar'] : $r['event_en'] }}@if ($note)<span class="mc-note">{{ $note }}</span>@endif</th>
+                    <td>{{ $countriesOf($r) }}</td>
+                    <td><span class="badge {{ $r['status'] === 'fixed' ? '' : 'badge-neutral' }}">{{ $r['status'] === 'fixed' ? $t['fixed'] : $t['expected'] }}</span></td>
+                    <td>{{ $r['plan_from'] ? $fmt($r['plan_from']) : $t['plan_each'] }}</td>
+                    <td>@if ($r['source_url'])<a href="{{ $r['source_url'] }}" rel="noopener"><bdi dir="ltr">{{ $r['source_name'] ?: parse_url($r['source_url'], PHP_URL_HOST) }}</bdi></a>@endif</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+<ul class="mc-cards">
+    @foreach ($rows as $r)
+        @php $note = $noteOf($r); @endphp
+        <li data-mc data-date="{{ $r['date'] }}" data-codes="{{ implode(',', $r['country_codes']) }}">
+            <h2 style="font-size:17px;margin:0">{{ $ar ? $r['event_ar'] : $r['event_en'] }}</h2>
+            <p><strong>{{ $fmt($r['date'], $r['alt_date']) }}@if ($r['end']) – {{ $fmt($r['end']) }}@endif</strong> <span class="badge {{ $r['status'] === 'fixed' ? '' : 'badge-neutral' }}">{{ $r['status'] === 'fixed' ? $t['fixed'] : $t['expected'] }}</span></p>
+            @if ($note)<p class="mc-note">{{ $note }}</p>@endif
+            <p>{{ $t['cols'][2] }}: {{ $countriesOf($r) }}</p>
+            <p>{{ $t['cols'][4] }}: {{ $r['plan_from'] ? $fmt($r['plan_from']) : $t['plan_each'] }}</p>
+            @if ($r['source_url'])<p>{{ $t['cols'][5] }}: <a href="{{ $r['source_url'] }}" rel="noopener"><bdi dir="ltr">{{ $r['source_name'] ?: parse_url($r['source_url'], PHP_URL_HOST) }}</bdi></a></p>@endif
+        </li>
+    @endforeach
+</ul>
+@endsection
+
+@push('scripts')
+<script>
+(function(){
+  var f=document.getElementById('mc-filters');if(!f){return;}f.hidden=false;
+  var c=document.getElementById('mc-country'),p=document.getElementById('mc-period'),none=document.getElementById('mc-none');
+  var today=new Date('{{ $today }}T00:00:00');
+  function apply(){
+    var code=c.value,per=p.value,end=null,shown=0;
+    if(per==='month'){end=new Date(today.getFullYear(),today.getMonth()+1,1);}
+    if(per==='3m'){end=new Date(today.getFullYear(),today.getMonth()+3,today.getDate());}
+    document.querySelectorAll('[data-mc]').forEach(function(el){
+      var codes=el.getAttribute('data-codes'),d=new Date(el.getAttribute('data-date')+'T00:00:00');
+      var ok=(!code||codes===''||codes.split(',').indexOf(code)!==-1)&&(!end||d<end);
+      el.hidden=!ok;if(ok){shown++;}
+    });
+    none.hidden=shown>0;
+  }
+  c.addEventListener('change',apply);p.addEventListener('change',apply);
+})();
+</script>
+@endpush

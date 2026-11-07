@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\WaitlistEntry;
+use App\Support\PublicUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\RateLimiter;
@@ -109,31 +110,62 @@ class PublicSiteController extends Controller
         return view('public.security', ['lang' => $lang === 'en' ? 'en' : 'ar']);
     }
 
+    public function ramadanCalculator(string $lang = 'ar')
+    {
+        return view('public.ramadan-calculator', ['lang' => $lang === 'en' ? 'en' : 'ar']);
+    }
+
+    /**
+     * Public pages in the sitemap (P-0 set + R-19): Arabic path => view that renders it (its file time is the lastmod).
+     *
+     * @return array<string, string>
+     */
+    public static function sitemapPageViews(): array
+    {
+        return [
+            '/' => 'welcome',
+            '/waitlist' => 'public/waitlist',
+            '/ramadan-2027' => 'public/ramadan-2027',
+            '/tools/ramadan-budget-calculator' => 'public/ramadan-calculator',
+            '/pricing' => 'public/pricing',
+            '/integrations' => 'public/integrations',
+            '/demo-report' => 'public/demo-report',
+            '/mena-calendar' => 'public/mena-calendar',
+            '/security' => 'public/security',
+            '/privacy' => 'legal/page',
+            '/terms' => 'legal/page',
+            '/data-deletion' => 'legal/page',
+        ];
+    }
+
+    /** R-13: /sitemap.xml is a sitemap index; children are added as sections ship (features, guides, blog, …). */
     public function sitemap(): Response
     {
-        $urls = [
-            ['https://adsranger.com/', 'https://adsranger.com/en'],
-            ['https://adsranger.com/pricing', 'https://adsranger.com/en/pricing'],
-            ['https://adsranger.com/integrations', 'https://adsranger.com/en/integrations'],
-            ['https://adsranger.com/demo-report', 'https://adsranger.com/en/demo-report'],
-            ['https://adsranger.com/mena-calendar', 'https://adsranger.com/en/mena-calendar'],
-            ['https://adsranger.com/ramadan-2027', 'https://adsranger.com/en/ramadan-2027'],
-            ['https://adsranger.com/waitlist', 'https://adsranger.com/en/waitlist'],
-            ['https://adsranger.com/security', 'https://adsranger.com/en/security'],
-            ['https://adsranger.com/privacy', 'https://adsranger.com/en/privacy'],
-            ['https://adsranger.com/terms', 'https://adsranger.com/en/terms'],
-            ['https://adsranger.com/data-deletion', 'https://adsranger.com/en/data-deletion'],
-        ];
-
         $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n"
-             .'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n";
-        foreach ($urls as [$arUrl, $enUrl]) {
-            foreach ([$arUrl, $enUrl] as $loc) {
-                $xml .= "  <url>\n"
-                      ."    <loc>{$loc}</loc>\n"
-                      ."    <xhtml:link rel=\"alternate\" hreflang=\"ar\" href=\"{$arUrl}\"/>\n"
-                      ."    <xhtml:link rel=\"alternate\" hreflang=\"en\" href=\"{$enUrl}\"/>\n"
-                      ."  </url>\n";
+            .'<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n"
+            .'  <sitemap><loc>'.PublicUrl::HOST.'/sitemaps/pages.xml</loc></sitemap>'."\n"
+            .'</sitemapindex>'."\n";
+
+        return response($xml, 200, ['Content-Type' => 'application/xml; charset=UTF-8']);
+    }
+
+    /** One <url> per language, each with ar / en / x-default (→ Arabic) alternates and a real lastmod (P-0, D-06). */
+    public function sitemapPages(): Response
+    {
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n"
+            .'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n";
+        foreach (static::sitemapPageViews() as $arPath => $view) {
+            $file = resource_path('views/'.$view.'.blade.php');
+            $lastmod = is_file($file) ? date('Y-m-d', (int) filemtime($file)) : null;
+            $ar = PublicUrl::absolute($arPath, 'ar');
+            $en = PublicUrl::absolute($arPath, 'en');
+            foreach ([$ar, $en] as $loc) {
+                $xml .= "  <url>\n    <loc>{$loc}</loc>\n"
+                    .($lastmod ? "    <lastmod>{$lastmod}</lastmod>\n" : '')
+                    ."    <xhtml:link rel=\"alternate\" hreflang=\"ar\" href=\"{$ar}\"/>\n"
+                    ."    <xhtml:link rel=\"alternate\" hreflang=\"en\" href=\"{$en}\"/>\n"
+                    ."    <xhtml:link rel=\"alternate\" hreflang=\"x-default\" href=\"{$ar}\"/>\n"
+                    ."  </url>\n";
             }
         }
         $xml .= "</urlset>\n";

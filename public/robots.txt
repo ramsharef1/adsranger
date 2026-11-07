@@ -1,2 +1,20 @@
 User-agent: *
-Disallow:
+Disallow: /app/
+Disallow: /admin/
+Disallow: /invite/
+Disallow: /login
+Disallow: /register
+Disallow: /password/
+Disallow: /connect/
+Disallow: /en/login
+Disallow: /en/register
+Disallow: /en/password/
+Disallow: /r/
+Disallow: /reports/unsubscribe/
+Disallow: /studio/brief/
+Disallow: /onboard/
+Disallow: /api/
+Disallow: /waitlist/thanks
+Disallow: /en/waitlist/thanks
+Disallow: /*?
+Sitemap: https://adsranger.com/sitemap.xml

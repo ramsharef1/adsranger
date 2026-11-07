@@ -1,6 +1,7 @@
 @php
 $ar = ($lang ?? 'ar') === 'ar';
 $base = $ar ? '' : '/en';
+$arPath = '/waitlist';
 $self = 'https://adsranger.com'.($ar ? '/waitlist' : '/en/waitlist');
 $t = $ar ? [
     'title' => 'قائمة انتظار AdsRanger: نخبرك عند الإطلاق',
@@ -62,52 +63,34 @@ $t = $ar ? [
 $networkLabels = ['meta' => 'Meta', 'google' => 'Google', 'tiktok' => 'TikTok', 'snapchat' => 'Snapchat', 'microsoft' => 'Microsoft Advertising', 'linkedin' => 'LinkedIn', 'x' => 'X', 'other' => null];
 $fieldIds = ['email' => 'wl-email', 'agency_name' => 'wl-agency', 'country' => 'wl-country', 'consent' => 'wl-consent', 'form' => 'wl-email'];
 $oldNetworks = (array) old('networks', []);
+$title = $t['title'];
+$meta = $t['meta'];
+$schema = [['@type' => 'WebPage', 'name' => $t['title'], 'url' => $self, 'inLanguage' => $ar ? 'ar' : 'en']];
 @endphp
-<!doctype html>
-<html lang="{{ $ar ? 'ar' : 'en' }}" dir="{{ $ar ? 'rtl' : 'ltr' }}">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex">
-<link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
-<title>{{ $t['title'] }}</title>
-<meta name="description" content="{{ $t['meta'] }}">
-<link rel="canonical" href="{{ $self }}">
-<link rel="alternate" hreflang="ar" href="https://adsranger.com/waitlist">
-<link rel="alternate" hreflang="en" href="https://adsranger.com/en/waitlist">
-<link rel="alternate" hreflang="x-default" href="https://adsranger.com/waitlist">
-<script type="application/ld+json">{!! json_encode(['@@context' => 'https://schema.org', '@type' => 'WebPage', 'name' => $t['title'], 'url' => $self, 'inLanguage' => $ar ? 'ar' : 'en'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+@extends('layouts.public')
+
+@push('styles')
 <style>
-:root{--bg:#0b1020;--card:#121933;--ink:#eef1fb;--muted:#9aa3c0;--acc:#5EEAD4;--line:#232c4d;--bad:#fca5a5}
-*{box-sizing:border-box}body{margin:0;font-family:{!! $ar ? '"IBM Plex Sans Arabic",' : '' !!}system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--ink);line-height:{{ $ar ? '1.8' : '1.55' }}}
-.w{max-width:860px;margin:0 auto;padding:0 20px}
-.btn{display:inline-flex;align-items:center;min-height:44px;padding:10px 18px;border-radius:10px;background:var(--acc);color:#0B1020;text-decoration:none;font-weight:600;border:0;cursor:pointer;font-family:inherit;font-size:15px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px;margin:24px 0 48px}
-label,.lbl{display:block;font-size:14px;font-weight:600;margin:16px 0 6px}
-input[type=text],input[type=email],select{width:100%;min-height:44px;padding:10px 13px;border-radius:10px;border:1px solid var(--line);background:#0b1020;color:var(--ink);font-family:inherit;font-size:15px}
-input[aria-invalid=true],select[aria-invalid=true]{border-color:var(--bad)}
-.check{display:flex;align-items:center;gap:10px;min-height:44px;margin:0;font-weight:400;cursor:pointer}
-.check input{width:20px;height:20px;flex:none;accent-color:var(--acc)}
-.nets{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:0 12px}
-.consent{border:1px solid var(--line);border-radius:12px;padding:6px 14px;margin-top:20px}
-.ok{background:rgba(94,234,212,.12);border:1px solid var(--acc);padding:14px 16px;border-radius:12px;margin-bottom:18px}
-.ok h2{margin:0 0 4px;font-size:18px}.ok p{margin:0}
-.sum{border:1px solid var(--bad);border-radius:12px;padding:12px 16px;margin-bottom:18px}
-.sum a{color:var(--bad)}
-.err{color:var(--bad);font-size:13px;margin-top:4px}
+.wl .check{min-height:44px;padding-block:6px}
+.wl .nets{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:0 12px}
+.wl .consent{border:1px solid var(--line);border-radius:12px;padding:6px 14px;margin-top:20px}
+.wl .ok{background:var(--info-bg);border:1px solid var(--acc);padding:14px 16px;border-radius:12px;margin-bottom:18px}
+.wl .ok h2{margin:0 0 4px;font-size:18px}.wl .ok p{margin:0}
+.wl .sum{border:1px solid var(--bad);border-radius:12px;padding:12px 16px;margin-bottom:18px}
+.wl .sum a{color:var(--bad)}
+.wl .err{color:var(--bad);font-size:13px;margin-top:4px}
+.wl input[aria-invalid=true],.wl select[aria-invalid=true]{border-color:var(--bad)}
 .hp{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.priv{color:var(--muted);font-size:13px;margin:18px 0 0}.priv a,.consent a{color:var(--acc)}
+.wl .priv{color:var(--muted);font-size:14px;margin:18px 0 0}
 </style>
-</head>
-<body>
-<div class="w">
-@include('public.nav', ['lang' => $lang, 'switch_url' => $t['switch_url']])
-<section style="padding:32px 0 8px">
+@endpush
+
+@section('content')
+<section style="padding:24px 0 8px;max-width:860px">
     <h1 style="font-size:clamp(26px,4.5vw,40px);margin:0 0 12px">{!! $t['h1'] !!}</h1>
     <p style="color:var(--muted);font-size:17px;margin:0">{!! $t['lead'] !!}</p>
 </section>
-<div class="card">
+<div class="card wl" style="max-width:860px;margin:24px 0">
     @if (session('waitlist_saved'))
         <div class="ok" id="wl-done" tabindex="-1" role="status">
             <h2>{{ $t['saved_h'] }}</h2>
@@ -131,6 +114,7 @@ input[aria-invalid=true],select[aria-invalid=true]{border-color:var(--bad)}
             <input id="wl-website" name="website" type="text" tabindex="-1" autocomplete="off" value="">
         </div>
 
+        <p class="muted" style="margin:0">{{ $ar ? 'الحقول المعلَّمة بـ * مطلوبة.' : 'Fields marked * are required.' }}</p>
         <label for="wl-email">{{ $t['email'] }} *</label>
         <input id="wl-email" name="email" type="email" inputmode="email" autocomplete="email" dir="ltr" required maxlength="190" placeholder="name@agency.com" value="{{ old('email') }}" @error('email') aria-invalid="true" aria-describedby="wl-email-err" @enderror>
         @error('email')<div class="err" id="wl-email-err">{{ $message }}</div>@enderror
@@ -189,15 +173,15 @@ input[aria-invalid=true],select[aria-invalid=true]{border-color:var(--bad)}
 
         <div style="margin-top:20px">
             <button type="submit" class="btn">{{ $t['submit'] }}</button>
+            <p class="muted" style="font-size:14px;margin:8px 0 0">{{ $ar ? 'تحتفظ الوكالات المؤسِّسة بسعر الإطلاق.' : 'Founding agencies keep their launch price.' }}</p>
         </div>
         <p class="priv">{!! $t['privacy_line'] !!} <a href="{{ $base }}/privacy">{{ $t['privacy_link'] }}</a></p>
     </form>
 </div>
-@include('public.footer', ['lang' => $lang])
-</div>
+@endsection
+
+@push('scripts')
 <script>
 (function(){var el=document.getElementById('wl-errors')||document.getElementById('wl-done');if(el){el.focus();}})();
 </script>
-@include('public.cookie-banner', ['lang' => $lang])
-</body>
-</html>
+@endpush

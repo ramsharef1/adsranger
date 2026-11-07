@@ -1,4 +1,4 @@
-<p><bdi dir="ltr">AdsRanger</bdi> («نحن») منصة تساعد الوكالات التسويقية والشركات على إنشاء الإعلانات وإدارتها وإعداد تقاريرها على شبكات الإعلان مثل ميتا وجوجل وتيك توك وسناب شات ومايكروسوفت ولينكدإن وإكس، وعلى إدارة المحتوى العضوي على وسائل التواصل. توضح هذه السياسة البيانات التي نجمعها وكيف نستخدمها والخيارات المتاحة لك.</p>
+<p><bdi dir="ltr">AdsRanger</bdi> («نحن») منصة تساعد الوكالات التسويقية والشركات على إنشاء الإعلانات وإدارتها وإعداد تقاريرها على شبكات الإعلان مثل <bdi dir="ltr">Meta</bdi>، <bdi dir="ltr">Google</bdi>، <bdi dir="ltr">TikTok</bdi>، <bdi dir="ltr">Snapchat</bdi>، <bdi dir="ltr">Microsoft</bdi>، <bdi dir="ltr">LinkedIn</bdi>، <bdi dir="ltr">X</bdi>، وعلى إدارة المحتوى العضوي على وسائل التواصل. توضح هذه السياسة البيانات التي نجمعها وكيف نستخدمها والخيارات المتاحة لك.</p>
 <div class="note">تُدار <bdi dir="ltr">AdsRanger</bdi> من عمّان، الأردن. سيُذكر اسم الشركة المشغّلة هنا عند اكتمال تسجيلها. للتواصل: <a href="mailto:privacy@adsranger.com">privacy@adsranger.com</a></div>
 
 <h2>1. البيانات التي نجمعها</h2>
@@ -20,11 +20,11 @@
 </ul>
 <p>نحن لا نبيع البيانات الشخصية، ولا نستخدم بيانات المنصات المربوطة لبناء ملفات إعلانية أو لاستهداف الإعلانات أو لأي غرض غير تقديم <bdi dir="ltr">AdsRanger</bdi> للمستخدم الذي ربطها.</p>
 
-<h2>3. بيانات مستخدمي جوجل</h2>
-<p>يلتزم استخدام <bdi dir="ltr">AdsRanger</bdi> للمعلومات التي تصلها من واجهات جوجل البرمجية ونقلها إلى أي تطبيق آخر <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener">بسياسة بيانات المستخدمين لخدمات Google API</a>، بما في ذلك متطلبات الاستخدام المحدود (Limited Use). نستخدم بيانات Google Ads، و Google Analytics، و Google Merchant Center، و Google Business Profile فقط لعرض الحسابات التي تربطها وإعداد تقاريرها وإدارتها، ولا نسمح لأي شخص بالاطلاع عليها إلا بطلب منك للدعم، أو عند الحاجة للأمان أو القانون، أو بعد تجميعها وإخفاء هويتها.</p>
+<h2>3. بيانات مستخدمي <bdi dir="ltr">Google</bdi></h2>
+<p>يلتزم استخدام <bdi dir="ltr">AdsRanger</bdi> للمعلومات التي تصلها من واجهات <bdi dir="ltr">Google</bdi> البرمجية ونقلها إلى أي تطبيق آخر <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener">بسياسة بيانات المستخدمين لخدمات Google API</a>، بما في ذلك متطلبات الاستخدام المحدود (Limited Use). نستخدم بيانات Google Ads، و Google Analytics، و Google Merchant Center، و Google Business Profile فقط لعرض الحسابات التي تربطها وإعداد تقاريرها وإدارتها، ولا نسمح لأي شخص بالاطلاع عليها إلا بطلب منك للدعم، أو عند الحاجة للأمان أو القانون، أو بعد تجميعها وإخفاء هويتها.</p>
 
-<h2>4. ميتا وتيك توك وسناب شات والمنصات الأخرى</h2>
-<p>تُستخدم البيانات الواردة من ميتا (فيسبوك وإنستغرام وواتساب) وتيك توك وسناب شات ومايكروسوفت ولينكدإن وإكس وغيرها فقط لتقديم ميزات <bdi dir="ltr">AdsRanger</bdi> للوكالة التي ربطت الحساب، وفق شروط وسياسات المطوّرين لكل منصة. يمكنك إلغاء الوصول في أي وقت من داخل <bdi dir="ltr">AdsRanger</bdi> أو من إعدادات المنصة نفسها.</p>
+<h2>4. <bdi dir="ltr">Meta</bdi>، <bdi dir="ltr">TikTok</bdi>، <bdi dir="ltr">Snapchat</bdi> والمنصات الأخرى</h2>
+<p>تُستخدم البيانات الواردة من <bdi dir="ltr">Meta</bdi> (<bdi dir="ltr">Facebook</bdi>، <bdi dir="ltr">Instagram</bdi>، <bdi dir="ltr">WhatsApp</bdi>)، <bdi dir="ltr">TikTok</bdi>، <bdi dir="ltr">Snapchat</bdi>، <bdi dir="ltr">Microsoft</bdi>، <bdi dir="ltr">LinkedIn</bdi>، <bdi dir="ltr">X</bdi> وغيرها فقط لتقديم ميزات <bdi dir="ltr">AdsRanger</bdi> للوكالة التي ربطت الحساب، وفق شروط وسياسات المطوّرين لكل منصة. يمكنك إلغاء الوصول في أي وقت من داخل <bdi dir="ltr">AdsRanger</bdi> أو من إعدادات المنصة نفسها.</p>
 
 <h2>5. مع من نشارك البيانات</h2>
 <ul>
