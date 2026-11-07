@@ -8,13 +8,12 @@ Nov 3, 2026 · @Rami
 
 ## Overview
 
-A multi-tenant platform to create, manage and report ads on every network, plus organic tools, for small-to-mid MENA agencies, owned and built by Rami. All 157 planned features are built before one public launch, on Laravel. Build starts now, in parallel with the Telescope handover that ends 12 Nov 2026.
+A multi-tenant platform to create, manage and report ads on every network, plus organic tools, for small-to-mid MENA agencies, owned and built by Rami. All 157 planned features are built before one public launch, on Laravel. Build starts now.
 
 - **Who it's for:** agencies of 5–30 people running Meta and Google Ads for clinics, charities, e-commerce and services in Jordan, KSA, UAE and the Gulf.
 - **The problem:** generic dashboards count the wrong result, report only in English, and catch wasted spend days late.
 - **What it does:** shows each campaign's result by its real goal (messages, calls, leads, donations, sales), sends daily alerts on broken tracking and waste, scores client health against targets, and gives clients Arabic/English reports through signed links.
 - **Launch goal:** one public launch with every feature complete and tested; one build, tested as a whole before release.
-- **Clean-room rule:** the spec is written from Rami's own knowledge of the rules. No code, client data, branding or assets are copied from the Telescope Apps Script platform. Check the Telescope services contract for IP terms before launch.
 
 ## Name and legal entity
 
@@ -29,8 +28,6 @@ Name decided: AdsRanger (Arabic: أدز رينجر), on adsranger.com (registere
 | Basira | بصيرة | insight, foresight | Health score, forecast, insights tiers |
 | Raseed | رصيد | balance, record | Spend, pacing and reconciliation |
 | Daleel | دليل | guide, evidence | Reports that prove results to clients |
-
-Avoid anything close to "Telescope" (مرصد, scope, lens) to keep the product clearly separate.
 
 **Legal entity options:**
 
@@ -226,127 +223,127 @@ The product plan holds 157 features, all built before launch: 44 in Starter, 78 
 
 ### Connect & data (10)
 
-| # | Feature | Tier | Source | Priority |
-| --- | --- | --- | --- | --- |
-| 1 | Meta connector ★ | Starter | Built at Telescope |  |
-| 2 | Google Ads connector ★ | Starter | Built at Telescope |  |
-| 3 | GA4 | Pro | Built at Telescope |  |
-| 4 | TikTok Ads | Agency | Built at Telescope |  |
-| 5 | Snapchat Ads | Agency | Built at Telescope |  |
-| 6 | Google Search Console | Pro | Telescope roadmap |  |
-| 7 | 13-month backfill on connect | Starter | Built at Telescope |  |
-| 8 | Multi-currency + FX history | Starter | Built at Telescope |  |
-| 9 | Spend reconciliation vs platform | Pro | Built at Telescope |  |
-| 10 | Sync health + data-updated badge | Starter | Built at Telescope |  |
+| # | Feature | Tier | Priority |
+| --- | --- | --- | --- |
+| 1 | Meta connector ★ | Starter |  |
+| 2 | Google Ads connector ★ | Starter |  |
+| 3 | GA4 | Pro |  |
+| 4 | TikTok Ads | Agency |  |
+| 5 | Snapchat Ads | Agency |  |
+| 6 | Google Search Console | Pro |  |
+| 7 | 13-month backfill on connect | Starter |  |
+| 8 | Multi-currency + FX history | Starter |  |
+| 9 | Spend reconciliation vs platform | Pro |  |
+| 10 | Sync health + data-updated badge | Starter |  |
 
 ### Results & outcomes (10)
 
-| # | Feature | Tier | Source | Priority |
-| --- | --- | --- | --- | --- |
-| 11 | Goal-based results ★ | Starter | Built at Telescope |  |
-| 12 | Calls split: placed / confirmed / 20s+ | Starter | Built at Telescope |  |
-| 13 | Google conversions by action | Starter | Built at Telescope |  |
-| 14 | Attribution windows (1d / 7d / 28d / view) | Pro | Built at Telescope |  |
-| 15 | Over-claim ratio, platform vs GA4 | Pro | Telescope roadmap |  |
-| 16 | Full funnel, impressions to paid | Pro | Built at Telescope |  |
-| 17 | Lead outcomes form: cost per booked / paid, real ROAS | Pro | Built at Telescope |  |
-| 18 | Offline outcomes to Conversions API + CRM (HubSpot, Zoho, Odoo, Sheets) | Agency | Telescope roadmap |  |
-| 19 | WhatsApp outcomes tagging | Agency | New |  |
-| 20 | E-commerce revenue: Shopify, WooCommerce, Salla, Zid | Agency | Telescope roadmap |  |
+| # | Feature | Tier | Priority |
+| --- | --- | --- | --- |
+| 11 | Goal-based results ★ | Starter |  |
+| 12 | Calls split: placed / confirmed / 20s+ | Starter |  |
+| 13 | Google conversions by action | Starter |  |
+| 14 | Attribution windows (1d / 7d / 28d / view) | Pro |  |
+| 15 | Over-claim ratio, platform vs GA4 | Pro |  |
+| 16 | Full funnel, impressions to paid | Pro |  |
+| 17 | Lead outcomes form: cost per booked / paid, real ROAS | Pro |  |
+| 18 | Offline outcomes to Conversions API + CRM (HubSpot, Zoho, Odoo, Sheets) | Agency |  |
+| 19 | WhatsApp outcomes tagging | Agency |  |
+| 20 | E-commerce revenue: Shopify, WooCommerce, Salla, Zid | Agency |  |
 
 ### Daily operations (14)
 
-| # | Feature | Tier | Source | Priority |
-| --- | --- | --- | --- | --- |
-| 21 | Daily desk ★ | Starter | Built at Telescope |  |
-| 22 | Compare two clients | Starter | Built at Telescope |  |
-| 23 | Alerts engine ★ (7 rules in Starter, about 20 in Pro) | Starter | Built at Telescope |  |
-| 24 | Alerts inbox: assign, snooze, resolve | Starter | New |  |
-| 25 | Morning digest | Starter | Built at Telescope |  |
-| 26 | Alerts on WhatsApp / Telegram / Google Chat / Slack | Pro | New |  |
-| 27 | Tasks + action tracker | Pro | Built at Telescope |  |
-| 28 | Change log + before/after impact | Pro | Built at Telescope |  |
-| 29 | "Why did it change?" explainer | Pro | New |  |
-| 30 | Change approvals: propose, approve, apply in Meta | Pro | New |  |
-| 31 | Pause list + tired ads to refresh | Pro | Built at Telescope |  |
-| 32 | Learning-phase risk | Pro | Built at Telescope |  |
-| 33 | Naming + setup checks | Pro | Built at Telescope |  |
-| 34 | Rejected ads + spend-cap alerts | Pro | Built at Telescope |  |
+| # | Feature | Tier | Priority |
+| --- | --- | --- | --- |
+| 21 | Daily desk ★ | Starter |  |
+| 22 | Compare two clients | Starter |  |
+| 23 | Alerts engine ★ (7 rules in Starter, about 20 in Pro) | Starter |  |
+| 24 | Alerts inbox: assign, snooze, resolve | Starter |  |
+| 25 | Morning digest | Starter |  |
+| 26 | Alerts on WhatsApp / Telegram / Google Chat / Slack | Pro |  |
+| 27 | Tasks + action tracker | Pro |  |
+| 28 | Change log + before/after impact | Pro |  |
+| 29 | "Why did it change?" explainer | Pro |  |
+| 30 | Change approvals: propose, approve, apply in Meta | Pro |  |
+| 31 | Pause list + tired ads to refresh | Pro |  |
+| 32 | Learning-phase risk | Pro |  |
+| 33 | Naming + setup checks | Pro |  |
+| 34 | Rejected ads + spend-cap alerts | Pro |  |
 
 ### Planning & insights (16)
 
-| # | Feature | Tier | Source | Priority |
-| --- | --- | --- | --- | --- |
-| 35 | Health score + targets ★ | Starter | Built at Telescope |  |
-| 36 | Budget pacing | Starter | Built at Telescope |  |
-| 37 | Month-end forecast | Pro | Built at Telescope |  |
-| 38 | Budget planner (spend-response curve) | Pro | Built at Telescope |  |
-| 39 | Budget reallocation suggestions | Pro | Telescope roadmap |  |
-| 40 | Hijri / MENA calendar + seasonality | Starter | New |  |
-| 41 | Internal benchmarks | Pro | Built at Telescope |  |
-| 42 | MENA benchmarks network (across agencies) | Pro | New |  |
-| 43 | Best and weakest hours / weekdays heatmap | Pro | Built at Telescope |  |
-| 44 | Audience + placement breakdown | Pro | Built at Telescope |  |
-| 45 | Annual budget plan vs actual | Agency | Telescope roadmap |  |
-| 46 | Google search terms + negative keywords | Pro | Built at Telescope |  |
-| 47 | Impression share + Quality Score | Pro | Built at Telescope |  |
-| 48 | Performance Max asset groups | Pro | Telescope roadmap |  |
-| 49 | Landing page health (speed, broken links) | Pro | Telescope roadmap |  |
-| 50 | Competitor watch (Meta Ad Library) | Pro | Telescope roadmap |  |
+| # | Feature | Tier | Priority |
+| --- | --- | --- | --- |
+| 35 | Health score + targets ★ | Starter |  |
+| 36 | Budget pacing | Starter |  |
+| 37 | Month-end forecast | Pro |  |
+| 38 | Budget planner (spend-response curve) | Pro |  |
+| 39 | Budget reallocation suggestions | Pro |  |
+| 40 | Hijri / MENA calendar + seasonality | Starter |  |
+| 41 | Internal benchmarks | Pro |  |
+| 42 | MENA benchmarks network (across agencies) | Pro |  |
+| 43 | Best and weakest hours / weekdays heatmap | Pro |  |
+| 44 | Audience + placement breakdown | Pro |  |
+| 45 | Annual budget plan vs actual | Agency |  |
+| 46 | Google search terms + negative keywords | Pro |  |
+| 47 | Impression share + Quality Score | Pro |  |
+| 48 | Performance Max asset groups | Pro |  |
+| 49 | Landing page health (speed, broken links) | Pro |  |
+| 50 | Competitor watch (Meta Ad Library) | Pro |  |
 
 ### Creative (5)
 
-| # | Feature | Tier | Source | Priority |
-| --- | --- | --- | --- | --- |
-| 51 | Top ads with thumbnails | Starter | Built at Telescope |  |
-| 52 | Creative fatigue detection | Pro | Built at Telescope |  |
-| 53 | Creative intelligence (AI tags: hook, format, offer) | Pro | New |  |
-| 54 | Creative Studio: briefs, versions, client approval links | Agency | Built at Telescope |  |
-| 55 | Test tracker (Meta experiments) | Agency | Telescope roadmap |  |
+| # | Feature | Tier | Priority |
+| --- | --- | --- | --- |
+| 51 | Top ads with thumbnails | Starter |  |
+| 52 | Creative fatigue detection | Pro |  |
+| 53 | Creative intelligence (AI tags: hook, format, offer) | Pro |  |
+| 54 | Creative Studio: briefs, versions, client approval links | Agency |  |
+| 55 | Test tracker (Meta experiments) | Agency |  |
 
 ### Clients (8)
 
-| # | Feature | Tier | Source | Priority |
-| --- | --- | --- | --- | --- |
-| 56 | Signed client links ★ | Starter | Built at Telescope |  |
-| 57 | Monthly PDF report in EN/AR ★ | Starter | Built at Telescope |  |
-| 58 | Plain-language AI summary | Pro | Built at Telescope |  |
-| 59 | Client portal with goals + milestones | Pro | Built at Telescope |  |
-| 60 | White-label + custom domain | Agency | New |  |
-| 61 | Client satisfaction pulse | Pro | Telescope roadmap |  |
-| 62 | Prospect audit link | Pro | New |  |
-| 63 | Pitch forecast builder | Pro | New |  |
+| # | Feature | Tier | Priority |
+| --- | --- | --- | --- |
+| 56 | Signed client links ★ | Starter |  |
+| 57 | Monthly PDF report in EN/AR ★ | Starter |  |
+| 58 | Plain-language AI summary | Pro |  |
+| 59 | Client portal with goals + milestones | Pro |  |
+| 60 | White-label + custom domain | Agency |  |
+| 61 | Client satisfaction pulse | Pro |  |
+| 62 | Prospect audit link | Pro |  |
+| 63 | Pitch forecast builder | Pro |  |
 
 ### Agency management (5)
 
-| # | Feature | Tier | Source | Priority |
-| --- | --- | --- | --- | --- |
-| 64 | Portfolio view + risk board | Pro | Built at Telescope |  |
-| 65 | Manager scorecard + workload | Agency | Built at Telescope |  |
-| 66 | Agency economics: fees, margin, VAT invoices | Agency | Built at Telescope |  |
-| 67 | Influencers module | Agency | Built at Telescope |  |
-| 68 | Checklists: launch, monthly review | Pro | Built at Telescope |  |
+| # | Feature | Tier | Priority |
+| --- | --- | --- | --- |
+| 64 | Portfolio view + risk board | Pro |  |
+| 65 | Manager scorecard + workload | Agency |  |
+| 66 | Agency economics: fees, margin, VAT invoices | Agency |  |
+| 67 | Influencers module | Agency |  |
+| 68 | Checklists: launch, monthly review | Pro |  |
 
 ### AI (2)
 
-| # | Feature | Tier | Source | Priority |
-| --- | --- | --- | --- | --- |
-| 69 | Ask the platform (Arabic / English) | Agency | Telescope roadmap |  |
-| 70 | AI drafts with human approval | Agency | Built at Telescope |  |
+| # | Feature | Tier | Priority |
+| --- | --- | --- | --- |
+| 69 | Ask the platform (Arabic / English) | Agency |  |
+| 70 | AI drafts with human approval | Agency |  |
 
 ### Platform & admin (9)
 
-| # | Feature | Tier | Source | Priority |
-| --- | --- | --- | --- | --- |
-| 71 | Agencies, roles, client access, View as | Starter | Built at Telescope |  |
-| 72 | Onboarding wizard | Starter | Telescope roadmap |  |
-| 73 | Audit log | Starter | Built at Telescope |  |
-| 74 | Google SSO + 2FA | Starter | New |  |
-| 75 | Plans + billing | Starter | New |  |
-| 76 | What's new page | Starter | Built at Telescope |  |
-| 77 | Public API + Looker Studio / Sheets connector | Agency | New |  |
-| 78 | Phone app (PWA) + push | Pro | New |  |
-| 79 | Data export + deletion (needed for Meta App Review) | Starter | New |  |
+| # | Feature | Tier | Priority |
+| --- | --- | --- | --- |
+| 71 | Agencies, roles, client access, View as | Starter |  |
+| 72 | Onboarding wizard | Starter |  |
+| 73 | Audit log | Starter |  |
+| 74 | Google SSO + 2FA | Starter |  |
+| 75 | Plans + billing | Starter |  |
+| 76 | What's new page | Starter |  |
+| 77 | Public API + Looker Studio / Sheets connector | Agency |  |
+| 78 | Phone app (PWA) + push | Pro |  |
+| 79 | Data export + deletion (needed for Meta App Review) | Starter |  |
 
 ### Added features (80–115)
 
@@ -354,79 +351,79 @@ The 36 features below were added on 3 Nov 2026. All are new ideas, not built any
 
 #### Connect & data (7)
 
-| # | Feature | Tier | Source | Priority |
-| --- | --- | --- | --- | --- |
-| 80 | Meta lead forms inbox: live leads forwarded to the client by WhatsApp/email | Pro | New |  |
-| 81 | Google Business Profile insights (calls, directions, reviews) | Pro | New |  |
-| 82 | Facebook / Instagram organic page insights | Pro | New |  |
-| 83 | Microsoft (Bing) Ads | Agency | New |  |
-| 84 | LinkedIn Ads | Agency | New |  |
-| 85 | Call tracking numbers (via a call provider) | Agency | New |  |
-| 86 | UTM builder + link checker | Starter | New |  |
+| # | Feature | Tier | Priority |
+| --- | --- | --- | --- |
+| 80 | Meta lead forms inbox: live leads forwarded to the client by WhatsApp/email | Pro |  |
+| 81 | Google Business Profile insights (calls, directions, reviews) | Pro |  |
+| 82 | Facebook / Instagram organic page insights | Pro |  |
+| 83 | Microsoft (Bing) Ads | Agency |  |
+| 84 | LinkedIn Ads | Agency |  |
+| 85 | Call tracking numbers (via a call provider) | Agency |  |
+| 86 | UTM builder + link checker | Starter |  |
 
 #### Results & outcomes (4)
 
-| # | Feature | Tier | Source | Priority |
-| --- | --- | --- | --- | --- |
-| 87 | Lead quality score (fields, duplicates, fake numbers) | Pro | New |  |
-| 88 | Reverse-funnel goal calculator | Starter | New |  |
-| 89 | Customer LTV + cohorts (e-commerce) | Agency | New |  |
-| 90 | Lift / holdout test helper | Agency | New |  |
+| # | Feature | Tier | Priority |
+| --- | --- | --- | --- |
+| 87 | Lead quality score (fields, duplicates, fake numbers) | Pro |  |
+| 88 | Reverse-funnel goal calculator | Starter |  |
+| 89 | Customer LTV + cohorts (e-commerce) | Agency |  |
+| 90 | Lift / holdout test helper | Agency |  |
 
 #### Daily operations (5)
 
-| # | Feature | Tier | Source | Priority |
-| --- | --- | --- | --- | --- |
-| 91 | Account health monitor: disabled accounts, failed payments, restrictions | Starter | New |  |
-| 92 | Ad rejection explainer + fix suggestions | Pro | New |  |
-| 93 | Custom alert-rule builder | Pro | New |  |
-| 94 | Bulk edits across accounts (with approvals) | Agency | New |  |
-| 95 | Business Manager access audit | Pro | New |  |
+| # | Feature | Tier | Priority |
+| --- | --- | --- | --- |
+| 91 | Account health monitor: disabled accounts, failed payments, restrictions | Starter |  |
+| 92 | Ad rejection explainer + fix suggestions | Pro |  |
+| 93 | Custom alert-rule builder | Pro |  |
+| 94 | Bulk edits across accounts (with approvals) | Agency |  |
+| 95 | Business Manager access audit | Pro |  |
 
 #### Planning & insights (4)
 
-| # | Feature | Tier | Source | Priority |
-| --- | --- | --- | --- | --- |
-| 96 | Ramadan / Eid scenario planner | Pro | New |  |
-| 97 | City-level geo heatmap | Pro | New |  |
-| 98 | Audience overlap + saturation | Pro | New |  |
-| 99 | Weekly AI account review (top 3 actions per client) | Pro | New |  |
+| # | Feature | Tier | Priority |
+| --- | --- | --- | --- |
+| 96 | Ramadan / Eid scenario planner | Pro |  |
+| 97 | City-level geo heatmap | Pro |  |
+| 98 | Audience overlap + saturation | Pro |  |
+| 99 | Weekly AI account review (top 3 actions per client) | Pro |  |
 
 #### Creative (5)
 
-| # | Feature | Tier | Source | Priority |
-| --- | --- | --- | --- | --- |
-| 100 | Shareable ad preview gallery for clients | Starter | New |  |
-| 101 | Arabic copy checker (dialect fit, RTL breaks, mixed numerals) | Pro | New |  |
-| 102 | Video retention curves | Pro | New |  |
-| 103 | Competitor swipe file | Pro | New |  |
-| 104 | Creative brief generator from winning ads | Pro | New |  |
+| # | Feature | Tier | Priority |
+| --- | --- | --- | --- |
+| 100 | Shareable ad preview gallery for clients | Starter |  |
+| 101 | Arabic copy checker (dialect fit, RTL breaks, mixed numerals) | Pro |  |
+| 102 | Video retention curves | Pro |  |
+| 103 | Competitor swipe file | Pro |  |
+| 104 | Creative brief generator from winning ads | Pro |  |
 
 #### Clients (5)
 
-| # | Feature | Tier | Source | Priority |
-| --- | --- | --- | --- | --- |
-| 105 | Client onboarding link: requests Meta / Google / GA4 access in one flow | Pro | New |  |
-| 106 | Scheduled reports by email and WhatsApp | Starter | New |  |
-| 107 | Shared notes visible to the client | Pro | New |  |
-| 108 | Client approvals for budget increases | Agency | New |  |
-| 109 | Reports in French + other languages | Pro | New |  |
+| # | Feature | Tier | Priority |
+| --- | --- | --- | --- |
+| 105 | Client onboarding link: requests Meta / Google / GA4 access in one flow | Pro |  |
+| 106 | Scheduled reports by email and WhatsApp | Starter |  |
+| 107 | Shared notes visible to the client | Pro |  |
+| 108 | Client approvals for budget increases | Agency |  |
+| 109 | Reports in French + other languages | Pro |  |
 
 #### Agency management (4)
 
-| # | Feature | Tier | Source | Priority |
-| --- | --- | --- | --- | --- |
-| 110 | Churn risk score per client | Pro | New |  |
-| 111 | Upsell finder | Pro | New |  |
-| 112 | Time tracking + capacity per team member | Agency | New |  |
-| 113 | Contract + renewal tracker | Agency | New |  |
+| # | Feature | Tier | Priority |
+| --- | --- | --- | --- |
+| 110 | Churn risk score per client | Pro |  |
+| 111 | Upsell finder | Pro |  |
+| 112 | Time tracking + capacity per team member | Agency |  |
+| 113 | Contract + renewal tracker | Agency |  |
 
 #### Platform & admin (2)
 
-| # | Feature | Tier | Source | Priority |
-| --- | --- | --- | --- | --- |
-| 114 | Demo agency with sample data | Starter | New |  |
-| 115 | Webhooks + Zapier / Make / n8n | Pro | New |  |
+| # | Feature | Tier | Priority |
+| --- | --- | --- | --- |
+| 114 | Demo agency with sample data | Starter |  |
+| 115 | Webhooks + Zapier / Make / n8n | Pro |  |
 
 ### Scope expansion: every network, ads creation, organic (116–157)
 
@@ -434,21 +431,21 @@ Added 2026-11-04: 42 features that make AdsRanger a platform to create, manage a
 
 #### Every ad network (13)
 
-| # | Feature | Tier | Source | Priority |
-| --- | --- | --- | --- | --- |
-| 116 | Integration tiers: full API, report import, manual + universal CSV/Sheets importer | Starter | New |  |
-| 117 | Search: Apple Search Ads, Yandex Direct, Naver, Baidu (Microsoft Ads is #83) | Agency | New |  |
-| 118 | Social: X Ads, Pinterest Ads, Reddit Ads, Telegram Ads, YouTube reported on its own (LinkedIn is #84) | Pro | New |  |
-| 119 | Native (Western): Taboola, Outbrain, MGID, Revcontent, Yahoo Native | Pro | New |  |
-| 120 | Native + publishers (Arabic/MENA): ArabyAds, Anghami Ads, Arabic publisher networks via import | Agency | New |  |
-| 121 | Retail media: Amazon Ads, Noon Ads, Talabat Ads, Careem Ads, Google Merchant Center / Shopping | Agency | New |  |
-| 122 | DSPs / programmatic: DV360, The Trade Desk, Amazon DSP, StackAdapt, Yahoo DSP | Agency | New |  |
-| 123 | PPV / pop / push: PropellerAds, Adsterra, RichAds, Zeropark, PopAds, Clickadu, Evadav, HilltopAds | Pro | New |  |
-| 124 | Mobile app networks: AppLovin, Unity Ads, ironSource, Mintegral, Moloco + AppsFlyer / Adjust attribution | Agency | New |  |
-| 125 | Video / CTV / audio: Spotify Ads, Anghami audio, Shahid (MBC), OSN+, CTV through DSPs (streaming via report import) | Agency | New |  |
-| 126 | Affiliate networks: Admitad, ArabClicks, Impact, CJ | Agency | New |  |
-| 127 | Network catalog + request-a-network votes | Starter | New |  |
-| 128 | Cross-network normalised metrics: one schema, one currency, one result definition | Starter | New |  |
+| # | Feature | Tier | Priority |
+| --- | --- | --- | --- |
+| 116 | Integration tiers: full API, report import, manual + universal CSV/Sheets importer | Starter |  |
+| 117 | Search: Apple Search Ads, Yandex Direct, Naver, Baidu (Microsoft Ads is #83) | Agency |  |
+| 118 | Social: X Ads, Pinterest Ads, Reddit Ads, Telegram Ads, YouTube reported on its own (LinkedIn is #84) | Pro |  |
+| 119 | Native (Western): Taboola, Outbrain, MGID, Revcontent, Yahoo Native | Pro |  |
+| 120 | Native + publishers (Arabic/MENA): ArabyAds, Anghami Ads, Arabic publisher networks via import | Agency |  |
+| 121 | Retail media: Amazon Ads, Noon Ads, Talabat Ads, Careem Ads, Google Merchant Center / Shopping | Agency |  |
+| 122 | DSPs / programmatic: DV360, The Trade Desk, Amazon DSP, StackAdapt, Yahoo DSP | Agency |  |
+| 123 | PPV / pop / push: PropellerAds, Adsterra, RichAds, Zeropark, PopAds, Clickadu, Evadav, HilltopAds | Pro |  |
+| 124 | Mobile app networks: AppLovin, Unity Ads, ironSource, Mintegral, Moloco + AppsFlyer / Adjust attribution | Agency |  |
+| 125 | Video / CTV / audio: Spotify Ads, Anghami audio, Shahid (MBC), OSN+, CTV through DSPs (streaming via report import) | Agency |  |
+| 126 | Affiliate networks: Admitad, ArabClicks, Impact, CJ | Agency |  |
+| 127 | Network catalog + request-a-network votes | Starter |  |
+| 128 | Cross-network normalised metrics: one schema, one currency, one result definition | Starter |  |
 
 #### Network build order
 
@@ -533,42 +530,42 @@ Layers 2–4 are built in Wave 1 with plans, agency workspaces and roles.
 
 #### Ads creation: AdsRanger Studio (16)
 
-| # | Feature | Tier | Source | Priority |
-| --- | --- | --- | --- | --- |
-| 129 | Campaign builder: create campaigns, ad sets and ads on Meta, Google, TikTok and Snap | Pro | New |  |
-| 130 | Cross-network launch: one brief becomes network-ready variants | Agency | New |  |
-| 131 | AI ad copy in Arabic dialects (Gulf, Levantine, Egyptian) + English / French | Starter | New |  |
-| 132 | AI image generation + auto-resize to every placement | Pro | New |  |
-| 133 | Video ad maker: templates, Arabic captions, auto-cut to 9:16 / 1:1 / 16:9 | Pro | New |  |
-| 134 | Brand kit: logos, colours, fonts, tone, banned words | Starter | New |  |
-| 135 | Asset library with tags + where each asset runs | Starter | New |  |
-| 136 | Placement previews: feed, stories, reels, search, native, push | Starter | New |  |
-| 137 | Search ad builder: keywords, RSA headlines, assets | Pro | New |  |
-| 138 | Audience builder + sync across networks (custom, lookalike, retargeting) | Pro | New |  |
-| 139 | Variant generator + A/B test setup | Pro | New |  |
-| 140 | Landing page builder (AR/EN, RTL, forms into the leads inbox) | Pro | New |  |
-| 141 | Product feed manager for Meta, Google, TikTok and Snap catalogs | Agency | New |  |
-| 142 | Draft, approve, schedule and publish flow | Pro | New |  |
-| 143 | Policy pre-check before publish (Meta / Google rules, health and finance claims) | Pro | New |  |
-| 144 | Native, push and pop creative formats (titles, icons, thumbnails) | Pro | New |  |
+| # | Feature | Tier | Priority |
+| --- | --- | --- | --- |
+| 129 | Campaign builder: create campaigns, ad sets and ads on Meta, Google, TikTok and Snap | Pro |  |
+| 130 | Cross-network launch: one brief becomes network-ready variants | Agency |  |
+| 131 | AI ad copy in Arabic dialects (Gulf, Levantine, Egyptian) + English / French | Starter |  |
+| 132 | AI image generation + auto-resize to every placement | Pro |  |
+| 133 | Video ad maker: templates, Arabic captions, auto-cut to 9:16 / 1:1 / 16:9 | Pro |  |
+| 134 | Brand kit: logos, colours, fonts, tone, banned words | Starter |  |
+| 135 | Asset library with tags + where each asset runs | Starter |  |
+| 136 | Placement previews: feed, stories, reels, search, native, push | Starter |  |
+| 137 | Search ad builder: keywords, RSA headlines, assets | Pro |  |
+| 138 | Audience builder + sync across networks (custom, lookalike, retargeting) | Pro |  |
+| 139 | Variant generator + A/B test setup | Pro |  |
+| 140 | Landing page builder (AR/EN, RTL, forms into the leads inbox) | Pro |  |
+| 141 | Product feed manager for Meta, Google, TikTok and Snap catalogs | Agency |  |
+| 142 | Draft, approve, schedule and publish flow | Pro |  |
+| 143 | Policy pre-check before publish (Meta / Google rules, health and finance claims) | Pro |  |
+| 144 | Native, push and pop creative formats (titles, icons, thumbnails) | Pro |  |
 
 #### Organic tools (13)
 
-| # | Feature | Tier | Source | Priority |
-| --- | --- | --- | --- | --- |
-| 145 | Post scheduler: Facebook, Instagram, TikTok, X, LinkedIn, Snapchat, YouTube, Google Business, Telegram | Starter | New |  |
-| 146 | Content calendar with Hijri dates + client approvals | Starter | New |  |
-| 147 | Unified inbox: comments, DMs, WhatsApp, reviews | Pro | New |  |
-| 148 | Organic analytics across every social profile | Starter | New |  |
-| 149 | AI caption + hashtag writer (AR/EN) | Starter | New |  |
-| 150 | Best time to post, per profile | Pro | New |  |
-| 151 | Trend + hashtag finder by country | Pro | New |  |
-| 152 | Competitor organic tracking | Pro | New |  |
-| 153 | Boost a post: turn a top organic post into an ad | Pro | New |  |
-| 154 | Review management: Google + Facebook reviews, AI reply drafts | Pro | New |  |
-| 155 | SEO tools: rank tracking, site audit, keyword research | Agency | New |  |
-| 156 | Link-in-bio page with UTM tracking | Starter | New |  |
-| 157 | Social listening: brand mentions in Arabic and English | Agency | New |  |
+| # | Feature | Tier | Priority |
+| --- | --- | --- | --- |
+| 145 | Post scheduler: Facebook, Instagram, TikTok, X, LinkedIn, Snapchat, YouTube, Google Business, Telegram | Starter |  |
+| 146 | Content calendar with Hijri dates + client approvals | Starter |  |
+| 147 | Unified inbox: comments, DMs, WhatsApp, reviews | Pro |  |
+| 148 | Organic analytics across every social profile | Starter |  |
+| 149 | AI caption + hashtag writer (AR/EN) | Starter |  |
+| 150 | Best time to post, per profile | Pro |  |
+| 151 | Trend + hashtag finder by country | Pro |  |
+| 152 | Competitor organic tracking | Pro |  |
+| 153 | Boost a post: turn a top organic post into an ad | Pro |  |
+| 154 | Review management: Google + Facebook reviews, AI reply drafts | Pro |  |
+| 155 | SEO tools: rank tracking, site audit, keyword research | Agency |  |
+| 156 | Link-in-bio page with UTM tracking | Starter |  |
+| 157 | Social listening: brand mentions in Arabic and English | Agency |  |
 
 New totals: 157 features, 44 in Starter, 78 in Pro, 35 in Agency.
 
@@ -609,4 +606,3 @@ Estimates assume Rami building solo with Claude Code, full time after 12 Nov. Pl
 - [ ] Livewire or Inertia + Vue for app screens
 - [ ] Same VPS or a separate server (decide later; build first)
 - [ ] Beta agencies: who to invite
-- [ ] IP check of the Telescope services contract
