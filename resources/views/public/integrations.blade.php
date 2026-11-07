@@ -2,57 +2,47 @@
 $ar = ($lang ?? 'ar') === 'ar';
 $base = $ar ? '' : '/en';
 $t = $ar ? [
-    'title' => 'دليل الـ 18 شبكة إعلانية والتكاملات · AdsRanger',
+    'title' => 'المنصات الإعلانية قيد الربط · AdsRanger',
     'switch_url' => '/en/integrations',
-    'tag' => '18 شبكة إعلانية · فحص البكسل و CAPI · صلاحيات آمنة',
-    'h1' => 'ربط موحد لجميع قنوات الإعلانات المدفوعة والعضوية في الشرق الأوسط.',
-    'lead' => 'يرتبط AdsRanger عبر بروتوكول OAuth الرسمي مع 18 شبكة إعلانية ومنصة تواصل، ليجمع الإنفاق والرسائل والمكالمات والمبيعات وجودة التتبع (EMQ) في لوحة واحدة.',
+    'tag' => 'قيد التطوير · ربط بصلاحية القراءة فقط',
+    'h1' => 'المنصات الإعلانية التي نعمل على ربطها.',
+    'lead' => 'هذه المنصات قيد التطوير: لا توجد منصة مفعّلة للوكالات بعد، وتُفتح كل منصة بعد اعتماد تطبيقنا لديها. الربط عبر واجهات المنصات الرسمية وبصلاحية القراءة فقط.',
     'networks' => [
-        ['Meta Ads (Facebook & Instagram)', 'مزامنة الحملات، رسائل واتساب وإنستغرام، المكالمات، العملاء المحتملين، المبيعات، وفحص جودة CAPI EMQ.'],
-        ['Google Ads (Search, PMax, Display)', 'مزامنة الكلمات المفتاحية، مكالمات الهاتف، التحويلات، ومصفوفة نيات البحث بالذكاء الاصطناعي.'],
-        ['TikTok Ads & Spark Ads', 'تتبع الفيديو، تفاعل Spark Ads، المبيعات، وتحليل سرعة الخطاف الإعلاني في الثواني الثلاث الأولى.'],
-        ['Snapchat Ads & AR Lenses', 'منصة أساسية لأسواق الخليج: تتبع المبيعات، الرسائل، وعائد عدسات الواقع المعزز (AR Lens ROI).'],
-        ['LinkedIn Ads (B2B Lead Gen)', 'تتبع نماذج العملاء المحتملين للشركات وتقييم جودة الشركات حسب القطاع وعدد الموظفين.'],
+        ['Meta Ads (Facebook & Instagram)', 'الحملات والرسائل والمكالمات والعملاء المحتملون والمبيعات حسب هدف كل حملة.'],
+        ['Google Ads (Search, PMax, Display)', 'الكلمات المفتاحية والمكالمات والتحويلات.'],
+        ['TikTok Ads', 'الإنفاق والمشاهدات والنتائج حسب هدف الحملة.'],
+        ['Snapchat Ads', 'الإنفاق والنتائج حسب هدف الحملة، مهمة لأسواق الخليج.'],
+        ['LinkedIn Ads (B2B Lead Gen)', 'العملاء المحتملون من نماذج LinkedIn والإنفاق والنتائج.'],
         ['X (Twitter) Ads', 'مزامنة حملات التفاعل، الزيارات، والتحويلات في أسواق الخليج والشرق الأوسط.'],
-        ['Microsoft Advertising (Bing)', 'حملات البحث والتسوق مع توزيع الكلمات المفتاحية المشترك مع جوجل.'],
-        ['YouTube Ads', 'قياس حملات الفيديو، المشاهدات الكاملة، والتأثير على البحث والعائد المدمج.'],
-        ['WhatsApp Business Cloud API', 'قياس محادثات الإعلانات الموجهة لواتساب وإرسال تقارير العملاء المجدولة تلقائياً.'],
+        ['Microsoft Advertising (Bing)', 'حملات البحث والتسوق.'],
         ['Apple Search Ads', 'تتبع تكلفة تثبيت التطبيقات والاشتراكات داخل متجر آبل.'],
         ['Amazon Ads (MENA)', 'قياس مبيعات المتاجر والعائد الإعلاني (ACOS / ROAS) على أمازون السعودية والإمارات ومصر.'],
         ['Pinterest Ads', 'مزامنة حملات التجارة الإلكترونية والأزياء والديكور.'],
         ['Reddit Ads', 'حملات المجتمعات والتقنية والزيارات المستهدفة.'],
         ['Taboola Native Ads', 'حملات المحتوى والإعلانات الضمنية في المواقع الإخبارية العربية.'],
         ['Outbrain Native Ads', 'تتبع زيارات وتحويلات المحتوى الممول عبر الناشرين.'],
-        ['Criteo Commerce Media', 'حملات إعادة الاستهداف الديناميكي لمتاجر التجارة الإلكترونية.'],
-        ['Telegram Ads', 'تتبع القنوات والإعلانات الممولة في تيليجرام.'],
-        ['Shahid / MBC Connected TV', 'قياس حملات البث الرقمي والفيديو المميز في رمضان والمواسم الذروة.'],
     ],
     'cta' => 'انضم لقائمة الانتظار لربط حسابات وكالتك',
 ] : [
-    'title' => '18 Ad Networks & API Integrations Directory · AdsRanger',
+    'title' => 'Ad networks in development · AdsRanger',
     'switch_url' => '/integrations',
-    'tag' => '18 Native Connectors · CAPI & Pixel EMQ · OAuth 2.0 Security',
-    'h1' => 'One unified schema across 18 paid, social & commerce networks.',
-    'lead' => 'AdsRanger connects via official OAuth 2.0 APIs to normalize spend, goal-based conversions (messages, calls, leads, purchases), and pixel Event Match Quality every morning.',
+    'tag' => 'In development · read-only connections',
+    'h1' => 'The ad networks we are connecting.',
+    'lead' => 'These networks are in development: none is open to agencies yet, and each opens once the network approves our app. Connections use the official APIs with read-only access.',
     'networks' => [
-        ['Meta Ads (Facebook & Instagram)', 'Campaigns, Click-to-WhatsApp/IG messages, calls, lead forms, purchases, and CAPI Event Match Quality (EMQ).'],
-        ['Google Ads (Search, PMax, YouTube)', 'Search terms, call extensions, conversions, and AI search intent keyword clustering.'],
-        ['TikTok Ads & Spark Ads', 'Video hook velocity, Spark Ads organic boost triggers, and pixel/Events API diagnostics.'],
-        ['Snapchat Ads & AR Lenses', 'Built for GCC scale: story ads, dynamic catalogs, and AR Lens swipe-to-checkout ROI attribution.'],
-        ['LinkedIn Ads (B2B Lead Gen)', 'Native lead gen forms and automated B2B company size & industry lead scoring.'],
+        ['Meta Ads (Facebook & Instagram)', 'Campaigns, messages, calls, leads and sales by each campaign goal.'],
+        ['Google Ads (Search, PMax, YouTube)', 'Search terms, calls and conversions.'],
+        ['TikTok Ads', 'Spend, views and results by campaign goal.'],
+        ['Snapchat Ads', 'Spend and results by campaign goal; key for the Gulf.'],
+        ['LinkedIn Ads (B2B Lead Gen)', 'Leads from LinkedIn forms, spend and results.'],
         ['X (Twitter) Ads', 'Follower, engagement, website traffic, and conversion campaigns across MENA.'],
-        ['Microsoft Advertising (Bing)', 'Search & shopping campaigns with bilingual AI keyword mapping matrices.'],
-        ['YouTube Video & Shorts', 'TrueView views, CPV/CPM pacing, and cross-channel blended MER impact.'],
-        ['WhatsApp Business Cloud API', 'Click-to-WhatsApp conversion tracking and scheduled client report delivery.'],
+        ['Microsoft Advertising (Bing)', 'Search and shopping campaigns.'],
         ['Apple Search Ads', 'App Store install CPIs, tap-through rates, and in-app subscription events.'],
         ['Amazon Ads (KSA, UAE, Egypt)', 'Sponsored Products/Brands spend, attributed sales, ACOS and ROAS metrics.'],
         ['Pinterest Ads', 'Catalog shopping pins, visual discovery traffic, and e-commerce checkouts.'],
         ['Reddit Ads', 'Community targeting clicks, conversions, and tech/gaming cohort metrics.'],
         ['Taboola Native Ads', 'Native article placements across premier Arabic and global publishers.'],
         ['Outbrain Native Ads', 'Discovery feed traffic, landing page engagement, and conversion tracking.'],
-        ['Criteo Commerce Media', 'Dynamic retargeting catalogs and repeat-buyer ROAS tracking.'],
-        ['Telegram Sponsored Messages', 'Channel reach, clicks, and subscriber acquisition tracking.'],
-        ['Shahid / MBC Connected TV', 'Premium MENA OTT streaming impressions and Ramadan prime-time reach.'],
     ],
     'cta' => 'Join the Agency Waitlist to connect your accounts',
 ];
@@ -69,7 +59,7 @@ $t = $ar ? [
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0b1020;--card:#121933;--ink:#eef1fb;--muted:#9aa3c0;--acc:#2DD4BF;--line:#232c4d}
+:root{--bg:#0b1020;--card:#121933;--ink:#eef1fb;--muted:#9aa3c0;--acc:#5EEAD4;--line:#232c4d}
 *{box-sizing:border-box}body{margin:0;font-family:{{ $ar ? '"IBM Plex Sans Arabic",' : '' }}system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--ink);line-height:{{ $ar ? '1.8' : '1.55' }}}
 .w{max-width:1080px;margin:0 auto;padding:0 20px}
 .btn{display:inline-block;padding:10px 18px;border-radius:10px;background:var(--acc);color:#0B1020;text-decoration:none;font-weight:600}

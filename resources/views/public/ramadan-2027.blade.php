@@ -7,17 +7,11 @@ $t = $ar ? [
     'home' => 'الرئيسية', 'waitlist' => 'قائمة الانتظار', 'signin' => 'تسجيل الدخول',
     'tag' => 'تخطيط المواسم · رمضان 1448 هـ (8 فبراير – 9 مارس 2027)',
     'h1' => 'خطة ميزانية وحملات رمضان 2027 لوكالات الشرق الأوسط.',
-    'lead' => 'يبدأ شهر رمضان القادم المتوقع يوم <bdi dir="ltr">2027-02-08</bdi> ويستمر حتى عيد الفطر <bdi dir="ltr">2027-03-09</bdi>. ترتفع المنافسة وتكلفة الظهور في الأسواق العربية بنسبة 10% إلى 25% مع ذروة التفاعل في ساعات المساء والسحور عبر 18 شبكة إعلانية.',
+    'lead' => 'يبدأ شهر رمضان القادم المتوقع يوم <bdi dir="ltr">2027-02-08</bdi> ويستمر حتى عيد الفطر <bdi dir="ltr">2027-03-09</bdi>. ترتفع المنافسة وتكلفة الظهور في الأسواق العربية بنسبة 10% إلى 25% مع ذروة التفاعل في ساعات المساء والسحور.',
     'phases' => [
-        ['1. مرحلة التجهيز وفحص CAPI (18 يناير – 7 فبراير 2027)', 'اختبار الإعلانات، فحص جودة تتبع البكسل (EMQ) وسرعة صفحات الهبوط، وبناء جماهير إعادة الاستهداف قبل ارتفاع تكلفة الألف ظهور.'],
-        ['2. ذروة شهر رمضان (8 فبراير – 8 مارس 2027)', 'رفع الميزانيات اليومية بنسبة +20%، التركيز على حملات المبيعات والرسائل المسائية، وإعادة توزيع الميزانيات تلقائياً نحو القنوات الأعلى عائداً.'],
-        ['3. العشر الأواخر وعيد الفطر (28 فبراير – 11 مارس 2027)', 'ذروة الهدايا والأزياء والمطاعم؛ تحويل الرسائل الإعلانية باللهجات الخليجية والشامية والمصرية إلى عروض العيد والشحن السريع.'],
-    ],
-    'tools_title' => 'أدوات AdsRanger الجاهزة لموسم رمضان 2027',
-    'tools' => [
-        ['استوديو اللهجات العربية لرمضان والعيد', 'توليد نصوص إعلانية مخصصة لرمضان والعيد باللهجة الخليجية والشامية والمصرية مع تقييم الخطاف النفسي.'],
-        ['تتبع عائد المؤثرين وأكواد الخصم', 'قياس المبيعات والعائد الحقيقي لحملات صناع المحتوى في رمضان عبر تيك توك وسناب شات وإنستغرام.'],
-        ['العائد المدمج (MER) ومدرج الميزانية', 'مراقبة الصرف اليومي في أوقات الذروة والسحور مع تنبيهات فورية قبل نفاد ميزانية العميل.'],
+        ['1. مرحلة التجهيز والتشويق (18 يناير – 7 فبراير 2027)', 'اختبار الإعلانات، فحص البكسل وصفحات الهبوط، وبناء جماهير إعادة الاستهداف قبل ارتفاع تكلفة الألف ظهور.'],
+        ['2. ذروة شهر رمضان (8 فبراير – 8 مارس 2027)', 'رفع الميزانيات اليومية بنسبة +20%، التركيز على حملات المبيعات والرسائل المسائية، ومراقبة إجهاد الإعلانات.'],
+        ['3. العشر الأواخر وعيد الفطر (28 فبراير – 11 مارس 2027)', 'ذروة الهدايا والأزياء والمطاعم؛ تحويل الرسائل الإعلانية إلى عروض العيد والشحن السريع.'],
     ],
     'calc_title' => 'حاسبة ميزانية رمضان 2027 التفاعلية',
     'calc_sub' => 'احسب الميزانية المقترحة والنتائج المتوقعة خلال 30 يوماً بناءً على معاملات الموسم في AdsRanger (+20% إنفاق مقترح، +10% تغير تكلفة النتيجة).',
@@ -37,15 +31,9 @@ $t = $ar ? [
     'h1' => 'Ramadan 2027 media planning & budget calculator for MENA agencies.',
     'lead' => 'Ramadan 2027 is expected to begin around <bdi dir="ltr">2027-02-08</bdi> through Eid al-Fitr on <bdi dir="ltr">2027-03-09</bdi> (Umm al-Qura calendar). Evening and late-night traffic surges while auction CPRs typically rise 10%–25% across GCC and Levant markets.',
     'phases' => [
-        ['1. Warm-up & CAPI EMQ check (18 Jan – 7 Feb 2027)', 'Validate pixel/CAPI Event Match Quality, landing page speed and creative variants while CPMs are still at baseline.'],
-        ['2. Ramadan core flight (8 Feb – 8 Mar 2027)', 'Scale daily budgets +20% for evening/Suhoor prime hours with automated cross-channel budget reallocation.'],
-        ['3. Last 10 days & Eid al-Fitr (28 Feb – 11 Mar 2027)', 'Peak gifting, fashion and retail conversions; pivot Gulf, Levantine & Egyptian dialect copy to Eid delivery cutoffs.'],
-    ],
-    'tools_title' => 'Built-in AdsRanger Tools for Ramadan 2027',
-    'tools' => [
-        ['MENA Dialect Studio & Hook Scoring', 'Generate Ramadan & Eid ad copy in Gulf, Levantine, Egyptian & MSA dialects with psychological trigger audits.'],
-        ['Influencer & Promo-Code ROI Hub', 'Attribute creator revenue, promo redemptions, and net ROI across TikTok, Snapchat, Instagram & YouTube.'],
-        ['Blended MER & Budget Runway Alerts', 'Track real-time Suhoor/evening pacing and protect client retainers with automated runway diagnostics.'],
+        ['1. Warm-up & pixel check (18 Jan – 7 Feb 2027)', 'Validate conversion tracking, landing page speed and creative variants while CPMs are still at baseline.'],
+        ['2. Ramadan core flight (8 Feb – 8 Mar 2027)', 'Scale daily budgets +20% for evening/Suhoor prime hours and watch frequency alerts closely.'],
+        ['3. Last 10 days & Eid al-Fitr (28 Feb – 11 Mar 2027)', 'Peak gifting, fashion and retail conversions; pivot ad copy to Eid delivery cutoffs and offers.'],
     ],
     'calc_title' => 'Interactive Ramadan 2027 Budget Calculator',
     'calc_sub' => 'Estimate your 30-day Ramadan budget and projected results using AdsRanger seasonality defaults (+20% spend multiplier, +10% CPR shift).',
@@ -81,7 +69,7 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:20px 0
 .btn.o{background:transparent;border:1px solid var(--line);color:var(--ink)}
 .lang{color:var(--muted);text-decoration:none;font-size:14px;padding:8px 10px}
 .tag{display:inline-block;font-size:13px;color:var(--acc);border:1px solid var(--line);padding:4px 10px;border-radius:99px;margin-bottom:14px}
-.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;padding:18px 0 28px}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;padding:18px 0 32px}
 .c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
 .c h3{margin:0 0 8px;font-size:16px;color:var(--acc)}.c p{margin:0;color:var(--muted);font-size:14px}
 input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#0b1020;color:var(--ink);font-size:15px}
@@ -103,12 +91,6 @@ footer{border-top:1px solid var(--line);padding:22px 0;color:var(--muted);font-s
 <section class="g">
     @foreach ($t['phases'] as $p)
         <div class="c"><h3>{{ $p[0] }}</h3><p>{{ $p[1] }}</p></div>
-    @endforeach
-</section>
-<h2 style="margin:4px 0 0;font-size:20px">{{ $t['tools_title'] }}</h2>
-<section class="g">
-    @foreach ($t['tools'] as $tl)
-        <div class="c"><h3>{{ $tl[0] }}</h3><p>{{ $tl[1] }}</p></div>
     @endforeach
 </section>
 <section class="c" style="margin-bottom:48px">

@@ -5,14 +5,9 @@ $t = $ar ? [
     'title' => 'قائمة الانتظار · AdsRanger',
     'switch' => 'English', 'switch_url' => '/en/waitlist',
     'home' => 'الرئيسية', 'ramadan' => 'تخطيط رمضان 2027', 'signin' => 'تسجيل الدخول',
-    'tag' => 'وصول مبكر للوكالات · 18 شبكة إعلانية · إطلاق سبتمبر 2027',
+    'tag' => 'وصول مبكر للوكالات · الإطلاق في 2027',
     'h1' => 'انضم إلى قائمة الانتظار لوكالات الإعلانات في الشرق الأوسط.',
-    'lead' => 'نفتح الحسابات التجريبية للوكالات على دفعات لضمان جودة الربط عبر 18 شبكة إعلانية (<bdi dir="ltr">Meta</bdi>، <bdi dir="ltr">Google</bdi>، <bdi dir="ltr">TikTok</bdi>، <bdi dir="ltr">Snapchat</bdi>، <bdi dir="ltr">LinkedIn</bdi> وغيرها) والدعم الفني المباشر. سجّل بيانات وكالتك وسنتواصل معك فور فتح الدفعة القادمة.',
-    'perks' => [
-        ['ربط 18 شبكة + فحص CAPI', 'مزامنة يومية لحسابات عملائك مع تشخيص جودة تتبع البكسل (EMQ) واكتشاف الروابط المعطلة.'],
-        ['استوديو اللهجات العربية والذكاء الإعلاني', 'توليد نصوص إعلانية باللهجة الخليجية والشامية والمصرية، ومصفوفة الكلمات المفتاحية، وتقييم الخطاف النفسي.'],
-        ['تقارير العملاء ومركز عمليات الوكالة (CFO)', 'روابط تقارير آمنة، تقارير PDF وواتساب، حساب العائد المدمج (MER)، ومراقبة مدرج الميزانية وربحية العقود.'],
-    ],
+    'lead' => 'نفتح الحسابات التجريبية للوكالات على دفعات لضمان جودة الربط والدعم الفني. سجّل بيانات وكالتك وسنتواصل معك فور فتح الدفعة القادمة.',
     'saved' => 'تم تسجيل طلبك في قائمة الانتظار بنجاح. سنتواصل معك عبر البريد الإلكتروني قريباً.',
     'name' => 'الاسم الكامل',
     'agency' => 'اسم الوكالة',
@@ -32,14 +27,9 @@ $t = $ar ? [
     'title' => 'Join the Agency Waitlist · AdsRanger',
     'switch' => 'العربية', 'switch_url' => '/waitlist',
     'home' => 'Home', 'ramadan' => 'Ramadan 2027 Planner', 'signin' => 'Sign in',
-    'tag' => 'Early agency access · 18 Ad Networks · Public launch Sep 2027',
+    'tag' => 'Early agency access · launching 2027',
     'h1' => 'Join the waitlist for MENA marketing agencies.',
-    'lead' => 'We onboard agencies in cohorts so every workspace gets hands-on support across Meta, Google, TikTok, Snapchat, LinkedIn and 18 ad networks. Reserve your spot below.',
-    'perks' => [
-        ['18 Networks + CAPI EMQ Health', 'Unified daily sync across paid channels with automated pixel/CAPI Event Match Quality diagnostics.'],
-        ['MENA Dialect Studio & Intelligence', 'AI copy in Gulf, Levantine, Egyptian & MSA dialects, search intent matrices, and psychological hook scoring.'],
-        ['Client Reports & Agency CFO Hub', 'Signed client links, PDF/WhatsApp reports, Blended ROAS & MER, budget runway audits, and creator ROI.'],
-    ],
+    'lead' => 'We onboard agencies in cohorts so every workspace gets hands-on support across Meta, Google, TikTok, Snapchat and 14+ networks. Reserve your spot below.',
     'saved' => 'You are on the waitlist! We will reach out to your work email as soon as the next agency cohort opens.',
     'name' => 'Full name',
     'agency' => 'Agency name',
@@ -71,7 +61,7 @@ $t = $ar ? [
 <style>
 :root{--bg:#0b1020;--card:#121933;--ink:#eef1fb;--muted:#9aa3c0;--acc:#2DD4BF;--line:#232c4d}
 *{box-sizing:border-box}body{margin:0;font-family:{{ $ar ? '"IBM Plex Sans Arabic",' : '' }}system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--ink);line-height:{{ $ar ? '1.8' : '1.55' }}}
-.w{max-width:920px;margin:0 auto;padding:0 20px}
+.w{max-width:860px;margin:0 auto;padding:0 20px}
 nav{display:flex;justify-content:space-between;align-items:center;padding:20px 0;gap:12px;flex-wrap:wrap}
 .logo{font-weight:700;letter-spacing:.2px;direction:ltr;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:10px}.logo b{color:var(--acc)}
 .nr{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
@@ -79,9 +69,6 @@ nav{display:flex;justify-content:space-between;align-items:center;padding:20px 0
 .btn.o{background:transparent;border:1px solid var(--line);color:var(--ink)}
 .lang{color:var(--muted);text-decoration:none;font-size:14px;padding:8px 10px}
 .tag{display:inline-block;font-size:13px;color:var(--acc);border:1px solid var(--line);padding:4px 10px;border-radius:99px;margin-bottom:14px}
-.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:22px}
-.p{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
-.p h3{margin:0 0 6px;font-size:15px;color:var(--acc)}.p p{margin:0;color:var(--muted);font-size:13.5px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px;margin:24px 0 48px}
 label{display:block;font-size:14px;font-weight:600;margin:14px 0 6px}
 input,select,textarea{width:100%;padding:11px 13px;border-radius:10px;border:1px solid var(--line);background:#0b1020;color:var(--ink);font-family:inherit;font-size:15px}
@@ -96,12 +83,7 @@ footer{border-top:1px solid var(--line);padding:22px 0;color:var(--muted);font-s
 <section style="padding:32px 0 8px">
     <span class="tag">{{ $t['tag'] }}</span>
     <h1 style="font-size:clamp(26px,4.5vw,40px);margin:0 0 12px">{{ $t['h1'] }}</h1>
-    <p style="color:var(--muted);font-size:17px;margin:0">{!! $t['lead'] !!}</p>
-    <div class="g">
-        @foreach ($t['perks'] as $perk)
-            <div class="p"><h3>{{ $perk[0] }}</h3><p>{{ $perk[1] }}</p></div>
-        @endforeach
-    </div>
+    <p style="color:var(--muted);font-size:17px;margin:0">{{ $t['lead'] }}</p>
 </section>
 <div class="card">
     @if (session('waitlist_saved'))

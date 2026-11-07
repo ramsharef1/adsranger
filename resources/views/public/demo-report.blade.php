@@ -4,7 +4,7 @@ $base = $ar ? '' : '/en';
 $t = $ar ? [
     'title' => 'نموذج تقرير العميل التفاعلي · AdsRanger',
     'switch_url' => '/en/demo-report',
-    'tag' => 'معاينة حية · هكذا يرى عملاؤك نتائج حملاتهم بدون تعقيد',
+    'tag' => 'تقرير تجريبي ببيانات نموذجية · هكذا سيرى عملاؤك نتائجهم',
     'h1' => 'تقرير عميل واضح، بالنتيجة الحقيقية لكل حملة.',
     'lead' => 'بدلاً من جداول البيانات المعقدة، يحصل عميلك على رابط آمن للقراءة فقط وتقرير PDF شهري يعرض الإنفاق والرسائل والمكالمات والمبيعات ومؤشر صحة الحساب.',
     'client_name' => 'مجموعة النخبة الطبية — الرياض (بيانات تجريبية)',
@@ -28,7 +28,7 @@ $t = $ar ? [
 ] : [
     'title' => 'Interactive Sample Client Report · AdsRanger',
     'switch_url' => '/demo-report',
-    'tag' => 'Live Preview · What your agency clients see via signed read-only links',
+    'tag' => 'Sample report with demo data · what your clients will see',
     'h1' => 'Client reporting that speaks in real business outcomes.',
     'lead' => 'Replace confusing spreadsheets with a signed, read-only Arabic/English client portal and monthly PDF showing goal-matched results, health scores, and top creatives.',
     'client_name' => 'Al-Nokhba Medical Group — Riyadh (Sample Demo Data)',
@@ -63,7 +63,7 @@ $t = $ar ? [
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0b1020;--card:#121933;--ink:#eef1fb;--muted:#9aa3c0;--acc:#2DD4BF;--line:#232c4d}
+:root{--bg:#0b1020;--card:#121933;--ink:#eef1fb;--muted:#9aa3c0;--acc:#5EEAD4;--line:#232c4d}
 *{box-sizing:border-box}body{margin:0;font-family:{{ $ar ? '"IBM Plex Sans Arabic",' : '' }}system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--ink);line-height:{{ $ar ? '1.8' : '1.55' }}}
 .w{max-width:1080px;margin:0 auto;padding:0 20px}
 .btn{display:inline-block;padding:10px 18px;border-radius:10px;background:var(--acc);color:#0B1020;text-decoration:none;font-weight:600}

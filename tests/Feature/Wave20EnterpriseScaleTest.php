@@ -18,7 +18,7 @@ class Wave20EnterpriseScaleTest extends TestCase
     public function test_ai_analyst_driver_caches_and_returns_insight(): void
     {
         $res = AiAnalyst::analyze('Optimize campaign spend', 'en');
-        $this->assertStringContainsString('Advanced AI insight', $res);
+        $this->assertStringContainsString('no AI provider is connected yet', $res);
     }
 
     public function test_webhook_job_dispatches_with_signature(): void

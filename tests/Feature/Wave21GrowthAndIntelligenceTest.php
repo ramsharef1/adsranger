@@ -9,13 +9,14 @@ class Wave21GrowthAndIntelligenceTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_wave21_public_growth_pages_render(): void
+    /** D-168: the calculator, partner directory and case studies held invented figures and agencies; they redirect to the waitlist until rebuilt from real data. */
+    public function test_held_back_growth_pages_redirect_to_the_waitlist(): void
     {
-        $this->get('/calculator')->assertOk();
-        $this->get('/en/calculator')->assertOk();
-        $this->get('/partners')->assertOk()->assertSee('Riyadh Growth Partners');
-        $this->get('/en/partners')->assertOk();
-        $this->get('/resources')->assertOk()->assertSee('Ramadan');
-        $this->get('/en/resources')->assertOk();
+        $this->get('/calculator')->assertRedirect('/waitlist');
+        $this->get('/en/calculator')->assertRedirect('/en/waitlist');
+        $this->get('/partners')->assertRedirect('/waitlist');
+        $this->get('/en/partners')->assertRedirect('/en/waitlist');
+        $this->get('/resources')->assertRedirect('/waitlist');
+        $this->get('/en/resources')->assertRedirect('/en/waitlist');
     }
 }

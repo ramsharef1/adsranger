@@ -85,10 +85,9 @@ Route::post('/onboard/{token}', [ClientOnboardingController::class, 'submit'])
 Route::get('/api/v1/export/{token}', [ClientOnboardingController::class, 'exportFeed'])
     ->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{32,64}')->name('api.export.feed');
 
-// Wave 21 Public Growth Pages
-Route::get('/calculator', [PublicSiteController::class, 'calculator'])->defaults('lang', 'ar');
-Route::get('/en/calculator', [PublicSiteController::class, 'calculator'])->defaults('lang', 'en');
-Route::get('/partners', [PublicSiteController::class, 'partners'])->defaults('lang', 'ar');
-Route::get('/en/partners', [PublicSiteController::class, 'partners'])->defaults('lang', 'en');
-Route::get('/resources', [PublicSiteController::class, 'resources'])->defaults('lang', 'ar');
-Route::get('/en/resources', [PublicSiteController::class, 'resources'])->defaults('lang', 'en');
+// Wave 21 public growth pages (E2 `7c3df2e`) held back 2026-11-07 (D-168): the partner directory, case studies and
+// the uplift calculator showed invented agencies, results and an 18% figure. Views kept for a rebuild from real data.
+foreach (['calculator', 'partners', 'resources'] as $held) {
+    Route::redirect('/'.$held, '/waitlist', 302);
+    Route::redirect('/en/'.$held, '/en/waitlist', 302);
+}

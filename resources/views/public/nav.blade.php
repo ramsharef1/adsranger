@@ -4,7 +4,7 @@ $base = $ar ? '' : '/en';
 $navItems = $ar ? [
     ['/', 'الرئيسية'],
     ['/pricing', 'الأسعار'],
-    ['/integrations', 'الشبكات (18)'],
+    ['/integrations', 'المنصات الإعلانية'],
     ['/demo-report', 'تقرير تجريبي'],
     ['/mena-calendar', 'مواسم الشرق الأوسط'],
     ['/ramadan-2027', 'رمضان 2027'],
@@ -12,7 +12,7 @@ $navItems = $ar ? [
 ] : [
     ['/en', 'Home'],
     ['/en/pricing', 'Pricing'],
-    ['/en/integrations', '18 Networks'],
+    ['/en/integrations', 'Ad networks'],
     ['/en/demo-report', 'Live Demo'],
     ['/en/mena-calendar', 'MENA Calendar'],
     ['/en/ramadan-2027', 'Ramadan 2027'],
