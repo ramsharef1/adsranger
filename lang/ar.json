@@ -1390,5 +1390,9 @@
     "The address must point to a public server.": "يجب أن يشير العنوان إلى خادم عام.",
     "Sends critical alerts and sent reports to a public https address, signed with its own secret. The feed URL gives read-only data: keep it private.": "يرسل التنبيهات الحرجة والتقارير المُرسلة إلى عنوان https عام، موقّعة بسر خاص بها. رابط موجز البيانات يعرض البيانات للقراءة فقط، فاحتفظ به سرًّا.",
     "We close access now and keep the workspace data for 30 days, during which you can ask support to restore it. After that, our team deletes it for good.": "سنغلق الوصول فورًا ونحتفظ ببيانات مساحة العمل 30 يومًا يمكنك خلالها طلب استعادتها من الدعم، ثم يحذفها فريقنا نهائيًا.",
-    "Enter your password and the workspace slug to confirm.": "أدخل كلمة المرور ومعرّف مساحة العمل للتأكيد."
+    "Enter your password and the workspace slug to confirm.": "أدخل كلمة المرور ومعرّف مساحة العمل للتأكيد.",
+    "{1} Your plan includes :count client.|[2,*] Your plan includes :count clients.": "{1} تشمل باقتك عميلًا واحدًا.|{2} تشمل باقتك عميلَين.|[3,10] تشمل باقتك :count عملاء.|[11,*] تشمل باقتك :count عميلًا.",
+    "Archive a client you no longer manage, or upgrade.": "أرشِف عميلًا لم تعد تديره، أو رقِّ باقتك.",
+    "{1} :used of :count client|[2,*] :used of :count clients": "{1} :used من عميل واحد|{2} :used من عميلَين|[3,10] :used من :count عملاء|[11,*] :used من :count عميلًا",
+    "Clients (archived ones do not count)": "العملاء (لا يُحتسب المؤرشَفون)"
 }

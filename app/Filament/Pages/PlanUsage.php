@@ -42,6 +42,7 @@ class PlanUsage extends Page
             'rows' => [
                 [__('Team seats (members + pending invites)'), PlanLimits::seatsUsed($a), PlanLimits::seatsLimit($a)],
                 [__('Tracked ad accounts'), PlanLimits::adAccountsUsed($a), PlanLimits::adAccountsLimit($a)],
+                [__('Clients (archived ones do not count)'), PlanLimits::clientsUsed($a), PlanLimits::clientsLimit($a)],
             ],
             'networks' => NetworkAccess::forAgency($a)->pluck('name'),
             // EX-50 point 7: what each tier unlocks, from the gating config; in-app prices allowed (D-19), never public (D-07).

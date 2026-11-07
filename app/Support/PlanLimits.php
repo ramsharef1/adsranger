@@ -4,7 +4,7 @@ namespace App\Support;
 
 use App\Models\Agency;
 
-/** Plan limits for an agency: seats (members + pending invites) and active ad accounts. */
+/** Plan limits for an agency: seats (members + pending invites), active ad accounts and clients (archived clients do not count). */
 class PlanLimits
 {
     public static function seatsLimit(Agency $a): int
@@ -51,6 +51,22 @@ class PlanLimits
     public static function canActivateAdAccount(Agency $a): bool
     {
         return static::adAccountsUsed($a) < static::adAccountsLimit($a);
+    }
+
+    /** The plan's client limit (Solo 5, Starter 10, Pro 50, Agency 300); no trial cap applies. */
+    public static function clientsLimit(Agency $a): int
+    {
+        return (int) ($a->planModel?->clients ?? 10);
+    }
+
+    public static function clientsUsed(Agency $a): int
+    {
+        return $a->clients()->where('status', '!=', 'archived')->count();
+    }
+
+    public static function canAddClient(Agency $a): bool
+    {
+        return static::clientsUsed($a) < static::clientsLimit($a);
     }
 
     public static function trialDaysLeft(Agency $a): ?int

@@ -19,11 +19,14 @@ class UsageWarning
         foreach ([
             'ad_accounts' => [PlanLimits::adAccountsUsed($a), PlanLimits::adAccountsLimit($a)],
             'seats' => [PlanLimits::seatsUsed($a), PlanLimits::seatsLimit($a)],
+            'clients' => [PlanLimits::clientsUsed($a), PlanLimits::clientsLimit($a)],
         ] as $key => [$used, $limit]) {
             if ($limit > 0 && $used >= $limit * static::THRESHOLD) {
-                $text = $key === 'seats'
-                    ? trans_choice('{1} :used of :count team member|[2,*] :used of :count team members', $limit, ['used' => $used])
-                    : trans_choice('{1} :used of :count ad account tracked|[2,*] :used of :count ad accounts tracked', $limit, ['used' => $used]);
+                $text = match ($key) {
+                    'seats' => trans_choice('{1} :used of :count team member|[2,*] :used of :count team members', $limit, ['used' => $used]),
+                    'clients' => trans_choice('{1} :used of :count client|[2,*] :used of :count clients', $limit, ['used' => $used]),
+                    default => trans_choice('{1} :used of :count ad account tracked|[2,*] :used of :count ad accounts tracked', $limit, ['used' => $used]),
+                };
                 $out[] = ['key' => $key, 'used' => $used, 'limit' => $limit, 'text' => $text];
             }
         }

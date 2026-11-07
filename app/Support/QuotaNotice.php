@@ -14,13 +14,20 @@ use Filament\Notifications\Notification;
  */
 class QuotaNotice
 {
-    /** @param 'ad_accounts'|'seats' $key */
+    /** @param 'ad_accounts'|'seats'|'clients' $key */
     public static function make(Agency $a, ?User $user, string $key): Notification
     {
-        $limit = $key === 'seats' ? PlanLimits::seatsLimit($a) : PlanLimits::adAccountsLimit($a);
+        $limit = match ($key) {
+            'seats' => PlanLimits::seatsLimit($a),
+            'clients' => PlanLimits::clientsLimit($a),
+            default => PlanLimits::adAccountsLimit($a),
+        };
         $canUpgrade = PlanGate::canUpgrade($user, $a);
 
-        if (PlanLimits::isTrialCap($a, $key)) {
+        if ($key === 'clients') {
+            $title = __('Plan limit reached');
+            $body = trans_choice('{1} Your plan includes :count client.|[2,*] Your plan includes :count clients.', $limit).' '.__('Archive a client you no longer manage, or upgrade.');
+        } elseif (PlanLimits::isTrialCap($a, $key)) {
             $title = $key === 'seats'
                 ? trans_choice('{1} Trial limit reached: :count team member|[2,*] Trial limit reached: :count team members', $limit)
                 : trans_choice('{1} Trial limit reached: :count ad account|[2,*] Trial limit reached: :count ad accounts', $limit);
