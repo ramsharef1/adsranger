@@ -49,7 +49,7 @@ class AuditLogResource extends Resource
             TextColumn::make('subject')->label(__('On'))
                 ->state(fn (AuditLog $r) => $r->subject_type ? class_basename($r->subject_type).' #'.$r->subject_id : '—'),
             TextColumn::make('details')->label(__('Details'))->wrap()
-                ->state(fn (AuditLog $r) => Str::limit(collect($r->meta ?? [])->map(fn ($v, $k) => $k.': '.(is_array($v) ? implode(', ', $v) : $v))->implode(' · '), 140)),
+                ->state(fn (AuditLog $r) => Str::limit(collect($r->meta ?? [])->map(fn ($v, $k) => $k.': '.(is_scalar($v) || $v === null ? $v : json_encode($v, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)))->implode(' · '), 140)),
             TextColumn::make('ip')->label(__('IP'))->toggleable(isToggledHiddenByDefault: true),
         ])->filters([
             SelectFilter::make('action')->options(fn () => AuditLog::query()->distinct()->orderBy('action')->pluck('action', 'action')->all()),
