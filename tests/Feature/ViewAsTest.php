@@ -19,6 +19,7 @@ class ViewAsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        config(['modules.enabled.view_as' => true]); // D-163: held back by default; these tests cover the feature itself
         $this->agency = Agency::create([
             'name' => 'Preview Agency',
             'slug' => 'preview',
@@ -84,5 +85,42 @@ class ViewAsTest extends TestCase
         $r = $this->withSession(['locale' => 'en'])->actingAs($analyst)->get('/app/preview/desk?view_as=r:admin');
         $r->assertOk()->assertDontSee('data-context-view-as', false);
         $this->assertSame('analyst', $analyst->roleIn($this->agency));
+    }
+
+    public function test_view_as_is_hidden_for_agencies_by_default(): void
+    {
+        config(['modules.enabled.view_as' => false, 'modules.preview_agencies' => []]);
+        $owner = $this->member('owner', 'Owner User');
+        $analyst = $this->member('analyst', 'Read Only');
+
+        $r = $this->withSession(['locale' => 'en'])->actingAs($owner)->get('/app/preview/desk?view_as=u:'.$analyst->id);
+        $r->assertOk()->assertDontSee('data-context-view-as', false)->assertDontSee('Exit preview');
+        $this->assertSame('owner', $owner->roleIn($this->agency));
+    }
+
+    public function test_admin_cannot_preview_as_owner_or_another_admin(): void
+    {
+        $owner = $this->member('owner', 'Owner User');
+        $admin = $this->member('admin', 'Admin User');
+        $admin2 = $this->member('admin', 'Second Admin');
+
+        foreach (['u:'.$owner->id, 'u:'.$admin2->id, 'r:admin'] as $target) {
+            $this->withSession(['locale' => 'en'])->actingAs($admin)->get('/app/preview/desk?view_as='.$target)->assertOk();
+            $this->assertSame('admin', $admin->roleIn($this->agency), $target);
+        }
+
+        // Lower roles still work for an admin.
+        $this->withSession(['locale' => 'en'])->actingAs($admin)->get('/app/preview/desk?view_as=r:analyst')->assertOk();
+        $this->assertSame('analyst', $admin->roleIn($this->agency));
+    }
+
+    public function test_stale_session_target_above_your_rights_is_dropped(): void
+    {
+        $owner = $this->member('owner', 'Owner User');
+        $admin = $this->member('admin', 'Admin User');
+
+        $this->withSession(['locale' => 'en', 'view_as.'.$this->agency->id => 'u:'.$owner->id])
+            ->actingAs($admin)->get('/app/preview/desk')->assertOk()->assertDontSee('Exit preview');
+        $this->assertSame('admin', $admin->roleIn($this->agency));
     }
 }

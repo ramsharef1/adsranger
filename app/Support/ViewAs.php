@@ -26,6 +26,10 @@ class ViewAs
         if (! $user || ! $agency) {
             return false;
         }
+        // D-163 (UX-97): held back for agencies until the fix passes the re-check.
+        if (! Modules::on('view_as', $user, $agency)) {
+            return false;
+        }
         if ($user->isSuperAdmin()) {
             return true;
         }
@@ -64,6 +68,11 @@ class ViewAs
 
             $stored = $hasSession ? $req->session()->get(self::key($agency)) : null;
             if (! is_string($stored) || $stored === '') {
+                return null;
+            }
+            if (! self::isValidTarget($stored, $agency, $user)) {
+                $req->session()->forget(self::key($agency));
+
                 return null;
             }
 
@@ -114,17 +123,33 @@ class ViewAs
     {
         if (str_starts_with($target, 'r:')) {
             $role = substr($target, 2);
-            return in_array($role, ['admin', 'manager', 'analyst'], true);
+            return in_array($role, ['admin', 'manager', 'analyst'], true) && self::mayPreviewRole($actor, $agency, $role);
         }
         if (str_starts_with($target, 'u:')) {
             $uid = (int) substr($target, 2);
             if ($uid <= 0 || $uid === (int) $actor->id) {
                 return false;
             }
-            return $agency->members()->where('users.id', $uid)->exists();
+            $member = $agency->members()->where('users.id', $uid)->first();
+
+            return $member !== null && self::mayPreviewRole($actor, $agency, $member->pivot?->role ?: 'analyst');
         }
 
         return false;
+    }
+
+    /** UX-97: preview only roles with fewer rights than your own (super admins excepted); never the owner. */
+    private static function mayPreviewRole(User $actor, Agency $agency, string $role): bool
+    {
+        $rank = ['owner' => 4, 'admin' => 3, 'manager' => 2, 'analyst' => 1];
+        if (! isset($rank[$role]) || $role === 'owner') {
+            return false;
+        }
+        if ($actor->isSuperAdmin()) {
+            return true;
+        }
+
+        return $rank[$role] < ($rank[$actor->rawRoleIn($agency)] ?? 0);
     }
 
     private static function describe(string $target, Agency $agency): ?array
