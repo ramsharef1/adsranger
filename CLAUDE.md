@@ -137,3 +137,8 @@ Before relying on a package's API, confirm its installed version:
 - #105 & #62 Shareable Client Onboarding & Prospect Audit Links (/onboard/{token}).
 - #77 & #115 Outbound Webhooks & Looker Studio / Google Sheets JSON Feed (/api/v1/export/{token}).
 - /pricing UX-65 & D-07 canonical tier name alignment.
+
+## Recent Architecture Additions (Wave 20 - Enterprise Scale)
+- Pluggable AiAnalyst driver with Redis 4-hour semantic caching (#69 / #131).
+- Async DeliverAgencyWebhookJob with HMAC-SHA256 request signatures (X-AdsRanger-Signature) for #77 & #115.
+- Enterprise resilience test suite for queue jobs and semantic caching.
