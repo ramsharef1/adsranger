@@ -1,10 +1,15 @@
 <x-filament-panels::page>
     <div class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
-                <h3 class="text-sm font-semibold text-gray-500">{{ __('Blended ROAS & MER (#18)') }}</h3>
-                <p class="mt-2 text-2xl font-bold text-teal-600">{{ $blendedMetrics->count() }}</p>
-                <p class="text-xs text-gray-500 mt-1">{{ __('Cross-channel MER snapshots') }}</p>
+            <div class="p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-500">{{ __('Blended ROAS & MER (#18)') }}</h3>
+                    <p class="mt-2 text-2xl font-bold text-teal-600">{{ $blendedMetrics->count() }}</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ __('Cross-channel MER snapshots') }}</p>
+                </div>
+                <button type="button" wire:click="computeBlendedRoas" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-teal-600 text-white hover:bg-teal-500">
+                    {{ __('Compute MER') }}
+                </button>
             </div>
             <div class="p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
                 <h3 class="text-sm font-semibold text-gray-500">{{ __('AI Keyword Matrices (#16)') }}</h3>
@@ -30,6 +35,84 @@
             <div class="p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
                 <h3 class="text-sm font-semibold text-gray-500">{{ __('Network Accelerators (#23–#26)') }}</h3>
                 <p class="mt-2 text-2xl font-bold text-teal-600">{{ $accelerators->count() }}</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="p-5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 space-y-4">
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">{{ __('Generate AI Keyword Intent Matrix') }}</h3>
+                <form wire:submit="generateKeywords" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">{{ __('Client') }}</label>
+                        <select wire:model="clientId" class="mt-1 w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 text-sm">
+                            @foreach($clients as $c)
+                                <option value="{{ $c->id }}">{{ $c->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">{{ __('Core service or product') }}</label>
+                            <input type="text" wire:model="seedKeyword" class="mt-1 w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 text-sm" placeholder="{{ __('e.g. Dental Implants') }}" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">{{ __('Language') }}</label>
+                            <select wire:model="keywordLocale" class="mt-1 w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 text-sm">
+                                <option value="ar">{{ __('Arabic') }}</option>
+                                <option value="en">{{ __('English') }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="px-4 py-2 rounded-lg bg-teal-600 text-white text-xs font-semibold hover:bg-teal-500">
+                        {{ __('Generate keyword clusters') }}
+                    </button>
+                </form>
+
+                @if($keywordMaps->isNotEmpty())
+                    <div class="pt-3 border-t border-gray-100 dark:border-gray-800 space-y-2">
+                        @foreach($keywordMaps->take(3) as $km)
+                            <div class="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/60 text-xs flex justify-between items-center">
+                                <span class="font-semibold">{{ $km->seed_keyword }}</span>
+                                <span class="text-gray-500">{{ strtoupper($km->locale) }} · {{ count($km->negative_keywords ?? []) }} {{ __('negatives') }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+
+            <div class="p-5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 space-y-4">
+                <h3 class="text-base font-bold text-gray-900 dark:text-white">{{ __('Score Ad Copy Psychological Triggers') }}</h3>
+                <form wire:submit="scoreHook" class="space-y-3">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">{{ __('Ad hook or headline') }}</label>
+                            <input type="text" wire:model="adCopySample" class="mt-1 w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 text-sm" />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">{{ __('Dialect') }}</label>
+                            <select wire:model="hookDialect" class="mt-1 w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 text-sm">
+                                <option value="gulf">{{ __('Gulf') }}</option>
+                                <option value="egyptian">{{ __('Egyptian') }}</option>
+                                <option value="levantine">{{ __('Levantine') }}</option>
+                                <option value="msa">{{ __('MSA') }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="px-4 py-2 rounded-lg bg-teal-600 text-white text-xs font-semibold hover:bg-teal-500">
+                        {{ __('Analyze & score hook') }}
+                    </button>
+                </form>
+
+                @if($hookScores->isNotEmpty())
+                    <div class="pt-3 border-t border-gray-100 dark:border-gray-800 space-y-2">
+                        @foreach($hookScores->take(3) as $hs)
+                            <div class="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/60 text-xs flex justify-between items-center">
+                                <span class="truncate max-w-xs">{{ $hs->original_copy }}</span>
+                                <span class="font-bold text-teal-600">{{ $hs->overall_score }}/100</span>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
             </div>
         </div>
     </div>
