@@ -48,10 +48,9 @@ class ClientOnboardingController extends Controller
     /** #77 & #115 Signed JSON feed for Looker Studio / Google Sheets / Zapier / Make / n8n. */
     public function exportFeed(string $token): JsonResponse
     {
-        $webhook = AgencyWebhook::with(['agency', 'client'])
-            ->where('secret_token', $token)
-            ->where('is_active', true)
-            ->firstOrFail();
+        $webhook = AgencyWebhook::findByFeedToken($token);
+        abort_unless($webhook, 404);
+        $webhook->loadMissing(['agency', 'client']);
 
         $webhook->update(['last_triggered_at' => now()]);
 

@@ -9,6 +9,7 @@ use App\Models\AgencyWebhook;
 use App\Models\Client;
 use App\Models\ClientOnboardingLink;
 use App\Models\User;
+use App\Support\Webhooks;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -74,6 +75,7 @@ class Wave19AiOnboardingWebhooksTest extends TestCase
         Filament::setCurrentPanel(Filament::getPanel('app'));
         Filament::setTenant($this->agency);
 
+        Webhooks::$resolver = fn () => '93.184.216.34';
         Livewire::test(AgencyOpsHubPage::class)
             ->set('clientId', $this->client->id)
             ->set('prospectName', 'Jeddah E-Com Prospect')
@@ -103,7 +105,8 @@ class Wave19AiOnboardingWebhooksTest extends TestCase
 
         // Signed Looker Studio / Sheets JSON feed returns 200 JSON
         $webhook = AgencyWebhook::where('agency_id', $this->agency->id)->firstOrFail();
-        $this->getJson('/api/v1/export/'.$webhook->secret_token)
+        $this->assertNull($webhook->secret_token);
+        $this->getJson('/api/v1/export/'.$webhook->feed_token)
             ->assertOk()
             ->assertJsonFragment([
                 'workspace' => 'MENA Growth Lab',

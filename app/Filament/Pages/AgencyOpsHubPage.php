@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Filament\Concerns\HeldBackModule;
 use App\Models\AgencyOperationalAudit;
 use App\Models\AgencyWebhook;
+use App\Models\AuditLog;
 use App\Models\BudgetReallocationLog;
 use App\Models\Client;
 use App\Models\ClientOnboardingLink;
@@ -12,6 +13,8 @@ use App\Models\InfluencerCampaign;
 use App\Support\AgencyOperationsHub;
 use App\Support\CurrentClient;
 use App\Support\InfluencerCampaignTracker;
+use App\Support\TeamRoles;
+use App\Support\Webhooks;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
@@ -153,28 +156,52 @@ class AgencyOpsHubPage extends Page
         Notification::make()->title(__('Client onboarding link created'))->success()->send();
     }
 
-    /** #77 & #115 Create outbound webhook & Looker Studio / Sheets JSON feed token. */
+    /**
+     * #77 & #115 Create an outbound webhook + read-only JSON feed. Owners and admins only. The target must be a public
+     * https address (Webhooks::targetProblem). The feed URL and signing secret are shown once, in the notification.
+     */
     public function createWebhook(): void
     {
         $agency = Filament::getTenant();
-        if (! $agency || trim($this->webhookName) === '' || trim($this->webhookTargetUrl) === '') {
+        abort_unless($agency && TeamRoles::canManageTeam(auth()->user(), $agency), 403);
+        $name = trim($this->webhookName);
+        $url = trim($this->webhookTargetUrl);
+        if ($name === '' || mb_strlen($name) > 140 || $url === '') {
+            Notification::make()->title(__('Enter a name and a target address.'))->danger()->send();
+
+            return;
+        }
+        if ($problem = Webhooks::targetProblem($url)) {
+            Notification::make()->title(__($problem))->danger()->send();
+
             return;
         }
         $client = $this->resolveSelectedClient();
 
-        AgencyWebhook::create([
+        [$hook, $token, $secret] = AgencyWebhook::issue([
             'agency_id' => $agency->id,
             'client_id' => $client?->id,
-            'name' => trim($this->webhookName),
-            'target_url' => trim($this->webhookTargetUrl),
-            'events' => ['alert.critical', 'report.published', 'lead.created'],
-            'secret_token' => Str::random(40),
-            'is_active' => true,
+            'name' => $name,
+            'target_url' => $url,
+            'events' => Webhooks::EVENTS,
         ]);
+        AuditLog::record('webhook.created', $agency, ['webhook_id' => $hook->id, 'host' => parse_url($url, PHP_URL_HOST)]);
 
         $this->webhookName = '';
         $this->webhookTargetUrl = '';
-        Notification::make()->title(__('Webhook & Looker/Sheets feed created'))->success()->send();
+        Notification::make()->title(__('Webhook & Looker/Sheets feed created'))
+            ->body(__('Copy these now; the signing secret is not shown again.').' '.__('Feed URL').': '.$hook->feedUrl().' · '.__('Signing secret').': '.$secret)
+            ->success()->persistent()->send();
+    }
+
+    /** Switch a webhook and its feed off (owners and admins). */
+    public function deactivateWebhook(int $id): void
+    {
+        $agency = Filament::getTenant();
+        abort_unless($agency && TeamRoles::canManageTeam(auth()->user(), $agency), 403);
+        $hook = AgencyWebhook::where('agency_id', $agency->id)->findOrFail($id);
+        $hook->update(['is_active' => false]);
+        AuditLog::record('webhook.deactivated', $agency, ['webhook_id' => $hook->id]);
     }
 
     public function getViewData(): array
@@ -223,6 +250,7 @@ class AgencyOpsHubPage extends Page
             'influencerCampaigns' => $scope(InfluencerCampaign::query())->latest()->limit(10)->get(),
             'onboardingLinks' => $onboardingLinks,
             'webhooks' => $webhooks,
+            'canManageWebhooks' => $agency && TeamRoles::canManageTeam($user, $agency),
         ];
     }
 }

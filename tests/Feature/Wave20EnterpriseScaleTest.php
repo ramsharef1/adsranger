@@ -7,6 +7,7 @@ use App\Models\Agency;
 use App\Models\AgencyWebhook;
 use App\Models\Client;
 use App\Support\AiAnalyst;
+use App\Support\Webhooks;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
@@ -40,17 +41,16 @@ class Wave20EnterpriseScaleTest extends TestCase
             'status' => 'active',
         ]);
 
-        $webhook = AgencyWebhook::create([
+        config(['modules.enabled.agency_ops_hub' => true]);
+        [$webhook] = AgencyWebhook::issue([
             'agency_id' => $agency->id,
             'client_id' => $client->id,
-            'name' => 'Zapier Lead Forwarder',
+            'name' => 'Zapier Alert Forwarder',
             'target_url' => 'https://hooks.example.com/test',
-            'events' => ['lead.created'],
-            'secret_token' => 'sec_'.uniqid(),
-            'is_active' => true,
+            'events' => ['alert.critical'],
         ]);
 
-        DeliverAgencyWebhookJob::dispatch($webhook, ['event' => 'lead.created', 'id' => 123]);
+        $this->assertSame(1, Webhooks::fire($agency, 'alert.critical', ['alert_id' => 123], $client->id));
 
         Queue::assertPushed(DeliverAgencyWebhookJob::class);
     }

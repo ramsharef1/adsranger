@@ -12,11 +12,14 @@ use App\Models\Campaign;
 use App\Models\Client;
 use App\Models\DailyMetric;
 use App\Models\LandingPage;
+use App\Support\CriticalPush;
 use App\Support\Fx;
 use App\Support\GoogleInsights;
 use App\Support\MetricsQuery;
 use App\Support\Pacing;
 use App\Support\PlanGate;
+use App\Support\Severity;
+use App\Support\Webhooks;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 
@@ -292,7 +295,7 @@ class AlertEngine
                 if (str_contains($msg, 'rejected') && (int) preg_replace('/\D.*/', '', $msg) < (int) $r['t']['min_rejected']) {
                     continue;
                 }
-                static::add($found, 'account_health', ['severity' => \App\Support\Severity::normalize($sev) === 'critical' ? 'critical' : 'warning'] + $r, ['client_id' => $acct->client_id, 'ad_account_id' => $acct->id,
+                static::add($found, 'account_health', ['severity' => Severity::normalize($sev) === 'critical' ? 'critical' : 'warning'] + $r, ['client_id' => $acct->client_id, 'ad_account_id' => $acct->id,
                     'entity_type' => 'ad_account', 'entity_id' => $acct->id * 100 + $i, 'entity_name' => $acct->name,
                     'title' => 'Account health: '.($acct->network?->name).' · '.$acct->name, 'detail' => $msg]);
             }
@@ -449,7 +452,13 @@ class AlertEngine
             }
         }
         // #175: Critical push to subscribed phones (Pro+), before the email so a phone hears first.
-        \App\Support\CriticalPush::dispatch($a, $new);
+        CriticalPush::dispatch($a, $new);
+        foreach ($new as $al) {
+            if ($al->severity === 'critical') {
+                Webhooks::fire($a, 'alert.critical', ['alert_id' => $al->id, 'rule' => $al->rule_key, 'severity' => $al->severity,
+                    'title' => $al->title, 'entity' => $al->entity_name, 'client' => $al->client?->name, 'opened_at' => $al->created_at?->toIso8601String()], $al->client_id);
+            }
+        }
         $high = collect($new)->where('severity', 'critical');
         if ($high->isNotEmpty()) {
             foreach ($a->members()->where('email_alerts', true)->get() as $u) {

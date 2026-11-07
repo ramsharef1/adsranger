@@ -1377,5 +1377,16 @@
     "None, do not email": "لا توجد، لا ترسل له بريدًا",
     "Account audit": "تدقيق الحساب",
     "Audit finished": "انتهى التدقيق",
-    "You can run the audit again in a few minutes.": "يمكنك تشغيل التدقيق مرة أخرى بعد دقائق."
+    "You can run the audit again in a few minutes.": "يمكنك تشغيل التدقيق مرة أخرى بعد دقائق.",
+    "Enter a name and a target address.": "أدخل اسمًا وعنوان الوجهة.",
+    "Copy these now; the signing secret is not shown again.": "انسخ هذه البيانات الآن؛ لن يظهر سر التوقيع مرة أخرى.",
+    "Feed URL": "رابط موجز البيانات",
+    "Signing secret": "سر التوقيع",
+    "Off": "متوقف",
+    "Switch off": "إيقاف",
+    "Use an https:// address.": "استخدم عنوانًا آمنًا (https).",
+    "Use the standard https port.": "استخدم منفذ https القياسي.",
+    "The address is too long.": "العنوان طويل جدًا.",
+    "The address must point to a public server.": "يجب أن يشير العنوان إلى خادم عام.",
+    "Sends critical alerts and sent reports to a public https address, signed with its own secret. The feed URL gives read-only data: keep it private.": "يرسل التنبيهات الحرجة والتقارير المُرسلة إلى عنوان https عام، موقّعة بسر خاص بها. رابط موجز البيانات يعرض البيانات للقراءة فقط، فاحتفظ به سرًّا."
 }

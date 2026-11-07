@@ -5,7 +5,9 @@ namespace App\Jobs;
 use App\Mail\ScheduledReportMail;
 use App\Models\ReportSchedule;
 use App\Models\ReportSend;
+use App\Support\Modules;
 use App\Support\MonthlyReport;
+use App\Support\Webhooks;
 use App\Support\WhatsAppReport;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -55,7 +57,7 @@ class SendScheduledReport implements ShouldQueue
                 continue;
             }
             $channel = $row->channel ?: (str_starts_with((string) $row->email, '+') ? 'whatsapp' : 'email');
-            if ($channel === 'whatsapp' && (! config('reports.whatsapp_enabled', false) || ! \App\Support\Modules::enabled('whatsapp_reports'))) {
+            if ($channel === 'whatsapp' && (! config('reports.whatsapp_enabled', false) || ! Modules::enabled('whatsapp_reports'))) {
                 $row->update(['status' => 'skipped', 'error' => 'whatsapp off']);
 
                 continue;
@@ -82,6 +84,10 @@ class SendScheduledReport implements ShouldQueue
 
         if ($sent) {
             $s->forceFill(['last_sent_at' => now()])->saveQuietly();
+            if ($s->agency) {
+                Webhooks::fire($s->agency, 'report.sent', ['client' => $s->client->name, 'kind' => $this->kind,
+                    'period' => $this->period, 'recipients' => $sent], $s->client_id);
+            }
         }
     }
 }
