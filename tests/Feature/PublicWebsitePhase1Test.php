@@ -63,6 +63,13 @@ class PublicWebsitePhase1Test extends TestCase
             ->assertSessionHasErrors(['agency_name' => 'أدخل اسم وكالتك أو شركتك (حرفان على الأقل).']);
     }
 
+    /** D-177 / UX-133: the sample report uses an invented furniture retailer, not a medical client. */
+    public function test_demo_report_uses_the_fictional_furniture_retailer(): void
+    {
+        $this->get('/demo-report')->assertOk()->assertSee('مفروشات سِدرة')->assertDontSee('عيادة');
+        $this->get('/en/demo-report')->assertOk()->assertSee('Sidra Home Furnishings')->assertSee('fictional store')->assertDontSee('Dental');
+    }
+
     /** D-152 / D-159: country and an unticked consent box are required; the honeypot saves nothing. */
     public function test_waitlist_requires_country_and_consent_and_ignores_bots(): void
     {
