@@ -8,9 +8,10 @@
  */
 return [
     // Order matters: a higher tier includes everything below it.
-    'tiers' => ['starter' => 1, 'pro' => 2, 'agency' => 3],
+    'tiers' => ['solo' => 1, 'starter' => 2, 'pro' => 3, 'agency' => 4],
 
     'tier_labels' => [
+        'solo' => ['en' => 'Solo', 'ar' => 'باقة المستقل'],
         // Full glossary names (EX-61, UX-65): used inside sentences, so templates never add «الباقة».
         'starter' => ['en' => 'Starter', 'ar' => 'الباقة الأساسية'],
         'pro' => ['en' => 'Pro', 'ar' => 'الباقة الاحترافية'],
@@ -18,13 +19,14 @@ return [
     ],
     // Short forms for badges (PlanBadge, nav badge, locked buttons).
     'tier_short' => [
+        'solo' => ['en' => 'Solo', 'ar' => 'المستقل'],
         'starter' => ['en' => 'Starter', 'ar' => 'الأساسية'],
         'pro' => ['en' => 'Pro', 'ar' => 'الاحترافية'],
         'agency' => ['en' => 'Agency', 'ar' => 'الوكالات'],
     ],
 
     // In-app prices (D-19). Shown in Settings › Plan and upgrade screens only, never on public pages (D-07).
-    'prices' => ['starter' => 49, 'pro' => 149, 'agency' => 399],
+    'prices' => ['solo' => 19, 'starter' => 49, 'pro' => 149, 'agency' => 399],
 
     // A workspace on trial gets this tier (D-61: the 14-day trial runs at Pro, capped).
     'trial_tier' => 'pro',
@@ -66,6 +68,10 @@ return [
             'name' => ['en' => 'Phone alerts', 'ar' => 'تنبيهات الهاتف'],
             'what' => ['en' => 'Critical alerts arrive on your phone within a minute, with quiet hours you choose.', 'ar' => 'تصل التنبيهات الحرجة إلى هاتفك خلال دقيقة، مع ساعات هدوء تختارها.']],
         // Starter = every plan; listed so the send job and the schedule screen follow this map if the tier moves.
+        // #177 Solo = Starter minus the monthly PDF (D-115, D-140).
+        'monthly_pdf' => ['tier' => 'starter', 'refs' => [57],
+            'name' => ['en' => 'Monthly PDF report', 'ar' => 'تقرير PDF الشهري'],
+            'what' => ['en' => 'A branded monthly PDF for each client, in Arabic or English.', 'ar' => 'تقرير PDF شهري يحمل هويتك لكل عميل، بالعربية أو الإنجليزية.']],
         'scheduled_reports' => ['tier' => 'starter', 'refs' => [106],
             'name' => ['en' => 'Scheduled email reports', 'ar' => 'تقارير البريد المجدولة'],
             'what' => ['en' => 'Email each client a monthly PDF report and a weekly summary, in Arabic or English.', 'ar' => 'أرسل لكل عميل تقريرًا شهريًا بصيغة PDF وملخصًا أسبوعيًا بالبريد، بالعربية أو الإنجليزية.']],

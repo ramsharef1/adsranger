@@ -12,11 +12,13 @@ use App\Models\ClientLink;
 use App\Models\ReportSchedule;
 use App\Support\HealthScore;
 use App\Support\MetricsQuery;
+use App\Support\Modules;
 use App\Support\MonthlyReport;
 use App\Support\Pacing;
 use App\Support\Periods;
 use App\Support\PlanGate;
 use App\Support\TeamRoles;
+use App\Support\WhatsAppReport;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Filament\Actions\Action;
@@ -76,6 +78,7 @@ class ViewClient extends ViewRecord
                 }),
             // #57 monthly PDF report (AR / EN), any role that can see the client.
             Action::make('monthlyPdf')
+                ->visible(fn () => PlanGate::allows($this->record->agency, 'monthly_pdf'))
                 ->label(__('Monthly PDF'))
                 ->icon('heroicon-o-document-arrow-down')
                 ->color('gray')
@@ -173,7 +176,7 @@ class ViewClient extends ViewRecord
             TagsInput::make('whatsapp_recipients')->label(__('WhatsApp numbers'))->placeholder('+962790000000')
                 ->helperText(__('Optional: up to :n WhatsApp numbers with country code (e.g. +962790000000).', ['n' => $max]))
                 ->splitKeys([',', ' ', ';'])->rules(['array', 'max:'.$max])
-                ->visible(fn () => \App\Support\Modules::on('whatsapp_reports')), // ADSR-110 0.2
+                ->visible(fn () => Modules::on('whatsapp_reports')), // ADSR-110 0.2
             Toggle::make('monthly')->label(__('Monthly report'))->helperText(__('Last month\'s results, with the monthly PDF if you attach it.'))->live(),
             Select::make('monthly_day')->label(__('Day of the month'))->options(array_combine(range(1, 28), range(1, 28)))
                 ->visible(fn (Get $get) => (bool) $get('monthly'))->required(fn (Get $get) => (bool) $get('monthly')),
@@ -191,11 +194,11 @@ class ViewClient extends ViewRecord
     {
         abort_unless($this->canManageLinks() && ! $this->reportsLocked(), 403);
         $recipients = array_values(array_unique(array_filter(array_map(fn ($e) => strtolower(trim((string) $e)), (array) ($data['recipients'] ?? [])))));
-        $rawWa = \App\Support\Modules::on('whatsapp_reports') ? array_values(array_unique(array_filter(array_map(fn ($p) => trim((string) $p), (array) ($data['whatsapp_recipients'] ?? []))))) : [];
+        $rawWa = Modules::on('whatsapp_reports') ? array_values(array_unique(array_filter(array_map(fn ($p) => trim((string) $p), (array) ($data['whatsapp_recipients'] ?? []))))) : [];
         $waRecipients = [];
         $badWa = false;
         foreach ($rawWa as $p) {
-            if ($norm = \App\Support\WhatsAppReport::normalizePhone($p)) {
+            if ($norm = WhatsAppReport::normalizePhone($p)) {
                 $waRecipients[$norm] = $norm;
             } else {
                 $badWa = true;

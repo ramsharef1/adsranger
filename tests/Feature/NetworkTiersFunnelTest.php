@@ -29,8 +29,9 @@ class NetworkTiersFunnelTest extends TestCase
 
     public function test_network_tiers_follow_d32_and_d01(): void
     {
-        $this->assertSame(['starter', 'pro', 'agency'], $this->plansFor('tiktok'));
-        $this->assertSame(['starter', 'pro', 'agency'], $this->plansFor('snapchat'));
+        // #177 Solo gets the same networks as Starter.
+        $this->assertSame(['solo', 'starter', 'pro', 'agency'], $this->plansFor('tiktok'));
+        $this->assertSame(['solo', 'starter', 'pro', 'agency'], $this->plansFor('snapchat'));
         $this->assertSame(['pro', 'agency'], $this->plansFor('microsoft'));
         $this->assertSame(['pro', 'agency'], $this->plansFor('linkedin'));
         $this->assertSame(['pro', 'agency'], $this->plansFor('ga4'));

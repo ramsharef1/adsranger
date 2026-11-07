@@ -111,12 +111,14 @@
 
     <p><a class="pill" href="{{ url('/r/'.$link->token.'/ads').'?'.http_build_query(['p' => $period, 'lang' => $lang]) }}">{{ __('report.see_ads') }}</a></p>
 
+    @if ($pdfMonths)
     <h2>{{ __('report.download_pdf') }}</h2>
     <nav class="pills">
         @foreach ($pdfMonths as $m => $label)
             <a class="pill" href="{{ url('/r/'.$link->token.'/pdf').'?'.http_build_query(['m' => $m, 'lang' => $lang]) }}">{{ $label }}</a>
         @endforeach
     </nav>
+    @endif
     <p><a class="pill" href="{{ url('/r/'.$link->token.'/csv').'?'.http_build_query(['p' => $period, 'lang' => $lang]) }}">{!! __('report.download_csv') !!}</a></p>
 
     <footer>

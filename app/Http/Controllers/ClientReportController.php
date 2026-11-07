@@ -8,6 +8,7 @@ use App\Support\MetricsQuery;
 use App\Support\MonthlyReport;
 use App\Support\Pacing;
 use App\Support\Periods;
+use App\Support\PlanGate;
 use App\Support\TopAds;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -44,7 +45,7 @@ class ClientReportController extends Controller
             'campaigns' => array_slice(MetricsQuery::breakdown($client, $from, $to, 'campaign'), 0, 10),
             'synced' => MetricsQuery::lastSynced($client),
             'hideSpend' => (bool) $client->hide_spend,
-            'pdfMonths' => MonthlyReport::months(3, $lang, $tz),
+            'pdfMonths' => PlanGate::allows($client->agency, 'monthly_pdf') ? MonthlyReport::months(3, $lang, $tz) : [],
         ])->header('X-Robots-Tag', 'noindex, nofollow')->header('Referrer-Policy', 'no-referrer')->header('Cache-Control', 'private, no-store');
     }
 
@@ -76,6 +77,7 @@ class ClientReportController extends Controller
         abort_unless($link, 404);
         $client = $link->client()->with('agency')->first();
         abort_unless($client && $client->status !== 'archived', 404);
+        abort_unless(PlanGate::allows($client->agency, 'monthly_pdf'), 404);
 
         $lang = in_array($request->query('lang'), ['ar', 'en'], true) ? $request->query('lang') : ($client->agency->language === 'en' ? 'en' : 'ar');
         $month = $request->query('m');

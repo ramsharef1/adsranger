@@ -71,6 +71,10 @@ class AgencyInvitation extends Model
         if (! $agency->members()->whereKey($user->id)->exists()) {
             $agency->members()->attach($user->id, ['role' => $this->role]);
         }
+        // An owner invite (sent by a super admin for a new workspace) makes the invitee the workspace owner.
+        if ($this->role === 'owner' && ! $agency->owner_id) {
+            $agency->forceFill(['owner_id' => $user->id])->save();
+        }
         $this->update(['accepted_at' => now()]);
         AuditLog::record('team.joined', $agency, ['user_id' => $user->id, 'role' => $this->role]);
     }
