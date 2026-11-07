@@ -1,169 +1,93 @@
-@php
-$ar = ($lang ?? 'ar') === 'ar';
-$base = $ar ? '' : '/en';
-$t = $ar ? [
-    'title' => 'الأسعار والباقات للوكالات · AdsRanger',
-    'switch_url' => '/en/pricing',
-    'tag' => 'باقات شفافة للوكالات · بدون عمولة على الإنفاق الإعلاني',
-    'h1' => 'باقات مصممة لنمو وكالتك الإعلانية في الشرق الأوسط.',
-    'lead' => 'ثمن ثابت وواضح حسب عدد العملاء الذين تديرهم وكالتك، دون أي نسبة من ميزانيات عملائك الإعلانية عبر 18 شبكة.',
-    'plans' => [
-        [
-            'name' => 'باقة الانطلاق (Starter)',
-            'price' => '$99',
-            'period' => '/ شهرياً',
-            'desc' => 'للوكالات الناشئة ومديري الإعلانات المستقلين.',
-            'items' => [
-                'حتى 5 عملاء نشطين',
-                'ربط ميتا وجوجل وتيك توك وسناب شات',
-                'نتائج حسب الهدف الحقيقي للحملة',
-                'المكتب اليومي و 18 قاعدة تنبيه',
-                'روابط تقارير العملاء للقراءة فقط + PDF شهري',
-            ],
-        ],
-        [
-            'name' => 'باقة النمو (Growth)',
-            'price' => '$249',
-            'period' => '/ شهرياً',
-            'desc' => 'للوكالات المتنامية التي تدير حملات متعددة القنوات.',
-            'badge' => 'الأكثر اختياراً',
-            'items' => [
-                'حتى 20 عميلاً نشطاً',
-                'ربط جميع الـ 18 شبكة إعلانية + فحص CAPI EMQ',
-                'استوديو الإعلانات وتوليد النصوص باللهجات العربية',
-                'جدولة المحتوى العضوي وصندوق الوارد الموحد',
-                'تقارير مجدولة عبر البريد الإلكتروني وواتساب',
-            ],
-        ],
-        [
-            'name' => 'باقة الوكالة المتقدمة (Agency Pro)',
-            'price' => '$499',
-            'period' => '/ شهرياً',
-            'desc' => 'للوكالات الكبرى التي تحتاج ذكاء العائد المدمج وعمليات المالية.',
-            'items' => [
-                'عملاء غير محدودين وأعضاء فريق غير محدودين',
-                'مركز الذكاء: العائد المدمج (MER) ومصفوفة الكلمات والخطاف النفسي',
-                'مركز عمليات الوكالة (CFO): مدرج الميزانية، ربحية العقود، وإعادة التوزيع التلقائي',
-                'تتبع عائد حملات المؤثرين وأكواد الخصم',
-                'نطاق مخصص بالكامل باسم وكالتك (White-Label Custom Domain)',
-            ],
-        ],
-    ],
-    'cta_waitlist' => 'احجز مقعد وكالتك في قائمة الانتظار',
-    'cta_demo' => 'شاهد التقرير التجريبي التفاعلي',
-] : [
-    'title' => 'Agency Pricing & Plans · AdsRanger',
-    'switch_url' => '/pricing',
-    'tag' => 'Flat agency pricing · Zero % tax on your ad spend',
-    'h1' => 'Predictable plans built for MENA marketing agencies.',
-    'lead' => 'Scale your client roster across 18 ad networks without paying a percentage of managed media spend.',
-    'plans' => [
-        [
-            'name' => 'Starter Agency',
-            'price' => '$99',
-            'period' => '/ month',
-            'desc' => 'For boutique agencies and performance media buyers.',
-            'items' => [
-                'Up to 5 active client workspaces',
-                'Meta, Google, TikTok & Snapchat connectors',
-                'Goal-based results (messages, calls, leads, sales)',
-                'Daily Desk + 18 automated alert rules',
-                'Signed read-only client links + monthly PDF reports',
-            ],
-        ],
-        [
-            'name' => 'Growth Agency',
-            'price' => '$249',
-            'period' => '/ month',
-            'desc' => 'For multi-channel agencies scaling creative & social ops.',
-            'badge' => 'Most Popular',
-            'items' => [
-                'Up to 20 active client workspaces',
-                'All 18 ad network connectors + CAPI/Pixel EMQ diagnostics',
-                'Creative Studio + AI copy in Gulf, Levantine, Egyptian & MSA',
-                'Organic Social scheduler, calendar & sentiment inbox',
-                'Automated Email & WhatsApp client report delivery',
-            ],
-        ],
-        [
-            'name' => 'Agency Pro',
-            'price' => '$499',
-            'period' => '/ month',
-            'desc' => 'Full intelligence, CFO operations & white-label portal.',
-            'items' => [
-                'Unlimited clients & unlimited team seats',
-                'Intelligence Hub: Blended ROAS/MER, AI Keyword Matrix & Hook Scoring',
-                'Agency CFO Hub: Budget runway, retainer margin & auto-reallocation',
-                'Influencer campaign & promo-code ROI attribution',
-                'White-label custom agency domain with automated SSL',
-            ],
-        ],
-    ],
-    'cta_waitlist' => 'Reserve your agency spot on the waitlist',
-    'cta_demo' => 'Explore Interactive Demo Report',
-];
-@endphp
-<!doctype html>
-<html lang="{{ $ar ? 'ar' : 'en' }}" dir="{{ $ar ? 'rtl' : 'ltr' }}">
+<!DOCTYPE html>
+<html lang="{{ $lang === 'ar' ? 'ar' : 'en' }}" dir="{{ $lang === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex">
-<link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
-<title>{{ $t['title'] }}</title>
-<link rel="alternate" hreflang="ar" href="https://adsranger.com/pricing">
-<link rel="alternate" hreflang="en" href="https://adsranger.com/en/pricing">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#0b1020;--card:#121933;--ink:#eef1fb;--muted:#9aa3c0;--acc:#2DD4BF;--line:#232c4d}
-*{box-sizing:border-box}body{margin:0;font-family:{{ $ar ? '"IBM Plex Sans Arabic",' : '' }}system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--ink);line-height:{{ $ar ? '1.8' : '1.55' }}}
-.w{max-width:1080px;margin:0 auto;padding:0 20px}
-.btn{display:inline-block;padding:10px 18px;border-radius:10px;background:var(--acc);color:#0B1020;text-decoration:none;font-weight:600}
-.btn.o{background:transparent;border:1px solid var(--line);color:var(--ink)}
-.tag{display:inline-block;font-size:13px;color:var(--acc);border:1px solid var(--line);padding:4px 10px;border-radius:99px;margin-bottom:14px}
-.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;padding:24px 0 48px}
-.c{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px;display:flex;flex-direction:column;justify-content:space-between}
-.c.hi{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc)}
-ul{padding-inline-start:20px;margin:16px 0 24px;color:var(--muted);font-size:14.5px}
-li{margin-bottom:8px}
-</style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ $lang === 'ar' ? 'AdsRanger — الباقات ومزايا الوكالات' : 'AdsRanger — Agency Plans & Capabilities' }}</title>
+    <link rel="canonical" href="{{ url($lang === 'ar' ? '/pricing' : '/en/pricing') }}">
+    <style>
+        body { margin:0; font-family:'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif; background:#0B1120; color:#F8FAFC; line-height:1.65; }
+        .hero { max-width:1080px; margin:0 auto; padding:56px 24px 28px; text-align:center; }
+        .badge { display:inline-block; padding:5px 14px; border-radius:999px; background:rgba(20,184,166,0.14); color:#2DD4BF; font-size:0.84rem; font-weight:700; margin-bottom:14px; }
+        h1 { font-size:2.35rem; margin:0 0 12px; letter-spacing:-0.02em; }
+        .sub { color:#94A3B8; max-width:700px; margin:0 auto; font-size:1.05rem; }
+        .grid { max-width:1180px; margin:36px auto 64px; padding:0 24px; display:grid; grid-template-columns:repeat(auto-fit, minmax(310px, 1fr)); gap:22px; }
+        .tier { background:#111827; border:1px solid #1E293B; border-radius:18px; padding:30px 26px; display:flex; flex-direction:column; justify-content:space-between; }
+        .tier.featured { border-color:#14B8A6; box-shadow:0 16px 40px -15px rgba(20,184,166,0.28); position:relative; }
+        .tier h2 { margin:0 0 6px; font-size:1.4rem; }
+        .tier-tag { font-size:1.05rem; font-weight:700; color:#2DD4BF; margin:12px 0 4px; }
+        .tier ul { list-style:none; padding:0; margin:20px 0 28px; color:#CBD5E1; font-size:0.93rem; }
+        .tier li { padding:7px 0; border-bottom:1px solid rgba(148,163,184,0.12); }
+        .cta { display:block; text-align:center; padding:12px 18px; border-radius:10px; font-weight:700; text-decoration:none; background:#0F766E; color:#fff; }
+        .tier.featured .cta { background:#14B8A6; color:#0B1120; }
+        .faq { max-width:920px; margin:0 auto 72px; padding:0 24px; }
+        .faq-item { background:#111827; border:1px solid #1E293B; border-radius:14px; padding:20px 24px; margin-bottom:14px; }
+    </style>
 </head>
 <body>
-<div class="w">
-    @include('public.nav', ['lang' => $lang, 'switch_url' => $t['switch_url']])
-    <section style="padding:36px 0 12px">
-        <span class="tag">{{ $t['tag'] }}</span>
-        <h1 style="font-size:clamp(28px,4.5vw,44px);margin:0 0 12px">{{ $t['h1'] }}</h1>
-        <p style="color:var(--muted);font-size:17px;max-width:740px;margin:0">{{ $t['lead'] }}</p>
-    </section>
-    <section class="g">
-        @foreach ($t['plans'] as $p)
-            <div class="c {{ !empty($p['badge']) ? 'hi' : '' }}">
-                <div>
-                    @if (!empty($p['badge']))
-                        <span class="tag" style="margin-bottom:10px">{{ $p['badge'] }}</span>
-                    @endif
-                    <h2 style="margin:0 0 6px;font-size:20px">{{ $p['name'] }}</h2>
-                    <p style="color:var(--muted);font-size:14px;margin:0 0 14px">{{ $p['desc'] }}</p>
-                    <div style="margin-bottom:14px">
-                        <strong dir="ltr" style="font-size:34px;color:var(--acc)">{{ $p['price'] }}</strong>
-                        <span style="color:var(--muted);font-size:14px">{{ $p['period'] }}</span>
-                    </div>
-                    <ul>
-                        @foreach ($p['items'] as $item)
-                            <li>{{ $item }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-                <a class="btn {{ empty($p['badge']) ? 'o' : '' }}" style="text-align:center" href="{{ $base }}/waitlist">{{ $t['cta_waitlist'] }}</a>
-            </div>
-        @endforeach
-    </section>
-    <div style="text-align:center;padding-bottom:48px">
-        <a class="btn o" href="{{ $base }}/demo-report">{{ $t['cta_demo'] }}</a>
+@include('public.nav', ['lang' => $lang])
+
+<section class="hero">
+    <span class="badge">{{ $lang === 'ar' ? 'ثلاث باقات مصممة لوكالات التسويق في المنطقة' : '3 Tiers Built for MENA Marketing Agencies' }}</span>
+    <h1>{{ $lang === 'ar' ? 'الباقات ومزايا المنصة حسب حجم وكالتك' : 'Plans Structured Around Your Agency Growth' }}</h1>
+    <p class="sub">
+        {{ $lang === 'ar'
+            ? 'تشمل جميع الباقات فترة تجربة مجانية لمدة 14 يوماً على مزايا الباقة الاحترافية، مع عرض تفاصيل الأسعار والفوترة داخل إعدادات مساحة العمل بعد التفعيل.'
+            : 'Every workspace starts with a 14-day Pro trial. Exact billing and seat options are managed directly inside Settings › Plan & usage after onboarding.' }}
+    </p>
+</section>
+
+<section class="grid">
+    <div class="tier">
+        <div>
+            <h2>{{ $lang === 'ar' ? 'الباقة الأساسية' : 'Starter' }}</h2>
+            <p style="color:#94A3B8; margin:0; font-size:0.9rem;">{{ $lang === 'ar' ? 'للوكالات الناشئة وفرق إدارة الأداء المستقلة' : 'For boutique agencies & performance teams' }}</p>
+            <div class="tier-tag">{{ $lang === 'ar' ? 'أساسيات الربط والتقارير اليومية' : 'Core Connectors & Daily Reporting' }}</div>
+            <ul>
+                <li>✓ {{ $lang === 'ar' ? 'لوحة المتابعة اليومية + نقاط الصحة والأهداف' : 'Daily Desk + Health Score & Targets' }}</li>
+                <li>✓ {{ $lang === 'ar' ? 'ربط Meta وGoogle Ads وسجل عملات 13 شهراً' : 'Meta & Google Ads + 13-Month Backfill & FX' }}</li>
+                <li>✓ {{ $lang === 'ar' ? '7 قواعد تنبيه أساسية + ملخص الصباح البريدي' : '7 Core Alert Rules + Morning Email Digest' }}</li>
+                <li>✓ {{ $lang === 'ar' ? 'تقارير شهرية PDF (عربي/إنجليزي) وروابط مشاركة موقعة' : 'Bilingual Monthly PDF Reports & Signed Links' }}</li>
+                <li>✓ {{ $lang === 'ar' ? 'أداة بناء UTM وفحص الروابط + حاسبة الأهداف' : 'UTM Builder, Link Checker & Goal Calculator' }}</li>
+            </ul>
+        </div>
+        <a href="{{ $lang === 'ar' ? '/waitlist' : '/en/waitlist' }}" class="cta">{{ $lang === 'ar' ? 'اطلب دعوة للباقة الأساسية' : 'Request Starter Access' }}</a>
     </div>
-    @include('public.footer', ['lang' => $lang])
-</div>
-@include('public.cookie-banner', ['lang' => $lang])
+
+    <div class="tier featured">
+        <div>
+            <span class="badge" style="margin-bottom:8px;">{{ $lang === 'ar' ? 'الأكثر اختياراً — تشمل التجربة المجانية' : 'Most Popular — Included in 14-Day Trial' }}</span>
+            <h2>{{ $lang === 'ar' ? 'الباقة الاحترافية' : 'Pro' }}</h2>
+            <p style="color:#94A3B8; margin:0; font-size:0.9rem;">{{ $lang === 'ar' ? 'للوكالات المتنامية التي تدير قنوات وميزانيات متعددة' : 'For growing agencies managing multi-channel budgets' }}</p>
+            <div class="tier-tag">{{ $lang === 'ar' ? 'ذكاء القنوات والتنبيهات المتقدمة' : 'Full-Funnel Intelligence & Pro Alerts' }}</div>
+            <ul>
+                <li>✓ {{ $lang === 'ar' ? 'جميع مزايا الباقة الأساسية + 18 قاعدة تنبيه احترافية' : 'Everything in Starter + All 18 Pro Alert Rules' }}</li>
+                <li>✓ {{ $lang === 'ar' ? 'تنبيهات الهاتف الحرجة (PWA Push) مع ساعات الهدوء' : 'Critical Phone Push Alerts with Quiet Hours' }}</li>
+                <li>✓ {{ $lang === 'ar' ? 'توقع نهاية الشهر + مخطط سيناريوهات رمضان والعيد' : 'Month-End Forecast + Ramadan/Eid Scenario Planner' }}</li>
+                <li>✓ {{ $lang === 'ar' ? 'تفاصيل Google Ads + فحص صفحات الهبوط ومراقبة المنافسين' : 'Google Ads Depth, Landing Page Health & Competitor Watch' }}</li>
+                <li>✓ {{ $lang === 'ar' ? 'أدوات النشر العضوي وصندوق الوارد الموحد وروابط تهيئة العملاء' : 'Organic Social Scheduler, Unified Inbox & Client Onboarding Links' }}</li>
+            </ul>
+        </div>
+        <a href="{{ $lang === 'ar' ? '/waitlist' : '/en/waitlist' }}" class="cta">{{ $lang === 'ar' ? 'ابدأ تجربتك في الباقة الاحترافية' : 'Request Pro Trial Invite' }}</a>
+    </div>
+
+    <div class="tier">
+        <div>
+            <h2>{{ $lang === 'ar' ? 'باقة الوكالات' : 'Agency' }}</h2>
+            <p style="color:#94A3B8; margin:0; font-size:0.9rem;">{{ $lang === 'ar' ? 'للوكالات الكبرى التي تتطلب علامة بيضاء وأتمتة مالية' : 'For large agencies requiring white-label & CFO automation' }}</p>
+            <div class="tier-tag">{{ $lang === 'ar' ? 'العلامة البيضاء واستوديو الإبداع والعمليات' : 'White-Label, Studio & Agency CFO Pack' }}</div>
+            <ul>
+                <li>✓ {{ $lang === 'ar' ? 'جميع مزايا الباقة الاحترافية + 18 شبكة إعلانية كاملة' : 'Everything in Pro + All 18 Ad Network Connectors' }}</li>
+                <li>✓ {{ $lang === 'ar' ? 'نطاق مخصص وعلامة بيضاء كاملة لتقارير العملاء' : 'Custom White-Label Domain & Branded Client Portals' }}</li>
+                <li>✓ {{ $lang === 'ar' ? 'مركز عمليات الوكالة والمالية (CFO) وتتبع حملات المؤثرين' : 'Agency CFO Operations Hub & Influencer ROI Attribution' }}</li>
+                <li>✓ {{ $lang === 'ar' ? 'اسأل المنصة بالذكاء الاصطناعي + خطة الميزانية السنوية' : '"Ask the Platform" AI Analyst + 12-Month Budget Plan' }}</li>
+                <li>✓ {{ $lang === 'ar' ? 'واجهات Webhooks وتصدير مباشر إلى Looker Studio وSheets' : 'Outbound Webhooks + Looker Studio & Google Sheets Feed' }}</li>
+            </ul>
+        </div>
+        <a href="{{ $lang === 'ar' ? '/waitlist' : '/en/waitlist' }}" class="cta">{{ $lang === 'ar' ? 'تواصل لتفعيل باقة الوكالات' : 'Request Agency Tier Access' }}</a>
+    </div>
+</section>
+
+@include('public.footer', ['lang' => $lang])
 </body>
 </html>

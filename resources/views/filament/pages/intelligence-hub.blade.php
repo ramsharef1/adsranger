@@ -116,4 +116,31 @@
             </div>
         </div>
     </div>
+
+        {{-- #69 Ask the Platform (AR/EN) & #99 Weekly AI Account Review --}}
+        <div style="background:rgba(15,23,42,.04);border:1px solid rgba(148,163,184,.28);border-radius:12px;padding:16px">
+            <h3 style="margin:0 0 8px;font-size:15px;font-weight:700">{{ __("Ask the Platform & Weekly AI Review") }}</h3>
+            <form wire:submit="askPlatform" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+                <input type="text" wire:model="platformQuestion" placeholder="{{ __("Ask in Arabic or English about CPA, MER, or creative fatigue...") }}"
+                       style="flex:1;min-width:220px;padding:8px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.4);background:transparent">
+                <button type="submit" style="padding:8px 14px;border-radius:8px;background:#0F766E;color:#fff;border:0;font-weight:600;cursor:pointer">
+                    {{ __("Ask AI Analyst") }}
+                </button>
+                <button type="button" wire:click="generateWeeklyReview" style="padding:8px 14px;border-radius:8px;border:1px solid #0F766E;color:#0F766E;background:transparent;font-weight:600;cursor:pointer">
+                    {{ __("Top 3 Weekly Actions") }}
+                </button>
+            </form>
+            @if ($this->platformAnswer)
+                <div data-ai-platform-answer style="padding:10px 12px;border-radius:8px;background:rgba(20,184,166,.12);margin-bottom:8px;font-size:13px">
+                    {{ $this->platformAnswer }}
+                </div>
+            @endif
+            @if (! empty($this->weeklyActions))
+                <ul data-weekly-ai-actions style="margin:6px 0 0;padding-inline-start:18px;font-size:13px">
+                    @foreach ($this->weeklyActions as $act)
+                        <li style="margin-bottom:4px">{{ $act }}</li>
+                    @endforeach
+                </ul>
+            @endif
+        </div>
 </x-filament-panels::page>

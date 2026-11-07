@@ -55,8 +55,8 @@ class PublicWebsitePhase1Test extends TestCase
 
     public function test_phase2_public_pages_render_in_ar_and_en(): void
     {
-        $this->get('/pricing')->assertOk()->assertSee('$249')->assertSee('باقة النمو');
-        $this->get('/en/pricing')->assertOk()->assertSee('$249')->assertSee('Growth Agency');
+        $this->get('/pricing')->assertOk()->assertSee('الباقة الأساسية')->assertSee('الباقة الاحترافية')->assertSee('باقة الوكالات');
+        $this->get('/en/pricing')->assertOk()->assertSee('Starter')->assertSee('Pro')->assertSee('Agency');
 
         $this->get('/integrations')->assertOk()->assertSee('Meta Ads')->assertSee('Snapchat Ads');
         $this->get('/en/integrations')->assertOk()->assertSee('Meta Ads')->assertSee('Snapchat Ads');

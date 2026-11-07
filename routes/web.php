@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\ClientOnboardingController;
 use App\Http\Controllers\ClientReportController;
 use App\Http\Controllers\ConnectController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\PublicSiteController;
 use App\Http\Controllers\ReportUnsubscribeController;
+use App\Http\Controllers\StudioBriefController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -72,5 +74,13 @@ Route::get('/app/connect/{network}/callback', function (Request $r, string $netw
 })->where('network', '[a-z0-9_]+');
 
 // #54 Creative Studio signed client approval links (no login required)
-Route::get('/studio/brief/{token}', [\App\Http\Controllers\StudioBriefController::class, 'show'])->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{40}');
-Route::post('/studio/brief/{token}', [\App\Http\Controllers\StudioBriefController::class, 'decide'])->middleware('throttle:20,1')->where('token', '[A-Za-z0-9]{40}');
+Route::get('/studio/brief/{token}', [StudioBriefController::class, 'show'])->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{40}');
+Route::post('/studio/brief/{token}', [StudioBriefController::class, 'decide'])->middleware('throttle:20,1')->where('token', '[A-Za-z0-9]{40}');
+
+// #105 Client onboarding & access request links + #77/#115 signed JSON feed for Looker Studio / Sheets / Webhooks
+Route::get('/onboard/{token}', [ClientOnboardingController::class, 'show'])
+    ->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{32,64}')->name('client.onboard.show');
+Route::post('/onboard/{token}', [ClientOnboardingController::class, 'submit'])
+    ->middleware('throttle:20,1')->where('token', '[A-Za-z0-9]{32,64}')->name('client.onboard.submit');
+Route::get('/api/v1/export/{token}', [ClientOnboardingController::class, 'exportFeed'])
+    ->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{32,64}')->name('api.export.feed');

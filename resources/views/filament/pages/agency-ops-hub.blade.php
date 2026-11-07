@@ -104,4 +104,45 @@
             </div>
         </div>
     </div>
+
+        {{-- #105 Client Onboarding Links & #77/#115 Outbound Webhooks / Looker & Sheets Feed --}}
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-top:16px">
+            <div style="background:rgba(15,23,42,.04);border:1px solid rgba(148,163,184,.28);border-radius:12px;padding:16px">
+                <h3 style="margin:0 0 8px;font-size:15px;font-weight:700">{{ __("Client Onboarding & Access Link") }}</h3>
+                <form wire:submit="createOnboardingLink" style="display:grid;gap:8px;margin-bottom:12px">
+                    <input type="text" wire:model="prospectName" placeholder="{{ __("Client or Prospect Name") }}"
+                           style="padding:8px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.4);background:transparent">
+                    <input type="url" wire:model="prospectWebsite" placeholder="https://client-domain.com"
+                           style="padding:8px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.4);background:transparent">
+                    <button type="submit" style="padding:8px 14px;border-radius:8px;background:#0F766E;color:#fff;border:0;font-weight:600;cursor:pointer">
+                        {{ __("Generate Onboarding Link") }}
+                    </button>
+                </form>
+                @foreach ($onboardingLinks as $ob)
+                    <div style="font-size:12px;padding:6px 0;border-top:1px solid rgba(148,163,184,.2)">
+                        <strong>{{ $ob->prospect_name }}</strong> ({{ $ob->status }}) —
+                        <a href="{{ url('/onboard/'.$ob->token) }}" target="_blank" style="text-decoration:underline">/onboard/{{ $ob->token }}</a>
+                    </div>
+                @endforeach
+            </div>
+
+            <div style="background:rgba(15,23,42,.04);border:1px solid rgba(148,163,184,.28);border-radius:12px;padding:16px">
+                <h3 style="margin:0 0 8px;font-size:15px;font-weight:700">{{ __("Webhooks & Looker Studio / Sheets Feed") }}</h3>
+                <form wire:submit="createWebhook" style="display:grid;gap:8px;margin-bottom:12px">
+                    <input type="text" wire:model="webhookName" placeholder="{{ __("Integration Name (e.g. Zapier / Looker Feed)") }}"
+                           style="padding:8px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.4);background:transparent">
+                    <input type="url" wire:model="webhookTargetUrl" placeholder="https://hooks.zapier.com/..."
+                           style="padding:8px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.4);background:transparent">
+                    <button type="submit" style="padding:8px 14px;border-radius:8px;background:#0F766E;color:#fff;border:0;font-weight:600;cursor:pointer">
+                        {{ __("Create Webhook & Data Feed") }}
+                    </button>
+                </form>
+                @foreach ($webhooks as $wh)
+                    <div style="font-size:12px;padding:6px 0;border-top:1px solid rgba(148,163,184,.2)">
+                        <strong>{{ $wh->name }}</strong> —
+                        <code>/api/v1/export/{{ $wh->secret_token }}</code>
+                    </div>
+                @endforeach
+            </div>
+        </div>
 </x-filament-panels::page>

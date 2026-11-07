@@ -25,7 +25,7 @@ class ReadOnlyGuard
     /** Page / table methods that only change what is shown. */
     public const VIEW_METHODS = [
         // our pages
-        'setDay', 'setPeriod', 'setHeat', 'setSort', 'setYear', 'openCampaign', 'openAdSet', 'reportsLocked', 'canManageLinks', 'canEdit',
+        'setDay', 'setPeriod', 'setHeat', 'setSort', 'setYear', 'openCampaign', 'openAdSet', 'askPlatform', 'generateWeeklyReview', 'reportsLocked', 'canManageLinks', 'canEdit',
         // Filament tables / schemas / actions (view side)
         'sortTable', 'gotoPage', 'nextPage', 'previousPage', 'setPage', 'resetPage', 'loadTable', 'loadMoreTableRecords',
         'removeTableFilter', 'removeTableFilters', 'resetTableFiltersForm', 'applyTableFilters', 'resetTableSearch',
