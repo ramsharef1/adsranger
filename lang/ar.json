@@ -1366,5 +1366,11 @@
     "Generate Onboarding Link": "إنشاء رابط التهيئة",
     "Webhooks & Looker Studio / Sheets Feed": "روابط Webhooks وتغذية Looker Studio، Sheets",
     "Integration Name (e.g. Zapier / Looker Feed)": "اسم التكامل (مثل Zapier أو تغذية Looker)",
-    "Create Webhook & Data Feed": "إنشاء Webhook وتغذية البيانات"
+    "Create Webhook & Data Feed": "إنشاء Webhook وتغذية البيانات",
+    "Agency logo": "شعار الوكالة",
+    "SVG or PNG, up to 200 KB, at least 400 px wide; a transparent background works best. Shown on client links, the monthly PDF and report emails. Without a logo, your agency name is shown.": "ملف SVG أو PNG بحجم 200 كيلوبايت على الأكثر وبعرض 400 بكسل على الأقل، ويُفضَّل بخلفية شفافة. يظهر في روابط العملاء والتقرير الشهري PDF ورسائل التقارير. إن لم ترفع شعارًا يظهر اسم وكالتك.",
+    "The file is too large: the limit is 200 KB.": "الملف كبير جدًا: الحد 200 كيلوبايت.",
+    "This SVG has scripts or links to other files. Export a plain SVG or use a PNG.": "ملف SVG هذا يحتوي على نصوص برمجية أو روابط لملفات أخرى. صدّر ملف SVG بسيطًا أو استخدم PNG.",
+    "Use an SVG or PNG file.": "استخدم ملف SVG أو PNG.",
+    "Use an image at least 400 px wide.": "استخدم صورة بعرض 400 بكسل على الأقل."
 }

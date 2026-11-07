@@ -3,10 +3,16 @@
 namespace App\Filament\Pages\Tenancy;
 
 use App\Models\AuditLog;
+use App\Support\AgencyLogo;
+use Closure;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Toggle;
 use Filament\Pages\Tenancy\EditTenantProfile;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class EditAgencyProfile extends EditTenantProfile
 {
@@ -24,14 +30,59 @@ class EditAgencyProfile extends EditTenantProfile
     {
         return $schema->components([
             ...AgencyFields::make(),
+            // #176 (D-105): logo only, all tiers; shown on client links, the monthly PDF and report emails.
+            FileUpload::make('logo_path')->label(__('Agency logo'))
+                ->disk('local')->directory(AgencyLogo::DIRECTORY)->visibility('private')
+                ->acceptedFileTypes(['image/png', 'image/svg+xml'])->maxSize(AgencyLogo::MAX_KB)
+                ->getUploadedFileNameForStorageUsing(fn (TemporaryUploadedFile $file): string => Str::random(40).'.'.(str_contains((string) $file->getMimeType(), 'svg') ? 'svg' : 'png'))
+                ->rules([fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
+                    if ($message = static::logoProblem($value)) {
+                        $fail($message);
+                    }
+                }])
+                ->helperText(__('SVG or PNG, up to 200 KB, at least 400 px wide; a transparent background works best. Shown on client links, the monthly PDF and report emails. Without a logo, your agency name is shown.')),
             // #74: members without two-step verification are sent to set it up before they can open this workspace.
             Toggle::make('require_two_factor')->label(__('Require two-step verification for all members'))
                 ->helperText(__('Members who haven\'t set it up are asked to add an authenticator app before they can open this workspace. This includes you.')),
         ]);
     }
 
+    /** Experience spec B validation for #176; returns the message to show, or null when the file is fine. */
+    public static function logoProblem(mixed $value): ?string
+    {
+        if (! $value instanceof UploadedFile) {
+            return null;
+        }
+        $realPath = $value->getRealPath();
+        $contents = (string) @file_get_contents($realPath);
+        if (strlen($contents) > AgencyLogo::MAX_KB * 1024) {
+            return __('The file is too large: the limit is 200 KB.');
+        }
+        if (str_contains((string) $value->getMimeType(), 'svg')) {
+            // Logos are drawn by the PDF renderer and served from our domain: no scripts, external files or entities.
+            if (preg_match('/<script|<foreignObject|<!ENTITY|\bon[a-z]+\s*=|(?:xlink:)?href\s*=\s*["\']\s*(?!#)/i', $contents)) {
+                return __('This SVG has scripts or links to other files. Export a plain SVG or use a PNG.');
+            }
+
+            return null;
+        }
+        $size = @getimagesize($realPath);
+        if (! $size || ($size[2] ?? null) !== IMAGETYPE_PNG) {
+            return __('Use an SVG or PNG file.');
+        }
+        if ($size[0] < AgencyLogo::MIN_WIDTH) {
+            return __('Use an image at least 400 px wide.');
+        }
+
+        return null;
+    }
+
     protected function afterSave(): void
     {
+        if ($this->tenant->wasChanged('logo_path')) {
+            AuditLog::record('agency.logo_changed', $this->tenant, ['has_logo' => AgencyLogo::has($this->tenant)]);
+        }
+
         if ($this->tenant->wasChanged('require_two_factor')) {
             AuditLog::record('agency.require_2fa_changed', $this->tenant, ['on' => (bool) $this->tenant->require_two_factor]);
         }

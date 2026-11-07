@@ -36,7 +36,16 @@
 </style>
 </head>
 <body>
+@php $logoPath = \App\Support\AgencyLogo::absolutePath($agency); @endphp
+@if ($logoPath)
+    {{-- #176 spec B: 48 px on the cover, 24 px in the header of the following pages; never recoloured or cropped. --}}
+    <htmlpageheader name="agencyHeader"><div style="text-align: {{ $al }};"><img src="{{ $logoPath }}" style="height: 24px;"></div></htmlpageheader>
+    <sethtmlpageheader name="agencyHeader" value="on" show-this-page="0" />
+@endif
 <div class="band">
+    @if ($logoPath)
+        <div style="margin-bottom: 3mm;"><img src="{{ $logoPath }}" style="height: 48px;"></div>
+    @endif
     <h1>{{ $client->name }}</h1>
     <div class="muted">{{ __('report.monthly_heading', ['month' => $monthLabel]) }} · {{ __('report.by', ['agency' => $agency->name]) }}</div>
 </div>
@@ -107,7 +116,7 @@
 @endif
 
 <div class="foot">
-    {{ __('report.generated', ['date' => $generated]) }} · {{ __('report.pdf_note') }} · AdsRanger
+    {{ __('report.generated', ['date' => $generated]) }} · {{ __('report.pdf_note') }} · {!! __('report.powered_by') !!}
 </div>
 </body>
 </html>

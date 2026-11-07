@@ -28,7 +28,14 @@
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:24px 12px">
 <tr><td align="center">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" dir="{{ $ar ? 'rtl' : 'ltr' }}" style="max-width:560px;background:#ffffff;border-radius:12px;padding:24px">
-<tr><td style="font-size:20px;font-weight:bold;padding-bottom:4px;text-align:{{ $align }}"><bdi dir="ltr">Ads<span style="color:#0F766E">Ranger</span></bdi> · {!! $agencyName !!}</td></tr>
+@php $logoUrl = \App\Support\AgencyLogo::emailUrl($agency); @endphp
+<tr><td style="font-size:20px;font-weight:bold;padding-bottom:4px;text-align:{{ $align }}">
+    @if ($logoUrl)
+        <img src="{{ $logoUrl }}" alt="{{ $agency->name }}" height="40" style="height:40px;width:auto;max-width:200px;border:0;display:inline-block">
+    @else
+        {!! $agencyName !!}
+    @endif
+</td></tr>
 <tr><td style="font-size:16px;line-height:1.8;text-align:{{ $align }}">
     <p style="margin:12px 0 4px">{{ __('report.mail_hello') }}</p>
     <p style="margin:0 0 12px">
@@ -63,7 +70,8 @@
 <tr><td style="font-size:12px;color:#4A5473;padding-top:18px;margin-top:18px;border-top:1px solid #E5E8F0;line-height:1.7;text-align:{{ $align }}">
     {!! __('report.mail_why', ['agency' => $agencyName, 'client' => $name]) !!}
     {{ __('report.pdf_note') }}<br>
-    <a href="{{ $unsubscribeUrl }}" style="color:#0F766E">{{ __('report.mail_unsubscribe') }}</a>
+    <a href="{{ $unsubscribeUrl }}" style="color:#0F766E">{{ __('report.mail_unsubscribe') }}</a><br>
+    <span style="color:#94A3B8">{!! __('report.powered_by') !!}</span>
 </td></tr>
 </table>
 </td></tr>

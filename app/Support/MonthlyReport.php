@@ -78,7 +78,7 @@ class MonthlyReport
         }
         $mpdf = new Mpdf([
             'mode' => 'utf-8', 'format' => 'A4', 'tempDir' => $tmp,
-            'margin_left' => 14, 'margin_right' => 14, 'margin_top' => 16, 'margin_bottom' => 16,
+            'margin_left' => 14, 'margin_right' => 14, 'margin_top' => 16, 'margin_bottom' => 16, 'margin_header' => 6,
             'default_font' => 'dejavusans', 'autoScriptToLang' => true, 'autoLangToFont' => true,
             'directionality' => $lang === 'ar' ? 'rtl' : 'ltr',
         ]);

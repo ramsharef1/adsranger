@@ -20,6 +20,9 @@
 <div class="wrap">
     <header>
         <div>
+            @if ($logoUrl = \App\Support\AgencyLogo::url($agency))
+                <img class="agency-logo" src="{{ $logoUrl }}" alt="{{ $agency->name }}" height="32" style="height:32px;width:auto;max-width:240px;display:block;margin-bottom:8px">
+            @endif
             <h1><bdi>{{ $client->name }}</bdi> · {{ __('report.ads') }}</h1>
             <div class="muted">{{ __('report.by', ['agency' => $agency->name]) }} · {{ __('report.range', ['from' => \Carbon\Carbon::parse($from)->locale($lang)->translatedFormat('j F Y'), 'to' => \Carbon\Carbon::parse($to)->locale($lang)->translatedFormat('j F Y')]) }}</div>
         </div>
@@ -65,7 +68,7 @@
 
     <footer>
         {{ __('report.footer') }}<br>
-        <span dir="ltr">AdsRanger</span>
+        {!! __('report.powered_by') !!}
     </footer>
 </div>
 </body>

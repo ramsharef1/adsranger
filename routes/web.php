@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AgencyLogoController;
 use App\Http\Controllers\ClientOnboardingController;
 use App\Http\Controllers\ClientReportController;
 use App\Http\Controllers\ConnectController;
@@ -47,6 +48,9 @@ foreach (['privacy', 'terms', 'data-deletion'] as $legalPage) {
 }
 
 // #56 signed client links: read-only client report, no login
+// #176 agency logo on client reports (random file name, see App\Support\AgencyLogo)
+Route::get('/brand/agency/{file}', [AgencyLogoController::class, 'show'])
+    ->middleware('throttle:120,1')->where('file', '[A-Za-z0-9]{40}\.(png|svg)')->name('agency.logo');
 Route::get('/r/{token}', [ClientReportController::class, 'show'])->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{40}');
 // #57 monthly PDF behind the same link
 Route::get('/r/{token}/ads', [ClientReportController::class, 'ads'])->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{40}');
