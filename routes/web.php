@@ -84,3 +84,11 @@ Route::post('/onboard/{token}', [ClientOnboardingController::class, 'submit'])
     ->middleware('throttle:20,1')->where('token', '[A-Za-z0-9]{32,64}')->name('client.onboard.submit');
 Route::get('/api/v1/export/{token}', [ClientOnboardingController::class, 'exportFeed'])
     ->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{32,64}')->name('api.export.feed');
+
+// Wave 21 Public Growth Pages
+Route::get('/calculator', [PublicSiteController::class, 'calculator'])->defaults('lang', 'ar');
+Route::get('/en/calculator', [PublicSiteController::class, 'calculator'])->defaults('lang', 'en');
+Route::get('/partners', [PublicSiteController::class, 'partners'])->defaults('lang', 'ar');
+Route::get('/en/partners', [PublicSiteController::class, 'partners'])->defaults('lang', 'en');
+Route::get('/resources', [PublicSiteController::class, 'resources'])->defaults('lang', 'ar');
+Route::get('/en/resources', [PublicSiteController::class, 'resources'])->defaults('lang', 'en');

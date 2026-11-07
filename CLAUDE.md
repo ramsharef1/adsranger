@@ -142,3 +142,9 @@ Before relying on a package's API, confirm its installed version:
 - Pluggable AiAnalyst driver with Redis 4-hour semantic caching (#69 / #131).
 - Async DeliverAgencyWebhookJob with HMAC-SHA256 request signatures (X-AdsRanger-Signature) for #77 & #115.
 - Enterprise resilience test suite for queue jobs and semantic caching.
+
+## Recent Architecture Additions (Wave 21 - Growth & Intelligence)
+- Public MENA Ad Spend & ROAS Growth Calculator (/calculator & /en/calculator).
+- Certified MENA Agency Partner Directory (/partners & /en/partners).
+- Regional Performance Case Studies & Playbooks Hub (/resources & /en/resources).
+- Client Churn Risk & Health Scorecards (#110) & Agency Partner Listings.

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\WaitlistEntry;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\View\View;
 
 class PublicSiteController extends Controller
 {
@@ -87,18 +88,33 @@ class PublicSiteController extends Controller
         ];
 
         $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n"
-             . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n";
+             .'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'."\n";
         foreach ($urls as [$arUrl, $enUrl]) {
             foreach ([$arUrl, $enUrl] as $loc) {
                 $xml .= "  <url>\n"
-                      . "    <loc>{$loc}</loc>\n"
-                      . "    <xhtml:link rel=\"alternate\" hreflang=\"ar\" href=\"{$arUrl}\"/>\n"
-                      . "    <xhtml:link rel=\"alternate\" hreflang=\"en\" href=\"{$enUrl}\"/>\n"
-                      . "  </url>\n";
+                      ."    <loc>{$loc}</loc>\n"
+                      ."    <xhtml:link rel=\"alternate\" hreflang=\"ar\" href=\"{$arUrl}\"/>\n"
+                      ."    <xhtml:link rel=\"alternate\" hreflang=\"en\" href=\"{$enUrl}\"/>\n"
+                      ."  </url>\n";
             }
         }
         $xml .= "</urlset>\n";
 
         return response($xml, 200, ['Content-Type' => 'application/xml; charset=UTF-8']);
+    }
+
+    public function calculator(Request $request): View
+    {
+        return view('public.calculator', ['lang' => $request->segment(1) === 'en' ? 'en' : 'ar']);
+    }
+
+    public function partners(Request $request): View
+    {
+        return view('public.partners', ['lang' => $request->segment(1) === 'en' ? 'en' : 'ar']);
+    }
+
+    public function resources(Request $request): View
+    {
+        return view('public.resources', ['lang' => $request->segment(1) === 'en' ? 'en' : 'ar']);
     }
 }
