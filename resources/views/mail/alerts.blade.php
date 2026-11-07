@@ -33,8 +33,8 @@
         @forelse ($alerts as $a)
             <div style="border-top:1px solid #e2e8f0;padding:8px 0">
                 <span style="display:inline-block;font-size:12px;font-weight:600;color:{{ \App\Support\Severity::hex($a->severity) }}">● {{ $lvl($a->severity) }}</span>
-                <strong style="font-size:14px">{{ $a->title }}</strong>
-                <div style="font-size:13px;color:#475569;margin-top:2px">{{ $a->detail }}</div>
+                <strong style="font-size:14px">{{ $a->localTitle($ar ? 'ar' : 'en') }}</strong>
+                <div style="font-size:13px;color:#475569;margin-top:2px">{{ $a->localDetail($ar ? 'ar' : 'en') }}</div>
             </div>
         @empty
             <div style="font-size:13px;color:#64748b">{{ $ar ? 'لا توجد تنبيهات مفتوحة.' : 'No open alerts.' }}</div>

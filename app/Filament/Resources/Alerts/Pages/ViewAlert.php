@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Alerts\Pages;
 
 use App\Filament\Resources\Alerts\AlertResource;
+use App\Models\Agency;
 use App\Models\AuditLog;
 use Filament\Resources\Pages\ViewRecord;
 
@@ -18,7 +19,7 @@ class ViewAlert extends ViewRecord
 
     public function getTitle(): string
     {
-        return (string) $this->record->title;
+        return $this->record->localTitle();
     }
 
     protected function getHeaderActions(): array
@@ -31,7 +32,7 @@ class ViewAlert extends ViewRecord
     {
         $labels = ['alert.assigned' => __('Assigned'), 'alert.snoozed' => __('Snoozed'), 'alert.resolved' => __('Resolved'), 'alert.reopened' => __('Reopened')];
 
-        return AuditLog::with('user')->where('subject_type', \App\Models\Agency::class)->where('subject_id', $this->record->agency_id)
+        return AuditLog::with('user')->where('subject_type', Agency::class)->where('subject_id', $this->record->agency_id)
             ->where('action', 'like', 'alert.%')->orderByDesc('id')->limit(500)->get()
             ->filter(fn (AuditLog $l) => (int) ($l->meta['alert_id'] ?? 0) === (int) $this->record->id)
             ->take(20)

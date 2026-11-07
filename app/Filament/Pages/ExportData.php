@@ -18,7 +18,6 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 use UnitEnum;
 
 /**
@@ -116,7 +115,7 @@ class ExportData extends Page
             ->color('danger')
             ->visible(fn () => auth()->user()?->roleIn(Filament::getTenant()) === 'owner' && Modules::on('self_serve_deletion'))
             ->modalHeading(__('Delete workspace'))
-            ->modalDescription(__('This closes the workspace immediately and schedules all workspace data for deletion. Enter your password and the workspace slug to confirm.'))
+            ->modalDescription(__('We close access now and keep the workspace data for 30 days, during which you can ask support to restore it. After that, our team deletes it for good.').' '.__('Enter your password and the workspace slug to confirm.'))
             ->schema([
                 TextInput::make('password')
                     ->label(__('Current password'))

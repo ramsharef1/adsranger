@@ -34,7 +34,7 @@
                 <dt style="opacity:.65">{{ __('Since') }}</dt>
                 <dd style="margin:0">{{ $a->created_at?->locale(app()->getLocale())->diffForHumans() }}</dd>
                 <dt style="opacity:.65">{{ __('What we found') }}</dt>
-                <dd style="margin:0"><bdi>{{ $a->detail ?: $a->title }}</bdi></dd>
+                <dd style="margin:0"><bdi>{{ $a->localDetail() ?: $a->localTitle() }}</bdi></dd>
                 <dt style="opacity:.65">{{ __('Status') }}</dt>
                 <dd style="margin:0">{{ __($a->status) }}@if ($a->status === 'snoozed' && $a->snoozed_until) · {{ __('until :date', ['date' => $a->snoozed_until->translatedFormat('j M')]) }}@endif</dd>
                 <dt style="opacity:.65">{{ __('Assigned to') }}</dt>

@@ -1189,8 +1189,8 @@
     "Type DELETE to confirm": "اكتب DELETE للتأكيد",
     "Please type DELETE to confirm.": "يرجى كتابة DELETE للتأكيد.",
     "Delete your owned workspaces first before deleting your personal account.": "احذف مساحات العمل التي تملكها أولاً قبل حذف حسابك الشخصي.",
-    "View as": "العرض بصفتك",
-    "Myself": "حسابي",
+    "View as": "المعاينة بصفة",
+    "Myself": "أنا (دون معاينة)",
     "Exit preview": "إنهاء المعاينة",
     "Click-through rate drop": "انخفاض نسبة النقر إلى الظهور",
     "Link click-through rate down by at least this % vs the 7 days before (needs 1,000+ impressions in each week).": "انخفاض نسبة النقر على الرابط بهذه النسبة المئوية على الأقل مقارنة بالأيام السبعة السابقة (يتطلب 1,000 ظهور على الأقل في كل أسبوع).",
@@ -1388,5 +1388,7 @@
     "Use the standard https port.": "استخدم منفذ https القياسي.",
     "The address is too long.": "العنوان طويل جدًا.",
     "The address must point to a public server.": "يجب أن يشير العنوان إلى خادم عام.",
-    "Sends critical alerts and sent reports to a public https address, signed with its own secret. The feed URL gives read-only data: keep it private.": "يرسل التنبيهات الحرجة والتقارير المُرسلة إلى عنوان https عام، موقّعة بسر خاص بها. رابط موجز البيانات يعرض البيانات للقراءة فقط، فاحتفظ به سرًّا."
+    "Sends critical alerts and sent reports to a public https address, signed with its own secret. The feed URL gives read-only data: keep it private.": "يرسل التنبيهات الحرجة والتقارير المُرسلة إلى عنوان https عام، موقّعة بسر خاص بها. رابط موجز البيانات يعرض البيانات للقراءة فقط، فاحتفظ به سرًّا.",
+    "We close access now and keep the workspace data for 30 days, during which you can ask support to restore it. After that, our team deletes it for good.": "سنغلق الوصول فورًا ونحتفظ ببيانات مساحة العمل 30 يومًا يمكنك خلالها طلب استعادتها من الدعم، ثم يحذفها فريقنا نهائيًا.",
+    "Enter your password and the workspace slug to confirm.": "أدخل كلمة المرور ومعرّف مساحة العمل للتأكيد."
 }

@@ -158,8 +158,8 @@
             @foreach ($alerts as $a)
                 <div style="padding:6px 0;border-top:1px solid rgba(148,163,184,.2)">
                     <x-filament::badge :color="\App\Support\Severity::color($a->severity)" :icon="\App\Support\Severity::icon($a->severity)" style="display:inline-flex">{{ \App\Support\Severity::label($a->severity) }}</x-filament::badge>
-                    <strong style="margin-inline-start:6px">{{ $a->title }}</strong>
-                    <div style="{{ $muted }};margin-top:2px">{{ $a->detail }}</div>
+                    <strong style="margin-inline-start:6px">{{ $a->localTitle() }}</strong>
+                    <div style="{{ $muted }};margin-top:2px">{{ $a->localDetail() }}</div>
                 </div>
             @endforeach
         </x-filament::section>

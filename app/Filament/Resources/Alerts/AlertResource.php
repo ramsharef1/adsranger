@@ -4,9 +4,15 @@ namespace App\Filament\Resources\Alerts;
 
 use App\Filament\Concerns\TranslatesResourceLabels;
 use App\Filament\Resources\Alerts\Pages\ListAlerts;
+use App\Mail\AlertAssignedMail;
 use App\Models\Alert;
 use App\Models\AuditLog;
 use App\Models\Client;
+use App\Models\User;
+use App\Support\CriticalPush;
+use App\Support\CurrentClient;
+use App\Support\PlanGate;
+use App\Support\Severity;
 use App\Support\TeamRoles;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -20,6 +26,8 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 /** Alerts inbox: assign, snooze, resolve. */
@@ -70,7 +78,7 @@ class AlertResource extends Resource
             ->where(fn ($q) => $q->whereNull('client_id')->orWhereIn('client_id', $ids));
 
         // UX-81: with a current client chosen in the top bar, only that client's alerts.
-        return \App\Support\CurrentClient::apply($q, 'client_id', $a);
+        return CurrentClient::apply($q, 'client_id', $a);
     }
 
     protected static function act(Alert $a, array $set, string $what): void
@@ -115,19 +123,19 @@ class AlertResource extends Resource
         if (! $to || $to === $before || $to === auth()->id()) {
             return;
         }
-        $u = \App\Models\User::find($to);
+        $u = User::find($to);
         if (! $u) {
             return;
         }
-        $url = \App\Support\CriticalPush::alertUrl($r->agency, $r);
+        $url = CriticalPush::alertUrl($r->agency, $r);
         if ($u->email_alerts) {
-            \Illuminate\Support\Facades\Mail::to($u->email)->queue(new \App\Mail\AlertAssignedMail($r, $u, (string) auth()->user()?->name, $url));
+            Mail::to($u->email)->queue(new AlertAssignedMail($r, $u, (string) auth()->user()?->name, $url));
         }
-        if (\App\Support\PlanGate::allows($r->agency, 'phone_push') && $u->pushSubscriptions()->exists()) {
+        if (PlanGate::allows($r->agency, 'phone_push') && $u->pushSubscriptions()->exists()) {
             $l = $r->agency->language === 'en' ? 'en' : 'ar';
-            \App\Support\CriticalPush::push($u, [
-                'title' => \Illuminate\Support\Str::limit(__('Alert assigned to you · :client', ['client' => $r->client?->name ?? $r->agency->name], $l), 60, '…'),
-                'body' => \Illuminate\Support\Str::limit(__(config("alerts.rules.{$r->rule_key}.label") ?? $r->rule_key, [], $l).($r->entity_name ? ' · '.$r->entity_name : ''), 110, '…'),
+            CriticalPush::push($u, [
+                'title' => Str::limit(__('Alert assigned to you · :client', ['client' => $r->client?->name ?? $r->agency->name], $l), 60, '…'),
+                'body' => Str::limit(__(config("alerts.rules.{$r->rule_key}.label") ?? $r->rule_key, [], $l).($r->entity_name ? ' · '.$r->entity_name : ''), 110, '…'),
             ], $url, 'adsr-assigned-'.$r->id);
         }
     }
@@ -142,9 +150,9 @@ class AlertResource extends Resource
             ->emptyStateHeading(__('No alerts'))
             ->emptyStateDescription(__('Alert rules run every morning after the overnight sync.'))
             ->columns([
-                TextColumn::make('severity')->label(__('Level'))->badge()->color(fn ($state) => \App\Support\Severity::color($state))->icon(fn ($state) => \App\Support\Severity::icon($state))
-                    ->formatStateUsing(fn ($state) => \App\Support\Severity::label($state)),
-                TextColumn::make('title')->wrap()->weight('bold')->description(fn (Alert $r) => $r->detail)->searchable(),
+                TextColumn::make('severity')->label(__('Level'))->badge()->color(fn ($state) => Severity::color($state))->icon(fn ($state) => Severity::icon($state))
+                    ->formatStateUsing(fn ($state) => Severity::label($state)),
+                TextColumn::make('title')->wrap()->weight('bold')->formatStateUsing(fn (Alert $r) => $r->localTitle())->description(fn (Alert $r) => $r->localDetail())->searchable(),
                 TextColumn::make('client.name')->label(__('Client'))->toggleable(),
                 TextColumn::make('rule_key')->label(__('Rule'))->formatStateUsing(fn ($state) => __(config("alerts.rules.$state.label") ?? $state))->toggleable(),
                 TextColumn::make('assignee.name')->label(__('Assigned to'))->placeholder('—'),
@@ -154,7 +162,7 @@ class AlertResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('status')->options(['open' => __('Open'), 'snoozed' => __('Snoozed'), 'resolved' => __('Resolved')])->default('open'),
-                SelectFilter::make('severity')->label(__('Level'))->options(fn () => \App\Support\Severity::options()),
+                SelectFilter::make('severity')->label(__('Level'))->options(fn () => Severity::options()),
                 SelectFilter::make('client_id')->label(__('Client'))->options(fn () => Client::visibleTo(auth()->user(), $agency)->orderBy('name')->pluck('name', 'id')->all()),
                 TernaryFilter::make('mine')->label(__('Assigned to me'))->queries(true: fn ($q) => $q->where('assigned_to', auth()->id()), false: fn ($q) => $q, blank: fn ($q) => $q),
             ])
