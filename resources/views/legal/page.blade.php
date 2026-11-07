@@ -25,7 +25,7 @@
 <style>
 :root{--bg:#0b1020;--card:#121933;--ink:#eef1fb;--muted:#9aa3c0;--acc:#2DD4BF;--line:#232c4d}
 *{box-sizing:border-box}
-body{margin:0;font-family:{{ $ar ? '"IBM Plex Sans Arabic",' : '' }}system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--ink);line-height:{{ $ar ? '1.9' : '1.65' }}}
+body{margin:0;font-family:{!! $ar ? '"IBM Plex Sans Arabic",' : '' !!}system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--ink);line-height:{{ $ar ? '1.9' : '1.65' }}}
 .wrap{max-width:820px;margin:0 auto;padding:0 20px}
 header{display:flex;justify-content:space-between;align-items:center;padding:20px 0;border-bottom:1px solid var(--line)}
 .logo{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:700;direction:ltr}
@@ -46,10 +46,7 @@ footer a{color:var(--muted);margin-inline-end:14px}
 </head>
 <body>
 <div class="wrap">
-<header>
-    <a class="logo" href="{{ $base ?: '/' }}" aria-label="AdsRanger" translate="no"><img src="/brand/adsranger-mark-teal.svg" alt=""><span aria-hidden="true">Ads<b>Ranger</b></span></a>
-    <a class="lang" href="{{ $other }}">{{ $ar ? 'English' : 'العربية' }}</a>
-</header>
+@include('public.nav', ['lang' => $lang, 'switch_url' => $other])
 <main>
     <h1>{{ $title }}</h1>
     <p class="updated">{{ $updated }}</p>

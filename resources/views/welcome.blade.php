@@ -64,7 +64,7 @@
 <section class="hero">
     <div class="badge-pill">
         <span>✨</span>
-        <span>{{ $isAr ? 'عربية أولًا وجاهزة لرمضان' : 'Arabic-first, Ramadan-ready' }}</span>
+        <span>{{ $isAr ? 'عربية أولًا مع مخطط لرمضان' : 'Arabic-first, with a Ramadan planner' }}</span>
     </div>
     <h1>
         {{ $isAr ? 'تقارير إعلانات كل عملائك' : 'Every client\'s ad reporting' }}
@@ -78,7 +78,7 @@
             A Meta and Google reporting platform for ad agencies: messages, calls, leads, bookings and sales counted by each campaign's real goal, with daily alerts that catch wasted budget and Arabic and English reports your clients understand.
         @endif
     </p>
-    <p style="color:var(--text-muted);font-size:0.9rem;margin:-20px auto 30px">{{ $isAr ? 'قيد التطوير · في مرحلة تجريبية خاصة · الإطلاق في 2027' : 'In development · private beta · launching 2027' }}</p>
+    <p style="color:var(--text-muted);font-size:0.9rem;margin:-20px auto 30px">{{ $isAr ? 'قيد التطوير · الإطلاق في 2027' : 'In development · launching 2027' }}</p>
     <div class="cta-group">
         <a href="{{ $isAr ? '/waitlist' : '/en/waitlist' }}" class="btn-primary">
             {{ $isAr ? 'طلب دعوة لوكالتك (Early Access)' : 'Request Agency Access' }}

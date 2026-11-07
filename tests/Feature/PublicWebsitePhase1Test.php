@@ -89,6 +89,22 @@ class PublicWebsitePhase1Test extends TestCase
         $this->get('/en/ramadan-2027')->assertSee('8 February 2027')->assertSee('3,600 USD')->assertDontSee('Open MENA Calendar in App');
     }
 
+    /** One shared header on the home, inner and legal pages (R-17, UX-103): same links, current page marked, mobile toggle. */
+    public function test_home_inner_and_legal_pages_share_one_menu(): void
+    {
+        foreach (['/', '/pricing', '/waitlist', '/privacy', '/terms'] as $url) {
+            $this->get($url)->assertOk()
+                ->assertSee('id="arn-links"', false)
+                ->assertSee('class="arn-toggle"', false)
+                ->assertSee('تقويم المواسم')
+                ->assertSee('href="/app/login"', false)
+                ->assertDontSee('&quot;IBM Plex', false);
+        }
+        $this->get('/pricing')->assertSee('<a href="/pricing"  aria-current="page" >', false);
+        $this->get('/en/integrations')->assertSee('Sample report')->assertSee('Seasons calendar')->assertDontSee('Live Demo');
+        $this->get('/')->assertSee('عربية أولًا مع مخطط لرمضان')->assertDontSee('تجريبية خاصة');
+    }
+
     public function test_ramadan_2027_planner_renders_in_ar_and_en(): void
     {
         $this->get('/ramadan-2027')

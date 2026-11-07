@@ -8,7 +8,7 @@ $base = $ar ? '' : '/en';
         <a href="{{ $base }}/pricing" style="color:inherit;text-decoration:none">{{ $ar ? 'الأسعار' : 'Pricing' }}</a>
         <a href="{{ $base }}/integrations" style="color:inherit;text-decoration:none">{{ $ar ? 'المنصات الإعلانية' : 'Ad networks' }}</a>
         <a href="{{ $base }}/demo-report" style="color:inherit;text-decoration:none">{{ $ar ? 'تقرير تجريبي' : 'Demo Report' }}</a>
-        <a href="{{ $base }}/mena-calendar" style="color:inherit;text-decoration:none">{{ $ar ? 'تقويم المواسم' : 'MENA Calendar' }}</a>
+        <a href="{{ $base }}/mena-calendar" style="color:inherit;text-decoration:none">{{ $ar ? 'تقويم المواسم' : 'Seasons calendar' }}</a>
         <a href="{{ $base }}/security" style="color:inherit;text-decoration:none">{{ $ar ? 'الأمان والامتثال' : 'Security' }}</a>
         <a href="{{ $base }}/privacy" style="color:inherit;text-decoration:none">{{ $ar ? 'الخصوصية' : 'Privacy' }}</a>
         <a href="{{ $base }}/terms" style="color:inherit;text-decoration:none">{{ $ar ? 'الشروط' : 'Terms' }}</a>

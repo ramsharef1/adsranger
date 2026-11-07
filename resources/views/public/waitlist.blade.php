@@ -76,7 +76,7 @@ $oldNetworks = (array) old('networks', []);
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0b1020;--card:#121933;--ink:#eef1fb;--muted:#9aa3c0;--acc:#5EEAD4;--line:#232c4d;--bad:#fca5a5}
-*{box-sizing:border-box}body{margin:0;font-family:{{ $ar ? '"IBM Plex Sans Arabic",' : '' }}system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--ink);line-height:{{ $ar ? '1.8' : '1.55' }}}
+*{box-sizing:border-box}body{margin:0;font-family:{!! $ar ? '"IBM Plex Sans Arabic",' : '' !!}system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;background:var(--bg);color:var(--ink);line-height:{{ $ar ? '1.8' : '1.55' }}}
 .w{max-width:860px;margin:0 auto;padding:0 20px}
 .btn{display:inline-flex;align-items:center;min-height:44px;padding:10px 18px;border-radius:10px;background:var(--acc);color:#0B1020;text-decoration:none;font-weight:600;border:0;cursor:pointer;font-family:inherit;font-size:15px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px;margin:24px 0 48px}
@@ -92,7 +92,7 @@ input[aria-invalid=true],select[aria-invalid=true]{border-color:var(--bad)}
 .sum{border:1px solid var(--bad);border-radius:12px;padding:12px 16px;margin-bottom:18px}
 .sum a{color:var(--bad)}
 .err{color:var(--bad);font-size:13px;margin-top:4px}
-.hp{position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden}
+.hp{position:absolute;width:1px;height:1px;margin:-1px;padding:0;border:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .priv{color:var(--muted);font-size:13px;margin:18px 0 0}.priv a,.consent a{color:var(--acc)}
 </style>
 </head>

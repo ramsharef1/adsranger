@@ -37,7 +37,7 @@
     </p>
 </section>
 
-<p style="text-align:center;color:#94A3B8;font-size:0.9rem">{{ $lang === 'ar' ? '✓ قيد التطوير · ○ مخطط له. المنصة في مرحلة تجريبية خاصة والإطلاق في 2027.' : '✓ in development · ○ planned. AdsRanger is in private beta, launching 2027.' }}</p>
+<p style="text-align:center;color:#94A3B8;font-size:0.9rem">{{ $lang === 'ar' ? '✓ قيد التطوير · ○ مخطط له. المنصة قيد التطوير والإطلاق في 2027.' : '✓ in development · ○ planned. AdsRanger is in development, launching 2027.' }}</p>
 <section class="grid">
     <div class="tier">
         <div>
