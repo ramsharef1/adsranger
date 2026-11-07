@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
     <title>{{ $lang === 'ar' ? 'AdsRanger — الباقات ومزايا الوكالات' : 'AdsRanger — Agency Plans & Capabilities' }}</title>
     <link rel="canonical" href="{{ url($lang === 'ar' ? '/pricing' : '/en/pricing') }}">
     <style>
@@ -32,7 +33,7 @@
     <h1>{{ $lang === 'ar' ? 'الباقات ومزايا المنصة حسب حجم وكالتك' : 'Plans Structured Around Your Agency Growth' }}</h1>
     <p class="sub">
         {{ $lang === 'ar'
-            ? 'تشمل جميع الباقات فترة تجربة مجانية لمدة 14 يوماً على مزايا الباقة الاحترافية، مع عرض تفاصيل الأسعار والفوترة داخل إعدادات مساحة العمل بعد التفعيل.'
+            ? 'تشمل جميع الباقات فترة تجربة مجانية لمدة 14 يومًا على مزايا الباقة الاحترافية، مع عرض تفاصيل الأسعار والفوترة داخل إعدادات مساحة العمل بعد التفعيل.'
             : 'Every workspace starts with a 14-day Pro trial. Exact billing and seat options are managed directly inside Settings › Plan & usage after onboarding.' }}
     </p>
 </section>

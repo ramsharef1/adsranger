@@ -52,7 +52,7 @@
                             </select></div>
                         <div><label style="{{ $label }}" for="ob-tz">{{ __('onboarding.step2.timezone') }}</label>
                             <select id="ob-tz" wire:model="timezone" style="{{ $field }}" dir="ltr">
-                                @foreach ($timezones as $tz) <option value="{{ $tz }}">{{ $tz }}</option> @endforeach
+                                @foreach ($timezones as $tz) <option value="{{ $tz }}">{{ $timezoneLabel($tz) }} ({{ $tz }})</option> @endforeach
                             </select></div>
                     </div>
 
@@ -92,6 +92,10 @@
 
                 @elseif ($step === 6)
                     <h2 style="font-size:18px;font-weight:700;margin:0">{{ __('onboarding.step6.title') }}</h2>
+                    @if (! $hasTeamStep)
+                    <p style="margin:0">{{ __('onboarding.step6.solo_note') }}</p>
+                    <div><x-filament::button tag="a" :href="$planUrl" color="gray">{{ __('onboarding.step6.solo_link') }}</x-filament::button></div>
+                    @else
                     <p style="{{ $hint }};margin:0">{{ __('onboarding.step6.help') }}</p>
                     <div><label style="{{ $label }}" for="ob-email">{{ __('onboarding.step6.email') }}</label>
                         <input id="ob-email" type="email" dir="ltr" wire:model="inviteEmail" style="{{ $field }}" maxlength="190">
@@ -100,10 +104,11 @@
                         <select id="ob-role" wire:model="inviteRole" style="{{ $field }}">
                             @foreach (\App\Support\Onboarding::INVITE_ROLES as $r) <option value="{{ $r }}">{{ __(config('adsranger.member_roles')[$r]) }}</option> @endforeach
                         </select></div>
+                    @endif
 
                 @elseif ($step === 7)
                     <h2 style="font-size:18px;font-weight:700;margin:0">{{ __('onboarding.step7.title') }}</h2>
-                    <p style="{{ $hint }};margin:0">{{ __('onboarding.step7.help', ['tz' => $agency->timezone ?: 'Asia/Amman']) }}</p>
+                    <p style="{{ $hint }};margin:0">{{ __('onboarding.step7.help', ['tz' => $timezoneLabel($agency->timezone)]) }}</p>
                     <label style="{{ $choice($emailDigest) }}"><input type="checkbox" wire:model.live="emailDigest"> <span>{{ __('onboarding.step7.digest') }}</span></label>
                     <label style="{{ $choice($emailAlerts) }}"><input type="checkbox" wire:model.live="emailAlerts"> <span>{{ __('onboarding.step7.alerts') }}</span></label>
                 @endif
@@ -119,7 +124,7 @@
                             <x-filament::button type="button" color="gray" wire:click="skip">{{ __('onboarding.skip') }}</x-filament::button>
                         @endif
                         <x-filament::button type="submit">
-                            {{ $step === 6 ? __('onboarding.step6.send') : ($step === \App\Support\Onboarding::LAST_STEP ? __('onboarding.finish') : ($step === 5 ? __('onboarding.continue') : __('onboarding.save_continue'))) }}
+                            {{ $step === 6 ? ($hasTeamStep ? __('onboarding.step6.send') : __('onboarding.step6.continue_solo')) : ($step === \App\Support\Onboarding::LAST_STEP ? __('onboarding.finish') : ($step === 5 ? __('onboarding.continue') : __('onboarding.save_continue'))) }}
                         </x-filament::button>
                     </div>
                 </div>

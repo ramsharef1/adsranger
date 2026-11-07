@@ -7,6 +7,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
     <title>{{ $isAr ? 'AdsRanger — تقارير الإعلانات للوكالات' : 'AdsRanger — ad reporting for agencies' }}</title>
     <meta name="description" content="{{ $isAr ? 'منصة تقارير للوكالات الإعلانية: النتائج حسب الهدف الحقيقي لكل حملة، تنبيهات يومية، وتقارير بالعربية والإنجليزية. قيد التطوير، الإطلاق في 2027.' : 'Reporting platform for ad agencies: results by the real goal of each campaign, daily alerts, and Arabic and English client reports. In development, launching 2027.' }}">
     <link rel="canonical" href="{{ url($isAr ? '/' : '/en') }}">
@@ -119,7 +120,7 @@
 <section class="section">
     <div class="section-header">
         <h2>{{ $isAr ? 'كل ما تحتاجه وكالتك لزيادة الأرباح وتقليل الهدر' : 'Everything Your Agency Needs to Scale Profitably' }}</h2>
-        <p>{{ $isAr ? 'مزايا مصممة خصيصاً لتحديات السوق الإقليمي وسرعة اتخاذ القرار' : 'Engineered specifically for regional market dynamics and fast-paced agency operations.' }}</p>
+        <p>{{ $isAr ? 'مزايا مصممة خصيصًا لتحديات السوق الإقليمي وسرعة اتخاذ القرار' : 'Engineered specifically for regional market dynamics and fast-paced agency operations.' }}</p>
     </div>
 
     <div class="grid-3">

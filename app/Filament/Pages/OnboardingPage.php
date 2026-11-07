@@ -94,17 +94,11 @@ class OnboardingPage extends Page
         $this->targetCpr = $client?->target_cpr !== null ? (string) $client->target_cpr : null;
         $this->emailDigest = (bool) ($user->email_digest || ! $a->onboarding_completed_at);
         $this->emailAlerts = (bool) ($user->email_alerts || ! $a->onboarding_completed_at);
-        if ($this->step === 6 && ! Onboarding::hasTeamStep($a)) {
-            $this->step = 7;
-        }
     }
 
     public function back(): void
     {
         $this->step = max(1, $this->step - 1);
-        if ($this->step === 6 && ! Onboarding::hasTeamStep(Filament::getTenant())) {
-            $this->step = 5;
-        }
     }
 
     public function skip(): void
@@ -124,7 +118,7 @@ class OnboardingPage extends Page
             3 => $this->saveFirstClient(),
             4 => $this->saveTarget(),
             5 => null,
-            6 => $this->sendInvite(),
+            6 => Onboarding::hasTeamStep($a) ? $this->sendInvite() : null, // D-198: Solo sees an upgrade note
             7 => $this->saveSummary(),
         };
         Onboarding::track($a, $this->step, 'done');
@@ -136,9 +130,6 @@ class OnboardingPage extends Page
     {
         $a = Filament::getTenant();
         $next = $this->step + 1;
-        if ($next === 6 && ! Onboarding::hasTeamStep($a)) {
-            $next = 7;
-        }
         if ($next > Onboarding::LAST_STEP) {
             $a->forceFill(['onboarding_step' => Onboarding::LAST_STEP])->save();
 
@@ -236,8 +227,10 @@ class OnboardingPage extends Page
             'agency' => $a,
             'inHouse' => Onboarding::isInHouse($a) || $this->audience === 'business',
             'hasTeamStep' => Onboarding::hasTeamStep($a),
-            'shownSteps' => Onboarding::hasTeamStep($a) ? Onboarding::LAST_STEP : Onboarding::LAST_STEP - 1,
-            'shownIndex' => (! Onboarding::hasTeamStep($a) && $this->step === 7) ? 6 : $this->step,
+            'shownSteps' => Onboarding::LAST_STEP,
+            'shownIndex' => $this->step,
+            'timezoneLabel' => fn (?string $tz): string => Onboarding::timezoneLabel($tz),
+            'planUrl' => PlanUsage::getUrl(tenant: $a),
             'networksUrl' => Networks::getUrl(tenant: $a),
             'importsUrl' => '/app/'.$a->slug.'/imports',
             'countries' => config('adsranger.countries'),

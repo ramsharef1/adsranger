@@ -49,7 +49,7 @@
         <input type="number" x-model.number="spend" step="5000" min="5000" max="5000000">
 
         <div class="result-box">
-            <div style="font-size:0.9rem; color:#94A3B8;">{{ $lang === 'ar' ? 'العائد الإضافي المتوقع شهرياً' : 'Estimated Monthly Revenue Uplift' }}</div>
+            <div style="font-size:0.9rem; color:#94A3B8;">{{ $lang === 'ar' ? 'العائد الإضافي المتوقع شهريًا' : 'Estimated Monthly Revenue Uplift' }}</div>
             <div class="res-num" x-text="'+ ' + currency + ' ' + Math.round(spend * 0.22).toLocaleString()">+ SAR 11,000</div>
             <div style="font-size:0.88rem; color:#A7F3D0; margin-top:6px;">{{ $lang === 'ar' ? 'متوسط تقليل الهدر الإعلاني: 18% — تحسين العائد المدمج (MER)' : 'Average ad waste reduction: 18% — Blended MER optimization' }}</div>
             <a href="{{ $lang === 'ar' ? '/waitlist' : '/en/waitlist' }}" style="display:inline-block; margin-top:18px; background:#0F766E; color:#fff; padding:10px 22px; border-radius:10px; font-weight:700; text-decoration:none;">{{ $lang === 'ar' ? 'احصل على وصول مبكر لوكالتك' : 'Claim Agency Early Access' }}</a>

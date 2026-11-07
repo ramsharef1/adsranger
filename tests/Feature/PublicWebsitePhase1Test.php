@@ -143,8 +143,8 @@ class PublicWebsitePhase1Test extends TestCase
         $this->get('/integrations')->assertOk()->assertSee('Meta Ads')->assertSee('Snapchat Ads');
         $this->get('/en/integrations')->assertOk()->assertSee('Meta Ads')->assertSee('Snapchat Ads');
 
-        $this->get('/demo-report')->assertOk()->assertSee('$18,450')->assertSee('88 / 100');
-        $this->get('/en/demo-report')->assertOk()->assertSee('$18,450')->assertSee('88 / 100');
+        $this->get('/demo-report')->assertOk()->assertSee('18,450 USD')->assertSee('88 / 100');
+        $this->get('/en/demo-report')->assertOk()->assertSee('18,450 USD')->assertSee('88 / 100');
 
         $this->get('/mena-calendar')->assertOk()->assertSee('الجمعة البيضاء')->assertSee('رمضان');
         $this->get('/en/mena-calendar')->assertOk()->assertSee('White Friday')->assertSee('Ramadan');

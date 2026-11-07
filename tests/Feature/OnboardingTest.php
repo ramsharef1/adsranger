@@ -82,7 +82,8 @@ class OnboardingTest extends TestCase
 
         $page = $this->page($a, $u);
         $page->assertSet('step', 4)->set('monthlyBudget', '1500')->call('save')->assertSet('step', 5)
-            ->call('skip')->assertSet('step', 7)
+            ->call('skip')->assertSet('step', 6)->assertSee('The Solo plan has one seat')
+            ->call('save')->assertSet('step', 7)->assertSee('on Amman time')
             ->set('emailDigest', true)->call('save')->assertRedirect(DailyDesk::getUrl(tenant: $a));
         $this->assertEquals(1500, Client::where('agency_id', $a->id)->value('monthly_budget'));
         $this->assertTrue((bool) $u->fresh()->email_digest);

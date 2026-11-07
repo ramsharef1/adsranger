@@ -32,10 +32,18 @@ class Onboarding
         return $agency->members()->whereKey($user->id)->wherePivot('role', 'owner')->exists();
     }
 
-    /** Step 6 is hidden when the plan has one seat (Solo). */
+    /** Whether step 6 can invite: a one-seat plan (Solo) sees an upgrade note there instead (D-198). */
     public static function hasTeamStep(Agency $agency): bool
     {
         return PlanLimits::seatsLimit($agency) > 1;
+    }
+
+    /** UX-165: a time zone as a city name in the current language (e.g. «عمّان»), not the raw "Asia/Amman". */
+    public static function timezoneLabel(?string $tz): string
+    {
+        $tz = $tz ?: 'Asia/Amman';
+
+        return __('onboarding.timezones.'.$tz) !== 'onboarding.timezones.'.$tz ? __('onboarding.timezones.'.$tz) : $tz;
     }
 
     /** "Brands" instead of "Clients" for a business running its own ads (FR-032). */
