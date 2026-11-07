@@ -123,4 +123,26 @@ class ViewAsTest extends TestCase
             ->actingAs($admin)->get('/app/preview/desk')->assertOk()->assertDontSee('Exit preview');
         $this->assertSame('admin', $admin->roleIn($this->agency));
     }
+
+    public function test_preview_mode_shows_banner_and_enforces_read_only_guard(): void
+    {
+        $owner = $this->member('owner', 'Owner User');
+        $client = Client::create(['agency_id' => $this->agency->id, 'name' => 'Client One', 'currency' => 'USD', 'status' => 'active']);
+
+        $r = $this->withSession(['locale' => 'en'])->actingAs($owner)->get('/app/preview/desk?view_as=r:manager');
+        $r->assertOk()
+            ->assertSee('data-view-as-banner', false)
+            ->assertSee('Preview mode is read-only');
+
+        // Create/Edit pages redirect away while previewing (UX-97 read-only preview)
+        $this->withSession(['locale' => 'en', 'view_as.'.$this->agency->id => 'r:manager'])
+            ->actingAs($owner)
+            ->get('/app/preview/clients/create')
+            ->assertRedirect('/app/preview/clients');
+
+        $this->withSession(['locale' => 'en', 'view_as.'.$this->agency->id => 'r:manager'])
+            ->actingAs($owner)
+            ->get('/app/preview/clients/'.$client->id.'/edit')
+            ->assertRedirect('/app/preview/clients');
+    }
 }

@@ -4,6 +4,8 @@ namespace App\Support;
 
 use App\Models\Agency;
 use App\Models\User;
+use Filament\Facades\Filament;
+use Filament\Notifications\Notification;
 
 /**
  * #71 "View as" preview switcher for workspace owners, admins, and super admins.
@@ -59,6 +61,7 @@ class ViewAs
                     if ($hasSession) {
                         $req->session()->forget(self::key($agency));
                     }
+
                     return null;
                 }
                 if (self::isValidTarget($pick, $agency, $user) && $hasSession) {
@@ -96,6 +99,22 @@ class ViewAs
         }
     }
 
+    public static function isPreviewing(?User $user = null, ?Agency $agency = null): bool
+    {
+        $user ??= auth()->user();
+        $agency ??= Filament::getTenant();
+
+        return $user instanceof User && $agency instanceof Agency && self::current($user, $agency) !== null;
+    }
+
+    public static function notice(): Notification
+    {
+        return Notification::make()
+            ->warning()
+            ->title(__('Preview mode is read-only'))
+            ->body(__('Exit preview to make changes.'));
+    }
+
     public static function effectiveRole(User $user, Agency $agency): ?string
     {
         $cur = self::current($user, $agency);
@@ -123,6 +142,7 @@ class ViewAs
     {
         if (str_starts_with($target, 'r:')) {
             $role = substr($target, 2);
+
             return in_array($role, ['admin', 'manager', 'analyst'], true) && self::mayPreviewRole($actor, $agency, $role);
         }
         if (str_starts_with($target, 'u:')) {
@@ -139,7 +159,7 @@ class ViewAs
     }
 
     /** UX-97: preview only roles with fewer rights than your own (super admins excepted); never the owner. */
-    private static function mayPreviewRole(User $actor, Agency $agency, string $role): bool
+    public static function mayPreviewRole(User $actor, Agency $agency, string $role): bool
     {
         $rank = ['owner' => 4, 'admin' => 3, 'manager' => 2, 'analyst' => 1];
         if (! isset($rank[$role]) || $role === 'owner') {
@@ -159,6 +179,7 @@ class ViewAs
             if (! in_array($role, ['admin', 'manager', 'analyst'], true)) {
                 return null;
             }
+
             return [
                 'target' => $target,
                 'type' => 'role',
@@ -175,6 +196,7 @@ class ViewAs
                 return null;
             }
             $role = $member->pivot?->role ?: 'analyst';
+
             return [
                 'target' => $target,
                 'type' => 'user',

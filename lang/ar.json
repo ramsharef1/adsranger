@@ -1338,5 +1338,8 @@
     "Orders": "الطلبات",
     "Record creator ROI": "تسجيل عائد المؤثر",
     "Arabic": "العربية",
-    "English": "الإنجليزية"
+    "English": "الإنجليزية",
+    "Viewing as :target": "معاينة بصلاحيات :target",
+    "Preview mode is read-only": "وضع المعاينة للقراءة فقط",
+    "Exit preview to make changes.": "أنهِ المعاينة لإجراء أي تعديلات."
 }

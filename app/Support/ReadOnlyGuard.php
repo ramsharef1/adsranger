@@ -47,7 +47,7 @@ class ReadOnlyGuard
                 return;
             }
             $agency = Filament::getTenant();
-            TrialNotice::readOnly($agency, auth()->user())->send();
+            (ViewAs::isPreviewing(auth()->user(), $agency) ? ViewAs::notice() : TrialNotice::readOnly($agency, auth()->user()))->send();
             $returnEarly(null);
         });
     }
@@ -61,7 +61,7 @@ class ReadOnlyGuard
             return true;
         }
         $agency = Filament::getTenant();
-        if (! $agency instanceof Agency || ! Trial::isReadOnly($agency)) {
+        if (! $agency instanceof Agency || (! Trial::isReadOnly($agency) && ! ViewAs::isPreviewing(auth()->user(), $agency))) {
             return true; // invited / admin / paying agencies are never read-only here
         }
         if (str_starts_with($method, '$') || str_starts_with($method, '__') || in_array($method, static::VIEW_METHODS, true)) {

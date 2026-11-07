@@ -7,6 +7,7 @@ use App\Filament\Pages\TrialEnded;
 use App\Models\Agency;
 use App\Support\Trial;
 use App\Support\TrialNotice;
+use App\Support\ViewAs;
 use Closure;
 use Filament\Facades\Filament;
 use Filament\Pages\Dashboard;
@@ -28,7 +29,8 @@ class TrialLifecycleGate
     public function handle(Request $request, Closure $next): Response
     {
         $agency = Filament::getTenant();
-        if (! $agency instanceof Agency || ! Trial::isReadOnly($agency)) {
+        $previewing = $agency instanceof Agency && ViewAs::isPreviewing($request->user(), $agency);
+        if (! $agency instanceof Agency || (! Trial::isReadOnly($agency) && ! $previewing)) {
             return $next($request);
         }
 
@@ -44,7 +46,7 @@ class TrialLifecycleGate
         }
 
         if ($page && (is_subclass_of($page, CreateRecord::class) || is_subclass_of($page, EditRecord::class) || is_subclass_of($page, EditTenantProfile::class))) {
-            TrialNotice::readOnly($agency, $request->user())->send();
+            ($previewing ? ViewAs::notice() : TrialNotice::readOnly($agency, $request->user()))->send();
             $index = method_exists($page, 'getResource') ? $page::getResource()::getUrl('index', tenant: $agency) : Dashboard::getUrl(tenant: $agency);
 
             return redirect($index);
