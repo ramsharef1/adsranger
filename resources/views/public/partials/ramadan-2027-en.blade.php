@@ -92,4 +92,4 @@
 <li><a href="https://business.google.com/en-all/think/consumer-insights/ramadan-2024-retail-marketing-tips/" rel="noopener">Google: Ramadan 2024 retail marketing tips</a></li>
 <li><a href="https://preview-about.ads.microsoft.com/en/blog/post/february-2025/major-ramadan-trends-and-three-marketing-strategies-to-help-your-brand-excel" rel="noopener">Microsoft Advertising: Major Ramadan trends and three marketing strategies</a></li>
 </ul>
-<p class="muted">By Rami Alsharef · dates expected</p>
+<p class="muted">AdsRanger team · dates expected</p>

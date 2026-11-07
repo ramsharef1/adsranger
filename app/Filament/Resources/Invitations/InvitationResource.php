@@ -66,7 +66,7 @@ class InvitationResource extends Resource
                     ->color(fn (AgencyInvitation $record) => $record->expires_at->isPast() ? 'danger' : null),
             ])
             ->recordActions([
-                Action::make('resend')->label(__('Resend'))->icon('heroicon-o-paper-airplane')
+                Action::make('resend')->label(__('Resend'))->requiresConfirmation()->icon('heroicon-o-paper-airplane')
                     ->action(function (AgencyInvitation $record) {
                         AgencyInvitation::send($record->agency, $record->email, $record->role, auth()->user());
                         Notification::make()->title(__('Invitation sent again'))->success()->send();

@@ -136,7 +136,7 @@ $schema = [['@type' => 'WebPage', 'name' => $t['title'], 'url' => $self, 'inLang
             <legend class="lbl">{{ $t['audience'] }}</legend>
             <div class="nets">
                 @foreach ($t['audience_opts'] as $key => $label)
-                    <label class="check"><input type="radio" name="audience" value="{{ $key }}" @checked(old('audience') === $key)> {{ $label }}</label>
+                    <label class="check"><input type="radio" name="audience" value="{{ $key }}" @checked(old('audience', request('type')) === $key)> {{ $label }}</label>
                 @endforeach
             </div>
         </fieldset>

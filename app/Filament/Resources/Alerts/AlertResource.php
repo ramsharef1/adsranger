@@ -110,9 +110,9 @@ class AlertResource extends Resource
             Action::make('snooze')->label(__('Snooze'))->icon('heroicon-o-clock')->color('warning')->visible(fn (Alert $r) => $can() && $r->status === 'open')
                 ->schema([Select::make('days')->options(['1' => trans_choice(':count day|:count days', 1), '3' => trans_choice(':count day|:count days', 3), '7' => trans_choice(':count day|:count days', 7)])->default('1')->required()])
                 ->action(fn (Alert $r, array $data) => static::act($r, ['status' => 'snoozed', 'snoozed_until' => now()->addDays((int) $data['days'])], 'snoozed')),
-            Action::make('resolve')->label(__('Resolve'))->icon('heroicon-o-check')->color('success')->visible(fn (Alert $r) => $can() && $r->status !== 'resolved')
+            Action::make('resolve')->label(__('Resolve'))->requiresConfirmation()->icon('heroicon-o-check')->color('success')->visible(fn (Alert $r) => $can() && $r->status !== 'resolved')
                 ->action(fn (Alert $r) => static::act($r, ['status' => 'resolved', 'resolved_at' => now(), 'resolved_by' => auth()->id()], 'resolved')),
-            Action::make('reopen')->label(__('Reopen'))->icon('heroicon-o-arrow-uturn-left')->color('gray')->visible(fn (Alert $r) => $can() && $r->status !== 'open')
+            Action::make('reopen')->label(__('Reopen'))->requiresConfirmation()->icon('heroicon-o-arrow-uturn-left')->color('gray')->visible(fn (Alert $r) => $can() && $r->status !== 'open')
                 ->action(fn (Alert $r) => static::act($r, ['status' => 'open', 'snoozed_until' => null, 'resolved_at' => null, 'resolved_by' => null], 'reopened')),
         ];
     }
@@ -169,7 +169,7 @@ class AlertResource extends Resource
             ->recordUrl(fn (Alert $r) => static::getUrl('view', ['record' => $r]))
             ->recordActions(static::alertActions())
             ->toolbarActions([
-                BulkAction::make('resolveAll')->label(__('Resolve selected'))->icon('heroicon-o-check')->visible($can)
+                BulkAction::make('resolveAll')->label(__('Resolve selected'))->requiresConfirmation()->icon('heroicon-o-check')->visible($can)
                     ->action(fn (Collection $records) => $records->each(fn (Alert $r) => static::act($r, ['status' => 'resolved', 'resolved_at' => now(), 'resolved_by' => auth()->id()], 'resolved'))),
             ]);
     }

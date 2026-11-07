@@ -3,9 +3,9 @@
 $ar = ($lang ?? 'ar') === 'ar';
 $arPath = '/security';
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $ar ? 'ar' : 'en');
-$title = $ar ? 'كيف يحمي AdsRanger بيانات الوكالات وعملائها | AdsRanger' : 'How AdsRanger Protects Agency and Client Data | AdsRanger';
+$title = $ar ? 'كيف تحمي AdsRanger بيانات الوكالات وعملائها | AdsRanger' : 'How AdsRanger Protects Agency and Client Data | AdsRanger';
 $meta = $ar
-    ? 'كيف يحمي AdsRanger، وهو قيد التطوير، بيانات الوكالات وعملائها: صلاحية قراءة فقط، وفصل بيانات كل وكالة، وتحقق بخطوتين.'
+    ? 'كيف تحمي AdsRanger، وهي قيد التطوير، بيانات الوكالات وعملائها: صلاحية قراءة فقط، وفصل بيانات كل وكالة، وتحقق بخطوتين.'
     : 'How AdsRanger, now in development, protects agency and client data: read-only reporting, separate agency data and two-step sign-in.';
 $schema = [['@type' => 'WebPage', 'name' => $title, 'url' => \App\Support\PublicUrl::absolute($arPath, $ar ? 'ar' : 'en'), 'inLanguage' => $ar ? 'ar' : 'en']];
 $sections = $ar ? [

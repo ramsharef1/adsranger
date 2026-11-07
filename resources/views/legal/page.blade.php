@@ -8,7 +8,7 @@
         'data-deletion' => ['ar' => 'حذف البيانات', 'en' => 'Data Deletion'],
     ];
     $metas = [
-        'privacy' => ['ar' => 'كيف يجمع AdsRanger البيانات ويستخدمها ويحميها، وما حقوقك عليها.', 'en' => 'How AdsRanger collects, uses and protects data, and your rights over it.'],
+        'privacy' => ['ar' => 'كيف تجمع AdsRanger البيانات وتستخدمها وتحميها، وما حقوقك عليها.', 'en' => 'How AdsRanger collects, uses and protects data, and your rights over it.'],
         'terms' => ['ar' => 'شروط استخدام AdsRanger، مساحة العمل الإعلانية لوكالات المنطقة، وهي قيد التطوير.', 'en' => 'The terms for using AdsRanger, the ad workspace for MENA agencies, now in development.'],
         'data-deletion' => ['ar' => 'كيف تطلب حذف بياناتك من AdsRanger، وماذا يُحذف ومتى.', 'en' => 'How to ask AdsRanger to delete your data, what is deleted and when.'],
     ];

@@ -14,8 +14,7 @@ class Wave21GrowthAndIntelligenceTest extends TestCase
     {
         $this->get('/calculator')->assertRedirect('/waitlist');
         $this->get('/en/calculator')->assertRedirect('/en/waitlist');
-        $this->get('/partners')->assertRedirect('/waitlist');
-        $this->get('/en/partners')->assertRedirect('/en/waitlist');
+        $this->get('/partners')->assertOk(); // now the P-25 design-partner page (D-219); the old directory view is held
         $this->get('/resources')->assertRedirect('/waitlist');
         $this->get('/en/resources')->assertRedirect('/en/waitlist');
     }

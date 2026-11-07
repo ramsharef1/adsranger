@@ -92,4 +92,4 @@
 <li><a href="https://business.google.com/en-all/think/consumer-insights/ramadan-2024-retail-marketing-tips/" rel="noopener"><bdi dir="ltr">Google</bdi>: نصائح تسويق التجزئة في رمضان 2024</a></li>
 <li><a href="https://preview-about.ads.microsoft.com/en/blog/post/february-2025/major-ramadan-trends-and-three-marketing-strategies-to-help-your-brand-excel" rel="noopener"><bdi dir="ltr">Microsoft Advertising</bdi>: أبرز اتجاهات رمضان</a></li>
 </ul>
-<p class="muted">الكاتب: رامي الشريف · المواعيد متوقعة</p>
+<p class="muted">فريق <bdi dir="ltr">AdsRanger</bdi> · المواعيد متوقعة</p>

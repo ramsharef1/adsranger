@@ -4,9 +4,9 @@
     $ar = $lang === 'ar';
     $arPath = '/';
     $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
-    $title = $ar ? 'AdsRanger: مساحة عمل إعلانية عربية لوكالات المنطقة' : 'AdsRanger: Arabic-First Ad Workspace for MENA Agencies';
+    $title = $ar ? 'مساحة عمل إعلانية عربية لوكالات المنطقة | AdsRanger' : 'AdsRanger: Arabic-First Ad Workspace for MENA Agencies';
     $meta = $ar
-        ? 'AdsRanger مساحة عمل عربية أولًا، قيد التطوير، ستتيح لوكالات الإعلان في المنطقة إدارة إعلانات كل عملائها وتقاريرها في مكان واحد. الإطلاق في 2027.'
+        ? 'مساحة عمل عربية أولًا من AdsRanger، قيد التطوير، ستتيح لوكالات الإعلان في المنطقة إدارة إعلانات كل عملائها وتقاريرها في مكان واحد. الإطلاق في 2027.'
         : 'AdsRanger is the Arabic-first workspace, now in development, where MENA agencies will run and report every client\'s ads in one place. Launching in 2027.';
     $schema = [
         ['@type' => 'Organization', 'name' => 'AdsRanger', 'url' => 'https://adsranger.com/', 'logo' => 'https://adsranger.com/brand/icon-512.png'],

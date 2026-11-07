@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PartnerApplication;
 use App\Models\WaitlistEntry;
 use App\Support\PublicUrl;
 use Illuminate\Http\Request;
@@ -110,6 +111,83 @@ class PublicSiteController extends Controller
         return view('public.security', ['lang' => $lang === 'en' ? 'en' : 'ar']);
     }
 
+    /** Website P-23 /about, P-24 /contact, P-25 /partners (D-216, D-219) and the business-owners hub (D-213). */
+    public function about(string $lang = 'ar')
+    {
+        return view('public.about', ['lang' => $lang === 'en' ? 'en' : 'ar']);
+    }
+
+    public function contact(string $lang = 'ar')
+    {
+        return view('public.contact', ['lang' => $lang === 'en' ? 'en' : 'ar']);
+    }
+
+    public function partners(string $lang = 'ar')
+    {
+        return view('public.partners', ['lang' => $lang === 'en' ? 'en' : 'ar']);
+    }
+
+    public function businessOwners(string $lang = 'ar')
+    {
+        return view('public.business-owners', ['lang' => $lang === 'en' ? 'en' : 'ar']);
+    }
+
+    /** P-25 form: same rules as the waitlist (5 per IP per hour, honeypot, unticked consent); one row per application. */
+    public function submitPartners(Request $request, string $lang = 'ar')
+    {
+        $lang = $lang === 'en' ? 'en' : 'ar';
+        $ar = $lang === 'ar';
+        $target = $ar ? '/partners' : '/en/partners';
+        $key = 'partners:'.$request->ip();
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            return redirect($target)->withInput()->withErrors([
+                'form' => $ar ? 'محاولات كثيرة. انتظر ساعة ثم حاول مجددًا.' : 'Too many tries. Please wait an hour and try again.',
+            ]);
+        }
+        RateLimiter::hit($key, 3600);
+        if (filled($request->input('website'))) {
+            return redirect($target)->with('partners_saved', true);
+        }
+        $agencyMessage = $ar ? 'أدخل اسم وكالتك (حرفان على الأقل).' : 'Enter your agency name (at least 2 characters).';
+        $data = $request->validate([
+            'email' => ['required', 'email:filter', 'max:190'],
+            'agency_name' => ['required', 'string', 'min:2', 'max:140'],
+            'country' => ['required', Rule::in(WaitlistEntry::COUNTRIES)],
+            'clients_range' => ['required', Rule::in(PartnerApplication::CLIENT_RANGES)],
+            'consent' => ['accepted'],
+            'name' => ['nullable', 'string', 'max:120'],
+            'monthly_spend' => ['nullable', Rule::in(WaitlistEntry::SPEND_RANGES)],
+            'networks' => ['nullable', 'array'],
+            'networks.*' => [Rule::in(WaitlistEntry::NETWORKS)],
+        ], [
+            'email.required' => $ar ? 'أدخل بريدك الإلكتروني للعمل.' : 'Enter your work email.',
+            'email.email' => $ar ? 'أدخل بريدًا بصيغة name@agency.com.' : 'Enter an email like name@agency.com.',
+            'email.max' => $ar ? 'أدخل بريدًا بصيغة name@agency.com.' : 'Enter an email like name@agency.com.',
+            'agency_name.required' => $agencyMessage, 'agency_name.min' => $agencyMessage, 'agency_name.max' => $agencyMessage,
+            'country.required' => $ar ? 'اختر دولتك.' : 'Choose your country.',
+            'country.in' => $ar ? 'اختر دولتك.' : 'Choose your country.',
+            'clients_range.required' => $ar ? 'اختر عدد العملاء الذين تديرهم.' : 'Choose how many clients you manage.',
+            'clients_range.in' => $ar ? 'اختر عدد العملاء الذين تديرهم.' : 'Choose how many clients you manage.',
+            'consent.accepted' => $ar ? 'ضع علامة في المربع للموافقة على التواصل بخصوص برنامج الشركاء.' : 'Tick the box to agree to be contacted about the partner program.',
+        ]);
+        $name = trim((string) ($data['name'] ?? ''));
+        $networks = array_values(array_unique($data['networks'] ?? []));
+        PartnerApplication::create([
+            'email' => strtolower(trim($data['email'])),
+            'agency_name' => trim($data['agency_name']),
+            'country' => $data['country'],
+            'clients_range' => $data['clients_range'],
+            'name' => $name !== '' ? $name : null,
+            'networks' => $networks !== [] ? implode(',', $networks) : null,
+            'monthly_spend' => $data['monthly_spend'] ?? null,
+            'lang' => $lang,
+            'consent_at' => now(),
+            'consent_text_version' => PartnerApplication::CONSENT_TEXT_VERSION,
+        ]);
+
+        return redirect($target)->with('partners_saved', true);
+    }
+
     public function ramadanCalculator(string $lang = 'ar')
     {
         return view('public.ramadan-calculator', ['lang' => $lang === 'en' ? 'en' : 'ar']);
@@ -132,6 +210,10 @@ class PublicSiteController extends Controller
             '/demo-report' => 'public/demo-report',
             '/mena-calendar' => 'public/mena-calendar',
             '/security' => 'public/security',
+            '/about' => 'public/about',
+            '/contact' => 'public/contact',
+            '/partners' => 'public/partners',
+            '/solutions/business-owners' => 'public/business-owners',
             '/privacy' => 'legal/page',
             '/terms' => 'legal/page',
             '/data-deletion' => 'legal/page',
@@ -178,9 +260,9 @@ class PublicSiteController extends Controller
         return view('public.calculator', ['lang' => $request->segment(1) === 'en' ? 'en' : 'ar']);
     }
 
-    public function partners(Request $request): View
+    public function heldPartners(Request $request): View
     {
-        return view('public.partners', ['lang' => $request->segment(1) === 'en' ? 'en' : 'ar']);
+        return view('public.partners-held', ['lang' => $request->segment(1) === 'en' ? 'en' : 'ar']);
     }
 
     public function resources(Request $request): View

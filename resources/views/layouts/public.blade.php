@@ -22,6 +22,10 @@
     $footerLinks = array_merge($nav, [
         ['/demo-report', $ar ? 'تقرير تجريبي' : 'Sample report'],
         ['/security', $ar ? 'الأمان' : 'Security'],
+        ['/solutions/business-owners', $ar ? 'لأصحاب المشاريع' : 'For business owners'],
+        ['/partners', $ar ? 'الشركاء' : 'Partners'],
+        ['/about', $ar ? 'عن AdsRanger' : 'About'],
+        ['/contact', $ar ? 'تواصل معنا' : 'Contact'],
         ['/privacy', $ar ? 'الخصوصية' : 'Privacy'],
         ['/terms', $ar ? 'الشروط' : 'Terms'],
         ['/data-deletion', $ar ? 'حذف البيانات' : 'Data deletion'],

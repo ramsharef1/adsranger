@@ -39,6 +39,17 @@ Route::middleware(PublicTrailingSlash::class)->group(function () {
     Route::get('/mena-calendar', [PublicSiteController::class, 'menaCalendar'])->defaults('lang', 'ar');
     Route::get('/en/mena-calendar', [PublicSiteController::class, 'menaCalendar'])->defaults('lang', 'en');
 
+    Route::get('/about', [PublicSiteController::class, 'about'])->defaults('lang', 'ar');
+    Route::get('/en/about', [PublicSiteController::class, 'about'])->defaults('lang', 'en');
+    Route::get('/contact', [PublicSiteController::class, 'contact'])->defaults('lang', 'ar');
+    Route::get('/en/contact', [PublicSiteController::class, 'contact'])->defaults('lang', 'en');
+    Route::get('/partners', [PublicSiteController::class, 'partners'])->defaults('lang', 'ar');
+    Route::get('/en/partners', [PublicSiteController::class, 'partners'])->defaults('lang', 'en');
+    Route::post('/partners', [PublicSiteController::class, 'submitPartners'])->defaults('lang', 'ar');
+    Route::post('/en/partners', [PublicSiteController::class, 'submitPartners'])->defaults('lang', 'en');
+    Route::get('/solutions/business-owners', [PublicSiteController::class, 'businessOwners'])->defaults('lang', 'ar');
+    Route::get('/en/solutions/business-owners', [PublicSiteController::class, 'businessOwners'])->defaults('lang', 'en');
+
     Route::get('/security', [PublicSiteController::class, 'security'])->defaults('lang', 'ar');
     Route::get('/en/security', [PublicSiteController::class, 'security'])->defaults('lang', 'en');
 
@@ -95,9 +106,10 @@ Route::post('/onboard/{token}', [ClientOnboardingController::class, 'submit'])
 Route::get('/api/v1/export/{token}', [ClientOnboardingController::class, 'exportFeed'])
     ->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{32,64}')->name('api.export.feed');
 
-// Wave 21 public growth pages (E2 `7c3df2e`) held back 2026-11-07 (D-168): the partner directory, case studies and
+// Wave 21 public growth pages (E2 `7c3df2e`) held back 2026-11-07 (D-168): the partner directory (view kept as
+// public/partners-held; /partners is now the P-25 design-partner page, D-219), case studies and
 // the uplift calculator showed invented agencies, results and an 18% figure. Views kept for a rebuild from real data.
-foreach (['calculator', 'partners', 'resources'] as $held) {
+foreach (['calculator', 'resources'] as $held) {
     Route::redirect('/'.$held, '/waitlist', 302);
     Route::redirect('/en/'.$held, '/en/waitlist', 302);
 }

@@ -99,7 +99,7 @@ class AdAccountResource extends Resource
                 SelectFilter::make('client_id')->label(__('Client'))->options(fn () => Client::visibleTo(auth()->user(), Filament::getTenant())->orderBy('name')->pluck('name', 'id')->all()),
             ])
             ->recordActions([
-                Action::make('track')->label(__('Track'))->icon('heroicon-o-play')
+                Action::make('track')->label(__('Track'))->requiresConfirmation()->icon('heroicon-o-play')
                     ->visible(fn (AdAccount $r) => $can() && ! $r->is_active)
                     ->action(function (AdAccount $r) {
                         if (! PlanLimits::canActivateAdAccount($r->agency)) {
@@ -119,14 +119,14 @@ class AdAccountResource extends Resource
                         ->options(fn () => Client::where('agency_id', Filament::getTenant()->id)->orderBy('name')->pluck('name', 'id'))
                         ->default(fn (AdAccount $r) => $r->client_id)])
                     ->action(fn (AdAccount $r, array $data) => $r->update(['client_id' => $data['client_id'] ?: null])),
-                Action::make('sync')->label(__('Sync now'))->icon('heroicon-o-arrow-path')->color('gray')
+                Action::make('sync')->label(__('Sync now'))->requiresConfirmation()->icon('heroicon-o-arrow-path')->color('gray')
                     ->visible(fn (AdAccount $r) => $can() && $r->is_active && $r->network && ConnectorRegistry::for($r->network)->supportsSync())
                     ->action(function (AdAccount $r) {
                         $tz = $r->timezone ?: (Filament::getTenant()->timezone ?: 'UTC');
                         SyncAdAccount::dispatch($r->id, now($tz)->subDays(7)->toDateString(), now($tz)->toDateString(), 'manual');
                         Notification::make()->title(__('Sync queued'))->body(__('The last 7 days are being refreshed.'))->success()->send();
                     }),
-                Action::make('health')->label(__('Check health'))->icon('heroicon-o-heart')->color('gray')
+                Action::make('health')->label(__('Check health'))->requiresConfirmation()->icon('heroicon-o-heart')->color('gray')
                     ->visible(fn (AdAccount $r) => $can() && $r->is_active && $r->network && ConnectorRegistry::for($r->network)->supportsSync())
                     ->action(function (AdAccount $r) {
                         (new CheckAccountHealth($r->id))->handle();
@@ -134,7 +134,7 @@ class AdAccountResource extends Resource
                         Notification::make()->title(empty($r->health) ? __('No problems found') : trans_choice(static::ISSUES, count($r->health)))
                             ->body(collect((array) $r->health)->map(fn ($i) => $i[1])->implode("\n") ?: null)->{empty($r->health) ? 'success' : 'warning'}()->send();
                     }),
-                Action::make('untrack')->label(__('Stop tracking'))->icon('heroicon-o-pause')->color('gray')
+                Action::make('untrack')->label(__('Stop tracking'))->requiresConfirmation()->icon('heroicon-o-pause')->color('gray')
                     ->visible(fn (AdAccount $r) => $can() && $r->is_active)
                     ->action(fn (AdAccount $r) => $r->update(['is_active' => false])),
             ]);

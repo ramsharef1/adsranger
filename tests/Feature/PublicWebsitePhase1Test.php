@@ -207,8 +207,8 @@ class PublicWebsitePhase1Test extends TestCase
             $this->assertStringContainsString('<loc>https://adsranger.com'.$url.'</loc>', $xml);
         }
         $this->assertStringNotContainsString('<loc>https://adsranger.com/en</loc>', $xml);
-        $this->assertSame(24, substr_count($xml, 'hreflang="x-default"'));
-        $this->assertSame(24, substr_count($xml, '<lastmod>'));
+        $this->assertSame(count($this->publicUrls()), substr_count($xml, 'hreflang="x-default"'));
+        $this->assertSame(count($this->publicUrls()), substr_count($xml, '<lastmod>'));
         $robots = file_get_contents(public_path('robots.txt'));
         $this->assertStringContainsString("Disallow: /app/\n", $robots);
         $this->assertStringContainsString('Sitemap: https://adsranger.com/sitemap.xml', $robots);

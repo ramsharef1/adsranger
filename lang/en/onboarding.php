@@ -71,7 +71,7 @@ return [
     ],
     'step7' => [
         'title' => 'Your morning summary',
-        'help' => 'An email each morning with yesterday\'s numbers and the main alerts, on :tz time.',
+        'help' => 'An email every morning at 8:00 AM :tz time, with yesterday\'s numbers and the main alerts.',
         'digest' => 'Send me the morning summary',
         'alerts' => 'Email me important alerts',
     ],

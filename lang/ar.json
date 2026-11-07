@@ -1394,5 +1394,8 @@
     "Archive a client you no longer manage, or upgrade.": "أرشِف عميلًا لم تعد تديره، أو رقِّ باقتك.",
     "{1} :used of :count client|[2,*] :used of :count clients": "{1} :used من عميل واحد|{2} :used من عميلَين|[3,10] :used من :count عملاء|[11,*] :used من :count عميلًا",
     "Clients (archived ones do not count)": "العملاء (لا يُحتسب المؤرشَفون)",
-    "It is valid for 60 minutes. Ask them to check spam if it does not arrive.": "الدعوة صالحة 60 دقيقة. اطلب منهم فحص مجلد الرسائل غير المرغوب فيها إن لم تصل."
+    "It is valid for 60 minutes. Ask them to check spam if it does not arrive.": "الدعوة صالحة 60 دقيقة. اطلب منهم فحص مجلد الرسائل غير المرغوب فيها إن لم تصل.",
+    "Partner applications": "طلبات الشراكة",
+    "Agencies that applied via /partners or /en/partners.": "الوكالات التي قدّمت عبر ‎/partners‎ أو ‎/en/partners‎.",
+    "No partner applications yet.": "لا طلبات شراكة بعد."
 }

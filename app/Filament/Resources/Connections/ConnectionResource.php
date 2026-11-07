@@ -63,7 +63,7 @@ class ConnectionResource extends Resource
                 TextColumn::make('last_error')->label(__('Last error'))->limit(60)->color('danger'),
             ])
             ->recordActions([
-                Action::make('refresh')->label(__('Refresh accounts'))->icon('heroicon-o-arrow-path')
+                Action::make('refresh')->label(__('Refresh accounts'))->requiresConfirmation()->icon('heroicon-o-arrow-path')
                     ->visible(fn (Connection $r) => $can() && $r->status !== 'disconnected')
                     ->action(function (Connection $r) {
                         try {

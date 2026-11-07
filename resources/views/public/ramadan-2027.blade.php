@@ -14,7 +14,7 @@ preg_match_all('#<h3>(.*?)</h3>\s*<p>(.*?)</p>#s', $body, $faq, PREG_SET_ORDER);
 $selfUrl = \App\Support\PublicUrl::absolute($arPath, $lang);
 $schema = [
     ['@type' => 'Article', 'headline' => $h1, 'inLanguage' => $lang, 'url' => $selfUrl,
-        'author' => ['@type' => 'Person', 'name' => 'Rami Alsharef', 'sameAs' => ['https://www.linkedin.com/in/ramsharef/']],
+        'author' => ['@type' => 'Organization', 'name' => 'AdsRanger', 'url' => 'https://adsranger.com/'],
         'datePublished' => '2026-11-07', 'dateModified' => date('Y-m-d', (int) filemtime(resource_path('views/public/partials/ramadan-2027-'.$lang.'.blade.php')))],
     ['@type' => 'FAQPage', 'mainEntity' => array_map(fn ($m) => ['@type' => 'Question', 'name' => trim(strip_tags($m[1])),
         'acceptedAnswer' => ['@type' => 'Answer', 'text' => trim(strip_tags($m[2]))]], $faq)],

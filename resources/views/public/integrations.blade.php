@@ -5,7 +5,7 @@ $arPath = '/integrations';
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $ar ? 'ar' : 'en');
 $title = $ar ? 'المنصات الإعلانية التي نخطط لربطها | AdsRanger' : 'Ad platforms we plan to connect | AdsRanger';
 $meta = $ar
-    ? 'المنصات الإعلانية التي يخطط AdsRanger لربطها لوكالات المنطقة، بصلاحية قراءة فقط عبر الواجهة الرسمية لكل منصة. قيد التطوير.'
+    ? 'المنصات الإعلانية التي تخطط AdsRanger لربطها لوكالات المنطقة، بصلاحية قراءة فقط عبر الواجهة الرسمية لكل منصة. قيد التطوير.'
     : 'The ad platforms AdsRanger plans to connect for MENA agencies, with read-only access through each network\'s official API. In development.';
 $schema = [['@type' => 'WebPage', 'name' => $title, 'url' => \App\Support\PublicUrl::absolute($arPath, $ar ? 'ar' : 'en'), 'inLanguage' => $ar ? 'ar' : 'en']];
 $tiktokLine = $ar ? 'الإنفاق والنتائج حسب هدف الحملة' : 'Spend and results by campaign goal';
