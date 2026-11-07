@@ -17,7 +17,7 @@ return [
         'Europe/Istanbul', 'Europe/London', 'UTC',
     ],
     'languages' => ['ar' => 'العربية', 'en' => 'English'],
-    'plans' => ['starter' => 'Starter', 'pro' => 'Pro', 'agency' => 'Agency'],
+    'plans' => ['solo' => 'Solo', 'starter' => 'Starter', 'pro' => 'Pro', 'agency' => 'Agency'],
     // `read_only` and `expired` are set only by the D-61 trial lifecycle (self-signup agencies; config/trial.php).
     'agency_statuses' => ['active' => 'Active', 'trial' => 'Trial', 'read_only' => 'Read-only (trial ended)', 'expired' => 'Closed (trial ended)', 'suspended' => 'Suspended'],
     // Slugs an agency may not use (they clash with /app routes).
