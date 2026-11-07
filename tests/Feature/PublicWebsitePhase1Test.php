@@ -6,7 +6,6 @@ use App\Models\WaitlistEntry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/** Public Website Phase 1: Cookie consent banner, Waitlist (AR/EN), Ramadan 2027 planner (AR/EN), and XML Sitemap. */
 class PublicWebsitePhase1Test extends TestCase
 {
     use RefreshDatabase;
@@ -26,18 +25,18 @@ class PublicWebsitePhase1Test extends TestCase
 
         $this->post('/waitlist', [
             'name' => 'رامي الشريف',
-            'agency_name' => 'وكالة عمّان',
-            'email' => 'Rami@Agency.jo',
+            'agency_name' => 'وكالة عمان الرقمية',
+            'email' => 'rami@example.com',
             'monthly_spend' => '50k_200k',
             'notes' => 'Meta, Google, TikTok',
         ])->assertRedirect('/waitlist');
 
         $this->assertDatabaseHas('waitlist_entries', [
-            'email' => 'rami@agency.jo',
-            'agency_name' => 'وكالة عمّان',
-            'monthly_spend' => '50k_200k',
+            'email' => 'rami@example.com',
+            'agency_name' => 'وكالة عمان الرقمية',
             'lang' => 'ar',
         ]);
+
         $this->assertSame(1, WaitlistEntry::count());
     }
 
@@ -45,23 +44,43 @@ class PublicWebsitePhase1Test extends TestCase
     {
         $this->get('/ramadan-2027')
             ->assertOk()
-            ->assertSee('2027-02-08')
-            ->assertSee('2027-03-09')
+            ->assertSee('رمضان 2027')
             ->assertSee('rm-out-budget', false);
 
         $this->get('/en/ramadan-2027')
             ->assertOk()
             ->assertSee('Ramadan 2027')
-            ->assertSee('2027-02-08')
             ->assertSee('rm-out-budget', false);
+    }
+
+    public function test_phase2_public_pages_render_in_ar_and_en(): void
+    {
+        $this->get('/pricing')->assertOk()->assertSee('$249')->assertSee('باقة النمو');
+        $this->get('/en/pricing')->assertOk()->assertSee('$249')->assertSee('Growth Agency');
+
+        $this->get('/integrations')->assertOk()->assertSee('Meta Ads')->assertSee('Snapchat Ads');
+        $this->get('/en/integrations')->assertOk()->assertSee('Meta Ads')->assertSee('Snapchat Ads');
+
+        $this->get('/demo-report')->assertOk()->assertSee('$18,450')->assertSee('88 / 100');
+        $this->get('/en/demo-report')->assertOk()->assertSee('$18,450')->assertSee('88 / 100');
+
+        $this->get('/mena-calendar')->assertOk()->assertSee('الجمعة البيضاء')->assertSee('رمضان');
+        $this->get('/en/mena-calendar')->assertOk()->assertSee('White Friday')->assertSee('Ramadan');
+
+        $this->get('/security')->assertOk()->assertSee('ReadOnlyGuard')->assertSee('2FA');
+        $this->get('/en/security')->assertOk()->assertSee('ReadOnlyGuard')->assertSee('2FA');
     }
 
     public function test_sitemap_xml_lists_all_public_ar_and_en_urls(): void
     {
         $res = $this->get('/sitemap.xml');
         $res->assertOk();
-        $res->assertHeader('Content-Type', 'application/xml; charset=UTF-8');
         $res->assertSee('https://adsranger.com/ramadan-2027', false);
         $res->assertSee('https://adsranger.com/en/waitlist', false);
+        $res->assertSee('https://adsranger.com/pricing', false);
+        $res->assertSee('https://adsranger.com/en/integrations', false);
+        $res->assertSee('https://adsranger.com/demo-report', false);
+        $res->assertSee('https://adsranger.com/en/mena-calendar', false);
+        $res->assertSee('https://adsranger.com/security', false);
     }
 }

@@ -92,15 +92,7 @@ footer{border-top:1px solid var(--line);padding:22px 0;color:var(--muted);font-s
 </head>
 <body>
 <div class="w">
-<nav>
-    <a class="logo" href="{{ $base ?: '/' }}"><img src="/brand/adsranger-mark-teal.svg" alt="" width="34" height="34"><span>Ads<b>Ranger</b></span></a>
-    <div class="nr">
-        <a class="lang" href="{{ $base ?: '/' }}">{{ $t['home'] }}</a>
-        <a class="lang" href="{{ $base }}/ramadan-2027">{{ $t['ramadan'] }}</a>
-        <a class="lang" href="{{ $t['switch_url'] }}" lang="{{ $ar ? 'en' : 'ar' }}">{{ $t['switch'] }}</a>
-        <a class="btn o" href="/app/login">{{ $t['signin'] }}</a>
-    </div>
-</nav>
+@include('public.nav', ['lang' => $lang, 'switch_url' => $t['switch_url']])
 <section style="padding:32px 0 8px">
     <span class="tag">{{ $t['tag'] }}</span>
     <h1 style="font-size:clamp(26px,4.5vw,40px);margin:0 0 12px">{{ $t['h1'] }}</h1>
@@ -143,14 +135,7 @@ footer{border-top:1px solid var(--line);padding:22px 0;color:var(--muted);font-s
         </div>
     </form>
 </div>
-<footer>
-    <span>© {{ date('Y') }} AdsRanger · {{ $t['foot'] }}</span>
-    <span>
-        <a href="{{ $base }}/privacy" style="color:inherit;margin-inline-end:12px">{{ $ar ? 'الخصوصية' : 'Privacy' }}</a>
-        <a href="{{ $base }}/terms" style="color:inherit;margin-inline-end:12px">{{ $ar ? 'الشروط' : 'Terms' }}</a>
-        <a href="{{ $base }}/data-deletion" style="color:inherit">{{ $ar ? 'حذف البيانات' : 'Data deletion' }}</a>
-    </span>
-</footer>
+@include('public.footer', ['lang' => $lang])
 </div>
 @include('public.cookie-banner', ['lang' => $lang])
 </body>

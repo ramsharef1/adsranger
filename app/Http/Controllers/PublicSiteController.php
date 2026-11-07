@@ -45,12 +45,42 @@ class PublicSiteController extends Controller
         return view('public.ramadan-2027', ['lang' => $lang === 'en' ? 'en' : 'ar']);
     }
 
+    public function pricing(string $lang = 'ar')
+    {
+        return view('public.pricing', ['lang' => $lang === 'en' ? 'en' : 'ar']);
+    }
+
+    public function integrations(string $lang = 'ar')
+    {
+        return view('public.integrations', ['lang' => $lang === 'en' ? 'en' : 'ar']);
+    }
+
+    public function demoReport(string $lang = 'ar')
+    {
+        return view('public.demo-report', ['lang' => $lang === 'en' ? 'en' : 'ar']);
+    }
+
+    public function menaCalendar(string $lang = 'ar')
+    {
+        return view('public.mena-calendar', ['lang' => $lang === 'en' ? 'en' : 'ar']);
+    }
+
+    public function security(string $lang = 'ar')
+    {
+        return view('public.security', ['lang' => $lang === 'en' ? 'en' : 'ar']);
+    }
+
     public function sitemap(): Response
     {
         $urls = [
             ['https://adsranger.com/', 'https://adsranger.com/en'],
-            ['https://adsranger.com/waitlist', 'https://adsranger.com/en/waitlist'],
+            ['https://adsranger.com/pricing', 'https://adsranger.com/en/pricing'],
+            ['https://adsranger.com/integrations', 'https://adsranger.com/en/integrations'],
+            ['https://adsranger.com/demo-report', 'https://adsranger.com/en/demo-report'],
+            ['https://adsranger.com/mena-calendar', 'https://adsranger.com/en/mena-calendar'],
             ['https://adsranger.com/ramadan-2027', 'https://adsranger.com/en/ramadan-2027'],
+            ['https://adsranger.com/waitlist', 'https://adsranger.com/en/waitlist'],
+            ['https://adsranger.com/security', 'https://adsranger.com/en/security'],
             ['https://adsranger.com/privacy', 'https://adsranger.com/en/privacy'],
             ['https://adsranger.com/terms', 'https://adsranger.com/en/terms'],
             ['https://adsranger.com/data-deletion', 'https://adsranger.com/en/data-deletion'],

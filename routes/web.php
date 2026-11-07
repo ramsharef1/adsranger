@@ -3,6 +3,7 @@
 use App\Http\Controllers\ClientReportController;
 use App\Http\Controllers\ConnectController;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\PublicSiteController;
 use App\Http\Controllers\ReportUnsubscribeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -11,14 +12,31 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', fn () => view('welcome', ['lang' => 'ar']));
 Route::get('/en', fn () => view('welcome', ['lang' => 'en']));
 
-// Public Website Phase 1: Waitlist, Ramadan 2027 planner, and XML sitemap
-Route::get('/waitlist', [\App\Http\Controllers\PublicSiteController::class, 'waitlist'])-> defaults('lang', 'ar');
-Route::get('/en/waitlist', [\App\Http\Controllers\PublicSiteController::class, 'waitlist'])->defaults('lang', 'en');
-Route::post('/waitlist', [\App\Http\Controllers\PublicSiteController::class, 'submitWaitlist'])->defaults('lang', 'ar')->middleware('throttle:10,1');
-Route::post('/en/waitlist', [\App\Http\Controllers\PublicSiteController::class, 'submitWaitlist'])->defaults('lang', 'en')->middleware('throttle:10,1');
-Route::get('/ramadan-2027', [\App\Http\Controllers\PublicSiteController::class, 'ramadan'])->defaults('lang', 'ar');
-Route::get('/en/ramadan-2027', [\App\Http\Controllers\PublicSiteController::class, 'ramadan'])->defaults('lang', 'en');
-Route::get('/sitemap.xml', [\App\Http\Controllers\PublicSiteController::class, 'sitemap']);
+// Public Website Phase 1 & Phase 2: Waitlist, Ramadan 2027, Pricing, Integrations, Demo Report, MENA Calendar, Security, Sitemap
+Route::get('/waitlist', [PublicSiteController::class, 'waitlist'])->defaults('lang', 'ar');
+Route::get('/en/waitlist', [PublicSiteController::class, 'waitlist'])->defaults('lang', 'en');
+Route::post('/waitlist', [PublicSiteController::class, 'submitWaitlist'])->defaults('lang', 'ar')->middleware('throttle:10,1');
+Route::post('/en/waitlist', [PublicSiteController::class, 'submitWaitlist'])->defaults('lang', 'en')->middleware('throttle:10,1');
+
+Route::get('/ramadan-2027', [PublicSiteController::class, 'ramadan'])->defaults('lang', 'ar');
+Route::get('/en/ramadan-2027', [PublicSiteController::class, 'ramadan'])->defaults('lang', 'en');
+
+Route::get('/pricing', [PublicSiteController::class, 'pricing'])->defaults('lang', 'ar');
+Route::get('/en/pricing', [PublicSiteController::class, 'pricing'])->defaults('lang', 'en');
+
+Route::get('/integrations', [PublicSiteController::class, 'integrations'])->defaults('lang', 'ar');
+Route::get('/en/integrations', [PublicSiteController::class, 'integrations'])->defaults('lang', 'en');
+
+Route::get('/demo-report', [PublicSiteController::class, 'demoReport'])->defaults('lang', 'ar');
+Route::get('/en/demo-report', [PublicSiteController::class, 'demoReport'])->defaults('lang', 'en');
+
+Route::get('/mena-calendar', [PublicSiteController::class, 'menaCalendar'])->defaults('lang', 'ar');
+Route::get('/en/mena-calendar', [PublicSiteController::class, 'menaCalendar'])->defaults('lang', 'en');
+
+Route::get('/security', [PublicSiteController::class, 'security'])->defaults('lang', 'ar');
+Route::get('/en/security', [PublicSiteController::class, 'security'])->defaults('lang', 'en');
+
+Route::get('/sitemap.xml', [PublicSiteController::class, 'sitemap']);
 
 // Legal pages: Arabic default, English under /en
 foreach (['privacy', 'terms', 'data-deletion'] as $legalPage) {

@@ -82,7 +82,7 @@ footer{border-top:1px solid var(--line);padding:22px 0;color:var(--muted);font-s
 </head>
 <body>
 <div class="w">
-<nav><div class="logo" style="display:flex;align-items:center;gap:10px"><img src="/brand/adsranger-mark-teal.svg" alt="" width="34" height="34"><span>Ads<b>Ranger</b></span></div><div class="nr"><a class="lang" href="{{ $t['switch_url'] }}" lang="{{ $ar ? 'en' : 'ar' }}">{{ $t['switch'] }}</a><a class="btn o" href="/app/login">{{ $t['signin'] }}</a></div></nav>
+@include('public.nav', ['lang' => $ar ? 'ar' : 'en', 'switch_url' => $t['switch_url']])
 <section class="hero">
 <span class="tag">{{ $t['tag'] }}</span>
 <h1>{{ $t['h1'] }}</h1>
@@ -94,7 +94,7 @@ footer{border-top:1px solid var(--line);padding:22px 0;color:var(--muted);font-s
 <div class="c"><h3>{{ $f[0] }}</h3><p>{{ $f[1] }}</p></div>
 @endforeach
 </section>
-<footer><span>© {{ date('Y') }} AdsRanger · {{ $t['foot'] }}</span><span><a href="{{ $ar ? '' : '/en' }}/privacy" style="color:inherit;margin-inline-end:12px">{{ $ar ? 'الخصوصية' : 'Privacy' }}</a><a href="{{ $ar ? '' : '/en' }}/terms" style="color:inherit;margin-inline-end:12px">{{ $ar ? 'الشروط' : 'Terms' }}</a><a href="{{ $ar ? '' : '/en' }}/data-deletion" style="color:inherit;margin-inline-end:12px">{{ $ar ? 'حذف البيانات' : 'Data deletion' }}</a>{{ $t['env'] }}</span></footer>
+@include('public.footer', ['lang' => $ar ? 'ar' : 'en'])
 </div>
 @include('public.cookie-banner', ['lang' => $ar ? 'ar' : 'en'])
 </body>
