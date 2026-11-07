@@ -41,7 +41,7 @@ class ListMembers extends ListRecords
                         return;
                     }
                     AgencyInvitation::send($agency, $data['email'], $data['role'], auth()->user());
-                    Notification::make()->title(__('Invitation sent'))->body(__('It is valid for 7 days. Ask them to check spam if it does not arrive.'))->success()->send();
+                    Notification::make()->title(__('Invitation sent'))->body(__('It is valid for 60 minutes. Ask them to check spam if it does not arrive.'))->success()->send();
                 }),
         ];
     }

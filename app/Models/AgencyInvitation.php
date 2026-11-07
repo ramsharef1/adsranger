@@ -11,6 +11,9 @@ use Illuminate\Support\Str;
 
 class AgencyInvitation extends Model
 {
+    /** D-214: a new invite is valid for 60 minutes (Rami, 2026-11-07). */
+    public const VALID_MINUTES = 60;
+
     protected $guarded = [];
 
     protected function casts(): array
@@ -56,7 +59,7 @@ class AgencyInvitation extends Model
             'role' => $role,
             'token_hash' => hash('sha256', $token),
             'invited_by' => $inviter->id,
-            'expires_at' => now()->addDays(7),
+            'expires_at' => now()->addMinutes(static::VALID_MINUTES),
         ]);
 
         Mail::to($email)->send(new AgencyInvitationMail($invite, url('/invite/'.$token)));

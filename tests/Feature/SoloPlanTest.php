@@ -57,6 +57,7 @@ class SoloPlanTest extends TestCase
         $a = Agency::create(['name' => 'Invited workspace', 'slug' => 'invited-ws', 'plan' => 'solo', 'status' => 'active', 'currency' => 'USD', 'signup_source' => 'invite']);
         $invite = AgencyInvitation::send($a, 'Owner@Example.com', 'owner', $admin);
         $this->assertSame('owner@example.com', $invite->email);
+        $this->assertEqualsWithDelta(60, now()->diffInMinutes($invite->expires_at), 1); // D-214
 
         $u = User::factory()->create(['email' => 'owner@example.com']);
         $invite->accept($u);

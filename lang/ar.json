@@ -358,7 +358,7 @@
     "Joined": "تاريخ الانضمام",
     "Last sign-in": "آخر تسجيل دخول",
     "Platform role": "الدور في المنصة",
-    "Super admins can open /admin and manage the whole platform. You cannot change your own role.": "يستطيع مدير النظام فتح ‎/admin‎ وإدارة المنصة كلها. لا يمكنك تغيير دورك بنفسك.",
+    "Super admins can open /admin and manage the whole platform. You cannot change your own role.": "يستطيع مدير النظام فتح ‎/admin‎ وإدارة AdsRanger بالكامل. لا يمكنك تغيير دورك بنفسك.",
     "User": "المستخدم",
     "Connect": "اربط",
     "Connected": "مربوط",
@@ -474,7 +474,6 @@
     "Email address": "البريد الإلكتروني",
     "Invitation sent": "تم إرسال الدعوة",
     "Invite member": "ادعُ عضوًا",
-    "It is valid for 7 days. Ask them to check spam if it does not arrive.": "الدعوة صالحة 7 أيام. اطلب منهم فحص مجلد الرسائل غير المرغوب فيها إن لم تصل.",
     "No free seats": "لا توجد مقاعد متاحة",
     "Could not connect :network.": "تعذّر ربط :network.",
     "Checked: :state": "آخر فحص: :state",
@@ -1394,5 +1393,6 @@
     "{1} Your plan includes :count client.|[2,*] Your plan includes :count clients.": "{1} تشمل باقتك عميلًا واحدًا.|{2} تشمل باقتك عميلَين.|[3,10] تشمل باقتك :count عملاء.|[11,*] تشمل باقتك :count عميلًا.",
     "Archive a client you no longer manage, or upgrade.": "أرشِف عميلًا لم تعد تديره، أو رقِّ باقتك.",
     "{1} :used of :count client|[2,*] :used of :count clients": "{1} :used من عميل واحد|{2} :used من عميلَين|[3,10] :used من :count عملاء|[11,*] :used من :count عميلًا",
-    "Clients (archived ones do not count)": "العملاء (لا يُحتسب المؤرشَفون)"
+    "Clients (archived ones do not count)": "العملاء (لا يُحتسب المؤرشَفون)",
+    "It is valid for 60 minutes. Ask them to check spam if it does not arrive.": "الدعوة صالحة 60 دقيقة. اطلب منهم فحص مجلد الرسائل غير المرغوب فيها إن لم تصل."
 }
