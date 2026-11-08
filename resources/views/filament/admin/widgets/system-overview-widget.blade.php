@@ -10,8 +10,8 @@
 <x-filament-widgets::widget>
     {{-- /admin overview (E2-025…031, reviewed by E1): real counts + dynamic SVG donut gauges; light + dark theme aware. --}}
     <style>
-        .ov{display:grid;gap:18px;--ov-card:#fff;--ov-soft:#f8fafc;--ov-line:#e2e8f0;--ov-ink:#0f172a;--ov-muted:#475569;--ov-acc:#0f766e;--ov-cta:#f97316;--ov-track:#e2e8f0}
-        .dark .ov{--ov-card:#111827;--ov-soft:#0b1120;--ov-line:#1e293b;--ov-ink:#f8fafc;--ov-muted:#94a3b8;--ov-acc:#5eead4;--ov-cta:#f97316;--ov-track:#1e293b}
+        .ov{display:grid;gap:18px;--ov-card:#fff;--ov-soft:#f8fafc;--ov-line:#e2e8f0;--ov-ink:#0f172a;--ov-muted:#475569;--ov-acc:#0f766e;--ov-cta:#0f766e;--ov-cta-ink:#fff;--ov-track:#e2e8f0}
+        .dark .ov{--ov-card:#111827;--ov-soft:#0b1120;--ov-line:#1e293b;--ov-ink:#f8fafc;--ov-muted:#94a3b8;--ov-acc:#5eead4;--ov-cta:#5eead4;--ov-cta-ink:#0b1120;--ov-track:#1e293b}
         .ov-box{background:var(--ov-card);border:1px solid var(--ov-line);border-radius:14px;color:var(--ov-ink);box-shadow:0 2px 10px -2px rgba(15,23,42,.06)}
         .ov-top{padding:18px 22px}
         .ov-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--ov-line)}
@@ -21,7 +21,7 @@
         .ov-links{display:flex;flex-wrap:wrap;gap:8px}
         .ov-links a{display:inline-flex;align-items:center;min-height:44px;padding:6px 12px;border-radius:8px;background:var(--ov-soft);border:1px solid var(--ov-line);color:var(--ov-ink);text-decoration:none;font-size:13px;font-weight:600}
         .ov-links a:hover{border-color:var(--ov-acc)}
-        .ov-links a.ov-main{background:var(--ov-cta);border-color:var(--ov-cta);color:#fff;font-weight:700}
+        .ov-links a.ov-main{background:var(--ov-cta);border-color:var(--ov-cta);color:var(--ov-cta-ink);font-weight:700}
         .ov-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:16px;padding-top:16px}
         .ov-kpi{display:flex;flex-direction:column;justify-content:space-between;padding:14px 16px;border-radius:12px;background:var(--ov-soft);border:1px solid var(--ov-line);border-top:3px solid var(--ov-acc);text-decoration:none;color:var(--ov-ink);transition:transform .12s ease}
         .ov-kpi:hover{transform:translateY(-2px)}
@@ -85,14 +85,14 @@
                     <div class="ov-bar" role="img" aria-label="{{ $waitlistConsentPct }}%"><i style="width:{{ $waitlistConsentPct }}%;background:#10b981"></i></div>
                 </a>
 
-                <a class="ov-kpi" href="{{ url('/admin/partner-applications') }}" style="border-top-color:#f97316">
+                <a class="ov-kpi" href="{{ url('/admin/partner-applications') }}" style="border-top-color:var(--ov-acc)">
                     <div class="ov-kpi-row">
                         <div>
                             <div class="ov-lbl">{{ __('Partner applications') }}</div>
                             <div class="ov-num">{{ $partnersTotal }}</div>
-                            <div class="ov-note" style="color:#ea580c"><bdi dir="ltr">/partners</bdi></div>
+                            <div class="ov-note" style="color:var(--ov-acc)"><bdi dir="ltr">/partners</bdi></div>
                         </div>
-                        <span class="ov-ico" style="background:rgba(249,115,22,.14);color:#ea580c" aria-hidden="true">★</span>
+                        <span class="ov-ico" style="background:rgba(20,184,166,.14);color:var(--ov-acc)" aria-hidden="true">★</span>
                     </div>
                 </a>
 
