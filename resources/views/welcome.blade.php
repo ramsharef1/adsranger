@@ -4,7 +4,7 @@
     $ar = $lang === 'ar';
     $arPath = '/';
     $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
-    $title = $ar ? 'مساحة عمل إعلانية عربية لوكالات المنطقة | AdsRanger' : 'AdsRanger: Arabic-First Ad Workspace for MENA Agencies';
+    $title = $ar ? 'منصة إدارة الإعلانات للوكالات بالعربية | AdsRanger' : 'Arabic-First Ad Management Platform for Agencies | AdsRanger'; // B-01 (Content 03:22)
     $meta = $ar
         ? 'مساحة عمل عربية أولًا من AdsRanger، قيد التطوير، ستتيح لوكالات الإعلان في المنطقة إدارة إعلانات كل عملائها وتقاريرها في مكان واحد. الإطلاق في 2027.'
         : 'AdsRanger is the Arabic-first workspace, now in development, where MENA agencies will run and report every client\'s ads in one place. Launching in 2027.';

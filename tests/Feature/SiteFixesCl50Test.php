@@ -59,7 +59,7 @@ class SiteFixesCl50Test extends TestCase
         $this->get('/privacy')->assertSee('كيف تجمع AdsRanger');
         $this->get('/ramadan-2027')->assertSee('"author":{"@type":"Organization","name":"AdsRanger"', false)->assertDontSee('رامي الشريف')->assertDontSee('Rami Alsharef');
         $this->get('/en/ramadan-2027')->assertSee('AdsRanger team · dates expected')->assertDontSee('linkedin.com/in/ramsharef');
-        $this->get('/')->assertSee('<title>مساحة عمل إعلانية عربية لوكالات المنطقة | AdsRanger</title>', false);
+        $this->get('/')->assertSee('<title>منصة إدارة الإعلانات للوكالات بالعربية | AdsRanger</title>', false);
     }
 
     /** UX-191: no digest while no ad account is tracked; the Arabic subject starts with Arabic words. */
