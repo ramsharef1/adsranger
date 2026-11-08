@@ -15,7 +15,7 @@ class NetworkSpecificAccelerator
             'network' => 'meta',
             'feature_key' => 'meta_lead_capi_sync',
             'external_ref' => $leadId,
-            'status' => 'capi_dispatched',
+            'status' => 'simulated', // D-229: no Conversions API call is made
             'attributed_value' => round($dealValue, 4),
             'score' => 95,
             'payload' => [
@@ -28,7 +28,7 @@ class NetworkSpecificAccelerator
 
     public static function boostTikTokSparkAd(Client $client, string $organicPostId, float $engagementRate): NetworkAcceleratorEvent
     {
-        $sparkCode = 'SPARK-' . strtoupper(substr(md5($organicPostId), 0, 8));
+        $sparkCode = 'SPARK-'.strtoupper(substr(md5($organicPostId), 0, 8));
 
         return NetworkAcceleratorEvent::create([
             'agency_id' => $client->agency_id,
@@ -36,7 +36,7 @@ class NetworkSpecificAccelerator
             'network' => 'tiktok',
             'feature_key' => 'tiktok_spark_booster',
             'external_ref' => $organicPostId,
-            'status' => $engagementRate >= 5.0 ? 'syndicated_to_paid' : 'queued',
+            'status' => 'simulated', // D-229: no ad is created on TikTok
             'attributed_value' => 0,
             'score' => (int) min(100, round($engagementRate * 10)),
             'payload' => [
@@ -54,7 +54,7 @@ class NetworkSpecificAccelerator
             'network' => 'snapchat',
             'feature_key' => 'snap_ar_lens_roi',
             'external_ref' => $lensId,
-            'status' => 'attributed',
+            'status' => 'simulated', // D-229: no Snapchat data is read
             'attributed_value' => round($checkoutRevenue, 4),
             'score' => min(100, (int) round($swipes / 10)),
             'payload' => [

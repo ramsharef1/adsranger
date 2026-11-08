@@ -26,7 +26,7 @@ class Wave7And8LaunchReadinessTest extends TestCase
             4250
         );
 
-        $this->assertSame('synced', $sync->status);
+        $this->assertSame('simulated', $sync->status);
         $this->assertSame(4250, $sync->records_count);
         $this->assertEquals(78.50, (float) $sync->match_rate);
         $this->assertEquals(['meta', 'google', 'tiktok', 'snapchat'], $sync->target_networks);

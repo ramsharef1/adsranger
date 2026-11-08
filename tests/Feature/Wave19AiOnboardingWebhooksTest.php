@@ -2,8 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Pages\AgencyOpsHubPage;
+use App\Filament\Pages\ClientOnboardingLinksPage;
 use App\Filament\Pages\IntelligenceHubPage;
+use App\Filament\Pages\WebhooksPage;
 use App\Models\Agency;
 use App\Models\AgencyWebhook;
 use App\Models\Client;
@@ -32,6 +33,8 @@ class Wave19AiOnboardingWebhooksTest extends TestCase
         config([
             'modules.enabled.intelligence_hub' => true,
             'modules.enabled.agency_ops_hub' => true,
+            'modules.enabled.webhooks' => true,
+            'modules.enabled.client_onboarding' => true,
         ]);
 
         $this->agency = Agency::create([
@@ -76,11 +79,12 @@ class Wave19AiOnboardingWebhooksTest extends TestCase
         Filament::setTenant($this->agency);
 
         Webhooks::$resolver = fn () => '93.184.216.34';
-        Livewire::test(AgencyOpsHubPage::class)
+        Livewire::test(ClientOnboardingLinksPage::class)
             ->set('clientId', $this->client->id)
             ->set('prospectName', 'Jeddah E-Com Prospect')
             ->set('prospectWebsite', 'https://jeddah-shop.example.com')
-            ->call('createOnboardingLink')
+            ->call('createOnboardingLink');
+        Livewire::test(WebhooksPage::class)
             ->set('webhookName', 'Looker Studio Daily Feed')
             ->set('webhookTargetUrl', 'https://hooks.example.com/adsranger')
             ->call('createWebhook');

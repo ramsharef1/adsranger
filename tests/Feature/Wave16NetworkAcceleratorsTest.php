@@ -19,11 +19,11 @@ class Wave16NetworkAcceleratorsTest extends TestCase
         $client = Client::create(['agency_id' => $agency->id, 'name' => 'Gulf Enterprise Group', 'currency' => 'AED']);
 
         $meta = NetworkSpecificAccelerator::syncMetaLeadToCapi($client, 'lead_991', 4500.0, 'closed_won');
-        $this->assertSame('capi_dispatched', $meta->status);
+        $this->assertSame('simulated', $meta->status);
         $this->assertEquals(4500.0, $meta->attributed_value);
 
         $tiktok = NetworkSpecificAccelerator::boostTikTokSparkAd($client, 'post_772', 8.4);
-        $this->assertSame('syndicated_to_paid', $tiktok->status);
+        $this->assertSame('simulated', $tiktok->status);
         $this->assertStringStartsWith('SPARK-', $tiktok->payload['spark_auth_code']);
 
         $snap = NetworkSpecificAccelerator::trackSnapchatArLensRoi($client, 'lens_ramadan_1', 650, 13000.0);

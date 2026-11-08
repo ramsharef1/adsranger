@@ -42,10 +42,10 @@ class Webhooks
         return static::resolve($p['host']) ? null : 'The address must point to a public server.';
     }
 
-    /** Webhooks are part of the held-back Agency ops hub: they only fire where that module is on for agencies. */
+    /** Webhooks have their own held-back module (D-229): they only fire, and the feed only answers, where it is on. */
     public static function liveFor(Agency $agency): bool
     {
-        return Modules::enabled('agency_ops_hub') || in_array($agency->slug, (array) config('modules.preview_agencies', []), true);
+        return Modules::enabled('webhooks') || in_array($agency->slug, (array) config('modules.preview_agencies', []), true);
     }
 
     /** Queue one delivery per active webhook subscribed to the event (all clients, or this client). Returns how many. */

@@ -66,26 +66,6 @@ class AgencyOperationsHub
         ]);
     }
 
-    public static function generateClientPanicDefuser(Client $client, float $cpaChangePercent, string $locale = 'ar'): AgencyOperationalAudit
-    {
-        $isAr = str_starts_with(strtolower($locale), 'ar');
-        $reassurance = $isAr
-            ? "ملاحظة تنفيذية: التغير المؤقت في تكلفة النتيجة ({$cpaChangePercent}%) يعود لإعادة معايرة خوارزمية المزاد، وقد تم تفعيل قواعد الحماية التلقائية."
-            : "Executive Note: Temporary CPA variance ({$cpaChangePercent}%) reflects auction learning recalibration; automated pacing guards are active.";
-
-        return AgencyOperationalAudit::create([
-            'agency_id' => $client->agency_id,
-            'client_id' => $client->id,
-            'audit_type' => 'client_panic_defuser',
-            'status' => 'brief_ready',
-            'primary_metric' => $cpaChangePercent,
-            'details' => [
-                'locale' => $locale,
-                'executive_summary' => $reassurance,
-            ],
-        ]);
-    }
-
     public static function evaluateMediaBuyerWorkload(Agency $agency, string $buyerName, int $activeClients, int $activeCampaigns): AgencyOperationalAudit
     {
         $loadScore = min(100, ($activeClients * 8) + ($activeCampaigns * 2));

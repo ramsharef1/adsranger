@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Alerts\AlertEngine;
-use App\Filament\Pages\AgencyOpsHubPage;
+use App\Filament\Pages\WebhooksPage;
 use App\Jobs\DeliverAgencyWebhookJob;
 use App\Models\Agency;
 use App\Models\AgencyWebhook;
@@ -25,7 +25,7 @@ class WebhookSecurityTest extends TestCase
 
     private function agency(string $role = 'owner'): array
     {
-        config(['modules.enabled.agency_ops_hub' => true]);
+        config(['modules.enabled.webhooks' => true]);
         $a = Agency::create(['name' => 'Hook Lab', 'slug' => 'hook-lab-'.$role, 'plan' => 'agency', 'status' => 'active', 'currency' => 'USD']);
         $u = User::factory()->create();
         $a->members()->attach($u->id, ['role' => $role]);
@@ -40,7 +40,7 @@ class WebhookSecurityTest extends TestCase
         Filament::setCurrentPanel(Filament::getPanel('app'));
         Filament::setTenant($a);
 
-        return Livewire::test(AgencyOpsHubPage::class);
+        return Livewire::test(WebhooksPage::class);
     }
 
     public function test_targets_must_be_public_https(): void
@@ -122,7 +122,7 @@ class WebhookSecurityTest extends TestCase
         $this->assertSame(0, Webhooks::fire($a, 'lead.created', [], $c->id));
         Queue::assertPushed(DeliverAgencyWebhookJob::class, 1);
 
-        config(['modules.enabled.agency_ops_hub' => false]);
+        config(['modules.enabled.webhooks' => false]);
         $this->assertSame(0, Webhooks::fire($a, 'alert.critical', ['alert_id' => 2], $c->id));
         $this->assertTrue(method_exists(AlertEngine::class, 'run'));
     }

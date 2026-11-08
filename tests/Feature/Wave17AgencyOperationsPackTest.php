@@ -29,9 +29,7 @@ class Wave17AgencyOperationsPackTest extends TestCase
         $fx = AgencyOperationsHub::checkMenaFxVolatility($client, 'USD/EGP', 48.0, 50.5);
         $this->assertSame('fx_hedge_alert', $fx->status);
 
-        $defuser = AgencyOperationsHub::generateClientPanicDefuser($client, 14.5, 'ar');
-        $this->assertSame('brief_ready', $defuser->status);
-        $this->assertStringContainsString('ملاحظة تنفيذية', $defuser->details['executive_summary']);
+        $this->assertFalse(method_exists(AgencyOperationsHub::class, 'generateClientPanicDefuser')); // D-229 ER-1
 
         $workload = AgencyOperationsHub::evaluateMediaBuyerWorkload($agency, 'Tariq Al-Mansoor', 9, 10);
         $this->assertSame('overloaded', $workload->status);

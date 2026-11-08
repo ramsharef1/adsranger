@@ -10,14 +10,14 @@ use Symfony\Component\HttpFoundation\Response;
  * Baseline security headers on every response (Website W2, 2026-11-08). The CSP is deliberately narrow
  * (framing, base URI, plugins, mixed content) so it can't break Filament, Livewire or the public pages'
  * inline styles; a full script/style policy comes later with nonces. HSTS is sent only over HTTPS and
- * without includeSubDomains, so agency custom domains and other subdomains are not affected.
+ * without includeSubDomains, so agency custom domains and other subdomains are not affected. X-Frame-Options is
+ * left to nginx (it already sends SAMEORIGIN; sending it here too doubled the header).
  */
 class SecurityHeaders
 {
     /** @var array<string, string> */
     public const HEADERS = [
         'X-Content-Type-Options' => 'nosniff',
-        'X-Frame-Options' => 'SAMEORIGIN',
         'Referrer-Policy' => 'strict-origin-when-cross-origin',
         'Permissions-Policy' => 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
         'Content-Security-Policy' => "frame-ancestors 'self'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests",

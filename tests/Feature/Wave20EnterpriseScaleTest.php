@@ -41,7 +41,7 @@ class Wave20EnterpriseScaleTest extends TestCase
             'status' => 'active',
         ]);
 
-        config(['modules.enabled.agency_ops_hub' => true]);
+        config(['modules.enabled.webhooks' => true]);
         [$webhook] = AgencyWebhook::issue([
             'agency_id' => $agency->id,
             'client_id' => $client->id,

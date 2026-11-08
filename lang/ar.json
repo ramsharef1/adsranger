@@ -1397,5 +1397,8 @@
     "It is valid for 60 minutes. Ask them to check spam if it does not arrive.": "الدعوة صالحة 60 دقيقة. اطلب منهم فحص مجلد الرسائل غير المرغوب فيها إن لم تصل.",
     "Partner applications": "طلبات الشراكة",
     "Agencies that applied via /partners or /en/partners.": "الوكالات التي قدّمت عبر ‎/partners‎ أو ‎/en/partners‎.",
-    "No partner applications yet.": "لا طلبات شراكة بعد."
+    "No partner applications yet.": "لا طلبات شراكة بعد.",
+    "Webhooks & data feed": "روابط Webhooks وتغذية البيانات",
+    "Client onboarding links": "روابط تهيئة العملاء",
+    "New client (not added yet)": "عميل جديد (لم يُضف بعد)"
 }

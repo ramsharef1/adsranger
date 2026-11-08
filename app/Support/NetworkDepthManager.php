@@ -30,11 +30,11 @@ class NetworkDepthManager
             'target_networks' => array_values($targetNetworks),
             'records_count' => $recordsCount,
             'match_rate' => $estimatedMatchRate,
-            'status' => 'synced',
-            'last_synced_at' => now(),
+            'status' => 'simulated', // D-229: nothing is sent to any network yet
+            'last_synced_at' => null,
         ]);
 
-        AuditLog::record('network.audience_synced', $client, [
+        AuditLog::record('network.audience_simulated', $client, [
             'sync_id' => $sync->id,
             'networks' => $targetNetworks,
             'records_count' => $recordsCount,

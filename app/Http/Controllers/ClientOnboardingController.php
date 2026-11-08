@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Agency;
 use App\Models\AgencyWebhook;
 use App\Models\BlendedRoasMetric;
 use App\Models\ClientOnboardingLink;
+use App\Support\Modules;
+use App\Support\Webhooks;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,6 +18,7 @@ class ClientOnboardingController extends Controller
     public function show(string $token): View
     {
         $link = ClientOnboardingLink::with(['agency', 'client'])->where('token', $token)->firstOrFail();
+        abort_unless(static::onboardingLive($link->agency), 404);
 
         return view('public.client-onboarding', [
             'link' => $link,
@@ -24,7 +28,8 @@ class ClientOnboardingController extends Controller
 
     public function submit(Request $request, string $token): RedirectResponse
     {
-        $link = ClientOnboardingLink::where('token', $token)->firstOrFail();
+        $link = ClientOnboardingLink::with('agency')->where('token', $token)->firstOrFail();
+        abort_unless(static::onboardingLive($link->agency), 404);
 
         $validated = $request->validate([
             'website_url' => ['nullable', 'url', 'max:255'],
@@ -51,6 +56,7 @@ class ClientOnboardingController extends Controller
         $webhook = AgencyWebhook::findByFeedToken($token);
         abort_unless($webhook, 404);
         $webhook->loadMissing(['agency', 'client']);
+        abort_unless($webhook->agency && Webhooks::liveFor($webhook->agency), 404); // D-229: own module
 
         $webhook->update(['last_triggered_at' => now()]);
 
@@ -78,5 +84,11 @@ class ClientOnboardingController extends Controller
             'generated_at' => now()->toIso8601String(),
             'rows' => $rows,
         ]);
+    }
+
+    /** #105 links only open where the client_onboarding module is on (or a preview workspace), D-229. */
+    protected static function onboardingLive(?Agency $agency): bool
+    {
+        return $agency !== null && (Modules::enabled('client_onboarding') || in_array($agency->slug, (array) config('modules.preview_agencies', []), true));
     }
 }
