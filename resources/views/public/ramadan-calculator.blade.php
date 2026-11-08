@@ -27,6 +27,17 @@ $inputs = [
     ['spend_change', $ar ? 'تغيّر الإنفاق اليومي في رمضان (%)' : 'Change in daily spend during Ramadan (%)', 20, $assume],
     ['cpr_change', $ar ? 'تغيّر تكلفة النتيجة في رمضان (%)' : 'Change in cost per result during Ramadan (%)', 10, $assume],
 ];
+// CL-1 rev 2 E-01 (Growth 08e §1). FAQ 2 adapted: the calculator has no currency list yet (Package D2), so it says USD.
+$faq = $ar ? [
+    ['هل رمضان 29 يومًا أم 30؟', 'يتحدد ذلك برؤية الهلال في كل دولة. أدخل 29 أو 30 في عدد الأيام، وقارن النتيجتين إن أردت.'],
+    ['بأي عملة أحسب؟', 'تعرض الحاسبة المبالغ بالدولار الأمريكي. وإن كانت حساباتك الإعلانية بعملة أخرى، فأدخل أرقامك بها واقرأ النتيجة بالعملة نفسها، لأن الحساب لا يتغيّر.'],
+    ['هل تحفظون الأرقام التي أدخلها؟', 'لا. تعمل الحاسبة في متصفحك فقط، ولا يُرسل أي رقم إلينا.'],
+] : [
+    ['Is Ramadan 29 or 30 days?', 'It depends on the moon sighting in each country. Enter 29 or 30 days and compare both if you like.'],
+    ['Which currency should I use?', 'The calculator shows amounts in US dollars. If your ad accounts use another currency, enter your numbers in it and read the result in the same currency; the math doesn\'t change.'],
+    ['Do you store the numbers I enter?', 'No. The calculator runs only in your browser, and no number is sent to us.'],
+];
+$schema[] = ['@type' => 'FAQPage', 'mainEntity' => array_map(fn ($q) => ['@type' => 'Question', 'name' => $q[0], 'acceptedAnswer' => ['@type' => 'Answer', 'text' => $q[1]]], $faq)];
 @endphp
 @extends('layouts.public')
 
@@ -75,6 +86,26 @@ $inputs = [
             ? 'هذا تقدير مبني على الأرقام التي تدخلها، وليس توقعًا. وأفضل مرجع للنسبتين هو بياناتك أنت من رمضان الماضي.'
             : 'This is an estimate from the numbers you enter, not a forecast. Your own data from last Ramadan is the best guide for the two percentages.' }}</p>
     </form>
+
+    <h2 style="margin-top:28px">{{ $ar ? 'كيف تعمل الحاسبة' : 'How the calculator works' }}</h2>
+    <p>{{ $ar
+        ? 'تضرب الحاسبة إنفاقك اليومي المعتاد في نسبة التغيّر التي تتوقعها، ثم في عدد أيام رمضان، فتحصل على ميزانية الشهر. وتضيف نسبة التغيّر إلى تكلفة النتيجة المعتادة لتعرف تكلفة النتيجة في رمضان. ثم تقسم الميزانية على تكلفة النتيجة لتقدّر عدد النتائج.'
+        : 'The calculator multiplies your usual daily spend by the change you expect, then by the days of Ramadan, to get the month\'s budget. It adds your expected change to your usual cost per result to get the Ramadan cost per result. Then it divides the budget by that cost to estimate results.' }}</p>
+    <p>{!! $ar
+        ? 'مثال بالقيم الافتراضية: إنفاق يومي 100 وتكلفة نتيجة 5، مع زيادة 20% في الإنفاق و10% في التكلفة، لمدة 30 يومًا: ميزانية <bdi dir="ltr">3,600 USD</bdi>، وتكلفة نتيجة <bdi dir="ltr">5.50 USD</bdi>، ونحو 654 نتيجة.'
+        : 'With the default values — 100 a day, a cost per result of 5, spend up 20% and cost up 10%, over 30 days — the budget is 3,600 USD, the cost per result 5.50 USD, and about 654 results.' !!}</p>
+
+    <h2>{{ $ar ? 'عن الافتراضين' : 'About the two assumptions' }}</h2>
+    <p>{{ $ar
+        ? 'يرتفع الإنفاق في رمضان عادةً لأن المعلنين يزيدون حملاتهم، وقد ترتفع تكلفة النتيجة لأن المنافسة على الجمهور نفسه تزيد. لا نضع نسبة واحدة تناسب الجميع: النسبتان في الحاسبة افتراض للمثال، وأفضل مرجع لهما أرقامك أنت من رمضان الماضي لكل عميل.'
+        : 'Spend usually rises in Ramadan as advertisers grow their campaigns, and cost per result can rise as competition for the same audience grows. There\'s no single figure that fits everyone: the two percentages here are example assumptions, and your own numbers from last Ramadan, client by client, are the best guide.' }}</p>
+    <p>{!! $ar ? 'راجع <a href="'.$u('/mena-calendar').'">مواعيد رمضان والعيد في كل دولة</a>.' : 'See <a href="'.$u('/mena-calendar').'">Ramadan and Eid dates by country</a>.' !!}</p>
+
+    <h2>{{ $ar ? 'أسئلة شائعة' : 'FAQ' }}</h2>
+    @foreach ($faq as [$q, $a])
+        <h3 style="font-size:17px;margin:16px 0 4px">{{ $q }}</h3>
+        <p style="margin:0">{{ $a }}</p>
+    @endforeach
 
     <p style="margin-top:20px">{!! $ar
         ? 'خطّط للشهر كاملًا مرحلةً بمرحلة في <a href="'.$u('/ramadan-2027').'">دليل رمضان 2027</a>.'

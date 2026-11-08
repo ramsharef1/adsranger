@@ -12,12 +12,12 @@ $dev = $ar ? 'قيد التطوير' : 'In development';
 $planned = $ar ? 'مخطط له' : 'Planned';
 // [title, one line, [[line, planned?], …]]
 $plans = $ar ? [
-    ['باقة المستقل', 'للمستقلين الذين يديرون عددًا قليلًا من العملاء: روابط العملاء والتقارير الأساسية.', null],
+    ['باقة المستقل', 'للمستقلين الذين يديرون عددًا قليلًا من العملاء: روابط العملاء والتقارير الأساسية. تناسب أيضًا <a href="'.$u('/solutions/business-owners').'">أصحاب المشاريع</a> الذين يديرون إعلاناتهم بأنفسهم.', null],
     ['الباقة الأساسية', 'للوكالات الناشئة وفرق الأداء الصغيرة.', [
         ['المكتب اليومي ومؤشر الصحة والمستهدفات', false],
         ['تقارير <bdi dir="ltr">Meta</bdi>، <bdi dir="ltr">Google Ads</bdi> (تكاملات مخطط لها)، وسجل 13 شهرًا، وعملات متعددة', true],
         ['قواعد التنبيه الأساسية وملخص الصباح بالبريد', false],
-        ['تقرير شهري بالعربية أو الإنجليزية وروابط للعملاء', false],
+        ['تقرير شهري بالعربية أو الإنجليزية وروابط للعملاء: <a href="'.$u('/demo-report').'">شكل تقرير العميل</a>', false],
         ['منشئ روابط التتبّع وفحص الروابط وحاسبة الأهداف', false],
     ]],
     ['الباقة الاحترافية', 'للوكالات المتنامية التي تدير عدة منصات وميزانيات.', [
@@ -34,12 +34,12 @@ $plans = $ar ? [
         ['عمليات الوكالة والمالية وحملات المؤثرين', true],
     ]],
 ] : [
-    ['Solo', 'For freelancers who manage a few clients: client links and core reporting.', null],
+    ['Solo', 'For freelancers who manage a few clients: client links and core reporting. Also fits <a href="'.$u('/solutions/business-owners').'">business owners</a> who run their own ads.', null],
     ['Starter', 'For new agencies and small performance teams.', [
         ['Daily desk, health score and targets', false],
         ['Meta and Google Ads reporting (planned integrations), 13 months of history and multi-currency', true],
         ['Core alert rules and a morning email digest', false],
-        ['Monthly report in Arabic or English, and client links', false],
+        ['Monthly report in Arabic or English, and client links: <a href="'.$u('/demo-report').'">what a client report looks like</a>', false],
         ['UTM builder, link checker and goal calculator', false],
     ]],
     ['Pro', 'For growing agencies running several platforms and budgets.', [
@@ -56,6 +56,17 @@ $plans = $ar ? [
         ['Agency operations, finance and influencer campaigns', true],
     ]],
 ];
+// CL-1 rev 2 E-06 FAQ (Growth 08e §6; trial = D-61, Solo = D-184).
+$faq = $ar ? [
+    ['هل توجد فترة تجربة؟', 'نعم. عند الإطلاق، تبدأ كل مساحة عمل جديدة بتجربة لمدة 14 يومًا على الباقة الاحترافية.'],
+    ['هل يمكنني تغيير الباقة لاحقًا؟', 'نعم، يمكنك الترقية أو الانتقال إلى باقة أصغر عند حاجتك.'],
+    ['ما باقة المستقل؟', 'باقة للمستقلين والشركات التي تدير إعلاناتها بنفسها، تشمل روابط العملاء والتقارير الأساسية لعدد قليل من العملاء.'],
+] : [
+    ['Is there a trial?', 'Yes. At launch, each new workspace starts with a 14-day trial of Pro.'],
+    ['Can I change plans later?', 'Yes, you can move up or down a plan when you need to.'],
+    ['What is Solo?', 'A plan for freelancers and businesses that run their own ads, with client links and basic reports for a few clients.'],
+];
+$schema[] = ['@type' => 'FAQPage', 'mainEntity' => array_map(fn ($q) => ['@type' => 'Question', 'name' => $q[0], 'acceptedAnswer' => ['@type' => 'Answer', 'text' => $q[1]]], $faq)];
 @endphp
 @extends('layouts.public')
 
@@ -73,8 +84,8 @@ $plans = $ar ? [
 @section('hero')
 <h1>{{ $ar ? 'باقات تناسب كل حجم من الوكالات' : 'Plans for every size of agency' }}</h1>
 <p class="muted" style="font-size:17px">{!! $ar
-? 'ما زالت <bdi dir="ltr">AdsRanger</bdi> قيد التطوير، والإطلاق في 2027. هذا ما تخطط كل باقة لتقديمه، والأسعار تُعلن عند الإطلاق.'
-: 'AdsRanger is in development and launching in 2027. Here is what each plan is planned to include. Prices are shared at launch.' !!}</p>
+? 'ما زالت <bdi dir="ltr">AdsRanger</bdi> قيد التطوير، والإطلاق في 2027. هذا ما تخطط كل باقة لتقديمه، والأسعار تُعلن عند الإطلاق، وتشمل كل باقة <a href="'.$u('/integrations').'">المنصات الإعلانية المخطط لربطها</a> حسب مستواها.'
+: 'AdsRanger is in development and launching in 2027. Here is what each plan is planned to include. Prices are shared at launch, and each plan covers <a href="'.$u('/integrations').'">the ad platforms we plan to connect</a> by level.' !!}</p>
 @endsection
 
 @section('content')
@@ -87,7 +98,7 @@ $plans = $ar ? [
             <div>
                 <h2 style="margin:0 0 4px;font-size:21px">{{ $name }}</h2>
                 @if ($features === null)<span class="badge badge-neutral">{{ $planned }}</span>@endif
-                <p class="muted" style="margin:8px 0 0">{{ $line }}</p>
+                <p class="muted" style="margin:8px 0 0">{!! $line !!}</p>
                 @if ($features)
                     <ul>
                         @foreach ($features as [$feature, $isPlanned])
@@ -101,4 +112,12 @@ $plans = $ar ? [
     @endforeach
 </ul>
 <p class="muted">{{ $ar ? 'تحتفظ الوكالات المؤسِّسة بسعر الإطلاق.' : 'Founding agencies keep their launch price.' }}</p>
+<section style="max-width:820px">
+    <h2>{{ $ar ? 'أسئلة شائعة' : 'FAQ' }}</h2>
+    @foreach ($faq as [$q, $a])
+        <h3 style="font-size:17px;margin:16px 0 4px">{{ $q }}</h3>
+        <p style="margin:0">{{ $a }}</p>
+    @endforeach
+    <p style="margin-top:20px">{!! $ar ? 'اقرأ <a href="'.$u('/security').'">كيف نحمي بياناتك</a>.' : 'Read <a href="'.$u('/security').'">how we protect your data</a>.' !!}</p>
+</section>
 @endsection

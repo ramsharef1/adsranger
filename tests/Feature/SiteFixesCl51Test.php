@@ -31,7 +31,7 @@ class SiteFixesCl51Test extends TestCase
     public function test_site_copy_fixes(): void
     {
         $this->get('/')->assertSee('display=optional', false)->assertDontSee('display=swap', false);
-        $this->get('/about')->assertSee('تُعدّ <bdi dir="ltr">AdsRanger</bdi> مساحة عمل', false)->assertSee('لماذا نبنيها')->assertDontSee('نبنيه ');
+        $this->get('/about')->assertSee('تُعدّ <bdi dir="ltr">AdsRanger</bdi> مساحة عمل', false)->assertSee('القصة')->assertDontSee('نبنيه ');
         $this->get('/partners')->assertSee('Google Ads')->assertDontSee('الحقول المعلَّمة بـ * مطلوبة.');
         $this->get('/waitlist')->assertSee('Google Ads');
         $this->get('/ramadan-2027')->assertSee('<a href="/mena-calendar">تقويم المواسم</a>', false);

@@ -13,9 +13,16 @@ $schema = [['@type' => 'ContactPage', 'name' => $title, 'url' => \App\Support\Pu
         ['@type' => 'ContactPoint', 'contactType' => 'customer support', 'email' => 'support@adsranger.com', 'availableLanguage' => ['ar', 'en']],
         ['@type' => 'ContactPoint', 'contactType' => 'privacy', 'email' => 'privacy@adsranger.com', 'availableLanguage' => ['ar', 'en']],
     ]]]];
+// CL-1 rev 2 E-02 (Growth 08e §2): routes with one line each. hello@ waits for its forward (Brevo on hold, D-246); no response time until Business sets one.
 $cards = [
-    [$ar ? 'الأسئلة والدعم' : 'Questions and support', 'support@adsranger.com', null],
-    [$ar ? 'الخصوصية وبياناتك' : 'Privacy and your data', 'privacy@adsranger.com', [$u('/data-deletion'), $ar ? 'حذف البيانات' : 'Data deletion']],
+    [$ar ? 'أسئلة عن المنتج والدعم' : 'Product questions and support', 'support@adsranger.com',
+        $ar ? 'راسلنا واذكر اسم وكالتك ودولتك.' : 'Email us with your agency name and country.', null],
+    [$ar ? 'الخصوصية وبياناتك' : 'Privacy and your data', 'privacy@adsranger.com',
+        $ar ? 'لطلب نسخة من بياناتك أو حذفها، أو للإبلاغ عن مشكلة أمنية.' : 'To get a copy of your data, delete it or report a security issue.',
+        [$u('/data-deletion'), $ar ? 'كيف تطلب حذف بياناتك' : 'How to ask us to delete your data']],
+    [$ar ? 'الشراكات' : 'Partnerships', null,
+        $ar ? 'إن كنت تدير وكالة إعلانات في المنطقة وتريد العمل معنا قبل الإطلاق، قدّم طلب شراكة.' : 'If you run an ad agency in the region and want to work with us before launch, send a partner application.',
+        [$u('/partners'), $ar ? 'طلب شراكة' : 'Partner application']],
 ];
 @endphp
 @extends('layouts.public')
@@ -35,15 +42,19 @@ $cards = [
 
 @section('content')
 <section class="ct">
+    <h2>{{ $ar ? 'بماذا نساعدك' : 'How can we help' }}</h2>
     <ul class="ct-cards">
-        @foreach ($cards as [$label, $email, $extra])
+        @foreach ($cards as [$label, $email, $line, $extra])
             <li class="card">
-                <h2 style="font-size:18px;margin:0 0 6px">{{ $label }}</h2>
-                <a class="ml" href="mailto:{{ $email }}"><bdi dir="ltr">{{ $email }}</bdi></a>
-                @if ($extra)<br><a class="pl" href="{{ $extra[0] }}">{{ $extra[1] }}</a>@endif
+                <h3 style="font-size:18px;margin:0 0 6px">{{ $label }}</h3>
+                <p style="margin:0 0 4px">{{ $line }}</p>
+                @if ($email)<a class="ml" href="mailto:{{ $email }}"><bdi dir="ltr">{{ $email }}</bdi></a>@endif
+                @if ($extra)@if ($email)<br>@endif<a class="pl" href="{{ $extra[0] }}">{{ $extra[1] }}</a>@endif
             </li>
         @endforeach
     </ul>
+    <p>{{ $ar ? 'ولمعرفة كيف نحمي البيانات، اقرأ صفحة' : 'To see how we protect data, read our' }} <a class="pl" href="{{ $u('/security') }}">{{ $ar ? 'الأمان' : 'security page' }}</a>.</p>
+    <p>{!! $ar ? 'فريق <bdi dir="ltr">AdsRanger</bdi> في عمّان، الأردن. نرد بالعربية أو الإنجليزية.' : 'The AdsRanger team, Amman, Jordan. We reply in Arabic or English.' !!}</p>
     <p>{{ $ar ? 'تريد أن نخبرك عند الإطلاق؟' : 'Want to hear when we launch?' }} <a class="pl" href="{{ $u('/waitlist') }}">{{ $ar ? 'انضم إلى قائمة الانتظار.' : 'Join the waitlist.' }}</a></p>
 </section>
 @endsection

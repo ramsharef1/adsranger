@@ -102,6 +102,10 @@ $t = $ar ? [
 
 @section('content')
 <section style="padding-top:24px;max-width:820px">
+    <h2>{{ $ar ? 'كيف تستخدم التقويم' : 'How to use the calendar' }}</h2>
+    <p>{!! $ar
+        ? 'صفِّ المواسم حسب الدولة، وابدأ التخطيط من التاريخ المكتوب بجانب كل موسم. التواريخ المتوقعة تتحدد برؤية الهلال في كل دولة، وتُحسب حسب تقويم أم القرى، ونحدّثها حين تُعلن رسميًا. وللتخطيط لرمضان، جرّب <a href="'.$u('/tools/ramadan-budget-calculator').'">حاسبة ميزانية رمضان</a>.'
+        : 'Filter seasons by country and start planning from the date shown next to each one. Expected dates follow the moon sighting in each country and are based on the Umm al-Qura calendar; we update them when they\'re announced. For Ramadan, try the <a href="'.$u('/tools/ramadan-budget-calculator').'">Ramadan budget calculator</a>.' !!}</p>
     <p class="mc-links"><a href="{{ $u('/ramadan-2027') }}">{{ $t['guide'] }}</a> · <a href="{{ $u('/tools/ramadan-budget-calculator') }}">{{ $t['calc'] }}</a></p>
 </section>
 

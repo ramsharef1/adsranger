@@ -56,6 +56,7 @@ $fieldIds = ['email' => 'pa-email', 'agency_name' => 'pa-agency', 'country' => '
         <li>{{ $ar ? 'رأي في ما نبنيه أولًا' : 'A say in what we build first' }}</li>
         <li>{{ $ar ? 'تواصل مباشر مع الفريق' : 'Direct contact with the team' }}</li>
     </ul>
+    <p>{!! $ar ? 'ونشرح لكل شريك <a href="'.$u('/security').'">كيف نحمي بياناته</a>.' : 'We show each partner <a href="'.$u('/security').'">how we protect their data</a>.' !!}</p>
 
     <h2 id="apply">{{ $ar ? 'قدّم طلبك' : 'Apply' }}</h2>
     <div class="card">

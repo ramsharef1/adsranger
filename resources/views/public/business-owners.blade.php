@@ -21,7 +21,10 @@ $features = $ar
     ? ['النتائج حسب الهدف', 'تنبيهات يومية', 'متابعة وتيرة الإنفاق', 'مخطِّط رمضان، في الباقة الاحترافية']
     : ['Results by goal', 'Daily alerts', 'Spend pacing', 'Ramadan planner, on the Pro plan'];
 // Only live tools and published guides (B-08: no "coming soon"); guides are added here on their publish day.
-$tools = [[$u('/tools/ramadan-budget-calculator'), $ar ? 'حاسبة ميزانية إعلانات رمضان 2027' : 'Ramadan 2027 ad budget calculator']];
+$tools = [
+    [$u('/tools/ramadan-budget-calculator'), $ar ? 'حاسبة ميزانية إعلانات رمضان 2027' : 'Ramadan 2027 ad budget calculator', null],
+    [$u('/mena-calendar'), $ar ? 'تقويم المواسم' : 'Seasons calendar', $ar ? 'مواسم 2027 في دول المنطقة.' : '2027 seasons across the region.'],
+];
 @endphp
 @extends('layouts.public')
 
@@ -56,10 +59,11 @@ $tools = [[$u('/tools/ramadan-budget-calculator'), $ar ? 'حاسبة ميزان�
 
         <div class="card">
             <h2>{{ $ar ? 'أدوات وأدلة مجانية' : 'Free tools and guides' }}</h2>
-            <ul class="dots">@foreach ($tools as [$href, $label])<li><a class="pl" href="{{ $href }}">{{ $label }}</a></li>@endforeach</ul>
+            <ul class="dots">@foreach ($tools as [$href, $label, $line])<li><a class="pl" href="{{ $href }}">{{ $label }}</a>@if ($line): {{ $line }}@endif</li>@endforeach</ul>
 
             <h2 style="margin-top:20px">{{ $ar ? 'الباقة' : 'Plan' }}</h2>
             <p style="margin:6px 0 0">{{ $ar ? 'باقة المستقل: للمستقلين والشركات التي تدير إعلاناتها بنفسها' : 'Solo: for freelancers and businesses that run their own ads' }} <span class="badge badge-neutral">{{ $ar ? 'مخطط له' : 'Planned' }}</span></p>
+            <p style="margin:6px 0 0">{!! $ar ? 'اعرف ما تخطط له <a class="pl" href="'.$u('/pricing').'">الباقات</a>.' : 'See what the <a class="pl" href="'.$u('/pricing').'">plans</a> will include.' !!}</p>
         </div>
     </div>
 

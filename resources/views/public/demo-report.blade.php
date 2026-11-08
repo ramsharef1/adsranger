@@ -83,6 +83,7 @@ $t = $ar ? [
 @section('hero')
 <h1>{{ $t['h1'] }}</h1>
 <p class="muted" style="font-size:17px;max-width:760px">{{ $t['lead'] }}</p>
+<p class="muted" style="max-width:760px">{!! $ar ? 'تعرض البيانات من <a href="'.$u('/integrations').'">المنصات التي نخطط لربطها</a>.' : 'Data comes from <a href="'.$u('/integrations').'">the platforms we plan to connect</a>.' !!}</p>
 @endsection
 
 @section('content')
@@ -129,6 +130,27 @@ $t = $ar ? [
             </li>
         @endforeach
     </ul>
+</section>
+<p style="margin-top:16px">{!! $ar
+    ? 'يفتح عميلك التقرير برابط للقراءة فقط. <a href="'.$u('/security').'">كيف نحمي بيانات عملائك</a>'
+    : 'Your client opens the report with a read-only link. <a href="'.$u('/security').'">How we protect your clients\' data</a>' !!}</p>
+{{-- CL-1 rev 2 E-07 (Growth 08e §7): how to read the report. --}}
+<section style="margin-top:24px;max-width:820px">
+    <h2>{{ $ar ? 'كيف تقرأ هذا التقرير' : 'How to read this report' }}</h2>
+    <ol>
+        @foreach ($ar ? [
+            ['النتائج حسب الهدف:', 'تُعدّ كل حملة بما صُممت له، فرسائل واتساب لا تُخلط بالمبيعات.'],
+            ['الإنفاق مقابل الخطة:', 'ترى الإنفاق الفعلي بجانب الميزانية المستهدفة، وتكلفة النتيجة بجانب المستهدفة.'],
+            ['مؤشر صحة العميل:', 'رقم من 0 إلى 100 يلخّص أداء العميل مقابل مستهدفاته، مع كلمة واحدة تشرحه.'],
+        ] : [
+            ['Results by goal:', 'each campaign is counted by what it was built for, so WhatsApp messages aren\'t mixed with sales.'],
+            ['Spend against plan:', 'actual spend next to the target budget, and cost per result next to its target.'],
+            ['Client health score:', 'a 0–100 number that sums up the client against their targets, with one word to explain it.'],
+        ] as [$head, $body])
+            <li style="margin-bottom:8px"><strong>{{ $head }}</strong> {{ $body }}</li>
+        @endforeach
+    </ol>
+    <p>{!! $ar ? 'اعرف <a href="'.$u('/pricing').'">أي باقة تشمل هذا التقرير</a>.' : 'See <a href="'.$u('/pricing').'">which plan includes this report</a>.' !!}</p>
 </section>
 <p style="margin-top:24px"><a class="btn" href="{{ $u('/waitlist') }}">{{ $t['cta'] }}</a></p>
 @endsection

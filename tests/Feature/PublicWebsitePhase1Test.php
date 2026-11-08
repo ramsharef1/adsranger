@@ -195,7 +195,7 @@ class PublicWebsitePhase1Test extends TestCase
         $this->get('/en/mena-calendar')->assertOk()->assertSee('White Friday')->assertSee('9 or 10 March 2027')->assertDontSee('CPMs shift');
 
         $this->get('/security')->assertOk()->assertSee('privacy@adsranger.com')->assertDontSee('agency_id');
-        $this->get('/en/security')->assertOk()->assertSee('network access keys are stored encrypted')->assertDontSee('TOTP');
+        $this->get('/en/security')->assertOk()->assertSee('Access keys for the ad platforms are stored encrypted')->assertDontSee('TOTP');
     }
 
     /** R-13 / R-19: /sitemap.xml is an index; the pages child lists every public URL with ar / en / x-default and lastmod. */

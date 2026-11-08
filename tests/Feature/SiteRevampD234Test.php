@@ -46,6 +46,21 @@ class SiteRevampD234Test extends TestCase
         $this->get('/en/ramadan-2027')->assertSee('reporting across ad platforms.')->assertDontSee('across networks');
     }
 
+    public function test_cl1_rev2_copy_is_on_the_pages(): void
+    {
+        $this->get('/tools/ramadan-budget-calculator')->assertSee('كيف تعمل الحاسبة')->assertSee('"@type":"FAQPage"', false)->assertSee('مواعيد رمضان والعيد في كل دولة');
+        $this->get('/contact')->assertSee('بماذا نساعدك')->assertSee('طلب شراكة')->assertDontSee('hello@adsranger.com');
+        $this->get('/security')->assertSee('ما لا نفعله أبدًا')->assertSee('إن وجدت ثغرة')->assertDontSee('قراءة فقط');
+        $this->get('/en/security')->assertSee('What we never do')->assertDontSee('read-only');
+        $this->get('/integrations')->assertSee('كيف سيتم الربط')->assertSee('تقرير موحد لكل المنصات')->assertDontSee('قراءة فقط');
+        $this->get('/about')->assertSee('القصة')->assertSee('أين نحن الآن')->assertSee('ساعدنا في البناء كشريك');
+        $this->get('/pricing')->assertSee('هل توجد فترة تجربة؟')->assertSee('شكل تقرير العميل')->assertSee('أصحاب المشاريع');
+        $this->get('/demo-report')->assertSee('كيف تقرأ هذا التقرير')->assertSee('أي باقة تشمل هذا التقرير');
+        $this->get('/mena-calendar')->assertSee('كيف تستخدم التقويم');
+        $this->get('/partners')->assertSee('كيف نحمي بياناته');
+        $this->get('/solutions/business-owners')->assertSee('تقويم المواسم')->assertSee('اعرف ما تخطط له');
+    }
+
     public function test_home_occasions_show_ad_seasons_only(): void
     {
         $this->assertSame(['C5', 'A2', 'B1'], collect(PublicSite::nextOccasions(3, '2026-11-08'))->pluck('id')->all());
