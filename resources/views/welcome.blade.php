@@ -1,199 +1,373 @@
 @php
-    // Home rev 4 (Website P-2 with P-5 §7–8; UX-152). Lead line D-139 stays word for word.
+    // Home: Package G rev 2 (claude/site/pages/home.md) + next-occasions block (D-234). D-139 retired (D-232).
     $lang = request()->segment(1) === 'en' ? 'en' : 'ar';
     $ar = $lang === 'ar';
     $arPath = '/';
     $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
-    $title = $ar ? 'منصة إدارة الإعلانات للوكالات بالعربية | AdsRanger' : 'Arabic-First Ad Management Platform for Agencies | AdsRanger'; // B-01 (Content 03:22)
+    $title = $ar ? 'منصة إدارة الإعلانات للوكالات بالعربية | AdsRanger' : 'Arabic-First Ad Management Platform for Agencies | AdsRanger';
     $meta = $ar
-        ? 'مساحة عمل عربية أولًا من AdsRanger، قيد التطوير، ستتيح لوكالات الإعلان في المنطقة إدارة إعلانات كل عملائها وتقاريرها في مكان واحد. الإطلاق في 2027.'
-        : 'AdsRanger is the Arabic-first workspace, now in development, where MENA agencies will run and report every client\'s ads in one place. Launching in 2027.';
+        ? 'مساحة عمل عربية أولًا تتيح لوكالات الإعلان في المنطقة إدارة إعلانات كل عملائها وتقاريرها في مكان واحد. AdsRanger قيد التطوير، والإطلاق في 2027.'
+        : 'AdsRanger is an Arabic-first ad management platform, in development, where MENA agencies will report every client\'s ads in one place. Launching 2027.';
+    $b = fn (string $s) => '<bdi dir="ltr">'.$s.'</bdi>';
+
+    $faqs = $ar ? [
+        ['متى تُطلق AdsRanger؟', $b('AdsRanger').' قيد التطوير، والإطلاق في 2027. انضم إلى قائمة الانتظار لنراسلك عند الإطلاق.'],
+        ['كم السعر؟', 'تُعلن الأسعار عند الإطلاق. ويمكنك أن ترى ما تخطط كل باقة لتقديمه في <a href="'.$u('/pricing').'">صفحة الباقات</a>.'],
+        ['ما المنصات الإعلانية المخطط ربطها؟', 'في المرحلة الأولى: '.$b('Meta').'، '.$b('Google Ads').'، '.$b('TikTok').'، '.$b('Snapchat').'، '.$b('Microsoft Advertising').'، '.$b('LinkedIn').'، '.$b('X').'. ويُفتح كل تكامل بعد موافقة المنصة على تطبيقنا.'],
+        ['هل يمكن أن تعدّل AdsRanger حملات عملائي؟', 'لا. اتصالات التقارير تقرأ البيانات فقط، ولا يمكنها تعديل الميزانيات أو المزايدات أو الحملات. أما استوديو الإعلانات، وهو مخطط له، فلن ينشر أي شيء إلا بعد موافقتك.'],
+        ['لمن صُممت AdsRanger؟', 'لوكالات الإعلان في المنطقة التي تدير إعلانات عملاء كثيرين، وللمستقلين عبر باقة المستقل.'],
+    ] : [
+        ['When does AdsRanger launch?', 'AdsRanger is in development and launching in 2027. Join the waitlist and we\'ll email you at launch.'],
+        ['How much will it cost?', 'Prices are shared at launch. You can see what each plan is planned to include on the <a href="'.$u('/pricing').'">plans page</a>.'],
+        ['Which ad platforms are planned?', 'In the first stage: Meta, Google Ads, TikTok, Snapchat, Microsoft Advertising, LinkedIn and X. Each integration opens after the platform approves our app.'],
+        ['Can AdsRanger change my clients\' campaigns?', 'No. Reporting connections only read data; they can\'t change budgets, bids or campaigns. The planned Ads Studio will publish nothing without your approval.'],
+        ['Who is AdsRanger for?', 'Ad agencies in the region that run ads for many clients, and freelancers on the Solo plan.'],
+    ];
     $schema = [
         ['@type' => 'Organization', 'name' => 'AdsRanger', 'url' => 'https://adsranger.com/', 'logo' => 'https://adsranger.com/brand/icon-512.png'],
         ['@type' => 'WebSite', 'name' => 'AdsRanger', 'url' => \App\Support\PublicUrl::absolute('/', $lang), 'inLanguage' => $lang],
+        ['@type' => 'FAQPage', 'mainEntity' => array_map(fn ($f) => ['@type' => 'Question', 'name' => $f[0], 'acceptedAnswer' => ['@type' => 'Answer', 'text' => trim(strip_tags($f[1]))]], $faqs)],
     ];
-    $cards = $ar ? [
-        ['النتائج حسب الهدف', 'نتيجة كل حملة تتبع هدفها: الرسائل والمكالمات والعملاء المحتملون والحجوزات والمبيعات.', 'قيد التطوير', false],
-        ['المكتب اليومي والتنبيهات', 'التتبّع المعطّل، والإنفاق دون نتائج، وضعف التسليم، وارتفاع التكلفة، كلها تظهر كل صباح.', 'قيد التطوير', false],
+
+    $rows = $ar ? [
+        ['كل منصة تحسب النتائج بطريقتها.', 'نتيجة واحدة لكل هدف.', 'تُحسب نتيجة كل حملة حسب هدفها: الرسائل، المكالمات، العملاء المحتملون، الحجوزات، المبيعات، ثم تُجمع نتائج كل المنصات الإعلانية للعميل في عرض واحد.', ['/demo-report', 'شاهدها في التقرير التجريبي']],
+        ['الهدر يُكتشف بعد أيام.', 'المكتب اليومي وتنبيهات الصباح.', 'التتبّع المعطّل، والإنفاق دون نتائج، وضعف التسليم، وارتفاع التكلفة، تظهر لك كل صباح مرتبة حسب الأولوية.', null],
+        ['تقارير العملاء تُعدّ يدويًا.', 'روابط وتقارير جاهزة للعملاء.', 'رابط للقراءة فقط يفتحه العميل دون حساب، وتقرير شهري بالعربية أو الإنجليزية يحمل شعار وكالتك.', ['/demo-report', 'شاهد تقريرًا تجريبيًا']],
+    ] : [
+        ['Every platform counts results its own way.', 'One result per goal.', 'Each campaign is counted by its goal: messages, calls, leads, bookings or sales, then all of a client\'s ad platforms come together in one view.', ['/demo-report', 'See it in the sample report']],
+        ['Wasted spend is found days late.', 'A daily desk and morning alerts.', 'Broken tracking, spend with no results, under-delivery and rising costs, shown every morning in order of priority.', null],
+        ['Client reports are built by hand.', 'Client-ready links and reports.', 'A read-only link your client opens without an account, and a monthly report in Arabic or English with your agency\'s logo.', ['/demo-report', 'See a sample report']],
+    ];
+    $more = $ar ? [
         ['مؤشر الصحة والمستهدفات', 'تقييم كل عميل من 0 إلى 100 مقابل الميزانية وتكلفة النتيجة والمستهدفات.', 'قيد التطوير', false],
-        ['روابط وتقارير للعملاء', 'روابط للقراءة فقط لعملائك، وتقرير شهري بالعربية أو الإنجليزية.', 'قيد التطوير', false],
         ['استوديو الإعلانات', 'أنشئ الحملات ونصوص الإعلانات لعدة منصات من موجز واحد، بموافقتك قبل نشر أي شيء.', 'مخطط له', true],
     ] : [
-        ['Results by goal', 'Each campaign\'s result follows its goal: messages, calls, leads, bookings, sales.', 'In development', false],
-        ['Daily desk and alerts', 'Broken tracking, spend with no results, under-delivery and rising costs, flagged every morning.', 'In development', false],
         ['Health score and targets', 'Each client scored from 0 to 100 against budget, cost per result and targets.', 'In development', false],
-        ['Client links and reports', 'Read-only links for clients and a monthly report in Arabic or English.', 'In development', false],
         ['Ads Studio', 'Build campaigns and ad copy for several platforms from one brief, with your approval before anything is published.', 'Planned', true],
     ];
-    $goals = $ar ? ['الرسائل', 'المكالمات', 'العملاء المحتملون', 'الحجوزات', 'المبيعات'] : ['Messages', 'Calls', 'Leads', 'Bookings', 'Sales'];
+    $steps = $ar ? [
+        ['أضف حسابات عملائك الإعلانية', 'بصلاحية قراءة فقط، بعد أن تعتمد كل منصة تطبيقنا.'],
+        ['تابع النتائج حسب الهدف', 'في المكتب اليومي كل صباح، مع تنبيهات بما يحتاج إلى تدخل.'],
+        ['شارك عملاءك', 'رابطًا للقراءة فقط أو تقريرًا شهريًا بالعربية أو الإنجليزية.'],
+    ] : [
+        ['Add your clients\' ad accounts', 'with read-only access, once each platform approves our app.'],
+        ['Follow results by goal', 'on the daily desk every morning, with alerts for what needs attention.'],
+        ['Share with your clients', 'a read-only link or a monthly report in Arabic or English.'],
+    ];
+    $mena = $ar ? [
+        ['العربية أولًا.', 'كل شاشة وتقرير بالعربية أولًا، مع نسخة إنجليزية.'],
+        ['مواسم المنطقة ومناسباتها.', 'التقويم الهجري ورمضان والعيد ومواسم البيع في تخطيط كل عميل.'],
+        ['عملات المنطقة.', 'تُحوَّل نتائج كل عميل يوميًا إلى عملة واحدة يختارها، حتى لو اختلفت عملات حساباته الإعلانية.'],
+    ] : [
+        ['Arabic first.', 'Every screen and report in Arabic first, with an English version.'],
+        ['The region\'s seasons and occasions.', 'The Hijri calendar, Ramadan, Eid and sales seasons in every client\'s planning.'],
+        ['Regional currencies.', 'Each client\'s results are converted daily into one currency of your choice, even when its ad accounts use different currencies.'],
+    ];
+    $trust = $ar ? [
+        ['صلاحية قراءة فقط.', 'لا يمكن لاتصالات التقارير تعديل الميزانيات أو الحملات.'],
+        ['فصل بيانات كل وكالة.', 'ولا يرى أعضاء فريقك إلا العملاء المسندين إليهم.'],
+        ['تحت تصرفك.', 'افصل أي حساب، أو صدّر تقاريرك، أو اطلب حذف بياناتك.'],
+    ] : [
+        ['Read-only access.', 'Reporting connections can\'t change budgets or campaigns.'],
+        ['Each agency kept apart.', 'Team members see only the clients they\'re given.'],
+        ['Your control.', 'Disconnect any account, export your reports or ask us to delete your data.'],
+    ];
     $networks = ['Meta', 'Google Ads', 'TikTok', 'Snapchat', 'Microsoft Advertising', 'LinkedIn', 'X'];
+
+    // Next 3 occasions (D-95 data); Ramadan 2027 always among them until it starts (D-234).
+    $occ = \App\Support\PublicSite::nextOccasions(3);
+    $ramadan = collect(config('mena_calendar_2027.rows', []))->firstWhere('id', 'A2');
+    if ($ramadan && $ramadan['date'] >= now('Asia/Amman')->toDateString() && ! collect($occ)->contains('id', 'A2')) {
+        $occ = array_merge(array_slice($occ, 0, 2), [$ramadan]);
+    }
+    $months = $ar
+        ? ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر']
+        : ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    $day = function (string $iso) use ($months): array {
+        [$y, $m, $d] = array_map('intval', explode('-', $iso));
+
+        return [$d, $months[$m - 1], $y];
+    };
+
+    $demo = $ar ? [
+        'tabs' => ['النتائج حسب الهدف', 'تنبيهات الصباح', 'تقرير العميل'],
+        'sample' => 'بيانات تجريبية', 'client' => 'متجر أثاث (عميل تجريبي)', 'period' => 'آخر 7 أيام',
+        'goals' => [['الرسائل', '412', '1.20 USD'], ['المكالمات', '96', '4.80 USD'], ['العملاء المحتملون', '238', '2.35 USD'], ['المبيعات', '63', '9.10 USD']],
+        'cols' => ['الهدف', 'النتائج', 'تكلفة النتيجة'], 'health' => 'مؤشر الصحة',
+        'alerts' => [['حرج', 'تتبّع معطّل: لا تحويلات من حملة المبيعات منذ أمس'], ['تحذير', 'ارتفاع التكلفة: تكلفة الرسالة أعلى بـ 38% من المعتاد'], ['متابعة', 'إنفاق دون نتائج: مجموعة إعلانية أنفقت 120 USD دون نتيجة']],
+        'report' => [['رابط للقراءة فقط', 'يفتحه العميل دون حساب'], ['تقرير شهري', 'بالعربية أو الإنجليزية، بشعار وكالتك'], ['ملخص الشهر', 'النتائج حسب الهدف مقارنة بالشهر السابق']],
+        'alt' => 'نموذج للمكتب اليومي ببيانات تجريبية: النتائج حسب الهدف وتنبيهات الصباح وتقرير العميل',
+    ] : [
+        'tabs' => ['Results by goal', 'Morning alerts', 'Client report'],
+        'sample' => 'Sample data', 'client' => 'Furniture store (sample client)', 'period' => 'Last 7 days',
+        'goals' => [['Messages', '412', '1.20 USD'], ['Calls', '96', '4.80 USD'], ['Leads', '238', '2.35 USD'], ['Sales', '63', '9.10 USD']],
+        'cols' => ['Goal', 'Results', 'Cost per result'], 'health' => 'Health score',
+        'alerts' => [['Critical', 'Broken tracking: no conversions from the sales campaign since yesterday'], ['Warning', 'Rising cost: cost per message 38% above usual'], ['Watch', 'Spend with no results: an ad set spent 120 USD with no result']],
+        'report' => [['Read-only link', 'Your client opens it without an account'], ['Monthly report', 'In Arabic or English, with your agency\'s logo'], ['Month summary', 'Results by goal against the month before']],
+        'alt' => 'Daily desk sample with demo data: results by goal, morning alerts and the client report',
+    ];
 @endphp
 @extends('layouts.public')
 
 @push('styles')
 <style>
-/* Deep Indigo-Violet Centered Hero + Overlapping Product Showcase */
-.hp-hero{width:100vw;margin-inline:calc(50% - 50vw);margin-top:-8px;padding:52px 16px 110px;background:radial-gradient(950px 420px at 50% 0%,rgba(109,40,217,.32),transparent 70%),radial-gradient(700px 340px at 85% 20%,rgba(45,212,191,.18),transparent 65%),linear-gradient(180deg,#0f172a 0%,#191636 58%,#111827 100%);color:#ffffff;text-align:center}
-.hp-hero-in{max-width:900px;margin:0 auto}
-.hp-pill{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:99px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:#5eead4;font-size:13.5px;font-weight:700;margin-bottom:18px}
-.hp-pill i{width:8px;height:8px;border-radius:99px;background:var(--acc);display:inline-block}
-.hp-hero h1{color:#ffffff;font-size:clamp(32px,5vw,52px);line-height:1.18;letter-spacing:-.02em;margin:0 auto 16px;max-width:820px}
-.hp-hero .lead{color:#cbd5e1;font-size:clamp(16.5px,2vw,19px);line-height:1.75;max-width:780px;margin:0 auto 28px}
-/* Elevated Command Action Bar */
-.hp-cmdbar{max-width:680px;margin:0 auto 18px;background:#ffffff;border-radius:14px;padding:8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;box-shadow:0 22px 48px -12px rgba(0,0,0,.55)}
-.hp-cmd-preview{display:flex;align-items:center;gap:10px;padding:8px 14px;color:#0f172a;font-size:14.5px;font-weight:600;flex:1;min-width:200px;text-align:start}
-.hp-nets span{white-space:nowrap}
-.hp-cmd-dot{width:10px;height:10px;border-radius:99px;background:#0f766e;flex-shrink:0}
-.hp-cta-main{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 26px;border-radius:10px;background:var(--btn);color:var(--btn-ink);font-weight:700;font-size:16px;text-decoration:none;white-space:nowrap}
-.hp-cta-main:hover{opacity:.92;color:var(--btn-ink)}
-.hp-cta-sec{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:10px 16px;border-radius:10px;background:#f1f5f9;color:#0f172a;font-weight:600;font-size:14.5px;text-decoration:none;white-space:nowrap}
-.hp-cta-sec:hover{background:#e2e8f0;color:#0f172a}
-.hp-sublinks{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:12px;font-size:14px}
-.hp-sublinks a{color:#fde68a;font-weight:600;text-decoration:underline;min-height:44px;display:inline-flex;align-items:center;gap:6px}
-/* Overlapping White Product Board */
-.hp-showcase{max-width:1140px;margin:-76px auto 44px;background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 24px 60px -15px rgba(15,23,42,.18);overflow:hidden}
-.hp-tabs{display:flex;overflow-x:auto;background:var(--surface);border-bottom:1px solid var(--line);padding:10px 14px;gap:8px}
-.hp-tab{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;font-size:13.5px;font-weight:700;white-space:nowrap;background:var(--card);border:1px solid var(--line);color:var(--ink)}
-.hp-tab-active{background:#0f172a;color:#ffffff;border-color:#0f172a}
-.hp-tab-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:var(--info-bg);color:var(--acc);font-size:11.5px;font-weight:700}
-.hp-board{display:grid;grid-template-columns:1fr;gap:18px;padding:24px}
-@media (min-width:920px){.hp-board{grid-template-columns:300px 1fr}}
-/* Left Donut Gauge & Health Widget */
-.hp-widget{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;justify-content:space-between;gap:14px}
-.hp-w-hd{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
-.hp-donut-wrap{display:flex;align-items:center;gap:16px}
-.hp-donut{width:84px;height:84px;flex-shrink:0}
-.hp-score-big{font-size:28px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
-.hp-score-sub{font-size:12.5px;color:var(--muted);margin-top:4px}
-/* Right Campaign Goal & Alert Table */
-.hp-table-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-.hp-table-top{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--card)}
-.hp-goal-bar{display:flex;flex-wrap:wrap;gap:6px;padding:14px 16px;border-bottom:1px solid var(--line)}
-.hp-goal-pill{padding:5px 12px;border-radius:8px;background:var(--card);border:1px solid var(--line);font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
-.hp-goal-pill::before{content:"";width:7px;height:7px;border-radius:99px;background:#0f766e;display:inline-block}
-.hp-alert-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;padding:14px 16px}
-.hp-alert-box{background:var(--card);border:1px solid var(--line);border-inline-start:4px solid var(--acc);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600}
-/* 5-Card Toolkit Grid */
-.hp-sec-title{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin:20px 0 18px}
-.hp-sec-title h2{margin:0;font-size:clamp(24px,3.2vw,30px)}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:18px;list-style:none;padding:0;margin:0}
-.cards .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;justify-content:space-between;gap:14px;box-shadow:0 4px 16px -6px rgba(15,23,42,.07);transition:transform .15s ease,box-shadow .15s ease}
-.cards .card:hover{transform:translateY(-2px);box-shadow:0 14px 28px -10px rgba(15,23,42,.14)}
-.cards .card-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.hp-ico{width:38px;height:38px;border-radius:10px;background:rgba(255,100,45,.12);color:var(--acc);display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
-.cards h3{font-size:19.5px;margin:6px 0}
-.cards p{margin:0;color:var(--muted);font-size:15px;line-height:1.65}
-/* Planned Integrations Strip */
-.hp-nets{margin-top:40px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
-.hp-nets h2{margin:0 0 10px;font-size:21px}
-.pills{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:0}
-.pills li{display:inline-flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-size:14px;font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.04)}
-.pills li::before{content:"";width:8px;height:8px;border-radius:99px;background:var(--acc);display:inline-block}
-.text-link{display:inline-flex;align-items:center;min-height:44px;text-decoration:underline;font-weight:700;color:var(--acc)}
+.hp-hero{background:radial-gradient(900px 420px at 15% 0%,rgba(20,184,166,.22),transparent 70%),radial-gradient(700px 360px at 95% 30%,rgba(94,234,212,.10),transparent 65%),#0b1120;color:#f8fafc;padding-block:48px 64px;border-bottom:1px solid #1e293b}
+.hp-grid{display:grid;gap:32px;align-items:center}
+@media (min-width:1024px){.hp-grid{grid-template-columns:1.05fr 1fr;gap:48px}}
+.hp-status{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:99px;background:rgba(94,234,212,.10);border:1px solid rgba(94,234,212,.30);color:#5eead4;font-size:13.5px;font-weight:700;margin:0 0 18px}
+.hp-status::before{content:"";width:8px;height:8px;border-radius:99px;background:#5eead4}
+.hp-hero h1{color:#fff;font-size:clamp(32px,4.8vw,52px);line-height:1.2;margin:0 0 16px}
+.hp-hero .lead{color:#cbd5e1;font-size:clamp(16.5px,1.9vw,19px);line-height:1.8;margin:0 0 28px;max-width:640px}
+.hp-ctas{display:flex;flex-wrap:wrap;gap:12px}
+.hp-ctas .btn{min-height:50px;padding-inline:24px;font-size:16px}
+.hp-ctas .btn-main{background:#5eead4;color:#0b1120}
+.hp-ctas .btn-sec{background:transparent;color:#fff;border:1px solid #475569}
+.hp-ctas .btn-sec:hover{background:rgba(255,255,255,.06)}
+/* demo window */
+.dm{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:18px;box-shadow:0 30px 60px -20px rgba(0,0,0,.6);overflow:hidden}
+.dm-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--line);font-size:13px}
+.dm-bar .dots{display:flex;gap:6px}.dm-bar .dots i{width:10px;height:10px;border-radius:99px;background:var(--line)}
+.dm-tag{font-weight:700;color:var(--neu-ink);background:var(--neu-bg);border-radius:6px;padding:2px 8px;font-size:12px}
+.dm fieldset{border:0;margin:0;padding:0;min-width:0}
+.dm legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.dm-tabs{display:flex;gap:4px;padding:10px 12px 0;overflow-x:auto;border-bottom:1px solid var(--line)}
+.dm-r{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.dm-tabs label{display:inline-flex;align-items:center;min-height:44px;padding:8px 12px;margin:0;font-weight:600;font-size:14px;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.dm-tabs label:hover{color:var(--ink)}
+#dm-t1:checked~.dm-tabs label[for=dm-t1],#dm-t2:checked~.dm-tabs label[for=dm-t2],#dm-t3:checked~.dm-tabs label[for=dm-t3]{color:var(--acc);border-bottom-color:var(--acc)}
+#dm-t1:focus-visible~.dm-tabs label[for=dm-t1],#dm-t2:focus-visible~.dm-tabs label[for=dm-t2],#dm-t3:focus-visible~.dm-tabs label[for=dm-t3]{outline:2px solid var(--acc);outline-offset:-2px;border-radius:6px}
+.dm-p{display:none;padding:16px}
+#dm-t1:checked~.dm-ps .dm-p1,#dm-t2:checked~.dm-ps .dm-p2,#dm-t3:checked~.dm-ps .dm-p3{display:block}
+.dm-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px;font-size:13px;color:var(--muted)}
+.dm-head strong{color:var(--ink);font-size:14px}
+.dm table{width:100%;border-collapse:collapse;font-size:14px}
+.dm th{font-size:12px;color:var(--muted);font-weight:600;text-align:start;padding:6px 4px;border-bottom:1px solid var(--line)}
+.dm td{padding:9px 4px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.dm td:not(:first-child),.dm th:not(:first-child){text-align:end}
+.dm-health{display:flex;align-items:center;gap:12px;margin-top:12px;font-size:13px;color:var(--muted)}
+.dm-health b{font-size:22px;color:var(--ink)}
+.dm-meter{flex:1;height:8px;border-radius:99px;background:var(--neu-bg);overflow:hidden}.dm-meter i{display:block;height:100%;width:78%;background:var(--acc)}
+.dm-al{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.dm-al li{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-inline-start:4px solid var(--acc);border-radius:10px;font-size:14px}
+.dm-al li.crit{border-inline-start-color:var(--bad)}
+.dm-al b{white-space:nowrap}
+.dm-rep{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.dm-rep li{padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px}
+.dm-rep span{display:block;color:var(--muted);font-size:13px}
+/* platforms strip */
+.hp-nets{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin-top:36px;padding-top:20px;border-top:1px solid #1e293b;color:#94a3b8;font-size:14px}
+.hp-nets ul{list-style:none;display:flex;flex-wrap:wrap;gap:6px 18px;margin:0;padding:0}
+.hp-nets li{color:#e2e8f0;font-weight:600;white-space:nowrap}
+.hp-nets a{color:#5eead4;display:inline-flex;align-items:center;min-height:44px}
+/* sections */
+.hp-sec{margin-top:64px}
+.hp-sec>h2{font-size:clamp(24px,3.2vw,32px);margin:0 0 8px}
+.hp-sec>.sub{color:var(--muted);margin:0 0 24px;max-width:720px}
+.pa{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.pa li{display:grid;gap:12px;border:1px solid var(--line);border-radius:16px;padding:18px;background:var(--card)}
+@media (min-width:768px){.pa li{grid-template-columns:1fr 1.6fr;align-items:center;padding:20px 24px}}
+.pa h3{font-size:16px;font-weight:600;color:var(--muted);margin:0}
+.pa h3::before{content:"✕";display:inline-flex;justify-content:center;align-items:center;width:22px;height:22px;margin-inline-end:8px;border-radius:99px;background:var(--neu-bg);color:var(--neu-ink);font-size:11px}
+.pa .ans{border-inline-start:3px solid var(--acc);padding-inline-start:14px}
+.pa .ans strong{display:block;font-size:17px;margin-bottom:4px}
+.pa .ans p{margin:0;color:var(--muted)}
+.pa .ans a{font-weight:600}
+.more{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr))}
+.more li{border:1px dashed var(--line);border-radius:14px;padding:16px 18px}
+.more h3{font-size:16px;margin:0 0 4px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.more p{margin:0;color:var(--muted);font-size:14.5px}
+@media (max-width:479px){.more{display:none}}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:14px;counter-reset:s;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr))}
+.steps li{counter-increment:s;border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--surface)}
+.steps li::before{content:counter(s);display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;background:var(--btn);color:var(--btn-ink);font-weight:700;margin-bottom:12px}
+.steps strong{display:block;font-size:17px;margin-bottom:4px}
+.steps span{color:var(--muted)}
+.two{display:grid;gap:20px}
+@media (min-width:900px){.two{grid-template-columns:1fr 1fr;gap:28px}}
+.ticks{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.ticks li{padding-inline-start:30px;position:relative}
+.ticks li::before{content:"";position:absolute;inset-inline-start:0;top:.45em;width:18px;height:18px;border-radius:99px;background:var(--info-bg);box-shadow:inset 0 0 0 5px var(--info-bg),inset 0 0 0 9px var(--acc)}
+.ticks strong{display:block}
+.ticks span{color:var(--muted)}
+.occ{border:1px solid var(--line);border-radius:16px;background:var(--card);overflow:hidden}
+.occ h3{margin:0;padding:14px 18px;background:var(--surface);border-bottom:1px solid var(--line);font-size:16px}
+.occ ol{list-style:none;margin:0;padding:0}
+.occ li{display:flex;gap:14px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line)}
+.occ .d{flex:none;width:58px;text-align:center;border-radius:10px;background:var(--info-bg);color:var(--info-ink);padding:6px 0;line-height:1.2}
+.occ .d b{display:block;font-size:20px}.occ .d span{font-size:12px}
+.occ .e strong{display:block}.occ .e span,.occ .e a{font-size:14px}
+.occ .all{display:flex;align-items:center;min-height:48px;padding:0 18px;font-weight:600}
+.trust{list-style:none;margin:0;padding:0;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr))}
+.trust li{border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--card)}
+.trust strong{display:block;font-size:17px;margin-bottom:4px}
+.trust span{color:var(--muted)}
+.faq details{border:1px solid var(--line);border-radius:14px;background:var(--card);margin-bottom:10px}
+.faq summary{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:56px;padding:12px 18px;cursor:pointer;list-style:none}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-size:22px;color:var(--acc);flex:none}
+.faq details[open] summary::after{content:"−"}
+.faq h3{font-size:16.5px;margin:0}
+.faq p{margin:0;padding:0 18px 16px;color:var(--muted)}
+.band{margin-top:64px;border-radius:20px;padding:28px 24px;border:1px solid var(--line);background:var(--surface);display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.band h2{margin:0 0 6px;font-size:clamp(20px,3vw,26px)}
+.band p{margin:0;color:var(--muted);max-width:640px}
+.hp-close{margin-top:24px;border-radius:20px;padding:36px 24px;background:radial-gradient(600px 240px at 90% 0%,rgba(20,184,166,.25),transparent 70%),#0b1120;color:#f8fafc;text-align:center}
+.hp-close h2{color:#fff;margin:0 0 8px;font-size:clamp(22px,3.4vw,30px)}
+.hp-close p{color:#cbd5e1;margin:0 auto 20px;max-width:620px}
+.hp-close .btn{background:#5eead4;color:#0b1120;min-height:50px;padding-inline:26px}
 </style>
 @endpush
 
-@section('content')
-<section class="hp-hero">
-    <div class="hp-hero-in">
-        <p class="hp-pill"><i aria-hidden="true"></i><span>{{ $ar ? 'قيد التطوير · الإطلاق في 2027' : 'In development · launching 2027' }}</span></p>
-        <h1>{{ $ar ? 'تقارير إعلانات كل عملائك في مساحة عمل واحدة' : 'Every client\'s ad reporting in one workspace' }}</h1>
-        <p class="lead">{!! $ar
-            ? 'منصة تقارير <bdi dir="ltr">Meta</bdi>، <bdi dir="ltr">Google</bdi> للوكالات الإعلانية: الرسائل والمكالمات والعملاء المحتملون والحجوزات والمبيعات تُحسب حسب الهدف الحقيقي لكل حملة، مع تنبيهات يومية تكشف هدر الميزانية، وتقارير بالعربية والإنجليزية يفهمها عملاؤك.'
-            : 'Meta and Google Ads reporting for agencies: messages, calls, leads, bookings and sales counted by each campaign\'s real goal, with daily alerts that catch wasted spend and Arabic/English reports your clients understand.' !!}</p>
-
-        <div class="hp-cmdbar">
-            <div class="hp-cmd-preview">
-                <span class="hp-cmd-dot" aria-hidden="true"></span>
-                <span>{{ $ar ? 'المنصات المخطط لها:' : 'Planned platforms:' }} <bdi dir="ltr" class="hp-nets">@foreach (['Meta', 'Google Ads', 'TikTok', 'Snapchat'] as $i => $n)@if ($i) · @endif<span>{{ $n }}</span>@endforeach</bdi></span>
-            </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <a class="hp-cta-sec" href="{{ $u('/demo-report') }}">{{ $ar ? 'شاهد تقريرًا تجريبيًا' : 'See a sample report' }}</a>
-                <a class="hp-cta-main" href="{{ $u('/waitlist') }}">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a>
+@section('top')
+<section class="hp-hero" aria-labelledby="hp-h1">
+    <div class="wrap hp-grid">
+        <div>
+            <p class="hp-status">{{ $ar ? 'قيد التطوير · الإطلاق في 2027' : 'In development · launching 2027' }}</p>
+            <h1 id="hp-h1">{{ $ar ? 'اعرف ما تحققه إعلانات كل عميل، قبل أن يسألك' : 'Know what every client\'s ads achieve, before they ask' }}</h1>
+            <p class="lead">{{ $ar
+                ? 'منصة عربية أولًا لإدارة إعلانات الوكالات وتقاريرها: تحسب نتيجة كل حملة حسب هدفها الحقيقي، وتنبّهك كل صباح إلى الهدر، وتجهّز تقارير يفهمها عملاؤك بالعربية أو الإنجليزية.'
+                : 'An Arabic-first platform for managing and reporting agencies\' ads: it counts each campaign\'s result by its real goal, flags wasted spend every morning, and prepares reports your clients understand, in Arabic or English.' }}</p>
+            <div class="hp-ctas">
+                <a class="btn btn-main" href="{{ $u('/waitlist') }}?type=agency" data-cta="waitlist" data-pos="hero">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a>
+                <a class="btn btn-sec" href="{{ $u('/demo-report') }}" data-cta="sample_report" data-pos="hero">{{ $ar ? 'شاهد تقريرًا تجريبيًا' : 'See a sample report' }}</a>
             </div>
         </div>
 
-        <div class="hp-sublinks">
-            <a href="{{ $u('/ramadan-2027') }}">{{ $ar ? 'اقرأ دليل رمضان 2027' : 'Read the Ramadan 2027 guide' }}</a>
+        <figure class="dm" style="margin:0" aria-label="{{ $demo['alt'] }}">
+            <div class="dm-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="dm-tag">{{ $demo['sample'] }}</span></div>
+            <fieldset>
+                <legend>{{ $demo['alt'] }}</legend>
+                @foreach ([1, 2, 3] as $n)<input class="dm-r" type="radio" name="dm" id="dm-t{{ $n }}" @checked($n === 1)>@endforeach
+                <div class="dm-tabs">
+                    @foreach ($demo['tabs'] as $i => $tab)<label for="dm-t{{ $i + 1 }}">{{ $tab }}</label>@endforeach
+                </div>
+                <div class="dm-ps">
+                    <div class="dm-p dm-p1">
+                        <div class="dm-head"><strong>{{ $demo['client'] }}</strong><span>{{ $demo['period'] }}</span></div>
+                        <table>
+                            <thead><tr>@foreach ($demo['cols'] as $c)<th scope="col">{{ $c }}</th>@endforeach</tr></thead>
+                            <tbody>@foreach ($demo['goals'] as [$g, $n, $c])<tr><td>{{ $g }}</td><td>{{ $n }}</td><td><bdi dir="ltr">{{ $c }}</bdi></td></tr>@endforeach</tbody>
+                        </table>
+                        <div class="dm-health"><span>{{ $demo['health'] }}</span><span class="dm-meter" aria-hidden="true"><i></i></span><b>78</b></div>
+                    </div>
+                    <div class="dm-p dm-p2">
+                        <div class="dm-head"><strong>{{ $demo['client'] }}</strong><span>{{ $ar ? 'صباح اليوم' : 'This morning' }}</span></div>
+                        <ul class="dm-al">@foreach ($demo['alerts'] as $i => [$lvl, $txt])<li class="{{ $i === 0 ? 'crit' : '' }}"><b>{{ $lvl }}</b><span>{{ $txt }}</span></li>@endforeach</ul>
+                    </div>
+                    <div class="dm-p dm-p3">
+                        <div class="dm-head"><strong>{{ $demo['client'] }}</strong><span>{{ $ar ? 'العربية · English' : 'English · العربية' }}</span></div>
+                        <ul class="dm-rep">@foreach ($demo['report'] as [$h, $t])<li><strong>{{ $h }}</strong><span>{{ $t }}</span></li>@endforeach</ul>
+                    </div>
+                </div>
+            </fieldset>
+        </figure>
+    </div>
+    <div class="wrap">
+        <div class="hp-nets">
+            <span>{{ $ar ? 'المنصات الإعلانية التي نخطط لربطها' : 'Ad platforms we plan to connect' }}:</span>
+            <ul>@foreach ($networks as $n)<li><bdi dir="ltr">{{ $n }}</bdi></li>@endforeach</ul>
+            <a href="{{ $u('/integrations') }}">{{ $ar ? 'كل المنصات الإعلانية' : 'All ad platforms' }}</a>
         </div>
     </div>
 </section>
+@endsection
 
-<div class="hp-showcase" role="region" aria-label="{{ $ar ? 'معاينة المنصة (قيد التطوير)' : 'Platform preview (in development)' }}">
-    <div class="hp-tabs" aria-hidden="true">
-        @foreach ($cards as $idx => [$cardTitle])
-            <span class="hp-tab {{ $idx === 0 ? 'hp-tab-active' : '' }}">
-                <span class="hp-tab-num">0{{ $idx + 1 }}</span>
-                <span>{{ $cardTitle }}</span>
-            </span>
-        @endforeach
-    </div>
-
-    <div class="hp-board">
-        <div class="hp-widget">
-            <div class="hp-w-hd">
-                <span>{{ $ar ? 'مؤشر الصحة والمستهدفات' : 'Health score and targets' }}</span>
-                <span class="badge">{{ $ar ? 'قيد التطوير' : 'In development' }}</span>
-            </div>
-            <div class="hp-donut-wrap">
-                <svg class="hp-donut" viewBox="0 0 36 36" aria-hidden="true">
-                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e2e8f0" stroke-width="3.5"/>
-                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#0f766e" stroke-width="3.5" stroke-dasharray="85, 100" stroke-linecap="round"/>
-                </svg>
-                <div>
-                    <div class="hp-score-big">0–100</div>
-                    <div class="hp-score-sub">{{ $ar ? 'مقابل الميزانية وتكلفة النتيجة' : 'Against budget & cost per result' }}</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="hp-table-card">
-            <div class="hp-table-top">
-                <strong style="font-size:14px">{{ $ar ? 'النتائج حسب الهدف · المكتب اليومي' : 'Results by goal · Daily desk' }}</strong>
-                <span class="badge">{{ $ar ? 'معاينة · قيد التطوير' : 'Preview · In development' }}</span>
-            </div>
-            <div class="hp-goal-bar">
-                @foreach ($goals as $g)
-                    <span class="hp-goal-pill">{{ $g }}</span>
-                @endforeach
-            </div>
-            <div class="hp-alert-grid">
-                <div class="hp-alert-box">{{ $ar ? 'التتبّع المعطّل والإنفاق دون نتائج' : 'Broken tracking & spend with no results' }}</div>
-                <div class="hp-alert-box" style="border-inline-start-color:#0f766e">{{ $ar ? 'روابط للقراءة فقط وتقرير شهري (عربي / EN)' : 'Read-only client links & monthly AR/EN report' }}</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<section aria-labelledby="h-build">
-    <div class="hp-sec-title">
-        <h2 id="h-build">{{ $ar ? 'ما نبنيه لوكالتك' : 'What we\'re building for your agency' }}</h2>
-    </div>
-    <ul class="cards">
-        @foreach ($cards as $idx => [$cardTitle, $body, $badge, $planned])
-            <li class="card">
-                <div>
-                    <div class="card-head">
-                        <span class="hp-ico" aria-hidden="true">0{{ $idx + 1 }}</span>
-                        <span class="badge {{ $planned ? 'badge-neutral' : '' }}">{{ $badge }}</span>
-                    </div>
-                    <h3>{{ $cardTitle }}</h3>
-                    <p>{{ $body }}</p>
+@section('content')
+<section class="hp-sec" aria-labelledby="h-pa">
+    <h2 id="h-pa">{{ $ar ? 'ما يُبطئ الوكالات، وما نبنيه لحلّه' : 'What slows agencies down, and what we\'re building to fix it' }} <span class="badge">{{ $ar ? 'قيد التطوير' : 'In development' }}</span></h2>
+    <p class="sub">{!! $ar ? 'ثلاث مشكلات نسمعها من كل وكالة، وما تبنيه '.$b('AdsRanger').' لحلّ كل منها.' : 'Three problems we hear from every agency, and what AdsRanger is building for each.' !!}</p>
+    <ul class="pa">
+        @foreach ($rows as [$problem, $answer, $text, $link])
+            <li>
+                <h3>{{ $problem }}</h3>
+                <div class="ans">
+                    <strong>{{ $answer }}</strong>
+                    <p>{{ $text }}@if ($link) <a href="{{ $u($link[0]) }}" data-cta="sample_report" data-pos="problem_row">{{ $link[1] }}</a>@endif</p>
                 </div>
             </li>
         @endforeach
     </ul>
+    <ul class="more">
+        @foreach ($more as [$h, $p, $badge, $planned])
+            <li><h3>{{ $h }} <span class="badge {{ $planned ? 'badge-neutral' : '' }}">{{ $badge }}</span></h3><p>{{ $p }}</p></li>
+        @endforeach
+    </ul>
 </section>
 
-<section class="hp-nets" aria-labelledby="h-nets">
+<section class="hp-sec" aria-labelledby="h-how" id="how">
+    <h2 id="h-how">{{ $ar ? 'كيف تعمل' : 'How it works' }} <span class="badge">{{ $ar ? 'قيد التطوير' : 'In development' }}</span></h2>
+    <p class="sub">{{ $ar ? 'ثلاث خطوات من الربط إلى التقرير.' : 'Three steps from connecting to reporting.' }}</p>
+    <ol class="steps">
+        @foreach ($steps as [$s, $t])
+            <li><strong>{{ $s }}</strong><span>{{ $t }}</span></li>
+        @endforeach
+    </ol>
+</section>
+
+<section class="hp-sec two" aria-labelledby="h-mena">
     <div>
-        <h2 id="h-nets">{{ $ar ? 'تكاملات مخطط لها' : 'Planned integrations' }}</h2>
-        <ul class="pills">
-            @foreach ($networks as $network)
-                <li><bdi dir="ltr">{{ $network }}</bdi></li>
+        <h2 id="h-mena" style="font-size:clamp(24px,3.2vw,32px);margin:0 0 20px">{{ $ar ? 'مصمَّمة لأسواق المنطقة' : 'Built for MENA markets' }} <span class="badge">{{ $ar ? 'قيد التطوير' : 'In development' }}</span></h2>
+        <ul class="ticks">
+            @foreach ($mena as [$h, $p])
+                <li><strong>{{ $h }}</strong><span>{{ $p }}</span></li>
             @endforeach
         </ul>
     </div>
-    <a class="text-link" href="{{ $u('/integrations') }}">{{ $ar ? 'كل المنصات الإعلانية المخطط لها' : 'All planned ad platforms' }}</a>
+    @if ($occ)
+        <div class="occ">
+            <h3>{{ $ar ? 'المناسبات القادمة في المنطقة' : 'Coming up in the region' }}</h3>
+            <ol>
+                @foreach ($occ as $o)
+                    @php([$d, $mo, $y] = $day($o['date']))
+                    <li>
+                        <span class="d"><b>{{ $d }}</b><span>{{ $mo }}</span></span>
+                        <span class="e">
+                            <strong>{{ $ar ? $o['event_ar'] : $o['event_en'] }} {{ $y }}</strong>
+                            @if ($o['id'] === 'A2')
+                                <a href="{{ $u('/ramadan-2027') }}">{{ $ar ? 'دليل رمضان 2027' : 'Ramadan 2027 guide' }}</a> · <a href="{{ $u('/tools/ramadan-budget-calculator') }}">{{ $ar ? 'حاسبة الميزانية' : 'Budget calculator' }}</a>
+                            @else
+                                <span class="muted">{{ $o['status'] === 'fixed' ? ($ar ? 'موعد ثابت' : 'Fixed date') : ($ar ? 'موعد متوقع' : 'Expected date') }}</span>
+                            @endif
+                        </span>
+                    </li>
+                @endforeach
+            </ol>
+            <a class="all" href="{{ $u('/mena-calendar') }}">{{ $ar ? 'كل مواسم 2027 في تقويم المواسم' : 'All 2027 seasons in the seasons calendar' }}</a>
+        </div>
+    @endif
+</section>
+
+<section class="hp-sec" aria-labelledby="h-trust">
+    <h2 id="h-trust">{{ $ar ? 'بياناتك وبيانات عملائك' : 'Your data and your clients\' data' }}</h2>
+    <p class="sub"><a href="{{ $u('/security') }}">{{ $ar ? 'كيف نحمي بياناتك' : 'How we protect your data' }}</a></p>
+    <ul class="trust">
+        @foreach ($trust as [$h, $p])
+            <li><strong>{{ $h }}</strong><span>{{ $p }}</span></li>
+        @endforeach
+    </ul>
+</section>
+
+<section class="hp-sec faq" aria-labelledby="h-faq">
+    <h2 id="h-faq">{{ $ar ? 'الأسئلة الشائعة' : 'Questions' }}</h2>
+    @foreach ($faqs as [$q, $a])
+        <details>
+            <summary><h3>{!! $ar ? str_replace('AdsRanger', $b('AdsRanger'), e($q)) : e($q) !!}</h3></summary>
+            <p>{!! $a !!}</p>
+        </details>
+    @endforeach
+</section>
+
+<section class="band" aria-labelledby="h-partners">
+    <div>
+        <h2 id="h-partners">{{ $ar ? 'هل تدير وكالة إعلانات في المنطقة؟' : 'Run an ad agency in the region?' }}</h2>
+        <p>{{ $ar ? 'نختار عددًا قليلًا من الوكالات للعمل معنا قبل الإطلاق، بدءًا من الأردن ثم الخليج.' : 'We\'re choosing a small group of agencies to work with us before launch, starting in Jordan, then the Gulf.' }}</p>
+    </div>
+    <a class="btn btn-ghost" href="{{ $u('/partners') }}" data-cta="partners" data-pos="partners_band">{{ $ar ? 'قدّم طلب شراكة التصميم' : 'Apply to be a design partner' }}</a>
+</section>
+
+<section class="hp-close" aria-labelledby="h-close">
+    <h2 id="h-close">{{ $ar ? 'كن أول من يعرف عند الإطلاق' : 'Be the first to know at launch' }}</h2>
+    <p>{{ $ar ? 'اترك بريدك واسم وكالتك ودولتك، وسنراسلك عند الإطلاق في 2027.' : 'Leave your email, agency name and country, and we\'ll email you at launch in 2027.' }}</p>
+    <a class="btn" href="{{ $u('/waitlist') }}?type=agency" data-cta="waitlist" data-pos="closing">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a>
 </section>
 @endsection

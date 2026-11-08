@@ -85,11 +85,12 @@ $schema = [['@type' => 'WebPage', 'name' => $t['title'], 'url' => $self, 'inLang
 </style>
 @endpush
 
+@section('hero')
+<h1 style="font-size:clamp(26px,4.5vw,40px);margin:0 0 12px">{!! $t['h1'] !!}</h1>
+<p style="color:var(--muted);font-size:17px;margin:0">{!! $t['lead'] !!}</p>
+@endsection
+
 @section('content')
-<section style="padding:24px 0 8px;max-width:860px">
-    <h1 style="font-size:clamp(26px,4.5vw,40px);margin:0 0 12px">{!! $t['h1'] !!}</h1>
-    <p style="color:var(--muted);font-size:17px;margin:0">{!! $t['lead'] !!}</p>
-</section>
 <div class="card wl" style="max-width:860px;margin:24px 0">
     @if (session('waitlist_saved'))
         <div class="ok" id="wl-done" tabindex="-1" role="status">

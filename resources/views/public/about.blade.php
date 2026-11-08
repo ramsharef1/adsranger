@@ -34,12 +34,15 @@ $holds = $ar ? [
 </style>
 @endpush
 
+@section('hero')
+<h1>{{ $ar ? 'نبنيها في عمّان لمعلني المنطقة' : 'Built in Amman for the region\'s advertisers' }}</h1>
+<p class="muted" style="font-size:17px">{!! $ar
+? 'تُعدّ <bdi dir="ltr">AdsRanger</bdi> مساحة عمل إعلانية عربية أولًا للوكالات والمستقلين والشركات في الشرق الأوسط وشمال أفريقيا، وهي قيد التطوير، والإطلاق في 2027.'
+: 'AdsRanger is an Arabic-first advertising workspace for agencies, freelancers and businesses across the Middle East and North Africa. It is in development and launching in 2027.' !!}</p>
+@endsection
+
 @section('content')
 <section class="ab">
-    <h1>{{ $ar ? 'نبنيها في عمّان لمعلني المنطقة' : 'Built in Amman for the region\'s advertisers' }}</h1>
-    <p class="muted" style="font-size:17px">{!! $ar
-        ? 'تُعدّ <bdi dir="ltr">AdsRanger</bdi> مساحة عمل إعلانية عربية أولًا للوكالات والمستقلين والشركات في الشرق الأوسط وشمال أفريقيا، وهي قيد التطوير، والإطلاق في 2027.'
-        : 'AdsRanger is an Arabic-first advertising workspace for agencies, freelancers and businesses across the Middle East and North Africa. It is in development and launching in 2027.' !!}</p>
 
     <h2>{{ $ar ? 'لماذا نبنيها' : 'Why we\'re building it' }}</h2>
     <p>{{ $ar

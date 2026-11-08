@@ -43,12 +43,15 @@ $inputs = [
 </style>
 @endpush
 
+@section('hero')
+<h1>{{ $ar ? 'حاسبة ميزانية إعلانات رمضان 2027' : 'Ramadan 2027 ad budget calculator' }}</h1>
+<p class="muted" style="font-size:17px">{{ $ar
+? 'أدخل إنفاقك اليومي المعتاد وتكلفة النتيجة المعتادة، ثم حدّد مقدار التغيّر الذي تتوقعه لكل منهما في رمضان. تعرض الحاسبة تقديرًا لثلاثين يومًا، وتعتمد فقط على الأرقام التي تدخلها.'
+: 'Enter your usual daily spend and cost per result, then set how much you expect each to change in Ramadan. The calculator shows a 30-day estimate. It uses only the numbers you enter.' }}</p>
+@endsection
+
 @section('content')
 <section class="rc">
-    <h1>{{ $ar ? 'حاسبة ميزانية إعلانات رمضان 2027' : 'Ramadan 2027 ad budget calculator' }}</h1>
-    <p class="muted" style="font-size:17px">{{ $ar
-        ? 'أدخل إنفاقك اليومي المعتاد وتكلفة النتيجة المعتادة، ثم حدّد مقدار التغيّر الذي تتوقعه لكل منهما في رمضان. تعرض الحاسبة تقديرًا لثلاثين يومًا، وتعتمد فقط على الأرقام التي تدخلها.'
-        : 'Enter your usual daily spend and cost per result, then set how much you expect each to change in Ramadan. The calculator shows a 30-day estimate. It uses only the numbers you enter.' }}</p>
 
     <form class="card" id="rc-form" onsubmit="return false" novalidate>
         <div class="rc-grid">

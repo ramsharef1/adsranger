@@ -80,11 +80,12 @@ $t = $ar ? [
 </style>
 @endpush
 
+@section('hero')
+<h1>{{ $t['h1'] }}</h1>
+<p class="muted" style="font-size:17px;max-width:760px">{{ $t['lead'] }}</p>
+@endsection
+
 @section('content')
-<section style="padding-top:24px">
-    <h1>{{ $t['h1'] }}</h1>
-    <p class="muted" style="font-size:17px;max-width:760px">{{ $t['lead'] }}</p>
-</section>
 <p class="dr-banner" role="note">{{ $t['banner'] }}</p>
 <section class="card" aria-labelledby="dr-client">
     <div class="dr-head">

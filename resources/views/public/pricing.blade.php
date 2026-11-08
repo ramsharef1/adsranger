@@ -70,12 +70,15 @@ $plans = $ar ? [
 </style>
 @endpush
 
+@section('hero')
+<h1>{{ $ar ? 'باقات تناسب كل حجم من الوكالات' : 'Plans for every size of agency' }}</h1>
+<p class="muted" style="font-size:17px">{!! $ar
+? 'ما زالت <bdi dir="ltr">AdsRanger</bdi> قيد التطوير، والإطلاق في 2027. هذا ما تخطط كل باقة لتقديمه، والأسعار تُعلن عند الإطلاق.'
+: 'AdsRanger is in development and launching in 2027. Here is what each plan is planned to include. Prices are shared at launch.' !!}</p>
+@endsection
+
 @section('content')
 <section style="padding-top:24px;max-width:820px">
-    <h1>{{ $ar ? 'باقات تناسب كل حجم من الوكالات' : 'Plans for every size of agency' }}</h1>
-    <p class="muted" style="font-size:17px">{!! $ar
-        ? '<bdi dir="ltr">AdsRanger</bdi> قيد التطوير، والإطلاق في 2027. هذا ما تخطط كل باقة لتقديمه، والأسعار تُعلن عند الإطلاق.'
-        : 'AdsRanger is in development and launching in 2027. Here is what each plan is planned to include. Prices are shared at launch.' !!}</p>
     <p>{{ $ar ? 'عند الإطلاق، تبدأ كل مساحة عمل جديدة بتجربة لمدة 14 يومًا على الباقة الاحترافية.' : 'At launch, each new workspace starts with a 14-day trial of Pro.' }}</p>
 </section>
 <ul class="plans">

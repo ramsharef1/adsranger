@@ -95,10 +95,13 @@ $t = $ar ? [
 </style>
 @endpush
 
+@section('hero')
+<h1>{{ $t['h1'] }}</h1>
+<p class="muted" style="font-size:17px">{{ $t['lead'] }}</p>
+@endsection
+
 @section('content')
 <section style="padding-top:24px;max-width:820px">
-    <h1>{{ $t['h1'] }}</h1>
-    <p class="muted" style="font-size:17px">{{ $t['lead'] }}</p>
     <p class="mc-links"><a href="{{ $u('/ramadan-2027') }}">{{ $t['guide'] }}</a> · <a href="{{ $u('/tools/ramadan-budget-calculator') }}">{{ $t['calc'] }}</a></p>
 </section>
 

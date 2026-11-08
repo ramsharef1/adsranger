@@ -37,10 +37,13 @@ $fieldIds = ['email' => 'pa-email', 'agency_name' => 'pa-agency', 'country' => '
 </style>
 @endpush
 
+@section('hero')
+<h1>{!! $ar ? 'ساعدنا في بناء <bdi dir="ltr">AdsRanger</bdi> من واقع عمل وكالتك' : 'Help us build AdsRanger with your agency\'s real work' !!}</h1>
+<p class="muted" style="font-size:17px">{{ $ar ? 'نختار مجموعة صغيرة من الوكالات للعمل معنا قبل الإطلاق، نبدأ بوكالات الأردن ثم الخليج.' : 'We\'re choosing a small group of agencies to work with us before launch. We start with agencies in Jordan, then the Gulf.' }}</p>
+@endsection
+
 @section('content')
 <section class="pa">
-    <h1>{!! $ar ? 'ساعدنا في بناء <bdi dir="ltr">AdsRanger</bdi> من واقع عمل وكالتك' : 'Help us build AdsRanger with your agency\'s real work' !!}</h1>
-    <p class="muted" style="font-size:17px">{{ $ar ? 'نختار مجموعة صغيرة من الوكالات للعمل معنا قبل الإطلاق، نبدأ بوكالات الأردن ثم الخليج.' : 'We\'re choosing a small group of agencies to work with us before launch. We start with agencies in Jordan, then the Gulf.' }}</p>
 
     <h2>{{ $ar ? 'ما يقدّمه الشركاء' : 'What partners do' }}</h2>
     <ul class="dots">

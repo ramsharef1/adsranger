@@ -28,10 +28,13 @@ $cards = [
 </style>
 @endpush
 
+@section('hero')
+<h1>{{ $ar ? 'تواصل معنا' : 'Contact us' }}</h1>
+<p class="muted" style="font-size:17px">{{ $ar ? 'البريد الإلكتروني أفضل طريقة للتواصل معنا، ونرد بالعربية أو الإنجليزية.' : 'Email is the best way to reach us. We reply in Arabic or English.' }}</p>
+@endsection
+
 @section('content')
 <section class="ct">
-    <h1>{{ $ar ? 'تواصل معنا' : 'Contact us' }}</h1>
-    <p class="muted" style="font-size:17px">{{ $ar ? 'البريد الإلكتروني أفضل طريقة للتواصل معنا، ونرد بالعربية أو الإنجليزية.' : 'Email is the best way to reach us. We reply in Arabic or English.' }}</p>
     <ul class="ct-cards">
         @foreach ($cards as [$label, $email, $extra])
             <li class="card">

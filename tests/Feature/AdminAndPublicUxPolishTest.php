@@ -87,6 +87,6 @@ class AdminAndPublicUxPolishTest extends TestCase
             $this->assertStringNotContainsStringIgnoringCase('semrush', $html, $path);
             $this->assertStringNotContainsString('#ff642d', $html, $path);
         }
-        $this->get('/')->assertSee('المنصات المخطط لها:')->assertSee('<span>Google Ads</span>', false);
+        $this->get('/')->assertSee('بيانات تجريبية')->assertSee('<bdi dir="ltr">Google Ads</bdi>', false);
     }
 }

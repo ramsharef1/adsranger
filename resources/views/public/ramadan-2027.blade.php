@@ -40,9 +40,12 @@ $schema = [
 </style>
 @endpush
 
+@section('hero')
+<h1>{{ $h1 }}</h1>
+@endsection
+
 @section('content')
 <article class="rm">
-    <h1>{{ $h1 }}</h1>
     {!! $body !!}
 </article>
 @endsection

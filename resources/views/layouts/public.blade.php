@@ -12,24 +12,13 @@
     $arUrl = \App\Support\PublicUrl::absolute($arPath, 'ar');
     $enUrl = \App\Support\PublicUrl::absolute($arPath, 'en');
     $switchUrl = \App\Support\PublicUrl::path($arPath, $ar ? 'en' : 'ar');
-    $nav = [
-        ['/', $ar ? 'الرئيسية' : 'Home'],
-        ['/ramadan-2027', $ar ? 'رمضان 2027' : 'Ramadan 2027'],
-        ['/mena-calendar', $ar ? 'تقويم المواسم' : 'Seasons calendar'],
-        ['/integrations', $ar ? 'المنصات الإعلانية' : 'Ad platforms'],
-        ['/pricing', $ar ? 'الباقات' : 'Plans'],
-    ];
-    $footerLinks = array_merge($nav, [
-        ['/demo-report', $ar ? 'تقرير تجريبي' : 'Sample report'],
-        ['/security', $ar ? 'الأمان' : 'Security'],
-        ['/solutions/business-owners', $ar ? 'لأصحاب المشاريع' : 'For business owners'],
-        ['/partners', $ar ? 'الشركاء' : 'Partners'],
-        ['/about', $ar ? 'عن AdsRanger' : 'About'],
-        ['/contact', $ar ? 'تواصل معنا' : 'Contact'],
-        ['/privacy', $ar ? 'الخصوصية' : 'Privacy'],
-        ['/terms', $ar ? 'الشروط' : 'Terms'],
-        ['/data-deletion', $ar ? 'حذف البيانات' : 'Data deletion'],
-    ]);
+    $site = \App\Support\PublicSite::class;
+    $menu = $site::menu($ar);
+    $isHome = $arPath === '/';
+    $related = $site::related($arPath);
+    $closing = $site::hasClosingBand($arPath);
+    $sticky = ! in_array($arPath, ['/waitlist', '/partners'], true);
+    $crumb = $isHome ? null : $site::name($arPath, $ar);
     $waitlistLabel = $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist';
     $schema = $schema ?? [];
 @endphp
@@ -83,41 +72,88 @@ a{color:var(--acc)}
 .badge-neutral{background:var(--neu-bg);color:var(--neu-ink)}
 .muted{color:var(--muted)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
-main{display:block;padding-block:8px 48px}
+main{display:block;padding-block:0 8px}
+main>.wrap{padding-top:24px}
 main p a,main li a,main td a{text-decoration:underline}
 h1{font-size:clamp(28px,4.5vw,42px);line-height:1.25;margin:0 0 12px}
 h2{font-size:clamp(21px,3vw,26px);line-height:1.35;margin:32px 0 12px}
 h3{font-size:18px;margin:0 0 6px}
-/* header — #0f172a dark command bar */
-.sh{border-bottom:1px solid #1e293b;background:#0f172a;color:#f8fafc}
-.sh-in{display:flex;align-items:center;gap:8px;min-height:66px}
-.sh-logo{display:inline-flex;align-items:center;gap:8px;min-height:44px;min-width:44px;direction:ltr;color:#ffffff;text-decoration:none;font-weight:700;font-size:19px}
+/* header: dark bar + grouped menu (D-234) */
+.sh{position:relative;z-index:40;background:#0b1120;color:#f8fafc;border-bottom:1px solid #1e293b}
+.sh-in{display:flex;align-items:center;gap:8px;min-height:68px}
+.sh-logo{display:inline-flex;align-items:center;gap:8px;min-height:44px;min-width:44px;direction:ltr;color:#fff;text-decoration:none;font-weight:700;font-size:19px}
 .sh-logo img{width:32px;height:32px}
-.sh-logo b{color:#2dd4bf}
-.sh-nav{display:flex;align-items:center;gap:2px;margin-inline-start:16px}
-.sh-nav a,.sh-ctl{display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;padding:6px 11px;border-radius:8px;color:#cbd5e1;text-decoration:none;font-size:14.5px;font-weight:500;background:transparent;border:0;font-family:inherit;cursor:pointer}
-.sh-nav a[aria-current=page]{font-weight:700;color:#ffffff;background:rgba(255,255,255,.08)}
-.sh-nav a:hover,.sh-ctl:hover{color:#ffffff;background:rgba(255,255,255,.08)}
+.sh-logo b{color:#5eead4}
+.sh-nav{display:flex;align-items:center;gap:2px;margin-inline-start:20px}
+.sh-nav>a,.mm>button,.sh-ctl{white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;min-width:44px;padding:6px 12px;border-radius:8px;color:#cbd5e1;text-decoration:none;font-size:15px;font-weight:500;background:transparent;border:0;font-family:inherit;cursor:pointer}
+.sh-nav>a[aria-current=page],.mm.cur>button{color:#fff;font-weight:700}
+.sh-nav>a:hover,.mm>button:hover,.mm>button[aria-expanded=true],.sh-ctl:hover{color:#fff;background:rgba(255,255,255,.08)}
+.mm{position:relative}
+.mm>button svg{width:12px;height:12px;transition:transform .15s}
+.mm>button[aria-expanded=true] svg{transform:rotate(180deg)}
+.mm-panel{display:none;position:absolute;top:calc(100% + 8px);inset-inline-start:0;min-width:340px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:0 24px 48px -16px rgba(2,6,23,.45);padding:8px}
+.mm>button[aria-expanded=true]+.mm-panel{display:block}
+.mm-panel a{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:10px;color:var(--ink);text-decoration:none;min-height:44px}
+.mm-panel a strong{font-size:15px}
+.mm-panel a span{font-size:13px;color:var(--muted)}
+.mm-panel a:hover,.mm-panel a:focus-visible{background:var(--surface)}
+.mm-panel a[aria-current=page] strong{color:var(--acc)}
 .sh-end{display:flex;align-items:center;gap:6px;margin-inline-start:auto}
-.sh-end .btn{padding:8px 16px;border-radius:8px;font-weight:700}
-.sh-end .btn:hover{background:#f0531c;color:#ffffff;opacity:1}
+.sh-end .btn{white-space:nowrap;padding:8px 16px;border-radius:8px;font-weight:700;background:#5eead4;color:#0b1120}
 .sh-menu{display:none}
-.sh-panel{display:none;border-top:1px solid var(--line);padding-block:8px 16px}
-.sh-panel a,.sh-panel .sh-ctl{display:flex;align-items:center;min-height:48px;padding:8px 4px;color:var(--ink);text-decoration:none;font-size:16px;width:100%;justify-content:flex-start}
-.sh-panel a[aria-current=page]{font-weight:700;color:var(--acc)}
-.sh-panel .btn{margin-top:8px;width:100%;justify-content:center;color:var(--btn-ink)}
+.sh-panel{display:none;background:var(--bg);color:var(--ink);border-top:1px solid #1e293b;padding-block:8px 16px}
+.sh-panel details{border-bottom:1px solid var(--line)}
+.sh-panel summary{display:flex;align-items:center;justify-content:space-between;min-height:52px;font-weight:700;cursor:pointer;list-style:none}
+.sh-panel summary::-webkit-details-marker{display:none}
+.sh-panel summary::after{content:"+";font-size:20px;color:var(--muted)}
+.sh-panel details[open] summary::after{content:"−"}
+.sh-panel a,.sh-panel .sh-ctl{display:flex;align-items:center;min-height:48px;padding:6px 4px;color:var(--ink);text-decoration:none;font-size:16px;width:100%;justify-content:flex-start}
+.sh-panel nav>a:not(.btn){font-weight:700;border-bottom:1px solid var(--line)}
+.sh-panel a[aria-current=page]{color:var(--acc);font-weight:700}
+.sh-panel .btn{margin-top:12px;width:100%;justify-content:center;color:var(--btn-ink)}
 .sh.open .sh-panel{display:block}
 .ico{width:18px;height:18px;display:inline-block}
-@media (max-width:1199px){
-  .sh-nav,.sh-end .hide-sm{display:none}
-  .sh-menu{display:inline-flex}
-}
+@media (max-width:1279px){.sh-nav,.sh-end .hide-sm{display:none}.sh-menu{display:inline-flex}}
+/* page hero band (inner pages) */
+.ph{background:radial-gradient(800px 320px at 85% 0%,rgba(20,184,166,.20),transparent 70%),#0b1120;color:#f8fafc;padding-block:28px 40px;border-bottom:1px solid #1e293b}
+.ph a{color:#5eead4}
+.ph h1{color:#fff;max-width:900px;margin:0 0 12px}
+.ph p,.ph .muted{color:#cbd5e1!important;font-size:17px;max-width:820px;margin:0}
+.ph .updated{color:#94a3b8!important;font-size:14px;margin-top:8px}
+.crumbs{font-size:14px;margin:0 0 14px;color:#94a3b8}
+.crumbs ol{list-style:none;display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0}
+.crumbs li+li::before{content:"/";margin-inline-end:6px;color:#475569}
+.crumbs a{color:#cbd5e1;text-decoration:none;display:inline-flex;min-height:24px}
+.crumbs a:hover{color:#fff;text-decoration:underline}
+.ph-status{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#5eead4;margin-bottom:10px}
+.ph-status::before{content:"";width:8px;height:8px;border-radius:99px;background:#5eead4}
+/* related + closing band */
+.rel{margin-top:48px}
+.rel h2{font-size:20px;margin:0 0 14px}
+.rel ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:12px}
+.rel a{display:flex;flex-direction:column;gap:4px;height:100%;padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);text-decoration:none;min-height:44px;transition:border-color .15s}
+.rel a:hover{border-color:var(--acc)}
+.rel a strong{color:var(--acc)}
+.rel a span{font-size:14px;color:var(--muted)}
+.cb{margin-top:48px;border-radius:20px;padding:32px 24px;background:radial-gradient(600px 240px at 90% 0%,rgba(20,184,166,.25),transparent 70%),#0b1120;color:#f8fafc;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px}
+.cb h2{color:#fff;margin:0 0 6px;font-size:clamp(20px,3vw,26px)}
+.cb p{margin:0;color:#cbd5e1;max-width:620px}
+.cb .btn{background:#5eead4;color:#0b1120}
 /* footer */
-.sf{border-top:1px solid var(--line);margin-top:32px;padding-block:16px 24px;color:var(--muted);font-size:14px}
-.sf ul{list-style:none;display:flex;flex-wrap:wrap;gap:0 4px;margin:0;padding:0}
-.sf a{display:inline-flex;align-items:center;min-height:44px;min-width:44px;padding-inline:6px;color:var(--muted);text-decoration:none}
-.sf a:hover{color:var(--ink);text-decoration:underline}
+.sf{background:#0b1120;color:#94a3b8;margin-top:56px;padding-block:40px 24px;font-size:14px}
+.sf-top{display:grid;gap:24px;grid-template-columns:1fr}
+@media (min-width:768px){.sf-top{grid-template-columns:1.4fr repeat(4,1fr)}}
+.sf .sh-logo{font-size:18px}
+.sf h2{font-size:14px;color:#f8fafc;margin:0 0 8px}
+.sf ul{list-style:none;margin:0;padding:0}
+.sf a{display:inline-flex;align-items:center;min-height:44px;color:#cbd5e1;text-decoration:none}
+.sf a:hover{color:#fff;text-decoration:underline}
 .sf p{margin:8px 0 0}
+.sf-bottom{border-top:1px solid #1e293b;margin-top:24px;padding-top:12px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
+/* sticky mobile CTA */
+.stk{position:fixed;inset-inline:0;bottom:0;z-index:45;background:var(--bg);border-top:1px solid var(--line);padding:8px 16px;display:none}
+.stk .btn{width:100%}
+@media (max-width:767px){.stk.on{display:block}}
 /* cookie notice */
 .ck{position:fixed;inset-inline:0;bottom:0;z-index:50;background:var(--surface);border-top:1px solid var(--line);font-size:14px}
 .ck .wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:10px}
@@ -138,48 +174,115 @@ input[type=text],input[type=email],input[type=number],select{width:100%;min-heig
         <div class="sh-in">
             <a class="sh-logo" href="{{ $u('/') }}" aria-label="AdsRanger" translate="no"><img src="/brand/adsranger-mark-teal.svg" alt="" width="32" height="32"><span aria-hidden="true">Ads<b>Ranger</b></span></a>
             <nav class="sh-nav" aria-label="{{ $ar ? 'الرئيسية' : 'Main' }}">
-                @foreach ($nav as [$p, $label])
-                    <a href="{{ $u($p) }}" @if ($arPath === $p) aria-current="page" @endif>{{ $label }}</a>
+                @foreach ($menu as $i => $g)
+                    @if (isset($g['path']))
+                        <a href="{{ $u($g['path']) }}" @if ($arPath === $g['path']) aria-current="page" @endif>{{ $g['label'] }}</a>
+                    @else
+                        <div class="mm {{ in_array($arPath, $g['items'], true) ? 'cur' : '' }}">
+                            <button type="button" aria-expanded="false" aria-controls="mm-{{ $i }}">{{ $g['label'] }}<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 4l4 4 4-4"/></svg></button>
+                            <div class="mm-panel" id="mm-{{ $i }}">
+                                @foreach ($g['items'] as $p)
+                                    <a href="{{ $u($p) }}" @if ($arPath === $p) aria-current="page" @endif><strong>{{ $site::name($p, $ar) }}</strong><span>{{ $site::line($p, $ar) }}</span></a>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                 @endforeach
             </nav>
             <div class="sh-end">
                 <a class="sh-ctl" href="{{ $switchUrl }}" lang="{{ $ar ? 'en' : 'ar' }}" hreflang="{{ $ar ? 'en' : 'ar' }}">{{ $ar ? 'English' : 'العربية' }}</a>
                 <button type="button" class="sh-ctl hide-sm" data-theme-toggle aria-pressed="false" aria-label="{{ $ar ? 'الوضع الداكن' : 'Dark mode' }}" title="{{ $ar ? 'الوضع الداكن' : 'Dark mode' }}"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
                 <a class="sh-ctl hide-sm" href="/app/login">{{ $ar ? 'تسجيل الدخول' : 'Sign in' }}</a>
-                <a class="btn hide-sm" href="{{ $u('/waitlist') }}">{{ $waitlistLabel }}</a>
+                <a class="btn hide-sm" href="{{ $u('/waitlist') }}" data-cta="waitlist" data-pos="header">{{ $waitlistLabel }}</a>
                 <button type="button" class="sh-ctl sh-menu" id="sh-menu" aria-expanded="false" aria-controls="sh-panel"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>&nbsp;{{ $ar ? 'القائمة' : 'Menu' }}</button>
             </div>
         </div>
-        <div class="sh-panel" id="sh-panel">
+    </div>
+    <div class="sh-panel" id="sh-panel">
+        <div class="wrap">
             <nav aria-label="{{ $ar ? 'القائمة' : 'Menu' }}">
-                @foreach ($nav as [$p, $label])
-                    <a href="{{ $u($p) }}" @if ($arPath === $p) aria-current="page" @endif>{{ $label }}</a>
+                @foreach ($menu as $g)
+                    @if (isset($g['path']))
+                        <a href="{{ $u($g['path']) }}" @if ($arPath === $g['path']) aria-current="page" @endif>{{ $g['label'] }}</a>
+                    @else
+                        <details @if (in_array($arPath, $g['items'], true)) open @endif>
+                            <summary>{{ $g['label'] }}</summary>
+                            @foreach ($g['items'] as $p)
+                                <a href="{{ $u($p) }}" @if ($arPath === $p) aria-current="page" @endif>{{ $site::name($p, $ar) }}</a>
+                            @endforeach
+                        </details>
+                    @endif
                 @endforeach
                 <a href="/app/login">{{ $ar ? 'تسجيل الدخول' : 'Sign in' }}</a>
                 <button type="button" class="sh-ctl" data-theme-toggle aria-pressed="false">{{ $ar ? 'الوضع الداكن' : 'Dark mode' }}</button>
-                <a class="btn" href="{{ $u('/waitlist') }}">{{ $waitlistLabel }}</a>
+                <a class="btn" href="{{ $u('/waitlist') }}" data-cta="waitlist" data-pos="menu">{{ $waitlistLabel }}</a>
             </nav>
         </div>
     </div>
 </header>
 <main id="main" tabindex="-1">
+    @hasSection('hero')
+        <div class="ph">
+            <div class="wrap">
+                <nav class="crumbs" aria-label="{{ $ar ? 'مسار الصفحة' : 'Breadcrumb' }}"><ol>
+                    <li><a href="{{ $u('/') }}">{{ $site::name('/', $ar) }}</a></li>
+                    <li aria-current="page">{{ $crumb }}</li>
+                </ol></nav>
+                @yield('hero')
+            </div>
+        </div>
+    @endif
+    @yield('top')
     <div class="wrap">
         @yield('content')
+        @if ($related)
+            <section class="rel" aria-labelledby="rel-h">
+                <h2 id="rel-h">{{ $ar ? 'صفحات ذات صلة' : 'Related pages' }}</h2>
+                <ul>
+                    @foreach ($related as $p)
+                        <li><a href="{{ $u($p) }}"><strong>{{ $site::name($p, $ar) }}</strong><span>{{ $site::line($p, $ar) }}</span></a></li>
+                    @endforeach
+                </ul>
+            </section>
+        @endif
+        @if ($closing)
+            <section class="cb" aria-labelledby="cb-h">
+                <div>
+                    <h2 id="cb-h">{{ $ar ? 'كن أول من يعرف عند الإطلاق' : 'Be the first to know at launch' }}</h2>
+                    <p>{{ $ar ? 'اترك بريدك واسم وكالتك ودولتك، وسنراسلك عند الإطلاق في 2027.' : 'Leave your email, agency name and country, and we\'ll email you at launch in 2027.' }}</p>
+                </div>
+                <a class="btn" href="{{ $u('/waitlist') }}?type=agency" data-cta="waitlist" data-pos="closing">{{ $waitlistLabel }}</a>
+            </section>
+        @endif
     </div>
 </main>
 <footer class="sf">
     <div class="wrap">
-        <nav aria-label="{{ $ar ? 'روابط الموقع' : 'Site links' }}">
-            <ul>
-                @foreach ($footerLinks as [$p, $label])
-                    <li><a href="{{ $u($p) }}">{{ $label }}</a></li>
-                @endforeach
-            </ul>
-        </nav>
-        <p>{!! $ar ? '<bdi dir="ltr">AdsRanger</bdi> قيد التطوير، والإطلاق في 2027.' : 'AdsRanger is in development and launching in 2027.' !!}</p>
-        <p>© 2026 <bdi dir="ltr">AdsRanger</bdi> · {{ $ar ? 'عمّان' : 'Amman' }}</p>
+        <div class="sf-top">
+            <div>
+                <a class="sh-logo" href="{{ $u('/') }}" aria-label="AdsRanger" translate="no"><img src="/brand/adsranger-mark-teal.svg" alt="" width="28" height="28"><span aria-hidden="true">Ads<b>Ranger</b></span></a>
+                <p>{!! $ar ? 'منصة عربية أولًا لإدارة إعلانات الوكالات وتقاريرها. ما زالت <bdi dir="ltr">AdsRanger</bdi> قيد التطوير، والإطلاق في 2027.' : 'An Arabic-first platform for managing and reporting agencies\' ads. AdsRanger is still in development and launching in 2027.' !!}</p>
+            </div>
+            @foreach ($site::footer($ar) as $ci => [$heading, $paths])
+                <nav aria-labelledby="sf-h{{ $ci }}">
+                    <h2 id="sf-h{{ $ci }}">{{ $heading }}</h2>
+                    <ul>
+                        @foreach ($paths as $p)
+                            <li><a href="{{ $u($p) }}">{{ $site::name($p, $ar) }}</a></li>
+                        @endforeach
+                    </ul>
+                </nav>
+            @endforeach
+        </div>
+        <div class="sf-bottom">
+            <span>© 2026 <bdi dir="ltr">AdsRanger</bdi> · {{ $ar ? 'عمّان، الأردن' : 'Amman, Jordan' }}</span>
+            <a href="mailto:support@adsranger.com"><bdi dir="ltr">support@adsranger.com</bdi></a>
+        </div>
     </div>
 </footer>
+@if ($sticky)
+<div class="stk" id="ar-sticky"><a class="btn" href="{{ $u('/waitlist') }}?type=agency" data-cta="waitlist" data-pos="sticky">{{ $waitlistLabel }}</a></div>
+@endif
 <div class="ck" id="ar-cookie-banner" role="region" aria-label="{{ $ar ? 'إشعار ملفات تعريف الارتباط' : 'Cookie notice' }}" hidden>
     <div class="wrap">
         <p>{!! $ar ? 'نستخدم ملفات تعريف الارتباط الأساسية فقط لتشغيل الجلسات وحفظ اللغة والأمان، دون أي أدوات تتبّع إعلانية. راجع <a href="/privacy">سياسة الخصوصية</a>.' : 'We only use essential cookies for sign-in sessions, language and security, with no third-party ad trackers. See our <a href="/en/privacy">privacy policy</a>.' !!}</p>
@@ -191,6 +294,11 @@ input[type=text],input[type=email],input[type=number],select{width:100%;min-heig
   var h=document.getElementById('sh'),m=document.getElementById('sh-menu');
   if(m){m.addEventListener('click',function(){var o=h.classList.toggle('open');m.setAttribute('aria-expanded',o?'true':'false');});
     document.addEventListener('keydown',function(e){if(e.key==='Escape'&&h.classList.contains('open')){h.classList.remove('open');m.setAttribute('aria-expanded','false');m.focus();}});}
+  var groups=document.querySelectorAll('.mm>button');
+  function closeAll(except){groups.forEach(function(b){if(b!==except){b.setAttribute('aria-expanded','false');}});}
+  groups.forEach(function(b){b.addEventListener('click',function(e){e.stopPropagation();var o=b.getAttribute('aria-expanded')==='true';closeAll(b);b.setAttribute('aria-expanded',o?'false':'true');});});
+  document.addEventListener('click',function(e){if(!e.target.closest('.mm')){closeAll();}});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){var open=document.querySelector('.mm>button[aria-expanded=true]');if(open){open.setAttribute('aria-expanded','false');open.focus();}}});
   var root=document.documentElement;
   function isDark(){var t=root.getAttribute('data-theme');return t?t==='dark':window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;}
   function sync(){var d=isDark();document.querySelectorAll('[data-theme-toggle]').forEach(function(b){b.setAttribute('aria-pressed',d?'true':'false');});}
@@ -199,7 +307,11 @@ input[type=text],input[type=email],input[type=number],select{width:100%;min-heig
   var ck=document.getElementById('ar-cookie-banner');
   if(ck&&document.cookie.indexOf('ar_cookie_ok=1')===-1){ck.hidden=false;document.body.style.paddingBottom=ck.offsetHeight+'px';}
   var ok=document.getElementById('ar-cookie-accept');
-  if(ok){ok.addEventListener('click',function(){document.cookie='ar_cookie_ok=1; Max-Age=15552000; Path=/; SameSite=Lax';ck.hidden=true;document.body.style.paddingBottom='';});}
+  var stk=document.getElementById('ar-sticky'),cb=document.querySelector('.cb,.hp-close'),hero=document.querySelector('.ph,.hp-hero');
+  function stkSync(){if(!stk){return;}var cookieShown=ck&&!ck.hidden,past=hero?hero.getBoundingClientRect().bottom<0:true,atEnd=cb?cb.getBoundingClientRect().top<window.innerHeight:false;var on=!cookieShown&&past&&!atEnd;stk.classList.toggle('on',on);document.body.style.paddingBottom=cookieShown?ck.offsetHeight+'px':(on||past?'64px':'');}
+  if(stk&&window.matchMedia('(max-width:767px)').matches){window.addEventListener('scroll',stkSync,{passive:true});stkSync();}
+  if(ok){ok.addEventListener('click',function(){document.cookie='ar_cookie_ok=1; Max-Age=15552000; Path=/; SameSite=Lax';ck.hidden=true;document.body.style.paddingBottom='';stkSync();});}
+  document.addEventListener('click',function(e){var a=e.target.closest('[data-cta]');if(a&&window.gtag){window.gtag('event','cta_click',{cta:a.getAttribute('data-cta'),position:a.getAttribute('data-pos')});}});
 })();
 </script>
 @stack('scripts')

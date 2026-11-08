@@ -39,12 +39,15 @@ $sections[2][1] = $ar
 </style>
 @endpush
 
+@section('hero')
+<h1>{{ $ar ? 'كيف نحمي بيانات وكالتك وعملائك' : 'How we protect your agency and client data' }}</h1>
+<p class="muted" style="font-size:17px">{!! $ar
+? 'ما زالت <bdi dir="ltr">AdsRanger</bdi> قيد التطوير، وهذه وسائل الحماية المبنية فيها اليوم.'
+: 'AdsRanger is in development. These are the safeguards built into it today.' !!}</p>
+@endsection
+
 @section('content')
 <section class="sec">
-    <h1>{{ $ar ? 'كيف نحمي بيانات وكالتك وعملائك' : 'How we protect your agency and client data' }}</h1>
-    <p class="muted" style="font-size:17px">{!! $ar
-        ? '<bdi dir="ltr">AdsRanger</bdi> قيد التطوير، وهذه وسائل الحماية المبنية فيه اليوم.'
-        : 'AdsRanger is in development. These are the safeguards built into it today.' !!}</p>
     <div class="sec-grid">
         @foreach ($sections as $i => [$heading, $body])
             <div class="card">

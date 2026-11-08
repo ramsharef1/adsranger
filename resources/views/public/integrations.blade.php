@@ -31,13 +31,14 @@ $later = ['Apple Ads', 'Amazon Ads', 'Pinterest', 'Reddit', 'Taboola', 'Outbrain
 </style>
 @endpush
 
+@section('hero')
+<h1>{{ $ar ? 'المنصات الإعلانية التي نخطط لربطها' : 'The ad platforms we plan to connect' }}</h1>
+<p class="muted" style="font-size:17px">{{ $ar
+? 'هذه التكاملات قيد التطوير: لا يُفتح أي منها للوكالات بعد، وكل تكامل يُفتح بعد موافقة المنصة على تطبيقنا. نستخدم الواجهات الرسمية بصلاحية قراءة فقط.'
+: 'These integrations are in development: none is open to agencies yet, and each one opens after the platform approves our app. We use each platform\'s official API with read-only access.' }}</p>
+@endsection
+
 @section('content')
-<section style="padding-top:24px;max-width:820px">
-    <h1>{{ $ar ? 'المنصات الإعلانية التي نخطط لربطها' : 'The ad platforms we plan to connect' }}</h1>
-    <p class="muted" style="font-size:17px">{{ $ar
-        ? 'هذه التكاملات قيد التطوير: لا يُفتح أي منها للوكالات بعد، وكل تكامل يُفتح بعد موافقة المنصة على تطبيقنا. نستخدم الواجهات الرسمية بصلاحية قراءة فقط.'
-        : 'These integrations are in development: none is open to agencies yet, and each one opens after the platform approves our app. We use each platform\'s official API with read-only access.' }}</p>
-</section>
 
 <section aria-labelledby="h-first">
     <h2 id="h-first">{{ $ar ? 'المرحلة الأولى' : 'First stage' }}</h2>

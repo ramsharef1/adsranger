@@ -32,10 +32,13 @@
 </style>
 @endpush
 
+@section('hero')
+<h1>{{ $heading }}</h1>
+<p class="updated">{{ $updated }}</p>
+@endsection
+
 @section('content')
 <article class="legal">
-    <h1>{{ $heading }}</h1>
-    <p class="updated">{{ $updated }}</p>
     @include('legal.'.$page.'-'.$lang)
 </article>
 @endsection

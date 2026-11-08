@@ -35,10 +35,13 @@ $tools = [[$u('/tools/ramadan-budget-calculator'), $ar ? 'حاسبة ميزان�
 </style>
 @endpush
 
+@section('hero')
+<h1>{{ $ar ? 'أدِر إعلانات مشروعك بنفسك' : 'Run your own business\'s ads' }}</h1>
+<p class="muted" style="font-size:17px">{{ $ar ? 'إعلاناتك على المنصات الإعلانية التي تستخدمها، في عرض عربي واحد.' : 'Your own ads, on the ad platforms you use, in one Arabic view.' }}</p>
+@endsection
+
 @section('content')
 <section class="bo">
-    <h1>{{ $ar ? 'أدِر إعلانات مشروعك بنفسك' : 'Run your own business\'s ads' }}</h1>
-    <p class="muted" style="font-size:17px">{{ $ar ? 'إعلاناتك على المنصات الإعلانية التي تستخدمها، في عرض عربي واحد.' : 'Your own ads, on the ad platforms you use, in one Arabic view.' }}</p>
 
     <ul class="dots">
         <li>{{ $ar ? 'كل منصة تحسب النتائج بطريقتها.' : 'Each platform reports results its own way.' }}</li>
