@@ -6,7 +6,7 @@ $arPath = '/ramadan-2027';
 $title = $ar ? 'دليل إعلانات رمضان 2027 لوكالات الإعلان | AdsRanger' : 'Ramadan 2027 Advertising Guide for Agencies | AdsRanger';
 $meta = $ar
     ? 'يُتوقع أن يبدأ رمضان 2027 في 8 فبراير. خطة مرحلة بمرحلة لوكالات الإعلان: مواعيد التحضير، والميزانية، والتصاميم الإعلانية، والتقارير عبر المنصات.'
-    : 'Ramadan 2027 is expected to start on 8 February. A phase-by-phase plan for agencies: prep dates, budget pacing, creative, and reporting across networks.';
+    : 'Ramadan 2027 is expected to start on 8 February. A phase-by-phase plan for agencies: prep dates, budget pacing, creative, and reporting across ad platforms.';
 $h1 = $ar ? 'رمضان 2027: خطة الإعلانات لوكالات الإعلان' : 'Ramadan 2027: the advertising plan for agencies';
 $ogType = 'article';
 $body = view('public.partials.ramadan-2027-'.$lang)->render();

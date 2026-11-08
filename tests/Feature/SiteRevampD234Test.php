@@ -39,6 +39,13 @@ class SiteRevampD234Test extends TestCase
         $this->assertSame(collect($occ)->pluck('date')->sort()->values()->all(), collect($occ)->pluck('date')->all());
     }
 
+    public function test_waitlist_and_ramadan_copy_fixes_w7_to_w10(): void
+    {
+        $this->get('/waitlist')->assertSee('ما زالت <bdi dir="ltr">AdsRanger</bdi> قيد التطوير', false)->assertDontSee('الحقول المعلَّمة بـ * مطلوبة.');
+        $this->get('/en/waitlist')->assertSee('the ad platforms you run')->assertDontSee('Fields marked * are required.');
+        $this->get('/en/ramadan-2027')->assertSee('reporting across ad platforms.')->assertDontSee('across networks');
+    }
+
     public function test_home_occasions_show_ad_seasons_only(): void
     {
         $this->assertSame(['C5', 'A2', 'B1'], collect(PublicSite::nextOccasions(3, '2026-11-08'))->pluck('id')->all());

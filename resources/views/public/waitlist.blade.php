@@ -8,7 +8,7 @@ $t = $ar ? [
     'meta' => 'اترك بريدك واسم وكالتك أو شركتك ودولتك، وسنراسلك عند إطلاق AdsRanger، مساحة العمل العربية أولًا لوكالات المنطقة، في 2027.',
     'switch_url' => '/en/waitlist',
     'h1' => 'انضم إلى قائمة انتظار <bdi dir="ltr">AdsRanger</bdi>',
-    'lead' => '<bdi dir="ltr">AdsRanger</bdi> قيد التطوير، والإطلاق في 2027. اترك بياناتك وسنراسلك عند الإطلاق. لا رسائل مزعجة، ويمكنك مغادرة القائمة في أي وقت.',
+    'lead' => 'ما زالت <bdi dir="ltr">AdsRanger</bdi> قيد التطوير، والإطلاق في 2027. اترك بياناتك وسنراسلك عند الإطلاق. لا رسائل مزعجة، ويمكنك مغادرة القائمة في أي وقت.',
     'saved_h' => 'شكرًا، سجّلنا بياناتك',
     'saved_p' => 'حفظنا بياناتك. قبل أن نرسل إليك أي أخبار، سنراسلك مرة واحدة لتأكيد بريدك.',
     'errors_h' => 'راجع الحقول التالية:',
@@ -57,7 +57,7 @@ $t = $ar ? [
     'policy' => 'Privacy policy',
     'new_tab' => '(opens in a new tab)',
     'submit' => 'Join the waitlist',
-    'privacy_line' => 'We use your email, company name and country only to tell you about AdsRanger\'s launch. Name, spend range, the networks you run and "You are…" are optional; they help us invite the right people first. We don\'t share this with anyone, and you can unsubscribe or ask us to delete it at any time.',
+    'privacy_line' => 'We use your email, company name and country only to tell you about AdsRanger\'s launch. Name, spend range, the ad platforms you run and "You are…" are optional; they help us invite the right people first. We don\'t share this with anyone, and you can unsubscribe or ask us to delete it at any time.',
     'privacy_link' => 'See our privacy policy.',
 ];
 $networkLabels = ['meta' => 'Meta', 'google' => 'Google Ads', 'tiktok' => 'TikTok', 'snapchat' => 'Snapchat', 'microsoft' => 'Microsoft Advertising', 'linkedin' => 'LinkedIn', 'x' => 'X', 'other' => null];
@@ -115,7 +115,6 @@ $schema = [['@type' => 'WebPage', 'name' => $t['title'], 'url' => $self, 'inLang
             <input id="wl-website" name="website" type="text" tabindex="-1" autocomplete="off" value="">
         </div>
 
-        <p class="muted" style="margin:0">{{ $ar ? 'الحقول المعلَّمة بـ * مطلوبة.' : 'Fields marked * are required.' }}</p>
         <label for="wl-email">{{ $t['email'] }} *</label>
         <input id="wl-email" name="email" type="email" inputmode="email" autocomplete="email" dir="ltr" required maxlength="190" placeholder="name@agency.com" value="{{ old('email') }}" @error('email') aria-invalid="true" aria-describedby="wl-email-err" @enderror>
         @error('email')<div class="err" id="wl-email-err">{{ $message }}</div>@enderror
