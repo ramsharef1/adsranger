@@ -37,6 +37,7 @@
 </tr>
 </tbody>
 </table></div>
+<p>For the region's other 2027 seasons, see the <a href="/en/mena-calendar">Seasons calendar</a>.</p>
 <h2>Phase 1: preparation (11 January – 7 February)</h2>
 <p>Planning starts before the month. Google reports that one in five people in the region start preparing three to four weeks before Ramadan (<a href="https://business.google.com/en-all/think/consumer-insights/ramadan-2024-retail-marketing-tips/" rel="noopener">Google</a>). For agencies, this is the busiest working window:
 - Agree budgets per phase with every client, not one monthly number. To test a budget, use the <a href="/en/tools/ramadan-budget-calculator">Ramadan budget calculator</a>.

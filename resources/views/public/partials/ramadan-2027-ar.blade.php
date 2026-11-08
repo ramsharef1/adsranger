@@ -37,6 +37,7 @@
 </tr>
 </tbody>
 </table></div>
+<p>لباقي مواسم 2027 في المنطقة، راجع <a href="/mena-calendar">تقويم المواسم</a>.</p>
 <h2>المرحلة الأولى: التحضير (11 يناير – 7 فبراير)</h2>
 <p>يبدأ التخطيط قبل الشهر. تشير <bdi dir="ltr">Google</bdi> إلى أن شخصًا من كل خمسة في المنطقة يبدأ الاستعداد قبل رمضان بثلاثة إلى أربعة أسابيع (<a href="https://business.google.com/en-all/think/consumer-insights/ramadan-2024-retail-marketing-tips/" rel="noopener"><bdi dir="ltr">Google</bdi></a>). وهذه أكثر فترات العمل ازدحامًا للوكالات:
 - اتفق مع كل عميل على ميزانية لكل مرحلة، لا على رقم شهري واحد. ولتجربة ميزانية، استخدم <a href="/tools/ramadan-budget-calculator">حاسبة ميزانية رمضان</a>.

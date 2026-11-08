@@ -1,6 +1,6 @@
 # ADSR-040 Website & SEO (public adsranger.com)
 
-Owner: master (engine) · Updated 2026-11-07 23:22 (site sections + URL decisions D-150, D-176, D-192, D-202, D-204, D-209…D-212) · Renumbered from ADSR-030_Website_SEO (old copy in `claude/archive/`).
+Owner: master (engine) · Updated 2026-11-08 02:54 (byline D-226, go-live D-216, /about /contact /partners + hub live in cl50); earlier 2026-11-07 23:22 (site sections + URL decisions D-150, D-176, D-192, D-202, D-204, D-209…D-212) · Renumbered from ADSR-030_Website_SEO (old copy in `claude/archive/`).
 Full living plan: https://claude.ai/artifact/GxpwwLCxgK7WKquupRzbfB (goals, URL rules, site tree, 14 keyword clusters, content hub, linking, technical SEO, build order).
 
 ## Decided (Rami, 2026-11-04 — see ADSR-002)
@@ -27,6 +27,9 @@ Product (/features, /studio, /reports, /organic, /search, /ai, /pricing, /demo-r
 - **D-204** No GA4 page; GA4 is covered in the guides and the /integrations hub line.
 - **D-202** /demo-report is indexed. **D-211** /for-clients is indexed with **no target query** (its title must not chase "client ad report").
 - **D-212** Phase 1 site build = P-5…P-10 + A-1…A-7; P-11…P-25 stay proposed until M-3.
+- **D-226** Byline on every article = **«فريق AdsRanger» / "AdsRanger team"**, `Article.author` = `Organization` AdsRanger; no personal name on the public site (replaces D-41's byline and the D-09 author page plan; outreach emails may still be signed by Rami).
+- **D-227** AdsRanger is **feminine** in Arabic («تحمي / تخطط / تُطلق AdsRanger»).
+- **D-216 / D-219 / D-213** /about, /contact, /partners and /solutions/business-owners are built (cl50) and in the sitemap; **go-live has no fixed date: noindex lifts when Website + experience sign off** (replaces the 17–30 Nov target as a deadline).
 - English URLs: `/en/` for the English home only (301 from `/en`, R-14); every other English URL has no trailing slash (e.g. `/en/ramadan-2027`).
 
 ## Build order
@@ -123,7 +126,7 @@ Sitemap: https://adsranger.com/sitemap.xml
 
 **8. Structured data**
 - Home: `Organization` (name AdsRanger / أدز رينجر, url, logo; `sameAs` added once Business reserves the @adsranger handles) + `WebSite`.
-- Author page: held (D-41). The Ramadan page's `Article.author` = `Person` "Rami Alsharef" with `sameAs` LinkedIn, no `url`.
+- Author page: dropped (D-55). Every `Article.author` = `Organization` AdsRanger, byline «فريق AdsRanger» / "AdsRanger team" (D-226; replaces the earlier Person author).
 - No `Product`, `Offer`, `Review` or `AggregateRating` before launch (D-07).
 
 **9. Acceptance checks (engine runs before calling Phase 1 LIVE)**

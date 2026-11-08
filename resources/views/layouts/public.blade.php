@@ -56,7 +56,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/brand/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700{{ $ar ? '' : '&family=IBM+Plex+Sans:wght@400;600;700' }}&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700{{ $ar ? '' : '&family=IBM+Plex+Sans:wght@400;600;700' }}&display=optional" rel="stylesheet">
 @foreach ($schema as $block)
 <script type="application/ld+json">{!! json_encode(['@'.'context' => 'https://schema.org'] + $block, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
 @endforeach

@@ -31,12 +31,12 @@ $holds = $ar ? [
 
 @section('content')
 <section class="ab">
-    <h1>{{ $ar ? 'نبنيه في عمّان لمعلني المنطقة' : 'Built in Amman for the region\'s advertisers' }}</h1>
+    <h1>{{ $ar ? 'نبنيها في عمّان لمعلني المنطقة' : 'Built in Amman for the region\'s advertisers' }}</h1>
     <p class="muted" style="font-size:17px">{!! $ar
-        ? '<bdi dir="ltr">AdsRanger</bdi> مساحة عمل إعلانية عربية أولًا للوكالات والمستقلين والشركات في الشرق الأوسط وشمال أفريقيا، وهي قيد التطوير والإطلاق في 2027.'
+        ? 'تُعدّ <bdi dir="ltr">AdsRanger</bdi> مساحة عمل إعلانية عربية أولًا للوكالات والمستقلين والشركات في الشرق الأوسط وشمال أفريقيا، وهي قيد التطوير، والإطلاق في 2027.'
         : 'AdsRanger is an Arabic-first advertising workspace for agencies, freelancers and businesses across the Middle East and North Africa. It is in development and launching in 2027.' !!}</p>
 
-    <h2>{{ $ar ? 'لماذا نبنيه' : 'Why we\'re building it' }}</h2>
+    <h2>{{ $ar ? 'لماذا نبنيها' : 'Why we\'re building it' }}</h2>
     <p>{{ $ar
         ? 'تدير الفرق في المنطقة إعلاناتها على منصات كثيرة، وترسل التقارير لعملائها بلغتين، وتخطط حول رمضان والتقويم الهجري، بينما لم تُبنَ معظم الأدوات لشيء من ذلك.'
         : 'Teams in the region run ads on many platforms, report to clients in two languages and plan around Ramadan and the Hijri calendar. Most tools were built for none of that.' }}</p>

@@ -16,7 +16,7 @@ $ranges = ['1-5' => '1–5', '6-15' => '6–15', '16-40' => '16–40', '40+' => 
 $spend = $ar
     ? ['under_10k' => 'أقل من <bdi dir="ltr">10,000 USD</bdi>', '10k_50k' => '<bdi dir="ltr">10,000–50,000 USD</bdi>', '50k_200k' => '<bdi dir="ltr">50,000–200,000 USD</bdi>', 'over_200k' => 'أكثر من <bdi dir="ltr">200,000 USD</bdi>']
     : ['under_10k' => 'Under 10,000 USD', '10k_50k' => '10,000–50,000 USD', '50k_200k' => '50,000–200,000 USD', 'over_200k' => 'Over 200,000 USD'];
-$networks = ['meta' => 'Meta', 'google' => 'Google', 'tiktok' => 'TikTok', 'snapchat' => 'Snapchat', 'microsoft' => 'Microsoft Advertising', 'linkedin' => 'LinkedIn', 'x' => 'X', 'other' => null];
+$networks = ['meta' => 'Meta', 'google' => 'Google Ads', 'tiktok' => 'TikTok', 'snapchat' => 'Snapchat', 'microsoft' => 'Microsoft Advertising', 'linkedin' => 'LinkedIn', 'x' => 'X', 'other' => null];
 $oldNetworks = (array) old('networks', []);
 $fieldIds = ['email' => 'pa-email', 'agency_name' => 'pa-agency', 'country' => 'pa-country', 'clients_range' => 'pa-clients', 'consent' => 'pa-consent', 'form' => 'pa-email'];
 @endphp
@@ -70,7 +70,6 @@ $fieldIds = ['email' => 'pa-email', 'agency_name' => 'pa-agency', 'country' => '
         <form method="POST" action="{{ $u('/partners') }}" novalidate>
             @csrf
             <div class="hp" aria-hidden="true"><label for="pa-website">Website</label><input id="pa-website" name="website" type="text" tabindex="-1" autocomplete="off" value=""></div>
-            <p class="muted" style="margin:0">{{ $ar ? 'الحقول المعلَّمة بـ * مطلوبة.' : 'Fields marked * are required.' }}</p>
 
             <label for="pa-email">{{ $ar ? 'البريد الإلكتروني للعمل' : 'Work email' }} *</label>
             <input id="pa-email" name="email" type="email" inputmode="email" autocomplete="email" dir="ltr" required maxlength="190" placeholder="name@agency.com" value="{{ old('email') }}" @error('email') aria-invalid="true" aria-describedby="pa-email-err" @enderror>

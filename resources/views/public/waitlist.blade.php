@@ -60,7 +60,7 @@ $t = $ar ? [
     'privacy_line' => 'We use your email, company name and country only to tell you about AdsRanger\'s launch. Name, spend range, the networks you run and "You are…" are optional; they help us invite the right people first. We don\'t share this with anyone, and you can unsubscribe or ask us to delete it at any time.',
     'privacy_link' => 'See our privacy policy.',
 ];
-$networkLabels = ['meta' => 'Meta', 'google' => 'Google', 'tiktok' => 'TikTok', 'snapchat' => 'Snapchat', 'microsoft' => 'Microsoft Advertising', 'linkedin' => 'LinkedIn', 'x' => 'X', 'other' => null];
+$networkLabels = ['meta' => 'Meta', 'google' => 'Google Ads', 'tiktok' => 'TikTok', 'snapchat' => 'Snapchat', 'microsoft' => 'Microsoft Advertising', 'linkedin' => 'LinkedIn', 'x' => 'X', 'other' => null];
 $fieldIds = ['email' => 'wl-email', 'agency_name' => 'wl-agency', 'country' => 'wl-country', 'consent' => 'wl-consent', 'form' => 'wl-email'];
 $oldNetworks = (array) old('networks', []);
 $title = $t['title'];

@@ -21,7 +21,7 @@ class SiteFixesCl50Test extends TestCase
 
     public function test_about_contact_partners_and_hub_render_in_both_languages(): void
     {
-        $this->get('/about')->assertOk()->assertSee('نبنيه في عمّان لمعلني المنطقة')->assertSee('تأسست في 2026')->assertSee('"@type":"AboutPage"', false);
+        $this->get('/about')->assertOk()->assertSee('نبنيها في عمّان لمعلني المنطقة')->assertSee('تأسست في 2026')->assertSee('"@type":"AboutPage"', false);
         $this->get('/en/about')->assertOk()->assertSee('Founded 2026 · Amman, Jordan');
         $this->get('/contact')->assertOk()->assertSee('support@adsranger.com')->assertSee('privacy@adsranger.com')->assertDontSee('WhatsApp')->assertDontSee('<form', false);
         $this->get('/partners')->assertOk()->assertSee('قدّم طلبك')->assertSee('name="clients_range"', false)
