@@ -158,7 +158,8 @@ h3{font-size:18px;margin:0 0 6px}
 .ck{position:fixed;inset-inline:0;bottom:0;z-index:50;background:var(--surface);border-top:1px solid var(--line);font-size:14px}
 .ck .wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:10px}
 .ck p{margin:0;flex:1;min-width:220px}
-@media (max-width:480px){.ck{font-size:13px}.ck .wrap{gap:8px;padding-block:6px}.ck p{min-width:0}.ck .btn{min-height:44px;padding:6px 14px}}
+.ck-short{display:none}
+@media (max-width:480px){.ck{font-size:13px;line-height:1.5}.ck .wrap{flex-wrap:nowrap;gap:8px;padding-block:6px}.ck p{min-width:0}.ck-long{display:none}.ck-short{display:inline}.ck .btn{flex:none;min-height:44px;padding:6px 14px}}
 /* forms */
 label,.lbl{display:block;font-weight:600;margin:16px 0 6px}
 input[type=text],input[type=email],input[type=number],select{width:100%;min-height:48px;padding:10px 12px;border-radius:10px;border:1px solid var(--field);background:var(--bg);color:var(--ink);font:inherit}
@@ -286,7 +287,7 @@ input[type=text],input[type=email],input[type=number],select{width:100%;min-heig
 @endif
 <div class="ck" id="ar-cookie-banner" role="region" aria-label="{{ $ar ? 'إشعار ملفات تعريف الارتباط' : 'Cookie notice' }}" hidden>
     <div class="wrap">
-        <p>{!! $ar ? 'نستخدم ملفات تعريف الارتباط الأساسية فقط لتشغيل الجلسات وحفظ اللغة والأمان، دون أي أدوات تتبّع إعلانية. راجع <a href="/privacy">سياسة الخصوصية</a>.' : 'We only use essential cookies for sign-in sessions, language and security, with no third-party ad trackers. See our <a href="/en/privacy">privacy policy</a>.' !!}</p>
+        <p><span class="ck-long">{!! $ar ? 'نستخدم ملفات تعريف الارتباط الأساسية فقط لتشغيل الجلسات وحفظ اللغة والأمان، دون أي أدوات تتبّع إعلانية. راجع <a href="/privacy">سياسة الخصوصية</a>.' : 'We only use essential cookies for sign-in sessions, language and security, with no third-party ad trackers. See our <a href="/en/privacy">privacy policy</a>.' !!}</span><span class="ck-short">{!! $ar ? 'ملفات تعريف ارتباط أساسية فقط، دون تتبّع إعلاني. <a href="/privacy">الخصوصية</a>' : 'Essential cookies only, no ad trackers. <a href="/en/privacy">Privacy</a>' !!}</span></p>
         <button type="button" class="btn" id="ar-cookie-accept">{{ $ar ? 'حسنًا' : 'Got it' }}</button>
     </div>
 </div>
