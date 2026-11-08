@@ -8,11 +8,11 @@
     ];
 @endphp
 <x-filament-widgets::widget>
-    {{-- /admin overview (E2-025…030, reviewed by E1): real counts only; light + dark via the classes below. --}}
+    {{-- /admin overview (E2-025…031, reviewed by E1): real counts + dynamic SVG donut gauges; light + dark theme aware. --}}
     <style>
-        .ov{display:grid;gap:18px;--ov-card:#fff;--ov-soft:#f8fafc;--ov-line:#e2e8f0;--ov-ink:#0f172a;--ov-muted:#475569;--ov-acc:#0f766e;--ov-track:#e2e8f0}
-        .dark .ov{--ov-card:#111827;--ov-soft:#0b1120;--ov-line:#1e293b;--ov-ink:#f8fafc;--ov-muted:#94a3b8;--ov-acc:#5eead4;--ov-track:#1e293b}
-        .ov-box{background:var(--ov-card);border:1px solid var(--ov-line);border-radius:14px;color:var(--ov-ink)}
+        .ov{display:grid;gap:18px;--ov-card:#fff;--ov-soft:#f8fafc;--ov-line:#e2e8f0;--ov-ink:#0f172a;--ov-muted:#475569;--ov-acc:#0f766e;--ov-cta:#f97316;--ov-track:#e2e8f0}
+        .dark .ov{--ov-card:#111827;--ov-soft:#0b1120;--ov-line:#1e293b;--ov-ink:#f8fafc;--ov-muted:#94a3b8;--ov-acc:#5eead4;--ov-cta:#f97316;--ov-track:#1e293b}
+        .ov-box{background:var(--ov-card);border:1px solid var(--ov-line);border-radius:14px;color:var(--ov-ink);box-shadow:0 2px 10px -2px rgba(15,23,42,.06)}
         .ov-top{padding:18px 22px}
         .ov-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding-bottom:14px;border-bottom:1px solid var(--ov-line)}
         .ov-tag{display:inline-flex;padding:4px 12px;border-radius:6px;background:#0f172a;color:#fff;font-size:12px;font-weight:700;letter-spacing:.03em}
@@ -20,17 +20,20 @@
         .ov-sub{font-size:13px;color:var(--ov-muted)}
         .ov-links{display:flex;flex-wrap:wrap;gap:8px}
         .ov-links a{display:inline-flex;align-items:center;min-height:44px;padding:6px 12px;border-radius:8px;background:var(--ov-soft);border:1px solid var(--ov-line);color:var(--ov-ink);text-decoration:none;font-size:13px;font-weight:600}
-        .ov-links a.ov-main{background:var(--ov-acc);border-color:var(--ov-acc);color:#fff}
-        .dark .ov-links a.ov-main{color:#0b1120}
+        .ov-links a:hover{border-color:var(--ov-acc)}
+        .ov-links a.ov-main{background:var(--ov-cta);border-color:var(--ov-cta);color:#fff;font-weight:700}
         .ov-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:16px;padding-top:16px}
-        .ov-kpi{display:block;padding:14px 16px;border-radius:12px;background:var(--ov-soft);border:1px solid var(--ov-line);text-decoration:none;color:var(--ov-ink)}
-        .ov-lbl{font-size:12px;color:var(--ov-muted);font-weight:700}
+        .ov-kpi{display:flex;flex-direction:column;justify-content:space-between;padding:14px 16px;border-radius:12px;background:var(--ov-soft);border:1px solid var(--ov-line);border-top:3px solid var(--ov-acc);text-decoration:none;color:var(--ov-ink);transition:transform .12s ease}
+        .ov-kpi:hover{transform:translateY(-2px)}
+        .ov-kpi-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+        .ov-lbl{font-size:11.5px;color:var(--ov-muted);font-weight:700;text-transform:uppercase;letter-spacing:.02em}
         .ov-num{font-size:28px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
         .ov-note{font-size:12.5px;color:var(--ov-acc);margin-top:4px;font-weight:700}
         .ov-bar{height:6px;border-radius:99px;background:var(--ov-track);margin-top:8px;overflow:hidden}
         .ov-bar i{display:block;height:100%;background:var(--ov-acc)}
         .ov-pill{padding:2px 8px;border-radius:6px;font-size:12px;font-weight:700}
         .ov-open{background:#dcfce7;color:#166534}.ov-closed{background:#ffedd5;color:#9a3412}
+        .ov-ico{width:38px;height:38px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0}
         .ov-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(310px,100%),1fr));gap:16px}
         .ov-card{overflow:hidden}
         .ov-card-h{padding:10px 16px;background:var(--ov-soft);border-bottom:1px solid var(--ov-line);display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -59,34 +62,58 @@
 
             <div class="ov-kpis">
                 <a class="ov-kpi" href="{{ url('/admin/agencies') }}">
-                    <div class="ov-lbl">{{ __('Agencies') }}</div>
-                    <div class="ov-num">{{ $agenciesTotal }}</div>
-                    <div class="ov-note">{{ __('Active') }}: {{ $agenciesActive }}</div>
-                    <div class="ov-bar" role="img" aria-label="{{ $activePct }}%"><i style="width:{{ $activePct }}%"></i></div>
+                    <div class="ov-kpi-row">
+                        <div>
+                            <div class="ov-lbl">{{ __('Agencies') }}</div>
+                            <div class="ov-num">{{ $agenciesTotal }}</div>
+                            <div class="ov-note">{{ __('Active') }}: {{ $agenciesActive }}</div>
+                        </div>
+                        <svg width="46" height="46" viewBox="0 0 36 36" role="img" aria-label="{{ $activePct }}%">
+                            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--ov-track)" stroke-width="3.8"/>
+                            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--ov-acc)" stroke-width="3.8" stroke-dasharray="{{ $activePct }}, 100" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <div class="ov-bar" aria-hidden="true"><i style="width:{{ $activePct }}%"></i></div>
                 </a>
-                <a class="ov-kpi" href="{{ url('/admin/waitlist') }}">
-                    <div class="ov-lbl">{{ __('Agency waitlist') }}</div>
-                    <div class="ov-num">{{ $waitlistTotal }}</div>
-                    <div class="ov-note">{{ __('Consent') }}: {{ $waitlistConsented }} ({{ $waitlistConsentPct }}%)</div>
-                    <div class="ov-bar" role="img" aria-label="{{ $waitlistConsentPct }}%"><i style="width:{{ $waitlistConsentPct }}%"></i></div>
+
+                <a class="ov-kpi" href="{{ url('/admin/waitlist') }}" style="border-top-color:#10b981">
+                    <div>
+                        <div class="ov-lbl">{{ __('Agency waitlist') }}</div>
+                        <div class="ov-num">{{ $waitlistTotal }}</div>
+                        <div class="ov-note" style="color:#059669">{{ __('Consent') }}: {{ $waitlistConsented }} ({{ $waitlistConsentPct }}%)</div>
+                    </div>
+                    <div class="ov-bar" role="img" aria-label="{{ $waitlistConsentPct }}%"><i style="width:{{ $waitlistConsentPct }}%;background:#10b981"></i></div>
                 </a>
-                <a class="ov-kpi" href="{{ url('/admin/partner-applications') }}">
-                    <div class="ov-lbl">{{ __('Partner applications') }}</div>
-                    <div class="ov-num">{{ $partnersTotal }}</div>
-                    <div class="ov-note"><bdi dir="ltr">/partners</bdi></div>
+
+                <a class="ov-kpi" href="{{ url('/admin/partner-applications') }}" style="border-top-color:#f97316">
+                    <div class="ov-kpi-row">
+                        <div>
+                            <div class="ov-lbl">{{ __('Partner applications') }}</div>
+                            <div class="ov-num">{{ $partnersTotal }}</div>
+                            <div class="ov-note" style="color:#ea580c"><bdi dir="ltr">/partners</bdi></div>
+                        </div>
+                        <span class="ov-ico" style="background:rgba(249,115,22,.14);color:#ea580c" aria-hidden="true">★</span>
+                    </div>
                 </a>
-                <a class="ov-kpi" href="{{ url('/admin/network-requests') }}">
-                    <div class="ov-lbl">{{ __('Network requests') }}</div>
-                    <div class="ov-num">{{ $networkRequestsTotal }}</div>
-                    <div class="ov-note"><bdi dir="ltr">#127</bdi></div>
+
+                <a class="ov-kpi" href="{{ url('/admin/network-requests') }}" style="border-top-color:#0284c7">
+                    <div class="ov-kpi-row">
+                        <div>
+                            <div class="ov-lbl">{{ __('Network requests') }}</div>
+                            <div class="ov-num">{{ $networkRequestsTotal }}</div>
+                            <div class="ov-note" style="color:#0284c7"><bdi dir="ltr">#127</bdi></div>
+                        </div>
+                        <span class="ov-ico" style="background:rgba(2,132,199,.14);color:#0284c7" aria-hidden="true">⇄</span>
+                    </div>
                 </a>
-                <a class="ov-kpi" href="{{ url('/admin/platform-settings') }}">
+
+                <a class="ov-kpi" href="{{ url('/admin/platform-settings') }}" style="border-top-color:#0f172a">
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
                         <span class="ov-lbl">{{ __('Self-signup') }}</span>
                         <span class="ov-pill {{ $signupOpen ? 'ov-open' : 'ov-closed' }}">{{ $signupOpen ? __('Open') : __('Invite only') }}</span>
                     </div>
                     <div class="ov-num" style="font-size:15px;margin-top:10px">{{ __('Held-back modules off') }}: {{ $offModulesCount }}/{{ $totalModulesCount }}</div>
-                    <div class="ov-bar" role="img" aria-label="{{ $offPct }}%"><i style="width:{{ $offPct }}%"></i></div>
+                    <div class="ov-bar" role="img" aria-label="{{ $offPct }}%"><i style="width:{{ $offPct }}%;background:#0f172a"></i></div>
                 </a>
             </div>
         </div>

@@ -1,5 +1,5 @@
 @php
-    // Home: Package G rev 2 (claude/site/pages/home.md) + next-occasions block (D-234). D-139 retired (D-232).
+    // Home: Package G rev 2 + D-241 (Ads + SEO, in development) + High-Contrast Command Canvas Architecture (E2-031)
     $lang = request()->segment(1) === 'en' ? 'en' : 'ar';
     $ar = $lang === 'ar';
     $arPath = '/';
@@ -115,76 +115,94 @@
 
 @push('styles')
 <style>
-.hp-hero{background:radial-gradient(900px 420px at 15% 0%,rgba(20,184,166,.22),transparent 70%),radial-gradient(700px 360px at 95% 30%,rgba(94,234,212,.10),transparent 65%),#0b1120;color:#f8fafc;padding-block:48px 64px;border-bottom:1px solid #1e293b}
-.hp-grid{display:grid;gap:32px;align-items:center}
-@media (min-width:1024px){.hp-grid{grid-template-columns:1.05fr 1fr;gap:48px}}
-.hp-status{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:99px;background:rgba(94,234,212,.10);border:1px solid rgba(94,234,212,.30);color:#5eead4;font-size:13.5px;font-weight:700;margin:0 0 18px}
-.hp-status::before{content:"";width:8px;height:8px;border-radius:99px;background:#5eead4}
-.hp-hero h1{color:#fff;font-size:clamp(32px,4.8vw,52px);line-height:1.2;margin:0 0 16px}
-.hp-hero .lead{color:#cbd5e1;font-size:clamp(16.5px,1.9vw,19px);line-height:1.8;margin:0 0 28px;max-width:640px}
-.hp-ctas{display:flex;flex-wrap:wrap;gap:12px}
-.hp-ctas .btn{min-height:50px;padding-inline:24px;font-size:16px}
-.hp-ctas .btn-main{background:#5eead4;color:#0b1120}
-.hp-ctas .btn-sec{background:transparent;color:#fff;border:1px solid #475569}
-.hp-ctas .btn-sec:hover{background:rgba(255,255,255,.06)}
-/* demo window */
-.dm{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:18px;box-shadow:0 30px 60px -20px rgba(0,0,0,.6);overflow:hidden}
-.dm-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--line);font-size:13px}
-.dm-bar .dots{display:flex;gap:6px}.dm-bar .dots i{width:10px;height:10px;border-radius:99px;background:var(--line)}
-.dm-tag{font-weight:700;color:var(--neu-ink);background:var(--neu-bg);border-radius:6px;padding:2px 8px;font-size:12px}
+/* High-Contrast SaaS Command Hero + Elevated Action Bar + Overlapping Showcase Board */
+.hp-hero{background:radial-gradient(980px 440px at 50% 0%,rgba(109,40,217,.34),transparent 70%),radial-gradient(760px 360px at 85% 20%,rgba(45,212,191,.18),transparent 65%),linear-gradient(180deg,#0b1120 0%,#171538 58%,#0f172a 100%);color:#f8fafc;padding:56px 0 120px;border-bottom:1px solid #1e293b;text-align:center;position:relative}
+.hp-hero-in{max-width:920px;margin:0 auto}
+.hp-status{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:99px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#5eead4;font-size:13.5px;font-weight:700;margin:0 0 20px;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.hp-status::before{content:"";width:8px;height:8px;border-radius:99px;background:#f97316;box-shadow:0 0 10px #f97316}
+.hp-hero h1{color:#ffffff;font-size:clamp(34px,5vw,54px);line-height:1.18;letter-spacing:-.02em;margin:0 auto 18px;max-width:840px}
+.hp-hero .lead{color:#cbd5e1;font-size:clamp(16.5px,2vw,19.5px);line-height:1.8;margin:0 auto 32px;max-width:780px}
+/* Elevated White Command Action Bar */
+.hp-cmdbar{max-width:740px;margin:0 auto 16px;background:#ffffff;border-radius:16px;padding:10px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;box-shadow:0 24px 54px -12px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.2)}
+.hp-cmd-info{display:flex;align-items:center;gap:10px;padding:8px 14px;color:#0f172a;font-size:14.5px;font-weight:700;flex:1;min-width:200px;text-align:start}
+.hp-cmd-dot{width:10px;height:10px;border-radius:99px;background:#0f766e;flex-shrink:0;box-shadow:0 0 0 4px rgba(15,118,110,.16)}
+.hp-ctas{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.hp-ctas .btn{min-height:48px;padding-inline:24px;font-size:15.5px;border-radius:11px;font-weight:700}
+.hp-ctas .btn-main{background:#f97316;color:#ffffff;box-shadow:0 10px 24px -6px rgba(249,115,22,.5)}
+.hp-ctas .btn-main:hover{background:#ea580c;color:#ffffff}
+.hp-ctas .btn-sec{background:#f1f5f9;color:#0f172a;border:1px solid #cbd5e1}
+.hp-ctas .btn-sec:hover{background:#e2e8f0;color:#0f172a}
+/* Overlapping Interactive Product Showcase Board */
+.hp-showcase-wrap{max-width:1160px;margin:-84px auto 0;padding-inline:16px;position:relative;z-index:10}
+.dm{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:20px;box-shadow:0 32px 72px -18px rgba(15,23,42,.42);overflow:hidden;margin:0}
+.dm-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 18px;background:var(--surface);border-bottom:1px solid var(--line);font-size:13px}
+.dm-bar .dots{display:flex;gap:6px}.dm-bar .dots i{width:11px;height:11px;border-radius:99px;background:var(--line)}
+.dm-bar .dots i:nth-child(1){background:#f87171}
+.dm-bar .dots i:nth-child(2){background:#fbbf24}
+.dm-bar .dots i:nth-child(3){background:#34d399}
+.dm-tag{font-weight:700;color:var(--info-ink);background:var(--info-bg);border-radius:99px;padding:3px 12px;font-size:12px}
 .dm fieldset{border:0;margin:0;padding:0;min-width:0}
 .dm legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.dm-tabs{display:flex;flex-wrap:wrap;gap:4px;padding:10px 12px 0;border-bottom:1px solid var(--line)}
+.dm-tabs{display:flex;flex-wrap:wrap;gap:8px;padding:12px 18px;background:var(--surface);border-bottom:1px solid var(--line)}
 .dm-r{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
-.dm-tabs label{display:inline-flex;align-items:center;min-height:44px;padding:8px 10px;margin:0;font-weight:600;font-size:14px;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer}
-.dm-tabs label:hover{color:var(--ink)}
-#dm-t1:checked~.dm-tabs label[for=dm-t1],#dm-t2:checked~.dm-tabs label[for=dm-t2],#dm-t3:checked~.dm-tabs label[for=dm-t3]{color:var(--acc);border-bottom-color:var(--acc)}
-#dm-t1:focus-visible~.dm-tabs label[for=dm-t1],#dm-t2:focus-visible~.dm-tabs label[for=dm-t2],#dm-t3:focus-visible~.dm-tabs label[for=dm-t3]{outline:2px solid var(--acc);outline-offset:-2px;border-radius:6px}
-.dm-p{display:none;padding:16px}
+.dm-tabs label{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 16px;margin:0;font-weight:700;font-size:14px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;cursor:pointer;transition:all .15s ease}
+.dm-tabs label b{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:rgba(249,115,22,.14);color:#ea580c;font-size:11.5px;font-weight:700}
+.dm-tabs label:hover{border-color:var(--acc)}
+#dm-t1:checked~.dm-tabs label[for=dm-t1],#dm-t2:checked~.dm-tabs label[for=dm-t2],#dm-t3:checked~.dm-tabs label[for=dm-t3]{background:#0f172a;color:#ffffff;border-color:#0f172a;box-shadow:0 6px 16px -4px rgba(15,23,42,.25)}
+#dm-t1:checked~.dm-tabs label[for=dm-t1] b,#dm-t2:checked~.dm-tabs label[for=dm-t2] b,#dm-t3:checked~.dm-tabs label[for=dm-t3] b{background:#f97316;color:#ffffff}
+#dm-t1:focus-visible~.dm-tabs label[for=dm-t1],#dm-t2:focus-visible~.dm-tabs label[for=dm-t2],#dm-t3:focus-visible~.dm-tabs label[for=dm-t3]{outline:2px solid var(--acc);outline-offset:2px}
+.dm-p{display:none;padding:24px}
 #dm-t1:checked~.dm-ps .dm-p1,#dm-t2:checked~.dm-ps .dm-p2,#dm-t3:checked~.dm-ps .dm-p3{display:block}
-.dm-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px;font-size:13px;color:var(--muted)}
-.dm-head strong{color:var(--ink);font-size:14px}
-.dm table{width:100%;border-collapse:collapse;font-size:14px}
-.dm th{font-size:12px;color:var(--muted);font-weight:600;text-align:start;padding:6px 4px;border-bottom:1px solid var(--line)}
-.dm td{padding:9px 4px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.dm-board{display:grid;grid-template-columns:1fr;gap:20px;align-items:stretch}
+@media (min-width:900px){.dm-board{grid-template-columns:280px 1fr}}
+.dm-gauge-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;justify-content:space-between;gap:14px}
+.dm-gauge-wrap{display:flex;align-items:center;gap:16px}
+.dm-donut{width:84px;height:84px;flex-shrink:0}
+.dm-main-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px}
+.dm-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:12px;font-size:13px;color:var(--muted)}
+.dm-head strong{color:var(--ink);font-size:15px}
+.dm table{width:100%;border-collapse:collapse;font-size:14px;background:var(--card);border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.dm th{font-size:12px;color:var(--muted);font-weight:700;text-align:start;padding:10px 12px;background:var(--surface);border-bottom:1px solid var(--line)}
+.dm td{padding:11px 12px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;font-weight:600}
 .dm td:not(:first-child),.dm th:not(:first-child){text-align:end}
-.dm-health{display:flex;align-items:center;gap:12px;margin-top:12px;font-size:13px;color:var(--muted)}
-.dm-health b{font-size:22px;color:var(--ink)}
+.dm-health{display:flex;align-items:center;gap:12px;margin-top:8px;font-size:13px;color:var(--muted)}
+.dm-health b{font-size:28px;color:var(--ink);line-height:1}
 .dm-meter{flex:1;height:8px;border-radius:99px;background:var(--neu-bg);overflow:hidden}.dm-meter i{display:block;height:100%;width:78%;background:var(--acc)}
-.dm-al{list-style:none;margin:0;padding:0;display:grid;gap:8px}
-.dm-al li{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-inline-start:4px solid var(--acc);border-radius:10px;font-size:14px}
-.dm-al li.crit{border-inline-start-color:var(--bad)}
+.dm-al{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.dm-al li{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;background:var(--card);border:1px solid var(--line);border-inline-start:4px solid var(--acc);border-radius:10px;font-size:14px}
+.dm-al li.crit{border-inline-start-color:#f97316}
 .dm-al b{white-space:nowrap}
-.dm-rep{list-style:none;margin:0;padding:0;display:grid;gap:8px}
-.dm-rep li{padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px}
-.dm-rep span{display:block;color:var(--muted);font-size:13px}
+.dm-rep{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.dm-rep li{padding:14px 16px;background:var(--card);border:1px solid var(--line);border-top:3px solid var(--acc);border-radius:12px;font-size:14px}
+.dm-rep span{display:block;color:var(--muted);font-size:13px;margin-top:4px}
 /* platforms strip */
-.hp-nets{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;margin-top:36px;padding-top:20px;border-top:1px solid #1e293b;color:#94a3b8;font-size:14px}
-.hp-nets ul{list-style:none;display:flex;flex-wrap:wrap;gap:6px 18px;margin:0;padding:0}
-.hp-nets li{color:#e2e8f0;font-weight:600;white-space:nowrap}
-.hp-nets a{color:#5eead4;display:inline-flex;align-items:center;min-height:44px}
+.hp-nets{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 18px;margin-top:28px;padding:16px 22px;background:var(--surface);border:1px solid var(--line);border-radius:14px;color:var(--muted);font-size:14px}
+.hp-nets ul{list-style:none;display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0}
+.hp-nets li{color:var(--ink);font-weight:700;white-space:nowrap;background:var(--card);border:1px solid var(--line);padding:5px 12px;border-radius:8px;display:inline-flex;align-items:center;gap:6px}
+.hp-nets li::before{content:"";width:7px;height:7px;border-radius:99px;background:#f97316}
+.hp-nets a{color:var(--acc);font-weight:700;display:inline-flex;align-items:center;min-height:44px}
 /* sections */
 .hp-sec{margin-top:64px}
 .hp-sec>h2{font-size:clamp(24px,3.2vw,32px);margin:0 0 8px}
 .hp-sec>.sub{color:var(--muted);margin:0 0 24px;max-width:720px}
-.pa{list-style:none;margin:0;padding:0;display:grid;gap:14px}
-.pa li{display:grid;gap:12px;border:1px solid var(--line);border-radius:16px;padding:18px;background:var(--card)}
-@media (min-width:768px){.pa li{grid-template-columns:1fr 1.6fr;align-items:center;padding:20px 24px}}
-.pa h3{font-size:16px;font-weight:600;color:var(--muted);margin:0}
-.pa h3::before{content:"✕";display:inline-flex;justify-content:center;align-items:center;width:22px;height:22px;margin-inline-end:8px;border-radius:99px;background:var(--neu-bg);color:var(--neu-ink);font-size:11px}
-.pa .ans{border-inline-start:3px solid var(--acc);padding-inline-start:14px}
-.pa .ans strong{display:block;font-size:17px;margin-bottom:4px}
+.pa{list-style:none;margin:0;padding:0;display:grid;gap:16px;counter-reset:pa}
+.pa li{counter-increment:pa;display:grid;gap:14px;border:1px solid var(--line);border-top:3px solid var(--acc);border-radius:16px;padding:20px;background:var(--card);box-shadow:0 6px 20px -8px rgba(15,23,42,.07)}
+@media (min-width:768px){.pa li{grid-template-columns:1fr 1.6fr;align-items:center;padding:22px 26px}}
+.pa h3{font-size:16px;font-weight:600;color:var(--muted);margin:0;display:flex;align-items:center;gap:10px}
+.pa h3::before{content:"0" counter(pa);display:inline-flex;justify-content:center;align-items:center;width:30px;height:30px;flex-shrink:0;border-radius:8px;background:rgba(249,115,22,.14);color:#ea580c;font-size:12.5px;font-weight:700}
+.pa .ans{border-inline-start:3px solid var(--acc);padding-inline-start:16px}
+.pa .ans strong{display:block;font-size:17.5px;margin-bottom:4px}
 .pa .ans p{margin:0;color:var(--muted)}
-.pa .ans a{font-weight:600}
-.more{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr))}
-.more li{border:1px dashed var(--line);border-radius:14px;padding:16px 18px}
-.more h3{font-size:16px;margin:0 0 4px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.pa .ans a{font-weight:700}
+.more{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr))}
+.more li{border:1px solid var(--line);border-inline-start:4px solid #f97316;background:var(--surface);border-radius:14px;padding:18px 20px}
+.more h3{font-size:16.5px;margin:0 0 6px;display:flex;justify-content:space-between;gap:8px;align-items:center}
 .more p{margin:0;color:var(--muted);font-size:14.5px}
 @media (max-width:479px){.more{display:none}}
-.steps{list-style:none;margin:0;padding:0;display:grid;gap:14px;counter-reset:s;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr))}
-.steps li{counter-increment:s;border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--surface)}
-.steps li::before{content:counter(s);display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:10px;background:var(--btn);color:var(--btn-ink);font-weight:700;margin-bottom:12px}
-.steps strong{display:block;font-size:17px;margin-bottom:4px}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:16px;counter-reset:s;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr))}
+.steps li{counter-increment:s;border:1px solid var(--line);border-radius:16px;padding:22px;background:var(--card);box-shadow:0 4px 16px -6px rgba(15,23,42,.06)}
+.steps li::before{content:"0" counter(s);display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:10px;background:#0f172a;color:#5eead4;font-weight:700;margin-bottom:14px}
+.steps strong{display:block;font-size:17.5px;margin-bottom:6px}
 .steps span{color:var(--muted)}
 .two{display:grid;gap:20px}
 @media (min-width:900px){.two{grid-template-columns:1fr 1fr;gap:28px}}
@@ -193,17 +211,17 @@
 .ticks li::before{content:"";position:absolute;inset-inline-start:0;top:.45em;width:18px;height:18px;border-radius:99px;background:var(--info-bg);box-shadow:inset 0 0 0 5px var(--info-bg),inset 0 0 0 9px var(--acc)}
 .ticks strong{display:block}
 .ticks span{color:var(--muted)}
-.occ{border:1px solid var(--line);border-radius:16px;background:var(--card);overflow:hidden}
-.occ h3{margin:0;padding:14px 18px;background:var(--surface);border-bottom:1px solid var(--line);font-size:16px}
+.occ{border:1px solid var(--line);border-radius:16px;background:var(--card);overflow:hidden;box-shadow:0 6px 20px -8px rgba(15,23,42,.07)}
+.occ h3{margin:0;padding:14px 18px;background:#0f172a;color:#fff;border-bottom:1px solid #1e293b;font-size:16px}
 .occ ol{list-style:none;margin:0;padding:0}
 .occ li{display:flex;gap:14px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line)}
 .occ .d{flex:none;width:58px;text-align:center;border-radius:10px;background:var(--info-bg);color:var(--info-ink);padding:6px 0;line-height:1.2}
 .occ .d b{display:block;font-size:20px}.occ .d span{font-size:12px}
 .occ .e strong{display:block}.occ .e span,.occ .e a{font-size:14px}
-.occ .all{display:flex;align-items:center;min-height:48px;padding:0 18px;font-weight:600}
-.trust{list-style:none;margin:0;padding:0;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr))}
-.trust li{border:1px solid var(--line);border-radius:16px;padding:20px;background:var(--card)}
-.trust strong{display:block;font-size:17px;margin-bottom:4px}
+.occ .all{display:flex;align-items:center;min-height:48px;padding:0 18px;font-weight:700}
+.trust{list-style:none;margin:0;padding:0;display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr))}
+.trust li{border:1px solid var(--line);border-top:3px solid #0f172a;border-radius:16px;padding:22px;background:var(--card);box-shadow:0 4px 16px -6px rgba(15,23,42,.06)}
+.trust strong{display:block;font-size:17px;margin-bottom:6px}
 .trust span{color:var(--muted)}
 .faq details{border:1px solid var(--line);border-radius:14px;background:var(--card);margin-bottom:10px}
 .faq summary{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:56px;padding:12px 18px;cursor:pointer;list-style:none}
@@ -215,65 +233,96 @@
 .band{margin-top:64px;border-radius:20px;padding:28px 24px;border:1px solid var(--line);background:var(--surface);display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
 .band h2{margin:0 0 6px;font-size:clamp(20px,3vw,26px)}
 .band p{margin:0;color:var(--muted);max-width:640px}
-.hp-close{margin-top:24px;border-radius:20px;padding:36px 24px;background:radial-gradient(600px 240px at 90% 0%,rgba(20,184,166,.25),transparent 70%),#0b1120;color:#f8fafc;text-align:center}
+.hp-close{margin-top:24px;border-radius:20px;padding:42px 24px;background:radial-gradient(700px 280px at 50% 0%,rgba(109,40,217,.28),transparent 70%),linear-gradient(180deg,#0b1120 0%,#171538 100%);color:#f8fafc;text-align:center;border:1px solid #1e293b}
 .hp-close h2{color:#fff;margin:0 0 8px;font-size:clamp(22px,3.4vw,30px)}
-.hp-close p{color:#cbd5e1;margin:0 auto 20px;max-width:620px}
-.hp-close .btn{background:#5eead4;color:#0b1120;min-height:50px;padding-inline:26px}
+.hp-close p{color:#cbd5e1;margin:0 auto 22px;max-width:620px}
+.hp-close .btn{background:#f97316;color:#ffffff;min-height:50px;padding-inline:28px;font-weight:700;box-shadow:0 12px 28px -6px rgba(249,115,22,.5);border-radius:12px}
+.hp-close .btn:hover{background:#ea580c}
 </style>
 @endpush
 
 @section('top')
 <section class="hp-hero" aria-labelledby="hp-h1">
-    <div class="wrap hp-grid">
-        <div>
-            <p class="hp-status">{{ $ar ? 'قيد التطوير · الإطلاق في 2027' : 'In development · launching 2027' }}</p>
-            <h1 id="hp-h1">{{ $ar ? 'اعرف ما تحققه إعلانات كل عميل وظهوره في البحث، قبل أن يسألك' : 'Know what every client\'s ads and search visibility achieve, before they ask' }}</h1>
-            <p class="lead">{{ $ar
-                ? 'منصة عربية أولًا لإدارة إعلانات الوكالات وظهور عملائها في البحث: تحسب نتيجة كل حملة حسب هدفها، وتنبّهك كل صباح إلى الهدر، وتجهّز تقارير يفهمها عملاؤك بالعربية أو الإنجليزية. وأدوات البحث قيد التطوير أيضًا.'
-                : 'An Arabic-first platform for agencies\' ads and their clients\' search visibility: it counts each campaign\'s result by its goal, flags wasted spend every morning, and prepares reports your clients understand, in Arabic or English. Search tools are in development too.' }}</p>
-            <div class="hp-ctas">
-                <a class="btn btn-main" href="{{ $u('/waitlist') }}?type=agency" data-cta="waitlist" data-pos="hero">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a>
-                <a class="btn btn-sec" href="{{ $u('/demo-report') }}" data-cta="sample_report" data-pos="hero">{{ $ar ? 'شاهد تقريرًا تجريبيًا' : 'See a sample report' }}</a>
-            </div>
-        </div>
+    <div class="wrap hp-hero-in">
+        <p class="hp-status">{{ $ar ? 'قيد التطوير · الإطلاق في 2027' : 'In development · launching 2027' }}</p>
+        <h1 id="hp-h1">{{ $ar ? 'اعرف ما تحققه إعلانات كل عميل وظهوره في البحث، قبل أن يسألك' : 'Know what every client\'s ads and search visibility achieve, before they ask' }}</h1>
+        <p class="lead">{{ $ar
+            ? 'منصة عربية أولًا لإدارة إعلانات الوكالات وظهور عملائها في البحث: تحسب نتيجة كل حملة حسب هدفها، وتنبّهك كل صباح إلى الهدر، وتجهّز تقارير يفهمها عملاؤك بالعربية أو الإنجليزية. وأدوات البحث قيد التطوير أيضًا.'
+            : 'An Arabic-first platform for agencies\' ads and their clients\' search visibility: it counts each campaign\'s result by its goal, flags wasted spend every morning, and prepares reports your clients understand, in Arabic or English. Search tools are in development too.' }}</p>
 
-        <figure class="dm" style="margin:0" aria-label="{{ $demo['alt'] }}">
-            <div class="dm-bar"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="dm-tag">{{ $demo['sample'] }}</span></div>
-            <fieldset>
-                <legend>{{ $demo['alt'] }}</legend>
-                @foreach ([1, 2, 3] as $n)<input class="dm-r" type="radio" name="dm" id="dm-t{{ $n }}" @checked($n === 1)>@endforeach
-                <div class="dm-tabs">
-                    @foreach ($demo['tabs'] as $i => $tab)<label for="dm-t{{ $i + 1 }}">{{ $tab }}</label>@endforeach
-                </div>
-                <div class="dm-ps">
-                    <div class="dm-p dm-p1">
-                        <div class="dm-head"><strong>{{ $demo['client'] }}</strong><span>{{ $demo['period'] }}</span></div>
-                        <table>
-                            <thead><tr>@foreach ($demo['cols'] as $c)<th scope="col">{{ $c }}</th>@endforeach</tr></thead>
-                            <tbody>@foreach ($demo['goals'] as [$g, $n, $c])<tr><td>{{ $g }}</td><td>{{ $n }}</td><td><bdi dir="ltr">{{ $c }}</bdi></td></tr>@endforeach</tbody>
-                        </table>
-                        <div class="dm-health"><span>{{ $demo['health'] }}</span><span class="dm-meter" aria-hidden="true"><i></i></span><b>78</b></div>
-                    </div>
-                    <div class="dm-p dm-p2">
-                        <div class="dm-head"><strong>{{ $demo['client'] }}</strong><span>{{ $ar ? 'صباح اليوم' : 'This morning' }}</span></div>
-                        <ul class="dm-al">@foreach ($demo['alerts'] as $i => [$lvl, $txt])<li class="{{ $i === 0 ? 'crit' : '' }}"><b>{{ $lvl }}</b><span>{{ $txt }}</span></li>@endforeach</ul>
-                    </div>
-                    <div class="dm-p dm-p3">
-                        <div class="dm-head"><strong>{{ $demo['client'] }}</strong><span>{{ $ar ? 'العربية · English' : 'English · العربية' }}</span></div>
-                        <ul class="dm-rep">@foreach ($demo['report'] as [$h, $t])<li><strong>{{ $h }}</strong><span>{{ $t }}</span></li>@endforeach</ul>
-                    </div>
-                </div>
-            </fieldset>
-        </figure>
-    </div>
-    <div class="wrap">
-        <div class="hp-nets">
-            <span>{{ $ar ? 'المنصات الإعلانية التي نخطط لربطها' : 'Ad platforms we plan to connect' }}:</span>
-            <ul>@foreach ($networks as $n)<li><bdi dir="ltr">{{ $n }}</bdi></li>@endforeach</ul>
-            <a href="{{ $u('/integrations') }}">{{ $ar ? 'كل المنصات الإعلانية' : 'All ad platforms' }}</a>
+        <div class="hp-cmdbar">
+            <div class="hp-cmd-info">
+                <span class="hp-cmd-dot" aria-hidden="true"></span>
+                <span>{{ $ar ? 'مساحة عمل للوكالات والمستقلين · الإعلانات والظهور في البحث' : 'Agency & freelancer workspace · Ads & search visibility' }}</span>
+            </div>
+            <div class="hp-ctas">
+                <a class="btn btn-sec" href="{{ $u('/demo-report') }}" data-cta="sample_report" data-pos="hero">{{ $ar ? 'شاهد تقريرًا تجريبيًا' : 'See a sample report' }}</a>
+                <a class="btn btn-main" href="{{ $u('/waitlist') }}?type=agency" data-cta="waitlist" data-pos="hero">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a>
+            </div>
         </div>
     </div>
 </section>
+
+<div class="hp-showcase-wrap">
+    <figure class="dm" aria-label="{{ $demo['alt'] }}">
+        <div class="dm-bar">
+            <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <strong style="font-size:13px">{{ $demo['client'] }} · {{ $demo['period'] }}</strong>
+            <span class="dm-tag">{{ $demo['sample'] }}</span>
+        </div>
+        <fieldset>
+            <legend>{{ $demo['alt'] }}</legend>
+            @foreach ([1, 2, 3] as $n)<input class="dm-r" type="radio" name="dm" id="dm-t{{ $n }}" @checked($n === 1)>@endforeach
+            <div class="dm-tabs">
+                @foreach ($demo['tabs'] as $i => $tab)
+                    <label for="dm-t{{ $i + 1 }}"><b>0{{ $i + 1 }}</b><span>{{ $tab }}</span></label>
+                @endforeach
+            </div>
+            <div class="dm-ps">
+                <div class="dm-p dm-p1">
+                    <div class="dm-board">
+                        <div class="dm-gauge-card">
+                            <div class="dm-head"><strong>{{ $demo['health'] }}</strong><span>{{ $demo['sample'] }}</span></div>
+                            <div class="dm-gauge-wrap">
+                                <svg class="dm-donut" viewBox="0 0 36 36" aria-hidden="true">
+                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e2e8f0" stroke-width="3.6"/>
+                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#0f766e" stroke-width="3.6" stroke-dasharray="78, 100" stroke-linecap="round"/>
+                                </svg>
+                                <div>
+                                    <div class="dm-health"><b>78</b><span>/ 100</span></div>
+                                    <div style="font-size:12.5px;color:var(--muted);margin-top:4px">{{ $ar ? 'مقابل الميزانية وتكلفة النتيجة' : 'Against budget & cost per result' }}</div>
+                                </div>
+                            </div>
+                            <div class="dm-meter" aria-hidden="true"><i></i></div>
+                        </div>
+
+                        <div class="dm-main-card">
+                            <div class="dm-head"><strong>{{ $demo['client'] }}</strong><span>{{ $demo['period'] }}</span></div>
+                            <table>
+                                <thead><tr>@foreach ($demo['cols'] as $c)<th scope="col">{{ $c }}</th>@endforeach</tr></thead>
+                                <tbody>@foreach ($demo['goals'] as [$g, $n, $c])<tr><td>{{ $g }}</td><td>{{ $n }}</td><td><bdi dir="ltr">{{ $c }}</bdi></td></tr>@endforeach</tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="dm-p dm-p2">
+                    <div class="dm-head"><strong>{{ $demo['client'] }}</strong><span>{{ $ar ? 'صباح اليوم' : 'This morning' }}</span></div>
+                    <ul class="dm-al">@foreach ($demo['alerts'] as $i => [$lvl, $txt])<li class="{{ $i === 0 ? 'crit' : '' }}"><b>{{ $lvl }}</b><span>{{ $txt }}</span></li>@endforeach</ul>
+                </div>
+                <div class="dm-p dm-p3">
+                    <div class="dm-head"><strong>{{ $demo['client'] }}</strong><span>{{ $ar ? 'العربية · English' : 'English · العربية' }}</span></div>
+                    <ul class="dm-rep">@foreach ($demo['report'] as [$h, $t])<li><strong>{{ $h }}</strong><span>{{ $t }}</span></li>@endforeach</ul>
+                </div>
+            </div>
+        </fieldset>
+    </figure>
+
+    <div class="hp-nets">
+        <span>{{ $ar ? 'المنصات الإعلانية التي نخطط لربطها' : 'Ad platforms we plan to connect' }}:</span>
+        <ul>@foreach ($networks as $n)<li><bdi dir="ltr">{{ $n }}</bdi></li>@endforeach</ul>
+        <a href="{{ $u('/integrations') }}">{{ $ar ? 'كل المنصات الإعلانية' : 'All ad platforms' }}</a>
+    </div>
+</div>
 @endsection
 
 @section('content')

@@ -99,7 +99,8 @@ h3{font-size:18px;margin:0 0 6px}
 .mm-panel a:hover,.mm-panel a:focus-visible{background:var(--surface)}
 .mm-panel a[aria-current=page] strong{color:var(--acc)}
 .sh-end{display:flex;align-items:center;gap:6px;margin-inline-start:auto}
-.sh-end .btn{white-space:nowrap;padding:8px 16px;border-radius:8px;font-weight:700;background:#5eead4;color:#0b1120}
+.sh-end .btn{white-space:nowrap;padding:8px 18px;border-radius:10px;font-weight:700;background:#f97316;color:#ffffff;border:1px solid rgba(255,255,255,.2);box-shadow:0 4px 14px rgba(249,115,22,.4)}
+.sh-end .btn:hover{background:#ea580c}
 .sh-menu{display:none}
 .sh-panel{display:none;background:var(--bg);color:var(--ink);border-top:1px solid #1e293b;padding-block:8px 16px}
 .sh-panel details{border-bottom:1px solid var(--line)}
