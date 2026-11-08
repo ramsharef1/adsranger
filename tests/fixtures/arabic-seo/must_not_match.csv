@@ -1,0 +1,8 @@
+a,b,country,must_match,rule,source
+عمان,عُمان,,no,Amman (JO city) vs Oman (country) without context,Content 13:48 case 1
+عمّان,عُمان,,no,Amman (shadda) vs Oman (damma),Content 13:48 case 1
+فنادق عمان,فنادق عُمان,,no,Amman vs Oman inside a phrase,Content 13:48 case 1
+عمان,عُمان,JO,no,workspace in JO: plain «عمان» is Amman,Content 13:48 case 1
+طبيب أسنان,دكتور أسنان,,no,related words are suggestions only,Content 13:48 case 3
+عيادة أسنان,تقويم أسنان,,no,related words are suggestions only,Content 13:48 case 3
+إعلانات,دعايات,,no,related words are suggestions only,Content 13:48 case 3
