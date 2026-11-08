@@ -49,9 +49,48 @@ class ArabicSeoTestSet extends Command
     private function score(string $dir, string $file, float $bar): array
     {
         $path = $dir.'/'.$file;
-        if (! is_file($path) || $file === 'pages/expected.json') {
-            // pages/expected.json is scored by the A1 audit (step 0.3); until then it stays pending.
+        if (! is_file($path)) {
             return ['rows' => 0, 'passed' => 0, 'rate' => 0.0, 'bar' => $bar, 'status' => 'pending', 'failures' => []];
+        }
+        if ($file === 'pages/expected.json') {
+            $spec = json_decode((string) file_get_contents($path), true) ?: [];
+            $passed = 0;
+            $failures = [];
+            foreach ($spec as $pageFile => $exp) {
+                $pPath = $dir.'/pages/'.$pageFile;
+                if (! is_file($pPath)) {
+                    $failures[] = $pageFile.': missing file';
+                    continue;
+                }
+                $html = (string) file_get_contents($pPath);
+                $plain = trim((string) preg_replace('/\s+/u', ' ', strip_tags($html)));
+                $actual = [
+                    'ar_lang' => (bool) preg_match('/<html[^>]*\blang=["\']ar/i', $html),
+                    'rtl_dir' => (bool) preg_match('/<html[^>]*\bdir=["\']rtl/i', $html),
+                    'has_title' => (bool) preg_match('/<title>([^<]+)<\/title>/iu', $html, $tm) && mb_strlen(trim($tm[1])) > 0,
+                    'has_meta_description' => (bool) preg_match('/<meta[^>]*name=["\']description["\'][^>]*content=["\']([^"\']+)["\']/iu', $html, $dm) && mb_strlen(trim($dm[1])) > 0,
+                    'has_h1' => (bool) preg_match('/<h1[^>]*>([^<]+)<\/h1>/iu', $html),
+                    'has_canonical' => (bool) preg_match('/<link[^>]*rel=["\']canonical["\']/i', $html),
+                    'has_json_ld' => (bool) preg_match('/application\/ld\+json/i', $html),
+                    'has_question_heading' => (bool) preg_match('/<h[23][^>]*>[^<]*(؟|\?)[^<]*<\/h[23]>/iu', $html),
+                    'dialect_tags' => Normaliser::dialectTags($plain),
+                ];
+                if ($actual === $exp) {
+                    $passed++;
+                } else {
+                    $failures[] = $pageFile;
+                }
+            }
+            $total = count($spec);
+            $rate = $total > 0 ? round($passed / $total, 4) : 0.0;
+            return [
+                'rows' => $total,
+                'passed' => $passed,
+                'rate' => $rate,
+                'bar' => $bar,
+                'status' => ($total > 0 && $rate >= $bar) ? 'pass' : 'fail',
+                'failures' => array_slice($failures, 0, 10),
+            ];
         }
 
         $rows = $this->csv($path);

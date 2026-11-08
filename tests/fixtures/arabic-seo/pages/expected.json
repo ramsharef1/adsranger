@@ -1,0 +1,167 @@
+{
+    "page-01.html": {
+        "ar_lang": true,
+        "rtl_dir": true,
+        "has_title": true,
+        "has_meta_description": true,
+        "has_h1": true,
+        "has_canonical": true,
+        "has_json_ld": true,
+        "has_question_heading": true,
+        "dialect_tags": []
+    },
+    "page-02.html": {
+        "ar_lang": false,
+        "rtl_dir": false,
+        "has_title": true,
+        "has_meta_description": false,
+        "has_h1": false,
+        "has_canonical": false,
+        "has_json_ld": false,
+        "has_question_heading": false,
+        "dialect_tags": []
+    },
+    "page-03.html": {
+        "ar_lang": true,
+        "rtl_dir": true,
+        "has_title": true,
+        "has_meta_description": true,
+        "has_h1": true,
+        "has_canonical": true,
+        "has_json_ld": true,
+        "has_question_heading": true,
+        "dialect_tags": []
+    },
+    "page-04.html": {
+        "ar_lang": true,
+        "rtl_dir": true,
+        "has_title": true,
+        "has_meta_description": true,
+        "has_h1": true,
+        "has_canonical": true,
+        "has_json_ld": true,
+        "has_question_heading": true,
+        "dialect_tags": []
+    },
+    "page-05.html": {
+        "ar_lang": true,
+        "rtl_dir": true,
+        "has_title": true,
+        "has_meta_description": true,
+        "has_h1": true,
+        "has_canonical": true,
+        "has_json_ld": true,
+        "has_question_heading": true,
+        "dialect_tags": []
+    },
+    "page-06.html": {
+        "ar_lang": true,
+        "rtl_dir": true,
+        "has_title": true,
+        "has_meta_description": true,
+        "has_h1": true,
+        "has_canonical": true,
+        "has_json_ld": true,
+        "has_question_heading": true,
+        "dialect_tags": []
+    },
+    "page-07.html": {
+        "ar_lang": true,
+        "rtl_dir": true,
+        "has_title": true,
+        "has_meta_description": true,
+        "has_h1": true,
+        "has_canonical": true,
+        "has_json_ld": true,
+        "has_question_heading": true,
+        "dialect_tags": []
+    },
+    "page-08.html": {
+        "ar_lang": true,
+        "rtl_dir": true,
+        "has_title": true,
+        "has_meta_description": true,
+        "has_h1": true,
+        "has_canonical": true,
+        "has_json_ld": false,
+        "has_question_heading": true,
+        "dialect_tags": []
+    },
+    "page-09.html": {
+        "ar_lang": true,
+        "rtl_dir": true,
+        "has_title": true,
+        "has_meta_description": true,
+        "has_h1": true,
+        "has_canonical": true,
+        "has_json_ld": true,
+        "has_question_heading": true,
+        "dialect_tags": []
+    },
+    "page-10.html": {
+        "ar_lang": true,
+        "rtl_dir": true,
+        "has_title": true,
+        "has_meta_description": true,
+        "has_h1": true,
+        "has_canonical": true,
+        "has_json_ld": true,
+        "has_question_heading": true,
+        "dialect_tags": []
+    },
+    "page-11.html": {
+        "ar_lang": true,
+        "rtl_dir": true,
+        "has_title": true,
+        "has_meta_description": true,
+        "has_h1": true,
+        "has_canonical": true,
+        "has_json_ld": true,
+        "has_question_heading": true,
+        "dialect_tags": []
+    },
+    "page-12.html": {
+        "ar_lang": true,
+        "rtl_dir": true,
+        "has_title": true,
+        "has_meta_description": true,
+        "has_h1": true,
+        "has_canonical": true,
+        "has_json_ld": false,
+        "has_question_heading": true,
+        "dialect_tags": []
+    },
+    "page-13.html": {
+        "ar_lang": true,
+        "rtl_dir": true,
+        "has_title": true,
+        "has_meta_description": true,
+        "has_h1": true,
+        "has_canonical": true,
+        "has_json_ld": true,
+        "has_question_heading": true,
+        "dialect_tags": []
+    },
+    "page-14.html": {
+        "ar_lang": true,
+        "rtl_dir": true,
+        "has_title": true,
+        "has_meta_description": true,
+        "has_h1": true,
+        "has_canonical": true,
+        "has_json_ld": false,
+        "has_question_heading": true,
+        "dialect_tags": []
+    },
+    "page-15.html": {
+        "ar_lang": true,
+        "rtl_dir": true,
+        "has_title": true,
+        "has_meta_description": true,
+        "has_h1": true,
+        "has_canonical": true,
+        "has_json_ld": true,
+        "has_question_heading": true,
+        "dialect_tags": []
+    }
+}
