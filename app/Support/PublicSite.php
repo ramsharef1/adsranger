@@ -100,13 +100,18 @@ class PublicSite
         return ! in_array($path, ['/', '/waitlist', '/partners', '/privacy', '/terms', '/data-deletion'], true);
     }
 
-    /** Next occasions from the seasons calendar (D-95 data), soonest first, for the home block. */
+    /**
+     * Next ad seasons from the seasons calendar (D-95 data), soonest first, for the home block.
+     * Only rows tagged in `mena_calendar_2027.ad_seasons` (W-6); other national days stay on /mena-calendar.
+     */
     public static function nextOccasions(int $count = 3, ?string $today = null): array
     {
         $today ??= now('Asia/Amman')->toDateString();
+        $adSeasons = config('mena_calendar_2027.ad_seasons', []);
         $seen = [];
 
         return collect(config('mena_calendar_2027.rows', []))
+            ->filter(fn ($r) => in_array($r['id'], $adSeasons, true))
             ->filter(fn ($r) => ($r['end'] ?? $r['date']) >= $today)
             ->sortBy('date')
             ->filter(function ($r) use (&$seen) {

@@ -38,4 +38,13 @@ class SiteRevampD234Test extends TestCase
         $this->assertCount(3, $occ);
         $this->assertSame(collect($occ)->pluck('date')->sort()->values()->all(), collect($occ)->pluck('date')->all());
     }
+
+    public function test_home_occasions_show_ad_seasons_only(): void
+    {
+        $this->assertSame(['C5', 'A2', 'B1'], collect(PublicSite::nextOccasions(3, '2026-11-08'))->pluck('id')->all());
+        $this->assertNotContains('B19', collect(PublicSite::nextOccasions(20, '2026-11-08'))->pluck('id')->all());
+
+        $this->travelTo(now('Asia/Amman')->setDate(2026, 11, 8));
+        $this->get('/')->assertSee('مهرجان دبي للتسوق')->assertDontSee('عيد الاستقلال السوداني');
+    }
 }

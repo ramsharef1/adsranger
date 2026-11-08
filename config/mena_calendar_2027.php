@@ -843,6 +843,11 @@ return [
         ],
     ],
 
+    // Home "next 3 occasions" shows ad seasons only (W-6; Rami 2026-11-08 13:37: shopping festivals, Ramadan / Eid,
+    // back to school, GCC national days). Tags from Website Packages_2026-11-08e §10; A3 "Last ten nights" left out
+    // as a duplicate of Ramadan, C7 has no date yet. Other national days stay on /mena-calendar only.
+    'ad_seasons' => ['A2', 'A4', 'A6', 'B1', 'B2', 'B4', 'B6', 'B7', 'B8', 'B9', 'C1', 'C2', 'C3', 'C4', 'C5', 'C6'],
+
     // Display notes for the tool (experience), verbatim from ADSR-041.
     'display_notes' => [
         'Rows with two possible days (A4, A8) show both: EN "9 or 10 Mar (expected)" · AR «9 أو 10 مارس (متوقع)».',
