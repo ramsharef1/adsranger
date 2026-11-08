@@ -8,6 +8,8 @@
     $lang = $ar ? 'ar' : 'en';
     $arPath = $arPath ?? \App\Support\PublicUrl::arPathOf(request()->path());
     $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
+    // UX-226: the Latin brand inside Arabic menu / footer text gets its own direction.
+    $bd = fn (string $t) => $ar ? str_replace('AdsRanger', '<bdi dir="ltr">AdsRanger</bdi>', e($t)) : e($t);
     $selfUrl = \App\Support\PublicUrl::absolute($arPath, $lang);
     $arUrl = \App\Support\PublicUrl::absolute($arPath, 'ar');
     $enUrl = \App\Support\PublicUrl::absolute($arPath, 'en');
@@ -124,7 +126,7 @@ h3{font-size:18px;margin:0 0 6px}
 .crumbs{font-size:14px;margin:0 0 14px;color:#94a3b8}
 .crumbs ol{list-style:none;display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0}
 .crumbs li+li::before{content:"/";margin-inline-end:6px;color:#475569}
-.crumbs a{color:#cbd5e1;text-decoration:none;display:inline-flex;align-items:center;min-height:44px;padding-inline:2px}
+.crumbs a{color:#cbd5e1;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;padding-inline:2px}
 .crumbs a:hover{color:#fff;text-decoration:underline}
 .ph-status{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#5eead4;margin-bottom:10px}
 .ph-status::before{content:"";width:8px;height:8px;border-radius:99px;background:#5eead4}
@@ -147,7 +149,7 @@ h3{font-size:18px;margin:0 0 6px}
 .sf .sh-logo{font-size:18px}
 .sf h2{font-size:14px;color:#f8fafc;margin:0 0 8px}
 .sf ul{list-style:none;margin:0;padding:0}
-.sf a{display:inline-flex;align-items:center;min-height:44px;color:#cbd5e1;text-decoration:none}
+.sf a{display:inline-flex;align-items:center;min-height:44px;min-width:44px;color:#cbd5e1;text-decoration:none}
 .sf a:hover{color:#fff;text-decoration:underline}
 .sf p{margin:8px 0 0}
 .sf-bottom{border-top:1px solid #1e293b;margin-top:24px;padding-top:12px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}
@@ -179,13 +181,13 @@ input[type=text],input[type=email],input[type=number],select{width:100%;min-heig
             <nav class="sh-nav" aria-label="{{ $ar ? 'الرئيسية' : 'Main' }}">
                 @foreach ($menu as $i => $g)
                     @if (isset($g['path']))
-                        <a href="{{ $u($g['path']) }}" @if ($arPath === $g['path']) aria-current="page" @endif>{{ $g['label'] }}</a>
+                        <a href="{{ $u($g['path']) }}" @if ($arPath === $g['path']) aria-current="page" @endif>{!! $bd($g['label']) !!}</a>
                     @else
                         <div class="mm {{ in_array($arPath, $g['items'], true) ? 'cur' : '' }}">
-                            <button type="button" aria-expanded="false" aria-controls="mm-{{ $i }}">{{ $g['label'] }}<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 4l4 4 4-4"/></svg></button>
+                            <button type="button" aria-expanded="false" aria-controls="mm-{{ $i }}">{!! $bd($g['label']) !!}<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 4l4 4 4-4"/></svg></button>
                             <div class="mm-panel" id="mm-{{ $i }}">
                                 @foreach ($g['items'] as $p)
-                                    <a href="{{ $u($p) }}" @if ($arPath === $p) aria-current="page" @endif><strong>{{ $site::name($p, $ar) }}</strong><span>{{ $site::line($p, $ar) }}</span></a>
+                                    <a href="{{ $u($p) }}" @if ($arPath === $p) aria-current="page" @endif><strong>{!! $bd($site::name($p, $ar)) !!}</strong><span>{!! $bd($site::line($p, $ar)) !!}</span></a>
                                 @endforeach
                             </div>
                         </div>
@@ -206,12 +208,12 @@ input[type=text],input[type=email],input[type=number],select{width:100%;min-heig
             <nav aria-label="{{ $ar ? 'القائمة' : 'Menu' }}">
                 @foreach ($menu as $g)
                     @if (isset($g['path']))
-                        <a href="{{ $u($g['path']) }}" @if ($arPath === $g['path']) aria-current="page" @endif>{{ $g['label'] }}</a>
+                        <a href="{{ $u($g['path']) }}" @if ($arPath === $g['path']) aria-current="page" @endif>{!! $bd($g['label']) !!}</a>
                     @else
                         <details @if (in_array($arPath, $g['items'], true)) open @endif>
-                            <summary>{{ $g['label'] }}</summary>
+                            <summary>{!! $bd($g['label']) !!}</summary>
                             @foreach ($g['items'] as $p)
-                                <a href="{{ $u($p) }}" @if ($arPath === $p) aria-current="page" @endif>{{ $site::name($p, $ar) }}</a>
+                                <a href="{{ $u($p) }}" @if ($arPath === $p) aria-current="page" @endif>{!! $bd($site::name($p, $ar)) !!}</a>
                             @endforeach
                         </details>
                     @endif
@@ -228,7 +230,7 @@ input[type=text],input[type=email],input[type=number],select{width:100%;min-heig
         <div class="ph">
             <div class="wrap">
                 <nav class="crumbs" aria-label="{{ $ar ? 'مسار الصفحة' : 'Breadcrumb' }}"><ol>
-                    <li><a href="{{ $u('/') }}">{{ $site::name('/', $ar) }}</a></li>
+                    <li><a href="{{ $u('/') }}">{!! $bd($site::name('/', $ar)) !!}</a></li>
                     <li aria-current="page">{{ $crumb }}</li>
                 </ol></nav>
                 @yield('hero')
@@ -243,7 +245,7 @@ input[type=text],input[type=email],input[type=number],select{width:100%;min-heig
                 <h2 id="rel-h">{{ $ar ? 'صفحات ذات صلة' : 'Related pages' }}</h2>
                 <ul>
                     @foreach ($related as $p)
-                        <li><a href="{{ $u($p) }}"><strong>{{ $site::name($p, $ar) }}</strong><span>{{ $site::line($p, $ar) }}</span></a></li>
+                        <li><a href="{{ $u($p) }}"><strong>{!! $bd($site::name($p, $ar)) !!}</strong><span>{!! $bd($site::line($p, $ar)) !!}</span></a></li>
                     @endforeach
                 </ul>
             </section>
@@ -268,10 +270,10 @@ input[type=text],input[type=email],input[type=number],select{width:100%;min-heig
             </div>
             @foreach ($site::footer($ar) as $ci => [$heading, $paths])
                 <nav aria-labelledby="sf-h{{ $ci }}">
-                    <h2 id="sf-h{{ $ci }}">{{ $heading }}</h2>
+                    <h2 id="sf-h{{ $ci }}">{!! $bd($heading) !!}</h2>
                     <ul>
                         @foreach ($paths as $p)
-                            <li><a href="{{ $u($p) }}">{{ $site::name($p, $ar) }}</a></li>
+                            <li><a href="{{ $u($p) }}">{!! $bd($site::name($p, $ar)) !!}</a></li>
                         @endforeach
                     </ul>
                 </nav>

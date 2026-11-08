@@ -133,8 +133,9 @@ $schema[] = ['@type' => 'FAQPage', 'mainEntity' => array_map(fn ($q) => ['@type'
 <section style="max-width:960px;margin-top:28px;min-width:0;overflow:hidden" aria-labelledby="h-compare">
     <h2 id="h-compare">{{ $ar ? 'مقارنة الباقات' : 'Compare plans' }}</h2>
     <p class="muted">{{ $ar ? 'كل الميزات أدناه قيد التطوير. والقائمة تعرض فقط ما يختلف بين الباقات.' : 'Every feature below is in development. The list shows only what differs between plans.' }}</p>
-    <div class="cmp" tabindex="0" role="region" aria-labelledby="h-compare">
+    <div class="cmp" tabindex="0" role="region" aria-label="{{ $ar ? 'مقارنة الباقات' : 'Compare plans' }}">
         <table>
+            <caption class="sr">{{ $ar ? 'مقارنة الباقات' : 'Compare plans' }}</caption>
             <thead><tr><th scope="col">{{ $ar ? 'الميزة' : 'Feature' }}</th>@foreach ($compareTiers as $tier)<th scope="col">{{ $pf['tier_short'][$tier][$ar ? 'ar' : 'en'] }}</th>@endforeach</tr></thead>
             <tbody>
                 @foreach ($compare as $row)

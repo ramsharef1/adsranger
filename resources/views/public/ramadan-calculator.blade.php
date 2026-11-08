@@ -20,7 +20,7 @@ $schema = [
 $example = $ar ? 'قيمة مثال' : 'Example value';
 $assume = $ar ? 'افتراض للمثال، غيّره حسب خطتك' : 'Example assumption, change it to your plan';
 // Package D2 (Packages_2026-11-08b rev 2): currency select (no conversion: code + decimals only), 29 / 30 toggle.
-$currencies = [['USD', 'US dollar', 2], ['SAR', 'Saudi riyal', 2], ['AED', 'UAE dirham', 2], ['JOD', 'Jordanian dinar', 3], ['KWD', 'Kuwaiti dinar', 3], ['QAR', 'Qatari riyal', 2], ['EGP', 'Egyptian pound', 2]];
+$currencies = [['USD', 'US dollar', 2, 'دولار أمريكي'], ['SAR', 'Saudi riyal', 2, 'ريال سعودي'], ['AED', 'UAE dirham', 2, 'درهم إماراتي'], ['JOD', 'Jordanian dinar', 3, 'دينار أردني'], ['KWD', 'Kuwaiti dinar', 3, 'دينار كويتي'], ['QAR', 'Qatari riyal', 2, 'ريال قطري'], ['EGP', 'Egyptian pound', 2, 'جنيه مصري']];
 $assume = $ar ? 'افتراض للمثال، عدّله' : 'Example assumption, edit it';
 // [name, label, default, hint, money field?]
 $inputs = [
@@ -80,8 +80,8 @@ $schema[] = ['@type' => 'FAQPage', 'mainEntity' => array_map(fn ($q) => ['@type'
             <div>
                 <label for="rc-currency">{{ $ar ? 'العملة' : 'Currency' }}</label>
                 <select id="rc-currency" name="currency">
-                    @foreach ($currencies as [$code, $name, $dec])
-                        <option value="{{ $code }}" data-dec="{{ $dec }}">{{ $ar ? $code : $name.' ('.$code.')' }}</option>
+                    @foreach ($currencies as [$code, $name, $dec, $nameAr])
+                        <option value="{{ $code }}" data-dec="{{ $dec }}">{{ ($ar ? $nameAr : $name).' ('.$code.')' }}</option>
                     @endforeach
                 </select>
                 <p class="rc-hint">{{ $ar ? 'لا تحويل بين العملات.' : 'No conversion between currencies.' }}</p>

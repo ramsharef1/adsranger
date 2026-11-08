@@ -395,7 +395,7 @@
     <p class="sub"><a href="{{ $u('/security') }}">{{ $ar ? 'كيف نحمي بياناتك' : 'How we protect your data' }}</a></p>
     <ul class="trust">
         @foreach ($trust as [$h, $p])
-            <li><strong>{{ $h }}</strong><span>{{ $p }}</span></li>
+            <li><strong>{{ $h }}</strong><span>{!! $ar ? str_replace('AdsRanger', '<bdi dir="ltr">AdsRanger</bdi>', e($p)) : e($p) !!}</span></li>
         @endforeach
     </ul>
 </section>

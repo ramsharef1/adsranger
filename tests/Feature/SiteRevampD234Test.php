@@ -69,6 +69,9 @@ class SiteRevampD234Test extends TestCase
         $this->get('/en/pricing')->assertSee('Compare plans')->assertSee('Annual budget plan');
         $this->get('/pricing')->assertSee('دون الحاجة إلى بطاقة')->assertSee('ضمن حدود الباقة الأصغر');
         $this->get('/contact')->assertSee('نرد عادةً خلال يومَي عمل، من الأحد إلى الخميس.');
+        $this->get('/tools/ramadan-budget-calculator')->assertSee('دينار أردني (JOD)');
+        $this->get('/pricing')->assertSee('<caption class="sr">مقارنة الباقات</caption>', false)->assertSee('aria-label="مقارنة الباقات"', false);
+        $this->get('/')->assertSee('عن <bdi dir="ltr">AdsRanger</bdi>', false)->assertSee('لا تغيّر <bdi dir="ltr">AdsRanger</bdi>', false);
     }
 
     public function test_home_occasions_show_ad_seasons_only(): void
