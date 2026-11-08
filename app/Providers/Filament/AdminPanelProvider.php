@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Auth\AppAuthentication;
+use App\Filament\Admin\Widgets\SystemOverviewWidget;
 use App\Filament\Pages\Auth\AdminLogin;
 use App\Filament\Pages\Auth\RequestPasswordReset;
 use App\Filament\Pages\Auth\ResetPassword;
@@ -74,6 +75,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\Filament\Admin\Widgets')
             ->widgets([
                 AccountWidget::class,
+                SystemOverviewWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
