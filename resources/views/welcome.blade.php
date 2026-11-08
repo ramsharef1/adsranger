@@ -31,14 +31,16 @@
 
 @push('styles')
 <style>
-.hero{padding-block:40px 16px;max-width:860px}
-.hero .lead{font-size:18px;color:var(--muted);margin:0 0 10px}
-.hero .status{font-size:14px;font-weight:600;color:var(--acc);margin:0 0 20px}
+.hero{padding-block:40px 20px;max-width:860px}
+.hero .lead{font-size:18px;color:var(--muted);margin:0 0 12px}
+.hero .status{font-size:14px;font-weight:600;color:var(--acc);margin:0 0 22px}
 .hero .actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:14px;list-style:none;padding:0;margin:0}
-.cards p{margin:8px 0 0;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:16px;list-style:none;padding:0;margin:0}
+.cards .card{display:flex;flex-direction:column;gap:6px}
+.cards .card-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.cards p{margin:4px 0 0;color:var(--muted)}
 .pills{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:0}
-.pills li{border:1px solid var(--line);border-radius:99px;padding:6px 14px;font-size:14px}
+.pills li{background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:6px 14px;font-size:14px;font-weight:600}
 .text-link{display:inline-flex;align-items:center;min-height:44px;text-decoration:underline}
 </style>
 @endpush
@@ -62,8 +64,10 @@
     <ul class="cards">
         @foreach ($cards as [$cardTitle, $body, $badge, $planned])
             <li class="card">
-                <h3>{{ $cardTitle }}</h3>
-                <span class="badge {{ $planned ? 'badge-neutral' : '' }}">{{ $badge }}</span>
+                <div class="card-head">
+                    <h3>{{ $cardTitle }}</h3>
+                    <span class="badge {{ $planned ? 'badge-neutral' : '' }}">{{ $badge }}</span>
+                </div>
                 <p>{{ $body }}</p>
             </li>
         @endforeach

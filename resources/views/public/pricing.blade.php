@@ -61,10 +61,11 @@ $plans = $ar ? [
 
 @push('styles')
 <style>
-.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(250px,100%),1fr));gap:14px;list-style:none;padding:0;margin:24px 0}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:16px;list-style:none;padding:0;margin:24px 0}
 .plans>li{display:flex;flex-direction:column;justify-content:space-between;gap:16px}
-.plans ul{list-style:none;padding:0;margin:12px 0 0}
-.plans ul li{padding:8px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.plans>li.plan-featured{border-color:var(--acc)}
+.plans ul{list-style:none;padding:0;margin:14px 0 0}
+.plans ul li{padding:10px 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px;font-size:14.5px}
 .plans ul li .badge{align-self:flex-start}
 </style>
 @endpush
@@ -78,8 +79,8 @@ $plans = $ar ? [
     <p>{{ $ar ? 'عند الإطلاق، تبدأ كل مساحة عمل جديدة بتجربة لمدة 14 يومًا على الباقة الاحترافية.' : 'At launch, each new workspace starts with a 14-day trial of Pro.' }}</p>
 </section>
 <ul class="plans">
-    @foreach ($plans as [$name, $line, $features])
-        <li class="card">
+    @foreach ($plans as $idx => [$name, $line, $features])
+        <li class="card {{ $idx === 2 ? 'plan-featured' : '' }}">
             <div>
                 <h2 style="margin:0 0 4px;font-size:21px">{{ $name }}</h2>
                 @if ($features === null)<span class="badge badge-neutral">{{ $planned }}</span>@endif

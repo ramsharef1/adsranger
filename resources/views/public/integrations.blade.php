@@ -25,8 +25,9 @@ $later = ['Apple Ads', 'Amazon Ads', 'Pinterest', 'Reddit', 'Taboola', 'Outbrain
 
 @push('styles')
 <style>
-.nets{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:14px;list-style:none;padding:0;margin:0}
-.nets p{margin:8px 0 0}
+.nets{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(250px,100%),1fr));gap:16px;list-style:none;padding:0;margin:0}
+.nets .card-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.nets p{margin:8px 0 0;color:var(--muted)}
 </style>
 @endpush
 
@@ -43,9 +44,11 @@ $later = ['Apple Ads', 'Amazon Ads', 'Pinterest', 'Reddit', 'Taboola', 'Outbrain
     <ul class="nets">
         @foreach ($first as [$name, $sub, $line])
             <li class="card">
-                <h3><bdi dir="ltr">{{ $name }}</bdi></h3>
-                @if ($sub)<p class="muted" style="margin:0 0 6px">{!! $sub !!}</p>@endif
-                <span class="badge">{{ $ar ? 'قيد التطوير' : 'In development' }}</span>
+                <div class="card-head">
+                    <h3><bdi dir="ltr">{{ $name }}</bdi></h3>
+                    <span class="badge">{{ $ar ? 'قيد التطوير' : 'In development' }}</span>
+                </div>
+                @if ($sub)<p class="muted" style="margin:2px 0 6px">{!! $sub !!}</p>@endif
                 <p>{{ $line }}</p>
             </li>
         @endforeach
@@ -54,10 +57,12 @@ $later = ['Apple Ads', 'Amazon Ads', 'Pinterest', 'Reddit', 'Taboola', 'Outbrain
 
 <section aria-labelledby="h-later">
     <h2 id="h-later">{{ $ar ? 'مرحلة لاحقة' : 'Later stage' }}</h2>
-    <p>
-        @foreach ($later as $i => $name)<bdi dir="ltr">{{ $name }}</bdi>@if ($i < count($later) - 1){{ $ar ? '، ' : ' · ' }}@endif @endforeach
-        <span class="badge badge-neutral">{{ $ar ? 'مخطط له' : 'Planned' }}</span>
-    </p>
+    <div class="card" style="background:var(--surface)">
+        <p style="margin:0">
+            @foreach ($later as $i => $name)<bdi dir="ltr">{{ $name }}</bdi>@if ($i < count($later) - 1){{ $ar ? '، ' : ' · ' }}@endif @endforeach
+            <span class="badge badge-neutral">{{ $ar ? 'مخطط له' : 'Planned' }}</span>
+        </p>
+    </div>
 </section>
 <p style="margin-top:24px"><a class="btn" href="{{ $u('/waitlist') }}">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a></p>
 @endsection
