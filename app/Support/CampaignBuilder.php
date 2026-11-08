@@ -3,7 +3,6 @@
 namespace App\Support;
 
 use App\Models\AuditLog;
-
 use App\Models\CreativeBrief;
 use App\Models\NetworkLaunch;
 
@@ -11,10 +10,10 @@ class CampaignBuilder
 {
     public static function launch(CreativeBrief $brief, array $networks, float $budget = 50.0): NetworkLaunch
     {
-        $fullText = $brief->hook . ' ' . $brief->primary_text . ' ' . $brief->headline;
+        $fullText = $brief->hook.' '.$brief->primary_text.' '.$brief->headline;
         $check = PolicyPreCheck::analyze($fullText);
 
-        $status = $check['passed'] ? 'published' : 'draft';
+        $status = $check['passed'] ? 'simulated' : 'draft'; // D-229: nothing is sent to any network yet
         $notes = $check['passed'] ? 'Passed policy pre-check successfully.' : implode(' ', $check['issues']);
 
         $launch = NetworkLaunch::create([
@@ -26,7 +25,7 @@ class CampaignBuilder
             'budget_amount' => $budget,
             'status' => $status,
             'policy_notes' => $notes,
-            'published_at' => $status === 'published' ? now() : null,
+            'published_at' => null,
         ]);
 
         AuditLog::record('studio.campaign_launched', $brief->client, ['launch_id' => $launch->id, 'networks' => $launch->networks]);

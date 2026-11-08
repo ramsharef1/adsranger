@@ -138,7 +138,7 @@ class Wave6OrganicCalendarModerationTest extends TestCase
         ]);
 
         $moderatedPrice = OrganicCalendarManager::evaluateModerationRules($priceMsg);
-        $this->assertSame('replied', $moderatedPrice->status);
+        $this->assertSame('simulated', $moderatedPrice->status);
         $this->assertSame('تم إرسال قائمة الأسعار على الخاص!', $moderatedPrice->reply_body);
     }
 }

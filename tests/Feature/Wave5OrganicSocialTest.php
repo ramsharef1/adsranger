@@ -38,8 +38,8 @@ class Wave5OrganicSocialTest extends TestCase
             'post'
         );
 
-        $this->assertSame('published', $published->status);
-        $this->assertNotNull($published->published_at);
+        $this->assertSame('simulated', $published->status);
+        $this->assertNull($published->published_at);
     }
 
     public function test_unified_inbox_sentiment_and_reply_workflow(): void
@@ -63,8 +63,8 @@ class Wave5OrganicSocialTest extends TestCase
         ]);
 
         $updated = OrganicSocialManager::replyToInboxMessage($msg, 'نفتح من الساعة 8 صباحاً، أهلاً بك!');
-        $this->assertSame('replied', $updated->status);
-        $this->assertNotNull($updated->replied_at);
+        $this->assertSame('simulated', $updated->status);
+        $this->assertNull($updated->replied_at);
         $this->assertSame('نفتح من الساعة 8 صباحاً، أهلاً بك!', $updated->reply_body);
     }
 

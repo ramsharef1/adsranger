@@ -30,7 +30,7 @@ class Wave13BudgetReallocationTest extends TestCase
         $this->assertSame('Meta Prospecting Broad', $log->source_campaign);
         $this->assertSame('Google Brand Search', $log->target_campaign);
         $this->assertEquals(100.0, $log->shifted_amount);
-        $this->assertSame('applied', $log->status);
+        $this->assertSame('simulated', $log->status);
 
         $audit = LaunchReadinessAuditor::audit();
         $this->assertTrue($audit['ready']);

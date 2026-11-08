@@ -40,7 +40,7 @@ class BudgetReallocationEngine
         $remainingCap = max(0.0, $monthlyCap - $currentMonthSpend);
         $safeShift = min($rawShift, $remainingCap);
 
-        $status = $safeShift > 0 ? 'applied' : 'capped_hold';
+        $status = $safeShift > 0 ? 'simulated' : 'capped_hold'; // D-229: no budget is changed on any network
 
         return BudgetReallocationLog::create([
             'agency_id' => $client->agency_id,

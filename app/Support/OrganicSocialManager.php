@@ -22,7 +22,7 @@ class OrganicSocialManager
         array $mediaUrls = []
     ): SocialPost {
         $validPlatforms = array_values(array_intersect($platforms, self::SUPPORTED_PLATFORMS));
-        $status = $scheduledAt ? 'scheduled' : 'published';
+        $status = $scheduledAt ? 'scheduled' : 'simulated'; // D-229: no platform post is made yet
 
         $post = SocialPost::create([
             'agency_id' => $client->agency_id,
@@ -34,10 +34,10 @@ class OrganicSocialManager
             'media_urls' => $mediaUrls,
             'status' => $status,
             'scheduled_at' => $scheduledAt,
-            'published_at' => $status === 'published' ? now() : null,
+            'published_at' => null,
         ]);
 
-        AuditLog::record('social.post_' . $status, $client, [
+        AuditLog::record('social.post_'.$status, $client, [
             'post_id' => $post->id,
             'platforms' => $validPlatforms,
         ]);
@@ -69,8 +69,8 @@ class OrganicSocialManager
     {
         $message->update([
             'reply_body' => $replyBody,
-            'status' => 'replied',
-            'replied_at' => now(),
+            'status' => 'simulated', // D-229: the reply is stored, not sent to the platform
+            'replied_at' => null,
         ]);
 
         AuditLog::record('social.inbox_replied', $message->client, [

@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\Agency;
 use App\Models\Client;
 use App\Models\CreativeBrief;
-use App\Models\User;
 use App\Support\CampaignBuilder;
 use App\Support\PolicyPreCheck;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -45,14 +44,14 @@ class Wave4StudioSlice2Test extends TestCase
         ]);
 
         $launch = CampaignBuilder::launch($brief, ['meta', 'google_ads', 'tiktok'], 150.0);
-        $this->assertSame('published', $launch->status);
-        $this->assertNotNull($launch->published_at);
+        $this->assertSame('simulated', $launch->status);
+        $this->assertNull($launch->published_at);
         $this->assertCount(3, $launch->networks);
 
         $this->assertDatabaseHas('network_launches', [
             'client_id' => $client->id,
             'campaign_name' => 'Spring Launch Campaign',
-            'status' => 'published',
+            'status' => 'simulated',
         ]);
     }
 }
