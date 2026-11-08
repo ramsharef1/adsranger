@@ -56,14 +56,25 @@ $plans = $ar ? [
         ['Agency operations, finance and influencer campaigns', true],
     ]],
 ];
-// CL-1 rev 2 E-06 FAQ (Growth 08e §6; trial = D-61, Solo = D-184).
+// CL-1 E-06 comparison table, built from config/plan_features.php (gated features already built). Benchmarks left out:
+// MENA medians need 5+ opted-in agencies first (D-111). Every row is still «قيد التطوير» on the public site.
+$pf = config('plan_features');
+$tierOrder = $pf['tiers'];
+$compareTiers = ['solo', 'starter', 'pro', 'agency'];
+$compare = collect($pf['features'])->except(['benchmarks'])
+    ->sortBy(fn ($f) => $tierOrder[$f['tier']])
+    ->map(fn ($f) => [
+        'name' => str_replace('Google Ads', '<bdi dir="ltr">Google Ads</bdi>', e($f['name'][$ar ? 'ar' : 'en'])),
+        'in' => array_map(fn ($t) => $tierOrder[$t] >= $tierOrder[$f['tier']], $compareTiers),
+    ])->values()->all();
+// CL-1 rev 2 E-06 FAQ (Growth 08e §6; Business 913 · 18:59: "Confirm with 2 small fixes"; trial = D-61, limits = D-208, Solo = D-184).
 $faq = $ar ? [
-    ['هل توجد فترة تجربة؟', 'نعم. عند الإطلاق، تبدأ كل مساحة عمل جديدة بتجربة لمدة 14 يومًا على الباقة الاحترافية.'],
-    ['هل يمكنني تغيير الباقة لاحقًا؟', 'نعم، يمكنك الترقية أو الانتقال إلى باقة أصغر عند حاجتك.'],
+    ['هل توجد فترة تجربة؟', 'نعم. عند الإطلاق، تبدأ كل مساحة عمل جديدة بتجربة لمدة 14 يومًا على الباقة الاحترافية، دون الحاجة إلى بطاقة.'],
+    ['هل يمكنني تغيير الباقة لاحقًا؟', 'نعم، يمكنك الترقية أو الانتقال إلى باقة أصغر عند حاجتك، ما دام عدد عملائك وحساباتك الإعلانية ضمن حدود الباقة الأصغر.'],
     ['ما باقة المستقل؟', 'باقة للمستقلين والشركات التي تدير إعلاناتها بنفسها، تشمل روابط العملاء والتقارير الأساسية لعدد قليل من العملاء.'],
 ] : [
-    ['Is there a trial?', 'Yes. At launch, each new workspace starts with a 14-day trial of Pro.'],
-    ['Can I change plans later?', 'Yes, you can move up or down a plan when you need to.'],
+    ['Is there a trial?', 'Yes. At launch, each new workspace starts with a 14-day trial of Pro, no card needed.'],
+    ['Can I change plans later?', 'Yes, you can move up or down a plan when you need to, as long as your clients and ad accounts fit the smaller plan\'s limits.'],
     ['What is Solo?', 'A plan for freelancers and businesses that run their own ads, with client links and basic reports for a few clients.'],
 ];
 $schema[] = ['@type' => 'FAQPage', 'mainEntity' => array_map(fn ($q) => ['@type' => 'Question', 'name' => $q[0], 'acceptedAnswer' => ['@type' => 'Answer', 'text' => $q[1]]], $faq)];
@@ -78,6 +89,13 @@ $schema[] = ['@type' => 'FAQPage', 'mainEntity' => array_map(fn ($q) => ['@type'
 .plans ul{list-style:none;padding:0;margin:14px 0 0}
 .plans ul li{padding:10px 0;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px;font-size:14.5px}
 .plans ul li .badge{align-self:flex-start}
+.cmp{position:relative;overflow-x:auto;max-width:100%;border:1px solid var(--line);border-radius:12px}
+.cmp table{width:100%;border-collapse:collapse;min-width:520px;font-size:14.5px}
+.cmp th,.cmp td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:center}
+.cmp tbody th,.cmp thead th:first-child{text-align:start;font-weight:600}
+.cmp td .yes{color:var(--acc);font-weight:700}
+.cmp td .no{color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 </style>
 @endpush
 
@@ -112,6 +130,25 @@ $schema[] = ['@type' => 'FAQPage', 'mainEntity' => array_map(fn ($q) => ['@type'
     @endforeach
 </ul>
 <p class="muted">{{ $ar ? 'تحتفظ الوكالات المؤسِّسة بسعر الإطلاق.' : 'Founding agencies keep their launch price.' }}</p>
+<section style="max-width:960px;margin-top:28px;min-width:0;overflow:hidden" aria-labelledby="h-compare">
+    <h2 id="h-compare">{{ $ar ? 'مقارنة الباقات' : 'Compare plans' }}</h2>
+    <p class="muted">{{ $ar ? 'كل الميزات أدناه قيد التطوير. والقائمة تعرض فقط ما يختلف بين الباقات.' : 'Every feature below is in development. The list shows only what differs between plans.' }}</p>
+    <div class="cmp" tabindex="0" role="region" aria-labelledby="h-compare">
+        <table>
+            <thead><tr><th scope="col">{{ $ar ? 'الميزة' : 'Feature' }}</th>@foreach ($compareTiers as $tier)<th scope="col">{{ $pf['tier_short'][$tier][$ar ? 'ar' : 'en'] }}</th>@endforeach</tr></thead>
+            <tbody>
+                @foreach ($compare as $row)
+                    <tr>
+                        <th scope="row">{!! $row['name'] !!}</th>
+                        @foreach ($row['in'] as $has)
+                            <td>@if ($has)<span class="yes" aria-hidden="true">✓</span><span class="sr">{{ $ar ? 'مشمولة' : 'Included' }}</span>@else<span class="no" aria-hidden="true">—</span><span class="sr">{{ $ar ? 'غير مشمولة' : 'Not included' }}</span>@endif</td>
+                        @endforeach
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</section>
 <section style="max-width:820px">
     <h2>{{ $ar ? 'أسئلة شائعة' : 'FAQ' }}</h2>
     @foreach ($faq as [$q, $a])

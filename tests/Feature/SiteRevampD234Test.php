@@ -61,6 +61,16 @@ class SiteRevampD234Test extends TestCase
         $this->get('/solutions/business-owners')->assertSee('تقويم المواسم')->assertSee('اعرف ما تخطط له');
     }
 
+    public function test_calculator_currency_and_days_toggle_and_pricing_table(): void
+    {
+        $this->get('/tools/ramadan-budget-calculator')->assertSee('id="rc-currency"', false)->assertSee('value="KWD" data-dec="3"', false)
+            ->assertSee('name="days" value="29"', false)->assertSee('عدد أيام رمضان')->assertSee('اختر عملة حساباتك الإعلانية من القائمة')->assertDontSee('id="rc-days"', false);
+        $this->get('/pricing')->assertSee('مقارنة الباقات')->assertSee('توقع نهاية الشهر')->assertSee('خطة الميزانية السنوية')->assertDontSee('المقارنات المرجعية');
+        $this->get('/en/pricing')->assertSee('Compare plans')->assertSee('Annual budget plan');
+        $this->get('/pricing')->assertSee('دون الحاجة إلى بطاقة')->assertSee('ضمن حدود الباقة الأصغر');
+        $this->get('/contact')->assertSee('نرد عادةً خلال يومَي عمل، من الأحد إلى الخميس.');
+    }
+
     public function test_home_occasions_show_ad_seasons_only(): void
     {
         $this->assertSame(['C5', 'A2', 'B1'], collect(PublicSite::nextOccasions(3, '2026-11-08'))->pluck('id')->all());
