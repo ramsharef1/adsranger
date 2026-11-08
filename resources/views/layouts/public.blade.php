@@ -31,6 +31,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{{ $title }}</title>
 <meta name="description" content="{{ $meta }}">
+@if (! empty($noindex))<meta name="robots" content="noindex, nofollow">
+@endif
 <link rel="canonical" href="{{ $selfUrl }}">
 <link rel="alternate" hreflang="ar" href="{{ $arUrl }}">
 <link rel="alternate" hreflang="en" href="{{ $enUrl }}">
@@ -165,7 +167,7 @@ h3{font-size:18px;margin:0 0 6px}
 @media (max-width:480px){.ck{font-size:13px;line-height:1.5}.ck .wrap{flex-wrap:nowrap;gap:8px;padding-block:6px}.ck p{min-width:0}.ck-long{display:none}.ck-short{display:inline}.ck .btn{flex:none;min-height:44px;padding:6px 14px}}
 /* forms */
 label,.lbl{display:block;font-weight:600;margin:16px 0 6px}
-input[type=text],input[type=email],input[type=number],select{width:100%;min-height:48px;padding:10px 12px;border-radius:10px;border:1px solid var(--field);background:var(--bg);color:var(--ink);font:inherit}
+input[type=text],input[type=email],input[type=number],select,textarea{width:100%;min-height:48px;padding:10px 12px;border-radius:10px;border:1px solid var(--field);background:var(--bg);color:var(--ink);font:inherit}
 .check{display:flex;align-items:center;gap:10px;min-height:44px;margin:0;font-weight:400;cursor:pointer}
 .check input{width:20px;height:20px;flex:none;accent-color:var(--acc)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}

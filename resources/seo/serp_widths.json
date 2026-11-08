@@ -1,0 +1,8 @@
+{
+  "_about": "One width table for the SERP preview, the length checker and the S3 title / meta checks (PR-015 §5.2-3). Pixel widths are approximate: measured in the browser with canvas measureText on the result font. Re-check the limits on checked_on.",
+  "checked_on": "2026-11-08",
+  "font": "arial, sans-serif",
+  "title": { "font_px": 20, "max_px": { "desktop": 580, "mobile": 580 }, "min_chars": 30 },
+  "description": { "font_px": 14, "max_px": { "desktop": 920, "mobile": 680 }, "min_chars": 70 },
+  "bulk_max_rows": 50
+}

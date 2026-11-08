@@ -193,6 +193,22 @@ class PublicSiteController extends Controller
         return view('public.ramadan-calculator', ['lang' => $lang === 'en' ? 'en' : 'ar']);
     }
 
+    /** Free SEO tools (SEO slice 0 step 0.4). Until config('seo_tools.public') is on they answer but stay noindex. */
+    public function seoTool(string $lang = 'ar', string $tool = 'serp-preview'): Response
+    {
+        $public = (bool) config('seo_tools.public');
+        $response = response()->view('public.tools.'.$tool, [
+            'lang' => $lang === 'en' ? 'en' : 'ar',
+            'noindex' => ! $public,
+            'widths' => json_decode((string) file_get_contents(resource_path('seo/serp_widths.json')), true),
+        ]);
+        if (! $public) {
+            $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+        }
+
+        return $response;
+    }
+
     /**
      * Public pages in the sitemap (P-0 set + R-19): Arabic path => view that renders it (its file time is the lastmod).
      *
