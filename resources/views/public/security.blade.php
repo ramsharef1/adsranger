@@ -5,18 +5,18 @@ $arPath = '/security';
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $ar ? 'ar' : 'en');
 $title = $ar ? 'كيف تحمي AdsRanger بيانات الوكالات وعملائها | AdsRanger' : 'How AdsRanger Protects Agency and Client Data | AdsRanger';
 $meta = $ar
-    ? 'كيف تحمي AdsRanger، وهي قيد التطوير، بيانات الوكالات وعملائها: صلاحية قراءة فقط، وفصل بيانات كل وكالة، وتحقق بخطوتين.'
-    : 'How AdsRanger, now in development, protects agency and client data: read-only reporting, separate agency data and two-step sign-in.';
+    ? 'كيف تحمي AdsRanger، وهي قيد التطوير، بيانات الوكالات وعملائها: لا تغيير في الحسابات الإعلانية دون موافقتكم، وفصل بيانات كل وكالة، وتحقق بخطوتين.'
+    : 'How AdsRanger, now in development, protects agency and client data: no change to ad accounts without your approval, separate agency data and two-step sign-in.';
 $schema = [['@type' => 'WebPage', 'name' => $title, 'url' => \App\Support\PublicUrl::absolute($arPath, $ar ? 'ar' : 'en'), 'inLanguage' => $ar ? 'ar' : 'en']];
 $sections = $ar ? [
-    ['تقارير بصلاحية قراءة فقط', 'تطلب اتصالات التقارير من كل منصة إعلانية صلاحية قراءة بياناتك الإعلانية فقط.'],
+    ['لا تغيير دون موافقتكم', 'تطلب بعض المنصات صلاحية إدارة عند الربط، لكن التقارير تقرأ البيانات فقط، ولا تغيّر AdsRanger أي ميزانية أو حملة دون موافقة أحد أعضاء فريقك.'],
     ['فصل بيانات كل وكالة', 'كل سجل يخص وكالة واحدة، ولا يرى أعضاء الفريق إلا العملاء المسندين إليهم.'],
     ['تسجيل دخول محمي', 'تحقق بخطوتين عبر تطبيق المصادقة ورموز الاسترداد، ومفاتيح الوصول إلى المنصات محفوظة مشفّرة.'],
     ['فحص آمن للروابط', 'فحوص صفحات الهبوط لا تتصل أبدًا بعناوين خاصة أو داخلية.'],
     ['بياناتك تحت تصرفك', 'افصل أي حساب، أو صدّر تقاريرك، أو اطلب منا حذف بياناتك.'],
     ['سجل النشاط', 'تُسجَّل تغييرات الأدوار والإعدادات الحساسة.'],
 ] : [
-    ['Read-only reporting', 'Reporting connections ask each ad platform for read access to your ad data only.'],
+    ['Nothing changes without your approval', 'Some platforms ask for management permission when you connect, but reports only read data, and AdsRanger changes no budget or campaign without a team member\'s approval.'],
     ['Each agency kept apart', 'Every record belongs to one agency, and team members see only the clients they\'re given.'],
     ['Protected sign-in', 'Two-step verification with an authenticator app and recovery codes; network access keys are stored encrypted.'],
     ['Safe link checks', 'Our landing-page checks never call private or internal addresses.'],

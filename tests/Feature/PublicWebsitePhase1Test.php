@@ -160,10 +160,10 @@ class PublicWebsitePhase1Test extends TestCase
     /** Home = Package G rev 2 (D-232, D-234): new H1 + lead, status line, problem → answer, planned platforms. */
     public function test_home_rev_4_copy(): void
     {
-        $this->get('/')->assertSee('اعرف ما تحققه إعلانات كل عميل، قبل أن يسألك')->assertSee('قيد التطوير · الإطلاق في 2027')
+        $this->get('/')->assertSee('اعرف ما تحققه إعلانات كل عميل وظهوره في البحث، قبل أن يسألك')->assertSee('قيد التطوير · الإطلاق في 2027')
             ->assertSee('ما يُبطئ الوكالات، وما نبنيه لحلّه')->assertSee('استوديو الإعلانات')->assertSee('المنصات الإعلانية التي نخطط لربطها')
             ->assertDontSee('Google Analytics 4')->assertDontSee('تجريبية خاصة')->assertDontSee('افتح المنصة')->assertDontSee('24/7');
-        $this->raw('/en/')->assertSee('Know what every client&#039;s ads achieve, before they ask', false)->assertSee('Microsoft Advertising');
+        $this->raw('/en/')->assertSee('Know what every client&#039;s ads and search visibility achieve, before they ask', false)->assertSee('Microsoft Advertising');
     }
 
     /** P-3 pillar body + P-4 calculator at its own URL (defaults 3,600 USD · 5.50 USD · 654). */

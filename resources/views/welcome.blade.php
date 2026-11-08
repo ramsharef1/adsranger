@@ -4,24 +4,26 @@
     $ar = $lang === 'ar';
     $arPath = '/';
     $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
-    $title = $ar ? 'منصة إدارة الإعلانات للوكالات بالعربية | AdsRanger' : 'Arabic-First Ad Management Platform for Agencies | AdsRanger';
+    $title = $ar ? 'منصة الإعلانات والسيو للوكالات بالعربية | AdsRanger' : 'Arabic-First Ads and SEO Platform for Agencies | AdsRanger'; // D-241
     $meta = $ar
-        ? 'مساحة عمل عربية أولًا تتيح لوكالات الإعلان في المنطقة إدارة إعلانات كل عملائها وتقاريرها في مكان واحد. AdsRanger قيد التطوير، والإطلاق في 2027.'
-        : 'AdsRanger is an Arabic-first ad management platform, in development, where MENA agencies will report every client\'s ads in one place. Launching 2027.';
+        ? 'منصة عربية أولًا لوكالات الإعلان في المنطقة: إعلانات كل عملائها، وظهورهم في البحث، وتقاريرهم في مكان واحد. ما زالت AdsRanger قيد التطوير، والإطلاق في 2027.'
+        : 'AdsRanger is an Arabic-first platform for MENA agencies: every client\'s ads, search visibility and reports in one place. In development; launching 2027.';
     $b = fn (string $s) => '<bdi dir="ltr">'.$s.'</bdi>';
 
     $faqs = $ar ? [
         ['متى تُطلق AdsRanger؟', $b('AdsRanger').' قيد التطوير، والإطلاق في 2027. انضم إلى قائمة الانتظار لنراسلك عند الإطلاق.'],
         ['كم السعر؟', 'تُعلن الأسعار عند الإطلاق. ويمكنك أن ترى ما تخطط كل باقة لتقديمه في <a href="'.$u('/pricing').'">صفحة الباقات</a>.'],
         ['ما المنصات الإعلانية المخطط ربطها؟', 'في المرحلة الأولى: '.$b('Meta').'، '.$b('Google Ads').'، '.$b('TikTok').'، '.$b('Snapchat').'، '.$b('Microsoft Advertising').'، '.$b('LinkedIn').'، '.$b('X').'. ويُفتح كل تكامل بعد موافقة المنصة على تطبيقنا.'],
-        ['هل يمكن أن تعدّل AdsRanger حملات عملائي؟', 'لا. اتصالات التقارير تقرأ البيانات فقط، ولا يمكنها تعديل الميزانيات أو المزايدات أو الحملات. أما استوديو الإعلانات، وهو مخطط له، فلن ينشر أي شيء إلا بعد موافقتك.'],
+        ['هل يمكن أن تعدّل AdsRanger حملات عملائي؟', 'تطلب بعض المنصات صلاحية إدارة عند الربط، لكن '.$b('AdsRanger').' لا تغيّر أي ميزانية أو حملة دون موافقة أحد أعضاء فريقك. والتقارير تقرأ البيانات فقط، واستوديو الإعلانات المخطط له لن ينشر أي شيء إلا بعد موافقتك.'],
         ['لمن صُممت AdsRanger؟', 'لوكالات الإعلان في المنطقة التي تدير إعلانات عملاء كثيرين، وللمستقلين عبر باقة المستقل.'],
+        ['هل تشمل AdsRanger أدوات للسيو؟', 'نعم، وهي قيد التطوير: فحص المواقع، والكلمات المفتاحية، وتتبّع الترتيب، وإعلانات المنافسين في البحث، بالعربية أولًا. نعلن موعد كل أداة عند جاهزيتها.'],
     ] : [
         ['When does AdsRanger launch?', 'AdsRanger is in development and launching in 2027. Join the waitlist and we\'ll email you at launch.'],
         ['How much will it cost?', 'Prices are shared at launch. You can see what each plan is planned to include on the <a href="'.$u('/pricing').'">plans page</a>.'],
         ['Which ad platforms are planned?', 'In the first stage: Meta, Google Ads, TikTok, Snapchat, Microsoft Advertising, LinkedIn and X. Each integration opens after the platform approves our app.'],
-        ['Can AdsRanger change my clients\' campaigns?', 'No. Reporting connections only read data; they can\'t change budgets, bids or campaigns. The planned Ads Studio will publish nothing without your approval.'],
+        ['Can AdsRanger change my clients\' campaigns?', 'Some platforms ask for management permission when you connect, but AdsRanger changes no budget or campaign without a team member\'s approval. Reports only read data, and the planned Ads Studio will publish nothing without your approval.'],
         ['Who is AdsRanger for?', 'Ad agencies in the region that run ads for many clients, and freelancers on the Solo plan.'],
+        ['Does AdsRanger include SEO tools?', 'Yes, in development: site checks, keyword research, rank tracking and competitors\' search ads, Arabic first. We\'ll announce each tool when it\'s ready.'],
     ];
     $schema = [
         ['@type' => 'Organization', 'name' => 'AdsRanger', 'url' => 'https://adsranger.com/', 'logo' => 'https://adsranger.com/brand/icon-512.png'],
@@ -33,10 +35,12 @@
         ['كل منصة تحسب النتائج بطريقتها.', 'نتيجة واحدة لكل هدف.', 'تُحسب نتيجة كل حملة حسب هدفها: الرسائل، المكالمات، العملاء المحتملون، الحجوزات، المبيعات، ثم تُجمع نتائج كل المنصات الإعلانية للعميل في عرض واحد.', ['/demo-report', 'شاهدها في التقرير التجريبي']],
         ['الهدر يُكتشف بعد أيام.', 'المكتب اليومي وتنبيهات الصباح.', 'التتبّع المعطّل، والإنفاق دون نتائج، وضعف التسليم، وارتفاع التكلفة، تظهر لك كل صباح مرتبة حسب الأولوية.', null],
         ['تقارير العملاء تُعدّ يدويًا.', 'روابط وتقارير جاهزة للعملاء.', 'رابط للقراءة فقط يفتحه العميل دون حساب، وتقرير شهري بالعربية أو الإنجليزية يحمل شعار وكالتك.', ['/demo-report', 'شاهد تقريرًا تجريبيًا']],
+        ['لا تعرف أين يظهر عملاؤك في البحث.', 'فحص المواقع وتتبّع الظهور في البحث.', 'تفحص AdsRanger مواقع عملائك بالعربية والإنجليزية، وتعرض الكلمات المفتاحية التي يبحث بها جمهورهم، وترتيبهم في نتائج البحث حسب الدولة، وإعلانات المنافسين في البحث.', null],
     ] : [
         ['Every platform counts results its own way.', 'One result per goal.', 'Each campaign is counted by its goal: messages, calls, leads, bookings or sales, then all of a client\'s ad platforms come together in one view.', ['/demo-report', 'See it in the sample report']],
         ['Wasted spend is found days late.', 'A daily desk and morning alerts.', 'Broken tracking, spend with no results, under-delivery and rising costs, shown every morning in order of priority.', null],
         ['Client reports are built by hand.', 'Client-ready links and reports.', 'A read-only link your client opens without an account, and a monthly report in Arabic or English with your agency\'s logo.', ['/demo-report', 'See a sample report']],
+        ['You can\'t see where your clients show up in search.', 'Site checks and search visibility.', 'AdsRanger checks your clients\' sites in Arabic and English, shows the keywords their audience searches for, their search rankings by country, and competitors\' search ads.', null],
     ];
     $more = $ar ? [
         ['مؤشر الصحة والمستهدفات', 'تقييم كل عميل من 0 إلى 100 مقابل الميزانية وتكلفة النتيجة والمستهدفات.', 'قيد التطوير', false],
@@ -46,11 +50,11 @@
         ['Ads Studio', 'Build campaigns and ad copy for several platforms from one brief, with your approval before anything is published.', 'Planned', true],
     ];
     $steps = $ar ? [
-        ['أضف حسابات عملائك الإعلانية', 'بصلاحية قراءة فقط، بعد أن تعتمد كل منصة تطبيقنا.'],
+        ['أضف حسابات عملائك الإعلانية', 'بعد أن تعتمد كل منصة تطبيقنا، ولا يتغيّر شيء فيها دون موافقتك.'],
         ['تابع النتائج حسب الهدف', 'في المكتب اليومي كل صباح، مع تنبيهات بما يحتاج إلى تدخل.'],
         ['شارك عملاءك', 'رابطًا للقراءة فقط أو تقريرًا شهريًا بالعربية أو الإنجليزية.'],
     ] : [
-        ['Add your clients\' ad accounts', 'with read-only access, once each platform approves our app.'],
+        ['Add your clients\' ad accounts', 'once each platform approves our app; nothing in them changes without your approval.'],
         ['Follow results by goal', 'on the daily desk every morning, with alerts for what needs attention.'],
         ['Share with your clients', 'a read-only link or a monthly report in Arabic or English.'],
     ];
@@ -64,11 +68,11 @@
         ['Regional currencies.', 'Each client\'s results are converted daily into one currency of your choice, even when its ad accounts use different currencies.'],
     ];
     $trust = $ar ? [
-        ['صلاحية قراءة فقط.', 'لا يمكن لاتصالات التقارير تعديل الميزانيات أو الحملات.'],
+        ['لا تغيير دون موافقتك.', 'لا تغيّر AdsRanger الميزانيات أو الحملات دون موافقة أحد أعضاء فريقك، والتقارير تقرأ البيانات فقط.'],
         ['فصل بيانات كل وكالة.', 'ولا يرى أعضاء فريقك إلا العملاء المسندين إليهم.'],
         ['تحت تصرفك.', 'افصل أي حساب، أو صدّر تقاريرك، أو اطلب حذف بياناتك.'],
     ] : [
-        ['Read-only access.', 'Reporting connections can\'t change budgets or campaigns.'],
+        ['Nothing changes without your approval.', 'AdsRanger changes no budget or campaign without a team member\'s approval; reports only read data.'],
         ['Each agency kept apart.', 'Team members see only the clients they\'re given.'],
         ['Your control.', 'Disconnect any account, export your reports or ask us to delete your data.'],
     ];
@@ -130,9 +134,9 @@
 .dm-tag{font-weight:700;color:var(--neu-ink);background:var(--neu-bg);border-radius:6px;padding:2px 8px;font-size:12px}
 .dm fieldset{border:0;margin:0;padding:0;min-width:0}
 .dm legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.dm-tabs{display:flex;gap:4px;padding:10px 12px 0;overflow-x:auto;border-bottom:1px solid var(--line)}
+.dm-tabs{display:flex;flex-wrap:wrap;gap:4px;padding:10px 12px 0;border-bottom:1px solid var(--line)}
 .dm-r{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
-.dm-tabs label{display:inline-flex;align-items:center;min-height:44px;padding:8px 12px;margin:0;font-weight:600;font-size:14px;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
+.dm-tabs label{display:inline-flex;align-items:center;min-height:44px;padding:8px 10px;margin:0;font-weight:600;font-size:14px;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer}
 .dm-tabs label:hover{color:var(--ink)}
 #dm-t1:checked~.dm-tabs label[for=dm-t1],#dm-t2:checked~.dm-tabs label[for=dm-t2],#dm-t3:checked~.dm-tabs label[for=dm-t3]{color:var(--acc);border-bottom-color:var(--acc)}
 #dm-t1:focus-visible~.dm-tabs label[for=dm-t1],#dm-t2:focus-visible~.dm-tabs label[for=dm-t2],#dm-t3:focus-visible~.dm-tabs label[for=dm-t3]{outline:2px solid var(--acc);outline-offset:-2px;border-radius:6px}
@@ -223,10 +227,10 @@
     <div class="wrap hp-grid">
         <div>
             <p class="hp-status">{{ $ar ? 'قيد التطوير · الإطلاق في 2027' : 'In development · launching 2027' }}</p>
-            <h1 id="hp-h1">{{ $ar ? 'اعرف ما تحققه إعلانات كل عميل، قبل أن يسألك' : 'Know what every client\'s ads achieve, before they ask' }}</h1>
+            <h1 id="hp-h1">{{ $ar ? 'اعرف ما تحققه إعلانات كل عميل وظهوره في البحث، قبل أن يسألك' : 'Know what every client\'s ads and search visibility achieve, before they ask' }}</h1>
             <p class="lead">{{ $ar
-                ? 'منصة عربية أولًا لإدارة إعلانات الوكالات وتقاريرها: تحسب نتيجة كل حملة حسب هدفها الحقيقي، وتنبّهك كل صباح إلى الهدر، وتجهّز تقارير يفهمها عملاؤك بالعربية أو الإنجليزية.'
-                : 'An Arabic-first platform for managing and reporting agencies\' ads: it counts each campaign\'s result by its real goal, flags wasted spend every morning, and prepares reports your clients understand, in Arabic or English.' }}</p>
+                ? 'منصة عربية أولًا لإدارة إعلانات الوكالات وظهور عملائها في البحث: تحسب نتيجة كل حملة حسب هدفها، وتنبّهك كل صباح إلى الهدر، وتجهّز تقارير يفهمها عملاؤك بالعربية أو الإنجليزية. وأدوات البحث قيد التطوير أيضًا.'
+                : 'An Arabic-first platform for agencies\' ads and their clients\' search visibility: it counts each campaign\'s result by its goal, flags wasted spend every morning, and prepares reports your clients understand, in Arabic or English. Search tools are in development too.' }}</p>
             <div class="hp-ctas">
                 <a class="btn btn-main" href="{{ $u('/waitlist') }}?type=agency" data-cta="waitlist" data-pos="hero">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a>
                 <a class="btn btn-sec" href="{{ $u('/demo-report') }}" data-cta="sample_report" data-pos="hero">{{ $ar ? 'شاهد تقريرًا تجريبيًا' : 'See a sample report' }}</a>
@@ -282,7 +286,7 @@
                 <h3>{{ $problem }}</h3>
                 <div class="ans">
                     <strong>{{ $answer }}</strong>
-                    <p>{{ $text }}@if ($link) <a href="{{ $u($link[0]) }}" data-cta="sample_report" data-pos="problem_row">{{ $link[1] }}</a>@endif</p>
+                    <p>{!! str_replace('AdsRanger', $b('AdsRanger'), e($text)) !!}@if ($link) <a href="{{ $u($link[0]) }}" data-cta="sample_report" data-pos="problem_row">{{ $link[1] }}</a>@endif</p>
                 </div>
             </li>
         @endforeach

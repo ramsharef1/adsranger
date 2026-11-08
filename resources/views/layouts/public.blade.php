@@ -123,7 +123,7 @@ h3{font-size:18px;margin:0 0 6px}
 .crumbs{font-size:14px;margin:0 0 14px;color:#94a3b8}
 .crumbs ol{list-style:none;display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0}
 .crumbs li+li::before{content:"/";margin-inline-end:6px;color:#475569}
-.crumbs a{color:#cbd5e1;text-decoration:none;display:inline-flex;min-height:24px}
+.crumbs a{color:#cbd5e1;text-decoration:none;display:inline-flex;align-items:center;min-height:44px;padding-inline:2px}
 .crumbs a:hover{color:#fff;text-decoration:underline}
 .ph-status{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#5eead4;margin-bottom:10px}
 .ph-status::before{content:"";width:8px;height:8px;border-radius:99px;background:#5eead4}
@@ -158,6 +158,7 @@ h3{font-size:18px;margin:0 0 6px}
 .ck{position:fixed;inset-inline:0;bottom:0;z-index:50;background:var(--surface);border-top:1px solid var(--line);font-size:14px}
 .ck .wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:10px}
 .ck p{margin:0;flex:1;min-width:220px}
+@media (max-width:480px){.ck{font-size:13px}.ck .wrap{gap:8px;padding-block:6px}.ck p{min-width:0}.ck .btn{min-height:44px;padding:6px 14px}}
 /* forms */
 label,.lbl{display:block;font-weight:600;margin:16px 0 6px}
 input[type=text],input[type=email],input[type=number],select{width:100%;min-height:48px;padding:10px 12px;border-radius:10px;border:1px solid var(--field);background:var(--bg);color:var(--ink);font:inherit}
@@ -261,7 +262,7 @@ input[type=text],input[type=email],input[type=number],select{width:100%;min-heig
         <div class="sf-top">
             <div>
                 <a class="sh-logo" href="{{ $u('/') }}" aria-label="AdsRanger" translate="no"><img src="/brand/adsranger-mark-teal.svg" alt="" width="28" height="28"><span aria-hidden="true">Ads<b>Ranger</b></span></a>
-                <p>{!! $ar ? 'منصة عربية أولًا لإدارة إعلانات الوكالات وتقاريرها. ما زالت <bdi dir="ltr">AdsRanger</bdi> قيد التطوير، والإطلاق في 2027.' : 'An Arabic-first platform for managing and reporting agencies\' ads. AdsRanger is still in development and launching in 2027.' !!}</p>
+                <p>{!! $ar ? 'منصة عربية أولًا لإعلانات الوكالات وظهور عملائها في البحث. ما زالت <bdi dir="ltr">AdsRanger</bdi> قيد التطوير، والإطلاق في 2027.' : 'An Arabic-first platform for agencies\' ads and their clients\' search visibility. AdsRanger is in development and launching in 2027.' !!}</p>
             </div>
             @foreach ($site::footer($ar) as $ci => [$heading, $paths])
                 <nav aria-labelledby="sf-h{{ $ci }}">

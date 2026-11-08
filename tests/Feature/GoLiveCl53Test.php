@@ -29,8 +29,8 @@ class GoLiveCl53Test extends TestCase
 
     public function test_home_title_is_b01(): void
     {
-        $this->get('/')->assertSee('<title>منصة إدارة الإعلانات للوكالات بالعربية | AdsRanger</title>', false);
-        $this->raw('/en/')->assertSee('<title>Arabic-First Ad Management Platform for Agencies | AdsRanger</title>', false);
+        $this->get('/')->assertSee('<title>منصة الإعلانات والسيو للوكالات بالعربية | AdsRanger</title>', false);
+        $this->raw('/en/')->assertSee('<title>Arabic-First Ads and SEO Platform for Agencies | AdsRanger</title>', false);
     }
 
     /** The test client trims trailing slashes, so /en/ goes through the kernel directly. */

@@ -5,8 +5,8 @@ $arPath = '/integrations';
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $ar ? 'ar' : 'en');
 $title = $ar ? 'المنصات الإعلانية التي نخطط لربطها | AdsRanger' : 'Ad platforms we plan to connect | AdsRanger';
 $meta = $ar
-    ? 'المنصات الإعلانية التي تخطط AdsRanger لربطها لوكالات المنطقة، بصلاحية قراءة فقط عبر الواجهة الرسمية لكل منصة. قيد التطوير.'
-    : 'The ad platforms AdsRanger plans to connect for MENA agencies, with read-only access through each network\'s official API. In development.';
+    ? 'المنصات الإعلانية التي تخطط AdsRanger لربطها لوكالات المنطقة، عبر الواجهة الرسمية لكل منصة. قيد التطوير.'
+    : 'The ad platforms AdsRanger plans to connect for MENA agencies, through each network\'s official API. In development.';
 $schema = [['@type' => 'WebPage', 'name' => $title, 'url' => \App\Support\PublicUrl::absolute($arPath, $ar ? 'ar' : 'en'), 'inLanguage' => $ar ? 'ar' : 'en']];
 $tiktokLine = $ar ? 'الإنفاق والنتائج حسب هدف الحملة' : 'Spend and results by campaign goal';
 $first = [
@@ -34,8 +34,8 @@ $later = ['Apple Ads', 'Amazon Ads', 'Pinterest', 'Reddit', 'Taboola', 'Outbrain
 @section('hero')
 <h1>{{ $ar ? 'المنصات الإعلانية التي نخطط لربطها' : 'The ad platforms we plan to connect' }}</h1>
 <p class="muted" style="font-size:17px">{{ $ar
-? 'هذه التكاملات قيد التطوير: لا يُفتح أي منها للوكالات بعد، وكل تكامل يُفتح بعد موافقة المنصة على تطبيقنا. نستخدم الواجهات الرسمية بصلاحية قراءة فقط.'
-: 'These integrations are in development: none is open to agencies yet, and each one opens after the platform approves our app. We use each platform\'s official API with read-only access.' }}</p>
+? 'هذه التكاملات قيد التطوير: لا يُفتح أي منها للوكالات بعد، وكل تكامل يُفتح بعد موافقة المنصة على تطبيقنا. نستخدم الواجهات الرسمية لكل منصة، ولا يتغيّر شيء في حساباتك دون موافقتك.'
+: 'These integrations are in development: none is open to agencies yet, and each one opens after the platform approves our app. We use each platform\'s official API, and nothing in your accounts changes without your approval.' }}</p>
 @endsection
 
 @section('content')

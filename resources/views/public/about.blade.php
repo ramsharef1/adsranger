@@ -16,11 +16,11 @@ $schema = [
 $holds = $ar ? [
     ['العربية أولًا.', 'كل شاشة وتقرير ورسالة مكتوبة بالعربية أولًا، مع نسخة إنجليزية.'],
     ['النتيجة الحقيقية.', 'تُحسب كل حملة حسب الهدف الذي صُممت من أجله.'],
-    ['بياناتك ملكك.', 'صلاحية قراءة فقط للحسابات الإعلانية، وفصل بيانات كل وكالة.'],
+    ['بياناتك ملكك.', 'لا تغيير في الحسابات الإعلانية دون موافقتكم، وفصل بيانات كل وكالة.'],
 ] : [
     ['Arabic first.', 'Every screen, report and email is written in Arabic first, with an English version.'],
     ['The real result.', 'Each campaign is counted by the goal it was built for.'],
-    ['Your data stays yours.', 'Read-only access to ad accounts, each agency kept apart.'],
+    ['Your data stays yours.', 'No change to ad accounts without your approval, each agency kept apart.'],
 ];
 @endphp
 @extends('layouts.public')

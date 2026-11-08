@@ -49,7 +49,7 @@ $fieldIds = ['email' => 'pa-email', 'agency_name' => 'pa-agency', 'country' => '
     <ul class="dots">
         <li>{{ $ar ? 'مكالمات قصيرة كل أسبوعين' : 'Short calls every two weeks' }}</li>
         <li>{{ $ar ? 'ملاحظات على الشاشات والتقارير' : 'Feedback on screens and reports' }}</li>
-        <li>{{ $ar ? 'تجربة الميزات على حساباتهم بعد موافقة المنصات على تطبيقاتنا (قراءة فقط، وبموافقة مكتوبة من كل عميل)' : 'Trying features on their own accounts once the platforms approve our apps (read-only, with each client\'s written OK)' }}</li>
+        <li>{{ $ar ? 'تجربة الميزات على حساباتهم بعد موافقة المنصات على تطبيقاتنا (دون أي تغيير في الحملات، وبموافقة مكتوبة من كل عميل)' : 'Trying features on their own accounts once the platforms approve our apps (no changes to campaigns, with each client\'s written OK)' }}</li>
     </ul>
     <h2>{{ $ar ? 'ما يحصل عليه الشركاء' : 'What partners get' }}</h2>
     <ul class="dots">
