@@ -26,7 +26,12 @@ $holds = $ar ? [
 @extends('layouts.public')
 
 @push('styles')
-<style>.ab{max-width:820px;padding-top:24px}.ab a.pl{display:inline-flex;align-items:center;min-height:44px}</style>
+<style>
+.ab{max-width:920px;padding-top:24px}
+.ab a.pl{display:inline-flex;align-items:center;min-height:44px}
+.ab-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:14px;margin-top:14px}
+.ab-grid .card p{margin:6px 0 0;color:var(--muted)}
+</style>
 @endpush
 
 @section('content')
@@ -42,10 +47,14 @@ $holds = $ar ? [
         : 'Teams in the region run ads on many platforms, report to clients in two languages and plan around Ramadan and the Hijri calendar. Most tools were built for none of that.' }}</p>
 
     <h2>{{ $ar ? 'ما نلتزم به' : 'What we hold to' }}</h2>
-    @foreach ($holds as $i => [$head, $body])
-        <h3>{{ $head }}</h3>
-        <p>{{ $body }}@if ($i === 2) <a class="pl" href="{{ $u('/security') }}">{{ $ar ? 'كيف نحمي بياناتك' : 'How we protect your data' }}</a>@endif</p>
-    @endforeach
+    <div class="ab-grid">
+        @foreach ($holds as $i => [$head, $body])
+            <div class="card">
+                <h3>{{ $head }}</h3>
+                <p>{{ $body }}@if ($i === 2) <a class="pl" href="{{ $u('/security') }}">{{ $ar ? 'كيف نحمي بياناتك' : 'How we protect your data' }}</a>@endif</p>
+            </div>
+        @endforeach
+    </div>
 
     <p class="muted" style="margin-top:28px">{{ $ar ? 'تأسست في 2026 · عمّان، الأردن' : 'Founded 2026 · Amman, Jordan' }}</p>
     <p><a class="pl" href="{{ $u('/contact') }}">{{ $ar ? 'تواصل معنا' : 'Contact us' }}</a> · <a class="pl" href="{{ $u('/security') }}">{{ $ar ? 'الأمان' : 'Security' }}</a></p>

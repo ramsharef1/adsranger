@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Admin\Pages\NetworkRequests;
 use App\Filament\Admin\Pages\PartnerApplications;
+use App\Filament\Admin\Pages\PlatformSettings;
 use App\Filament\Admin\Pages\WaitlistEntries;
 use App\Filament\Admin\Widgets\SystemOverviewWidget;
 use App\Models\PartnerApplication;
@@ -57,5 +59,23 @@ class AdminAndPublicUxPolishTest extends TestCase
             ->assertSee('Petra Media')
             ->assertSee('AR: 1 · EN: 0')
             ->assertStatus(200);
+
+        Livewire::test(PlatformSettings::class)
+            ->assertSee('agency_ops_hub')
+            ->assertSee('intelligence_hub')
+            ->assertStatus(200);
+
+        Livewire::test(NetworkRequests::class)
+            ->assertStatus(200);
+    }
+
+    public function test_public_security_about_and_business_owners_card_grids_render(): void
+    {
+        $this->get('/security')->assertOk()->assertSee('sec-grid', false);
+        $this->get('/en/security')->assertOk()->assertSee('sec-grid', false);
+        $this->get('/about')->assertOk()->assertSee('ab-grid', false);
+        $this->get('/en/about')->assertOk()->assertSee('ab-grid', false);
+        $this->get('/solutions/business-owners')->assertOk()->assertSee('bo-grid', false);
+        $this->get('/en/solutions/business-owners')->assertOk()->assertSee('bo-grid', false);
     }
 }

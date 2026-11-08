@@ -26,7 +26,13 @@ $tools = [[$u('/tools/ramadan-budget-calculator'), $ar ? 'حاسبة ميزان�
 @extends('layouts.public')
 
 @push('styles')
-<style>.bo{max-width:820px;padding-top:24px}.bo ul.dots{padding-inline-start:22px}.bo a.pl{display:inline-flex;align-items:center;min-height:44px}</style>
+<style>
+.bo{max-width:920px;padding-top:24px}
+.bo ul.dots{padding-inline-start:22px;margin:8px 0 0}
+.bo a.pl{display:inline-flex;align-items:center;min-height:44px}
+.bo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(280px,100%),1fr));gap:14px;margin-top:18px}
+.bo-grid .card h2{margin-top:0}
+</style>
 @endpush
 
 @section('content')
@@ -39,14 +45,20 @@ $tools = [[$u('/tools/ramadan-budget-calculator'), $ar ? 'حاسبة ميزان�
         <li>{{ $ar ? 'لا وقت لمراجعة كل حساب يوميًا.' : 'No time to check every account each day.' }}</li>
     </ul>
 
-    <h2>{{ $ar ? 'ما نبنيه لك' : 'What we\'re building for you' }} <span class="badge">{{ $ar ? 'قيد التطوير' : 'In development' }}</span></h2>
-    <ul class="dots">@foreach ($features as $f)<li>{{ $f }}</li>@endforeach</ul>
+    <div class="bo-grid">
+        <div class="card">
+            <h2>{{ $ar ? 'ما نبنيه لك' : 'What we\'re building for you' }} <span class="badge">{{ $ar ? 'قيد التطوير' : 'In development' }}</span></h2>
+            <ul class="dots">@foreach ($features as $f)<li>{{ $f }}</li>@endforeach</ul>
+        </div>
 
-    <h2>{{ $ar ? 'أدوات وأدلة مجانية' : 'Free tools and guides' }}</h2>
-    <ul class="dots">@foreach ($tools as [$href, $label])<li><a class="pl" href="{{ $href }}">{{ $label }}</a></li>@endforeach</ul>
+        <div class="card">
+            <h2>{{ $ar ? 'أدوات وأدلة مجانية' : 'Free tools and guides' }}</h2>
+            <ul class="dots">@foreach ($tools as [$href, $label])<li><a class="pl" href="{{ $href }}">{{ $label }}</a></li>@endforeach</ul>
 
-    <h2>{{ $ar ? 'الباقة' : 'Plan' }}</h2>
-    <p>{{ $ar ? 'باقة المستقل: للمستقلين والشركات التي تدير إعلاناتها بنفسها' : 'Solo: for freelancers and businesses that run their own ads' }} <span class="badge badge-neutral">{{ $ar ? 'مخطط له' : 'Planned' }}</span></p>
+            <h2 style="margin-top:20px">{{ $ar ? 'الباقة' : 'Plan' }}</h2>
+            <p style="margin:6px 0 0">{{ $ar ? 'باقة المستقل: للمستقلين والشركات التي تدير إعلاناتها بنفسها' : 'Solo: for freelancers and businesses that run their own ads' }} <span class="badge badge-neutral">{{ $ar ? 'مخطط له' : 'Planned' }}</span></p>
+        </div>
+    </div>
 
     <p style="margin-top:24px"><a class="btn" href="{{ $u('/waitlist') }}?type=business">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a></p>
 </section>

@@ -344,7 +344,7 @@
     "By": "بواسطة",
     "Details": "التفاصيل",
     "IP": "IP",
-    "On": "على",
+    "On": "مفعّل",
     "When": "الوقت",
     "system": "النظام",
     "Available for new agencies": "متاحة للوكالات الجديدة",
@@ -1405,5 +1405,10 @@
     "Live summary of workspaces, public waitlist signups, partner applications, and platform safety switches.": "ملخص مباشر لمساحات العمل، وتسجيلات قائمة الانتظار، وطلبات الشركاء، ومفاتيح أمان المنصة.",
     "Invite only": "بدعوة فقط",
     "Held-back modules off": "الوحدات المؤجلة المتوقفة",
-    "Total": "الإجمالي"
+    "Total": "الإجمالي",
+    "Held-back modules (config/modules.php)": "الوحدات المؤجلة (config/modules.php)",
+    "Read-only status of feature switches governed by D-149 and D-229. Standard workspaces only see modules that are turned on.": "حالة للقراءة فقط لمفاتيح الميزات المحكومة بالقرارين D-149 و D-229. لا ترى مساحات العمل العادية إلا الوحدات المفعّلة.",
+    "Module key": "مفتاح الوحدة",
+    "Off (held back)": "متوقف (مؤجل)",
+    "Preview workspaces": "مساحات عمل المعاينة"
 }
