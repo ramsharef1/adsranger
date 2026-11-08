@@ -78,4 +78,15 @@ class AdminAndPublicUxPolishTest extends TestCase
         $this->get('/solutions/business-owners')->assertOk()->assertSee('bo-grid', false);
         $this->get('/en/solutions/business-owners')->assertOk()->assertSee('bo-grid', false);
     }
+
+    /** E1 review of E2-025…030: no competitor naming or colours; platforms in the hero are labelled planned. */
+    public function test_reviewed_redesign_keeps_brand_and_honesty_rules(): void
+    {
+        foreach (['/', '/en/', '/about'] as $path) {
+            $html = $this->call('GET', $path)->getContent();
+            $this->assertStringNotContainsStringIgnoringCase('semrush', $html, $path);
+            $this->assertStringNotContainsString('#ff642d', $html, $path);
+        }
+        $this->get('/')->assertSee('المنصات المخطط لها:')->assertSee('<span>Google Ads</span>', false);
+    }
 }

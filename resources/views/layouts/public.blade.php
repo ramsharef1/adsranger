@@ -88,8 +88,8 @@ main p a,main li a,main td a{text-decoration:underline}
 h1{font-size:clamp(28px,4.5vw,42px);line-height:1.25;margin:0 0 12px}
 h2{font-size:clamp(21px,3vw,26px);line-height:1.35;margin:32px 0 12px}
 h3{font-size:18px;margin:0 0 6px}
-/* header — Semrush #111322 dark command bar */
-.sh{border-bottom:1px solid #262940;background:#111322;color:#f8fafc}
+/* header — #0f172a dark command bar */
+.sh{border-bottom:1px solid #1e293b;background:#0f172a;color:#f8fafc}
 .sh-in{display:flex;align-items:center;gap:8px;min-height:66px}
 .sh-logo{display:inline-flex;align-items:center;gap:8px;min-height:44px;min-width:44px;direction:ltr;color:#ffffff;text-decoration:none;font-weight:700;font-size:19px}
 .sh-logo img{width:32px;height:32px}
@@ -99,7 +99,7 @@ h3{font-size:18px;margin:0 0 6px}
 .sh-nav a[aria-current=page]{font-weight:700;color:#ffffff;background:rgba(255,255,255,.08)}
 .sh-nav a:hover,.sh-ctl:hover{color:#ffffff;background:rgba(255,255,255,.08)}
 .sh-end{display:flex;align-items:center;gap:6px;margin-inline-start:auto}
-.sh-end .btn{padding:8px 16px;background:#ff642d;color:#ffffff;border-radius:8px;font-weight:700}
+.sh-end .btn{padding:8px 16px;border-radius:8px;font-weight:700}
 .sh-end .btn:hover{background:#f0531c;color:#ffffff;opacity:1}
 .sh-menu{display:none}
 .sh-panel{display:none;border-top:1px solid var(--line);padding-block:8px 16px}
