@@ -7,4 +7,11 @@
  */
 return [
     'public' => (bool) env('SEO_TOOLS_PUBLIC', false),
+
+    // Each tool's view is resources/views/public/tools/<slug>.blade.php. URLs per Content's map (ADSR-042 §13) where set;
+    // the three ad tools (D-90) wait for Content's OK on their slugs.
+    'tools' => [
+        'serp-preview', 'meta-length-checker', 'arabic-keyword-generator', 'arabizi-converter',
+        'roas-calculator', 'budget-pacing-calculator', 'utm-builder', 'hreflang-checker',
+    ],
 ];

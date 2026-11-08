@@ -13,6 +13,7 @@ const out = lines.map(([text, country]) => ({
     key: n.key(text),
     variants: n.variants(text),
     arabizi: n.arabiziToArabic(text),
+    toArabizi: n.arabicToArabizi(text),
     dialects: n.dialectTags(text),
     city: n.cityOf(text, country || null),
     ratio: n.tashkeelRatio(text).toFixed(4),

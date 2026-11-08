@@ -60,7 +60,9 @@ class ArabicNormaliserTest extends TestCase
         $this->assertContains('حبيبي', Normaliser::arabiziToArabic('habibi'));
         $this->assertContains('مطعم', Normaliser::arabiziToArabic('mat3am'));
         $this->assertContains('قهوة', Normaliser::arabiziToArabic('8ahwa'));
+        $this->assertContains('عيادة اسنان', Normaliser::arabiziToArabic('3yadat asnan'));
 
+        $this->assertSame(['3yada 2asnan', 'aiada asnan'], array_slice(Normaliser::arabicToArabizi('عيادة أسنان'), 0, 2));
         $this->assertSame(['gulf'], Normaliser::dialectTags('أبغى جوال'));
         $this->assertSame(['egypt', 'maghreb'], Normaliser::dialectTags('المطعم فين'));
         $this->assertSame([], Normaliser::dialectTags('أين المطعم'));
@@ -105,6 +107,7 @@ class ArabicNormaliserTest extends TestCase
                 'key' => Normaliser::key($text),
                 'variants' => Normaliser::variants($text),
                 'arabizi' => Normaliser::arabiziToArabic($text),
+                'toArabizi' => Normaliser::arabicToArabizi($text),
                 'dialects' => Normaliser::dialectTags($text),
                 'city' => Normaliser::cityOf($text, $country ?: null),
                 'ratio' => number_format(Normaliser::tashkeelRatio($text), 4, '.', ''),

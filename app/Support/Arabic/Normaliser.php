@@ -98,27 +98,39 @@ class Normaliser
         $max = (int) $r['arabizi_max_candidates'];
         $results = [''];
         foreach (preg_split('/\s+/u', mb_strtolower(trim($text), 'UTF-8'), -1, PREG_SPLIT_NO_EMPTY) as $word) {
-            $wordForms = [''];
+            $scored = [['', 0]];
             $chars = mb_str_split($word);
             $i = 0;
             while ($i < count($chars)) {
                 [$options, $len] = self::arabiziToken($chars, $i);
                 $next = [];
-                foreach ($wordForms as $form) {
-                    foreach ($options as $opt) {
-                        $next[] = $form.$opt;
+                foreach ($scored as [$form, $score]) {
+                    foreach ($options as $oi => $opt) {
+                        $next[] = [$form.$opt, $score + $oi];
                     }
                 }
-                $wordForms = array_slice(array_values(array_unique($next)), 0, $max);
+                usort($next, fn ($x, $y) => $x[1] <=> $y[1]);
+                $seen = [];
+                $scored = [];
+                foreach ($next as $n) {
+                    if (! isset($seen[$n[0]]) && count($scored) < $max) {
+                        $seen[$n[0]] = true;
+                        $scored[] = $n;
+                    }
+                }
                 $i += $len;
             }
+            $wordForms = array_column($scored, 0);
+            // Combine word by word, best-ranked combinations first (sum of each word's rank), so the cap keeps the
+            // likeliest forms of every word rather than every form of the first word.
             $next = [];
-            foreach ($results as $res) {
-                foreach ($wordForms as $form) {
-                    $next[] = $res === '' ? $form : $res.' '.$form;
+            foreach ($results as $ri => $res) {
+                foreach ($wordForms as $fi => $form) {
+                    $next[] = [$res === '' ? $form : $res.' '.$form, $ri + $fi];
                 }
             }
-            $results = array_slice(array_values(array_unique($next)), 0, $max);
+            usort($next, fn ($x, $y) => $x[1] <=> $y[1]);
+            $results = array_slice(array_values(array_unique(array_column($next, 0))), 0, $max);
         }
 
         return array_values(array_filter($results, fn ($s) => $s !== ''));
@@ -141,6 +153,9 @@ class Normaliser
         if (isset($chars[$i + 1], $r['arabizi_letters'][$two])) {
             return [$r['arabizi_letters'][$two], 2];
         }
+        if ($i === count($chars) - 2 && $i > 0 && isset($r['arabizi_final'][$two])) {
+            return [$r['arabizi_final'][$two], 2];
+        }
         if ($i === count($chars) - 1 && $i > 0 && isset($r['arabizi_final'][$chars[$i]])) {
             return [$r['arabizi_final'][$chars[$i]], 1];
         }
@@ -152,6 +167,24 @@ class Normaliser
         }
 
         return [[$chars[$i]], 1];
+    }
+
+    /** @return list<string> Arabizi forms of an Arabic text: digit style first (3 = ع, 7 = ح), then letter style; tashkeel dropped. */
+    public static function arabicToArabizi(string $text): array
+    {
+        $r = self::rules();
+        $plain = (string) preg_replace('/['.self::tashkeelClass().']/u', '', str_replace($r['strip']['tatweel'], '', trim($text)));
+        $forms = [];
+        foreach ([0, 1] as $style) {
+            $out = '';
+            foreach (mb_str_split($plain) as $ch) {
+                $opts = $r['arabic_to_arabizi'][$ch] ?? [$ch];
+                $out .= $opts[$style] ?? $opts[0];
+            }
+            $forms[] = (string) preg_replace('/\s+/u', ' ', $out);
+        }
+
+        return array_values(array_unique(array_filter($forms, fn ($f) => $f !== '' && $f !== $plain)));
     }
 
     /** @return list<string> subset of gulf, levant, egypt, maghreb (marker words only); empty = MSA or unknown */

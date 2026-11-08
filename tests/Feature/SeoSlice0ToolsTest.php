@@ -34,10 +34,16 @@ class SeoSlice0ToolsTest extends TestCase
 
     public function test_tools_answer_but_stay_hidden_until_published(): void
     {
-        foreach (['/tools/serp-preview', '/en/tools/serp-preview', '/tools/meta-length-checker', '/en/tools/meta-length-checker'] as $url) {
-            $this->get($url)->assertOk()->assertHeader('X-Robots-Tag', 'noindex, nofollow')
-                ->assertSee('<meta name="robots" content="noindex, nofollow">', false)->assertSee('window.ArSerp', false);
+        foreach (config('seo_tools.tools') as $tool) {
+            foreach (['/tools/'.$tool, '/en/tools/'.$tool] as $url) {
+                $this->get($url)->assertOk()->assertHeader('X-Robots-Tag', 'noindex, nofollow')
+                    ->assertSee('<meta name="robots" content="noindex, nofollow">', false);
+                $this->get('/')->assertDontSee($url.'"', false);
+                $this->get('/sitemaps/pages.xml')->assertDontSee('/tools/'.$tool);
+            }
         }
+        $this->get('/tools/serp-preview')->assertSee('window.ArSerp', false);
+        $this->get('/tools/arabic-keyword-generator')->assertSee('window.ArNorm = createNormaliser', false)->assertDontSee('export function', false);
         $this->get('/tools/serp-preview')->assertSee('معاينة نتائج البحث')->assertSee('المعاينة تقديرية');
         $this->get('/tools/meta-length-checker')->assertSee('حتى 50 صفحة في كل مرة.');
         $this->get('/')->assertDontSee('/tools/serp-preview')->assertDontSee('/tools/meta-length-checker');

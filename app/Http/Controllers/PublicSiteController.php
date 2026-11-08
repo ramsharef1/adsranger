@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\PartnerApplication;
 use App\Models\WaitlistEntry;
 use App\Support\PublicUrl;
+use App\Support\Seo\Hreflang;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\RateLimiter;
@@ -193,7 +195,7 @@ class PublicSiteController extends Controller
         return view('public.ramadan-calculator', ['lang' => $lang === 'en' ? 'en' : 'ar']);
     }
 
-    /** Free SEO tools (SEO slice 0 step 0.4). Until config('seo_tools.public') is on they answer but stay noindex. */
+    /** Free tools (SEO slice 0 step 0.4 + D-90 ad tools). Until config('seo_tools.public') is on they answer but stay noindex. */
     public function seoTool(string $lang = 'ar', string $tool = 'serp-preview'): Response
     {
         $public = (bool) config('seo_tools.public');
@@ -201,12 +203,33 @@ class PublicSiteController extends Controller
             'lang' => $lang === 'en' ? 'en' : 'ar',
             'noindex' => ! $public,
             'widths' => json_decode((string) file_get_contents(resource_path('seo/serp_widths.json')), true),
+            'arabicRules' => json_decode((string) file_get_contents(resource_path('arabic/normalise.json')), true),
         ]);
         if (! $public) {
             $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
         }
 
         return $response;
+    }
+
+    /**
+     * Free hreflang checker run (PR-015 §2.4): checks the URL and its language versions server-side through SafeFetcher.
+     * Limits per visitor (salted hash of the IP, never stored raw): 5 runs a day (D-243) and 10 an hour (D-239).
+     * Nothing about the URL or the result is stored.
+     */
+    public function hreflangRun(Request $request): JsonResponse
+    {
+        $data = $request->validate(['url' => ['required', 'string', 'max:500', 'regex:#^https?://#i']]);
+        $who = hash('sha256', config('app.key').'|'.$request->ip());
+        foreach ([['hreflang-day:'.$who.':'.now()->toDateString(), 5, 86400], ['hreflang-hour:'.$who, 10, 3600]] as [$key, $max, $decay]) {
+            if (RateLimiter::tooManyAttempts($key, $max)) {
+                return response()->json(['error' => 'limit'], 429);
+            }
+        }
+        RateLimiter::hit('hreflang-day:'.$who.':'.now()->toDateString(), 86400);
+        RateLimiter::hit('hreflang-hour:'.$who, 3600);
+
+        return response()->json(Hreflang::check($data['url']));
     }
 
     /**

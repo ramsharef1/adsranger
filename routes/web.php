@@ -26,11 +26,12 @@ Route::middleware(PublicTrailingSlash::class)->group(function () {
     Route::get('/en/ramadan-2027', [PublicSiteController::class, 'ramadan'])->defaults('lang', 'en');
     Route::get('/tools/ramadan-budget-calculator', [PublicSiteController::class, 'ramadanCalculator'])->defaults('lang', 'ar');
     Route::get('/en/tools/ramadan-budget-calculator', [PublicSiteController::class, 'ramadanCalculator'])->defaults('lang', 'en');
-    // SEO slice 0 step 0.4 free tools (PR-015 Part 2): reachable for checks, noindex until config('seo_tools.public').
-    Route::get('/tools/serp-preview', [PublicSiteController::class, 'seoTool'])->defaults('lang', 'ar')->defaults('tool', 'serp-preview');
-    Route::get('/en/tools/serp-preview', [PublicSiteController::class, 'seoTool'])->defaults('lang', 'en')->defaults('tool', 'serp-preview');
-    Route::get('/tools/meta-length-checker', [PublicSiteController::class, 'seoTool'])->defaults('lang', 'ar')->defaults('tool', 'meta-length-checker');
-    Route::get('/en/tools/meta-length-checker', [PublicSiteController::class, 'seoTool'])->defaults('lang', 'en')->defaults('tool', 'meta-length-checker');
+    // Free tools (SEO slice 0 step 0.4 + D-90 ad tools): reachable for checks, noindex until config('seo_tools.public').
+    foreach (config('seo_tools.tools') as $tool) {
+        Route::get('/tools/'.$tool, [PublicSiteController::class, 'seoTool'])->defaults('lang', 'ar')->defaults('tool', $tool);
+        Route::get('/en/tools/'.$tool, [PublicSiteController::class, 'seoTool'])->defaults('lang', 'en')->defaults('tool', $tool);
+    }
+    Route::post('/tools/hreflang-checker/run', [PublicSiteController::class, 'hreflangRun'])->middleware('throttle:30,1');
 
     Route::get('/pricing', [PublicSiteController::class, 'pricing'])->defaults('lang', 'ar');
     Route::get('/en/pricing', [PublicSiteController::class, 'pricing'])->defaults('lang', 'en');

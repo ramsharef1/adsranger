@@ -31,6 +31,7 @@ export function createNormaliser(rules) {
         if (rules.arabizi_map[two] !== undefined) { return [[].concat(rules.arabizi_map[two]), 2]; }
         if (rules.arabizi_map[chars[i]] !== undefined) { return [[].concat(rules.arabizi_map[chars[i]]), 1]; }
         if (two.length > chars[i].length && rules.arabizi_letters[two] !== undefined) { return [rules.arabizi_letters[two], 2]; }
+        if (i === chars.length - 2 && i > 0 && rules.arabizi_final[two] !== undefined) { return [rules.arabizi_final[two], 2]; }
         if (i === chars.length - 1 && i > 0 && rules.arabizi_final[chars[i]] !== undefined) { return [rules.arabizi_final[chars[i]], 1]; }
         if (i === 0 && ['a', 'e', 'i', 'o', 'u'].includes(chars[i])) { return [['ا'], 1]; }
         if (rules.arabizi_letters[chars[i]] !== undefined) { return [rules.arabizi_letters[chars[i]], 1]; }
@@ -42,19 +43,24 @@ export function createNormaliser(rules) {
         const max = Number(rules.arabizi_max_candidates);
         let results = [''];
         for (const word of text.trim().toLowerCase().split(/\s+/u).filter(Boolean)) {
-            let forms = [''];
+            let scored = [['', 0]];
             const chars = Array.from(word);
             let i = 0;
             while (i < chars.length) {
                 const [options, len] = arabiziToken(chars, i);
                 const next = [];
-                for (const f of forms) { for (const o of options) { next.push(f + o); } }
-                forms = unique(next).slice(0, max);
+                for (const [f, sc] of scored) { options.forEach((o, oi) => { next.push([f + o, sc + oi]); }); }
+                next.sort((x, y) => x[1] - y[1]);
+                const seen = new Set();
+                scored = [];
+                for (const n of next) { if (!seen.has(n[0]) && scored.length < max) { seen.add(n[0]); scored.push(n); } }
                 i += len;
             }
+            const forms = scored.map((x) => x[0]);
             const next = [];
-            for (const r of results) { for (const f of forms) { next.push(r === '' ? f : `${r} ${f}`); } }
-            results = unique(next).slice(0, max);
+            results.forEach((r, ri) => { forms.forEach((f, fi) => { next.push([r === '' ? f : `${r} ${f}`, ri + fi]); }); });
+            next.sort((x, y) => x[1] - y[1]);
+            results = unique(next.map((x) => x[0])).slice(0, max);
         }
 
         return results.filter((s) => s !== '');
@@ -85,6 +91,17 @@ export function createNormaliser(rules) {
         }
 
         return Array.from(out.values());
+    }
+
+    function arabicToArabizi(text) {
+        const plain = text.trim().split(rules.strip.tatweel).join('').replace(tashkeelRe, '');
+        const forms = [0, 1].map((style) => Array.from(plain).map((ch) => {
+            const opts = rules.arabic_to_arabizi[ch] ?? [ch];
+
+            return opts[style] ?? opts[0];
+        }).join('').replace(/\s+/gu, ' '));
+
+        return unique(forms.filter((f) => f !== '' && f !== plain));
     }
 
     function dialectTags(text) {
@@ -161,5 +178,5 @@ export function createNormaliser(rules) {
         return Math.round((marked / words.length) * 10000) / 10000;
     }
 
-    return { key, variants, arabiziToArabic, dialectTags, cityOf, sameKeyword, tashkeelRatio };
+    return { key, variants, arabiziToArabic, arabicToArabizi, dialectTags, cityOf, sameKeyword, tashkeelRatio };
 }
