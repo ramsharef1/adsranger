@@ -55,7 +55,7 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::SIMPLE_PAGE_END, fn () => view('panels.lang-switch'))
             ->profile(isSimple: false)
             ->colors([
-                'primary' => Color::Slate,
+                'primary' => Color::Teal,
             ])
             ->userMenuItems([
                 Action::make('switch-language')
