@@ -74,6 +74,15 @@ class HreflangCheckerTest extends TestCase
         Http::assertNothingSent();
     }
 
+    public function test_own_hosts_are_pinned_to_the_public_ip_and_private_overrides_are_ignored(): void
+    {
+        $this->assertSame('72.62.132.138', SafeFetcher::ownHostIp('adsranger.com'));
+        $this->assertSame('72.62.132.138', SafeFetcher::ownHostIp('WWW.adsranger.com'));
+        $this->assertNull(SafeFetcher::ownHostIp('example.com'));
+        config(['seo_tools.own_hosts' => ['adsranger.com' => '127.0.0.1']]);
+        $this->assertNull(SafeFetcher::ownHostIp('adsranger.com'));
+    }
+
     public function test_redirects_to_a_private_address_are_refused(): void
     {
         Http::fake(['www.test-site.com/*' => Http::response('', 302, ['Location' => 'http://127.0.0.1/admin'])]);

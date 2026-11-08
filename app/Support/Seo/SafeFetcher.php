@@ -29,7 +29,7 @@ class SafeFetcher
     /** @return array{ok: bool, status: ?int, url: string, html: string, error: ?string} */
     public static function fetch(string $url): array
     {
-        $resolve = self::$resolver ?? fn (string $host) => LandingPages::publicIp($host);
+        $resolve = self::$resolver ?? fn (string $host) => self::ownHostIp($host) ?? LandingPages::publicIp($host);
         for ($hop = 0; $hop <= self::MAX_REDIRECTS; $hop++) {
             $p = parse_url($url);
             $scheme = strtolower($p['scheme'] ?? '');
@@ -77,6 +77,14 @@ class SafeFetcher
         }
 
         return self::fail($url, 'redirects');
+    }
+
+    /** Our own hosts (config seo_tools.own_hosts) map to a fixed IP, used only if that IP is itself public. */
+    public static function ownHostIp(string $host): ?string
+    {
+        $ip = config('seo_tools.own_hosts')[strtolower($host)] ?? null;
+
+        return $ip && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) ? $ip : null;
     }
 
     /** @return array{ok: bool, status: ?int, url: string, html: string, error: ?string} */

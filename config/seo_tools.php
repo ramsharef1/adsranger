@@ -14,4 +14,11 @@ return [
         'serp-preview', 'meta-length-checker', 'arabic-keyword-generator', 'arabizi-converter',
         'roas-calculator', 'budget-pacing-calculator', 'utm-builder', 'hreflang-checker',
     ],
+
+    // Our own hosts, pinned to the server's public IP for SafeFetcher: the VPS resolves adsranger.com to ::1 in its hosts
+    // file, which the SSRF guard (rightly) refuses. Only these exact hosts are mapped; every other host goes through DNS.
+    'own_hosts' => [
+        'adsranger.com' => env('SEO_OWN_HOST_IP', '72.62.132.138'),
+        'www.adsranger.com' => env('SEO_OWN_HOST_IP', '72.62.132.138'),
+    ],
 ];
