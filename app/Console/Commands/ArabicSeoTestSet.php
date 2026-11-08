@@ -3,11 +3,12 @@
 namespace App\Console\Commands;
 
 use App\Support\Arabic\Normaliser;
+use App\Support\Seo\PageAudit;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
 /**
- * SEO slice 0 step 0.2 harness (FR-095): scores the Arabic SEO test set in tests/fixtures/arabic-seo against its
+ * SEO slice 0 step 0.2 + 0.3 harness (FR-095): scores the Arabic SEO test set in tests/fixtures/arabic-seo against its
  * pass bars, writes storage/app/arabic-seo/results-<date>.json and prints the one summary line E1 copies into the
  * build log. Exits with 1 when a file that exists is below its bar; files not delivered yet show as "pending".
  */
@@ -52,6 +53,7 @@ class ArabicSeoTestSet extends Command
         if (! is_file($path)) {
             return ['rows' => 0, 'passed' => 0, 'rate' => 0.0, 'bar' => $bar, 'status' => 'pending', 'failures' => []];
         }
+
         if ($file === 'pages/expected.json') {
             $spec = json_decode((string) file_get_contents($path), true) ?: [];
             $passed = 0;
@@ -62,18 +64,11 @@ class ArabicSeoTestSet extends Command
                     $failures[] = $pageFile.': missing file';
                     continue;
                 }
-                $html = (string) file_get_contents($pPath);
-                $plain = trim((string) preg_replace('/\s+/u', ' ', strip_tags($html)));
+                $audit = PageAudit::auditHtml((string) file_get_contents($pPath));
                 $actual = [
-                    'ar_lang' => (bool) preg_match('/<html[^>]*\blang=["\']ar/i', $html),
-                    'rtl_dir' => (bool) preg_match('/<html[^>]*\bdir=["\']rtl/i', $html),
-                    'has_title' => (bool) preg_match('/<title>([^<]+)<\/title>/iu', $html, $tm) && mb_strlen(trim($tm[1])) > 0,
-                    'has_meta_description' => (bool) preg_match('/<meta[^>]*name=["\']description["\'][^>]*content=["\']([^"\']+)["\']/iu', $html, $dm) && mb_strlen(trim($dm[1])) > 0,
-                    'has_h1' => (bool) preg_match('/<h1[^>]*>([^<]+)<\/h1>/iu', $html),
-                    'has_canonical' => (bool) preg_match('/<link[^>]*rel=["\']canonical["\']/i', $html),
-                    'has_json_ld' => (bool) preg_match('/application\/ld\+json/i', $html),
-                    'has_question_heading' => (bool) preg_match('/<h[23][^>]*>[^<]*(؟|\?)[^<]*<\/h[23]>/iu', $html),
-                    'dialect_tags' => Normaliser::dialectTags($plain),
+                    'score' => $audit['score'],
+                    'checks' => $audit['checks'],
+                    'issues' => $audit['issues'],
                 ];
                 if ($actual === $exp) {
                     $passed++;
@@ -83,6 +78,7 @@ class ArabicSeoTestSet extends Command
             }
             $total = count($spec);
             $rate = $total > 0 ? round($passed / $total, 4) : 0.0;
+
             return [
                 'rows' => $total,
                 'passed' => $passed,
@@ -94,6 +90,7 @@ class ArabicSeoTestSet extends Command
         }
 
         $rows = $this->csv($path);
+        $passed = 0;
         $failures = [];
         foreach ($rows as $row) {
             $ok = match ($file) {
@@ -103,23 +100,33 @@ class ArabicSeoTestSet extends Command
                 'dialect_tags.csv' => $this->tags($row['tags'] ?? '') === Normaliser::dialectTags($row['text']),
                 default => false,
             };
-            if (! $ok) {
-                $failures[] = implode(' | ', array_slice($row, 0, 2));
+            if ($ok) {
+                $passed++;
+            } else {
+                $failures[] = json_encode($row, JSON_UNESCAPED_UNICODE);
             }
         }
+
         $total = count($rows);
-        $passed = $total - count($failures);
         $rate = $total > 0 ? round($passed / $total, 4) : 0.0;
 
-        return ['rows' => $total, 'passed' => $passed, 'rate' => $rate, 'bar' => $bar, 'status' => $total > 0 && $rate >= $bar ? 'pass' : 'fail', 'failures' => array_slice($failures, 0, 50)];
+        return [
+            'rows' => $total,
+            'passed' => $passed,
+            'rate' => $rate,
+            'bar' => $bar,
+            'status' => ($total > 0 && $rate >= $bar) ? 'pass' : 'fail',
+            'failures' => array_slice($failures, 0, 10),
+        ];
     }
 
-    /** @return list<string> tags in the fixed dialect order; "none" or empty = no tag */
-    private function tags(string $cell): array
+    /** @return list<string> */
+    private function tags(string $raw): array
     {
-        $tags = array_filter(array_map('trim', preg_split('/[\s,;|]+/', strtolower($cell))), fn ($t) => $t !== '' && $t !== 'none');
+        $parts = array_values(array_filter(array_map('trim', preg_split('/[,;| ]+/', $raw) ?: [])));
+        sort($parts);
 
-        return array_values(array_filter(Normaliser::DIALECTS, fn ($d) => in_array($d, $tags, true)));
+        return $parts;
     }
 
     /** @return list<array<string, string>> */
