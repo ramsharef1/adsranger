@@ -6,3 +6,7 @@
     .ar-admin-label { display: inline-flex; align-items: center; min-height: 28px; padding: 0 .6rem; border-radius: .4rem; background: #334155; color: #f8fafc; font-size: .75rem; font-weight: 700; letter-spacing: .02em; }
     .ar-admin-label-ctn { display: flex; justify-content: center; margin-bottom: .75rem; }
 </style>
+<style id="ar-admin-signature">
+.fi-topbar{border-top:3px solid #0f766e;background-image:linear-gradient(90deg,rgba(15,118,110,.06),rgba(245,158,11,.04))}
+.fi-ta-table{font-variant-numeric:tabular-nums}
+</style>

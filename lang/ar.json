@@ -1410,5 +1410,6 @@
     "Read-only status of feature switches governed by D-149 and D-229. Standard workspaces only see modules that are turned on.": "حالة للقراءة فقط لمفاتيح الميزات المحكومة بالقرارين D-149 و D-229. لا ترى مساحات العمل العادية إلا الوحدات المفعّلة.",
     "Module key": "مفتاح الوحدة",
     "Off (held back)": "متوقف (مؤجل)",
-    "Preview workspaces": "مساحات عمل المعاينة"
+    "Preview workspaces": "مساحات عمل المعاينة",
+    "Ad networks": "المنصات الإعلانية"
 }

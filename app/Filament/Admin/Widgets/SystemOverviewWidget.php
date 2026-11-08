@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Widgets;
 
 use App\Models\Agency;
+use App\Models\AuditLog;
 use App\Models\NetworkRequest;
 use App\Models\PartnerApplication;
 use App\Models\WaitlistEntry;
@@ -26,17 +27,23 @@ class SystemOverviewWidget extends Widget
     {
         $enabledModules = (array) config('modules.enabled', []);
         $offModulesCount = collect($enabledModules)->filter(fn ($v) => ! $v)->count();
+        $waitlistTotal = WaitlistEntry::count();
+        $waitlistConsented = WaitlistEntry::whereNotNull('consent_at')->count();
 
         return [
             'agenciesTotal' => Agency::count(),
             'agenciesActive' => Agency::where('status', 'active')->count(),
-            'waitlistTotal' => WaitlistEntry::count(),
-            'waitlistConsented' => WaitlistEntry::whereNotNull('consent_at')->count(),
+            'waitlistTotal' => $waitlistTotal,
+            'waitlistConsented' => $waitlistConsented,
+            'waitlistConsentPct' => $waitlistTotal > 0 ? (int) round(($waitlistConsented / $waitlistTotal) * 100) : 0,
             'partnersTotal' => PartnerApplication::count(),
             'networkRequestsTotal' => NetworkRequest::count(),
             'signupOpen' => Signup::isOpen(),
             'offModulesCount' => $offModulesCount,
             'totalModulesCount' => count($enabledModules),
+            'recentWaitlist' => WaitlistEntry::query()->orderByDesc('created_at')->limit(5)->get(),
+            'recentPartners' => PartnerApplication::query()->orderByDesc('created_at')->limit(5)->get(),
+            'recentAudits' => AuditLog::query()->orderByDesc('id')->limit(5)->get(),
         ];
     }
 }
