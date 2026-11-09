@@ -1,7 +1,7 @@
 # ROY_CONTEXT — AdsRanger
 
 ## 1. Latest Sanitized Pulse
-- **Timestamp**: 2026-11-09T14:50:40+00:00 (`735c3e2`)
+- **Timestamp**: 2026-11-09T14:52:15+00:00 (`8665779`)
 - **Mail / Flags**: `mailer=log`, `SEO_TOOLS_PUBLIC=false`, `MODULE_VIEW_AS=false`, `SELF_SIGNUP=false`
 - **Counts**: `agencies=0`, `users=0`, `clients=0`, `ad_accounts=0`, `alerts=0`, `waitlist_entries=0`, `jobs=0`, `failed_jobs=0`
 - **Tech-Debt Triggers**: [TD-002 ACTIVE] MAIL_MAILER=log (outbound mails are not using live SMTP yet); [TD-001 OK] waitlist_entries=0/250 threshold

@@ -25,7 +25,7 @@ class RoyPulseCommand extends Command
         $seoPublic = config('seo.tools_public', env('SEO_TOOLS_PUBLIC', false)) ? 'true' : 'false';
         $viewAs = config('modules.view_as', env('MODULE_VIEW_AS', false)) ? 'true' : 'false';
         $selfSignup = config('modules.self_signup', env('SELF_SIGNUP_ENABLED', false)) ? 'true' : 'false';
-        $head = trim((string) shell_exec('git rev-parse --short HEAD 2>/dev/null')) ?: 'unknown';
+        $head = $this->resolveGitHeadShortSha();
 
         $triggers = [];
         if ($mailer === 'log' || $mailer === 'array') {
@@ -65,5 +65,34 @@ class RoyPulseCommand extends Command
         }
 
         return self::SUCCESS;
+    }
+
+    private function resolveGitHeadShortSha(): string
+    {
+        $gitDir = base_path('.git');
+        $headFile = $gitDir.'/HEAD';
+        if (! is_file($headFile)) {
+            return 'unknown';
+        }
+        $head = trim((string) file_get_contents($headFile));
+        if (str_starts_with($head, 'ref: ')) {
+            $ref = substr($head, 5);
+            $refFile = $gitDir.'/'.$ref;
+            if (is_file($refFile)) {
+                return substr(trim((string) file_get_contents($refFile)), 0, 7);
+            }
+            $packed = $gitDir.'/packed-refs';
+            if (is_file($packed)) {
+                foreach (explode("\n", (string) file_get_contents($packed)) as $line) {
+                    if (str_ends_with(trim($line), ' '.$ref)) {
+                        return substr(trim($line), 0, 7);
+                    }
+                }
+            }
+
+            return 'unknown';
+        }
+
+        return substr($head, 0, 7) ?: 'unknown';
     }
 }
