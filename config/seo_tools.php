@@ -12,7 +12,7 @@ return [
     // the three ad tools (D-90) wait for Content's OK on their slugs.
     'tools' => [
         'serp-preview', 'meta-length-checker', 'arabic-keyword-generator', 'arabizi-converter',
-        'roas-calculator', 'budget-pacing-calculator', 'utm-builder', 'hreflang-checker',
+        'roas-calculator', 'budget-pacing-calculator', 'utm-builder', 'hreflang-checker', 'page-audit',
     ],
 
     // Our own hosts, pinned to the server's public IP for SafeFetcher: the VPS resolves adsranger.com to ::1 in its hosts

@@ -30,6 +30,7 @@ class PublicSite
             '/tools/roas-calculator' => ['حاسبة العائد على الإنفاق الإعلاني', 'ROAS calculator', 'العائد ونقطة التعادل', 'Return and break-even'],
             '/tools/budget-pacing-calculator' => ['حاسبة وتيرة الإنفاق', 'Budget pacing calculator', 'هل ينفق الحساب حسب الخطة؟', 'Is the account spending to plan?'],
             '/tools/hreflang-checker' => ['فاحص روابط اللغات', 'Hreflang checker', 'روابط اللغات بين نسخ صفحتك', 'Language links between your page versions'],
+            '/tools/page-audit' => ['فاحص السيو العربي للصفحة', 'Arabic page SEO audit', 'فحص العنوان والاتجاه والكلمات والبيانات المنظمة', 'Check title, RTL direction, keywords and schema'],
             '/tools/utm-builder' => ['منشئ روابط التتبّع', 'UTM link builder', 'روابط تتبّع للحملات', 'Tracking links for campaigns'],
             '/mena-calendar' => ['تقويم المواسم', 'Seasons calendar', 'مواسم 2027 ومناسباتها في المنطقة', 'The region\'s 2027 seasons and occasions'],
             '/about' => ['من نحن', 'About', 'لماذا نبني AdsRanger في عمّان', 'Why we\'re building AdsRanger in Amman'],
@@ -62,7 +63,7 @@ class PublicSite
     {
         return [
             ['label' => $ar ? 'المنتج' : 'Product', 'items' => ['/demo-report', '/security', '/partners']],
-            ['label' => $ar ? 'أدوات وأدلة مجانية' : 'Free tools & guides', 'items' => ['/tools/ramadan-budget-calculator', '/ramadan-2027', '/mena-calendar']],
+            ['label' => $ar ? 'أدوات وأدلة مجانية' : 'Free tools & guides', 'items' => array_merge(['/tools/ramadan-budget-calculator', '/ramadan-2027', '/mena-calendar'], config('seo_tools.public') ? array_map(fn (string $t) => '/tools/'.$t, config('seo_tools.tools', [])) : [])],
             ['label' => $ar ? 'الباقات' : 'Plans', 'path' => '/pricing'],
             ['label' => $ar ? 'المنصات الإعلانية' : 'Ad platforms', 'path' => '/integrations'],
             ['label' => $ar ? 'عن AdsRanger' : 'About', 'items' => ['/about', '/contact']],

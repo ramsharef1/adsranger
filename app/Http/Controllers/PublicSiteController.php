@@ -232,6 +232,39 @@ class PublicSiteController extends Controller
         return response()->json(Hreflang::check($data['url']));
     }
 
+    public function pageAuditRun(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            "url" => ["required", "string", "max:500", "regex:#^https?://#i"],
+            "keyword" => ["nullable", "string", "max:120"],
+        ]);
+        $who = hash("sha256", config("app.key")."|".$request->ip());
+        foreach ([["page-audit-day:".$who.":".now()->toDateString(), 5, 86400], ["page-audit-hour:".$who, 10, 3600]] as [$key, $max, $decay]) {
+            if (RateLimiter::tooManyAttempts($key, $max)) {
+                return response()->json(["error" => "limit"], 429);
+            }
+        }
+        RateLimiter::hit("page-audit-day:".$who.":".now()->toDateString(), 86400);
+        RateLimiter::hit("page-audit-hour:".$who, 3600);
+
+        $fetched = \App\Support\Seo\SafeFetcher::fetch($data["url"]);
+        if (! ($fetched["ok"] ?? false) || ($fetched["status"] ?? 0) !== 200) {
+            $err = ($fetched["error"] ?? "") === "blocked" ? "blocked" : (($fetched["status"] ?? null) ? "not_200" : "fetch_failed");
+            return response()->json(["ok" => false, "error" => $err, "status" => $fetched["status"] ?? null, "url" => $fetched["url"] ?? $data["url"]]);
+        }
+
+        $audit = \App\Support\Seo\PageAudit::auditHtml((string) ($fetched["body"] ?? ""), $data["keyword"] ?? null);
+        return response()->json([
+            "ok" => true,
+            "url" => $fetched["url"],
+            "status" => $fetched["status"],
+            "score" => $audit["score"],
+            "checks" => $audit["checks"],
+            "issues" => $audit["issues"],
+            "serp" => $audit["serp"],
+        ]);
+    }
+
     /**
      * Public pages in the sitemap (P-0 set + R-19): Arabic path => view that renders it (its file time is the lastmod).
      *

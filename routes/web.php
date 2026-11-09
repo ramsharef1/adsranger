@@ -32,6 +32,7 @@ Route::middleware(PublicTrailingSlash::class)->group(function () {
         Route::get('/en/tools/'.$tool, [PublicSiteController::class, 'seoTool'])->defaults('lang', 'en')->defaults('tool', $tool);
     }
     Route::post('/tools/hreflang-checker/run', [PublicSiteController::class, 'hreflangRun'])->middleware('throttle:30,1');
+    Route::post('/tools/page-audit/run', [PublicSiteController::class, 'pageAuditRun'])->middleware('throttle:30,1');
 
     Route::get('/pricing', [PublicSiteController::class, 'pricing'])->defaults('lang', 'ar');
     Route::get('/en/pricing', [PublicSiteController::class, 'pricing'])->defaults('lang', 'en');

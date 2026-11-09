@@ -123,7 +123,7 @@ class ArabicSeoTestSet extends Command
     /** @return list<string> */
     private function tags(string $raw): array
     {
-        $parts = array_values(array_filter(array_map('trim', preg_split('/[,;| ]+/', $raw) ?: [])));
+        $parts = array_values(array_filter(array_map('trim', preg_split('/[,;| ]+/', $raw) ?: []), fn (string $p) => $p !== '' && $p !== 'none'));
         sort($parts);
 
         return $parts;
