@@ -1440,5 +1440,7 @@
     "Sample preview data (connect Google Search Console for live rows)": "بيانات معاينة تجريبية (اربط Google Search Console لعرض الاستعلامات الحية)",
     "Search query": "عبارة البحث",
     "Avg. position": "متوسط الترتيب",
-    "CTR opportunity": "فرصة تحسين النقر"
+    "CTR opportunity": "فرصة تحسين النقر",
+    "Ad account connection requires re-authentication": "اتصال الحساب الإعلاني يتطلب إعادة الربط",
+    "Sync paused for account :name because the platform token expired or was revoked (:code).": "توقفت المزامنة للحساب :name بسبب انتهاء صلاحية رمز الربط أو إلغائه (:code)."
 }

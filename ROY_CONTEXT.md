@@ -1,7 +1,7 @@
 # ROY_CONTEXT — AdsRanger
 
 ## 1. Latest Sanitized Pulse
-- **Timestamp**: 2026-11-09T14:54:57+00:00 (`a8e3fe8`)
+- **Timestamp**: 2026-11-09T19:48:56+00:00 (`85d08d7`)
 - **Mail / Flags**: `mailer=log`, `SEO_TOOLS_PUBLIC=false`, `MODULE_VIEW_AS=false`, `SELF_SIGNUP=false`
 - **Counts**: `agencies=0`, `users=0`, `clients=0`, `ad_accounts=0`, `alerts=0`, `waitlist_entries=0`, `jobs=0`, `failed_jobs=0`
 - **Tech-Debt Triggers**: [TD-002 ACTIVE] mailer=log host=127.0.0.1 (loopback/non-external SMTP — cut over to Brevo SMTP); [TD-001 OK] waitlist_entries=0/250 threshold
@@ -10,6 +10,8 @@
 - **[TD-001]**: Migrate `EmailSuppressionGuard` cache keys to a dedicated `email_suppressions` table + Brevo bounce webhook when `waitlist_entries >= 250` or outbound volume exceeds `100/day`.
 - **[TD-002]**: Cut over production `.env` `MAIL_MAILER` from `log` to `smtp` (Brevo) once SPF/DKIM/DMARC records are verified on `adsranger.com`.
 
+- **[TD-003]**: Migrate `OAuthTokenVaultService` encrypted blobs from `Cache::forever` to a dedicated `ad_account_credentials` table with KMS key-versioning once live OAuth `ad_accounts >= 50`.
+
 ## 3. Core Architecture & Guardrails
 - **Stack**: Laravel 13, Filament, PostgreSQL/MySQL, Redis, Nginx (`72.62.132.138`).
 - **Public SEO & Tools**: 10 free tools (`SEO_TOOLS_PUBLIC=true`), full `ADSR-042` (`B-01`–`B-12`) bilingual hubs, 40-term glossary, 328+ PHPUnit tests.
@@ -17,3 +19,4 @@
 ## 4. Recent Sprint Changes
 - `2026-11-09` | `app/Console/Commands/RoyPulseCommand.php`, `app/Support/Mail/EmailSuppressionGuard.php`, `app/Providers/AppServiceProvider.php` | Added `roy:pulse` sanitized telemetry command and `MessageSending` suppression guard (`E2-046`).
 - `2026-11-09` | `app/Console/Commands/MailSmokeTestCommand.php`, `app/Console/Commands/RoyPulseCommand.php` | Added `mail:smoke-test` CLI and loopback SMTP detection for `[TD-002]` (`E2-047`).
+- `2026-11-09` | `app/Services/AdNetworks/OAuthTokenVaultService.php`, `lang/ar.json`, `tests/Feature/OAuthTokenVaultTest.php` | Added encrypted Stage-1 OAuth Token Vault, atomic refresh lock, and Sync Circuit Breaker (`E2-048`).
