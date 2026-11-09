@@ -22,6 +22,7 @@ class PublicSite
             '/pricing' => ['الباقات', 'Plans', 'ما تخطط كل باقة لتقديمه', 'What each plan is planned to include'],
             '/security' => ['الأمان وبياناتك', 'Security and your data', 'كيف نحمي بيانات وكالتك وعملائك', 'How we protect agency and client data'],
             '/ramadan-2027' => ['دليل رمضان 2027', 'Ramadan 2027 guide', 'خطة إعلانية لكل مرحلة من الشهر', 'An ad plan for every stage of the month'],
+            '/tools' => ['الأدوات المجانية', 'Free tools', 'أدوات مجانية للسيو العربي والإعلانات', 'Free Arabic SEO and ad tools'],
             '/tools/ramadan-budget-calculator' => ['حاسبة ميزانية رمضان', 'Ramadan budget calculator', 'قدّر إنفاق رمضان ونتائجه', 'Estimate Ramadan spend and results'],
             '/tools/serp-preview' => ['معاينة نتائج البحث', 'Search results preview', 'كيف يظهر عنوان صفحتك ووصفها', 'How your title and description may look'],
             '/tools/meta-length-checker' => ['فاحص طول العنوان والوصف', 'Title and description length checker', 'حتى 50 صفحة في كل مرة', 'Up to 50 pages at a time'],
@@ -63,7 +64,7 @@ class PublicSite
     {
         return [
             ['label' => $ar ? 'المنتج' : 'Product', 'items' => ['/demo-report', '/security', '/partners']],
-            ['label' => $ar ? 'أدوات وأدلة مجانية' : 'Free tools & guides', 'items' => array_merge(['/tools/ramadan-budget-calculator', '/ramadan-2027', '/mena-calendar'], config('seo_tools.public') ? array_map(fn (string $t) => '/tools/'.$t, config('seo_tools.tools', [])) : [])],
+            ['label' => $ar ? 'أدوات وأدلة مجانية' : 'Free tools & guides', 'items' => array_merge(['/tools/ramadan-budget-calculator', '/ramadan-2027', '/mena-calendar'], config('seo_tools.public') ? array_merge(['/tools'], array_map(fn (string $t) => '/tools/'.$t, config('seo_tools.tools', []))) : [])],
             ['label' => $ar ? 'الباقات' : 'Plans', 'path' => '/pricing'],
             ['label' => $ar ? 'المنصات الإعلانية' : 'Ad platforms', 'path' => '/integrations'],
             ['label' => $ar ? 'عن AdsRanger' : 'About', 'items' => ['/about', '/contact']],
@@ -75,7 +76,7 @@ class PublicSite
     {
         return [
             [$ar ? 'المنتج' : 'Product', ['/demo-report', '/integrations', '/pricing', '/security']],
-            [$ar ? 'أدوات وأدلة مجانية' : 'Free tools & guides', ['/tools/ramadan-budget-calculator', '/ramadan-2027', '/mena-calendar']],
+            [$ar ? 'أدوات وأدلة مجانية' : 'Free tools & guides', array_merge(config('seo_tools.public') ? ['/tools'] : [], ['/tools/ramadan-budget-calculator', '/ramadan-2027', '/mena-calendar'])],
             [$ar ? 'الشركة' : 'Company', ['/about', '/partners', '/contact', '/solutions/business-owners']],
             [$ar ? 'القانونية' : 'Legal', ['/privacy', '/terms', '/data-deletion']],
         ];
@@ -86,6 +87,7 @@ class PublicSite
     {
         return match ($path) {
             '/ramadan-2027' => ['/tools/ramadan-budget-calculator', '/mena-calendar', '/demo-report'],
+            '/tools' => ['الأدوات المجانية', 'Free tools', 'أدوات مجانية للسيو العربي والإعلانات', 'Free Arabic SEO and ad tools'],
             '/tools/ramadan-budget-calculator' => ['/ramadan-2027', '/mena-calendar', '/pricing'],
             '/mena-calendar' => ['/ramadan-2027', '/tools/ramadan-budget-calculator', '/demo-report'],
             '/pricing' => ['/demo-report', '/integrations', '/security'],

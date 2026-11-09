@@ -196,6 +196,20 @@ class PublicSiteController extends Controller
     }
 
     /** Free tools (SEO slice 0 step 0.4 + D-90 ad tools). Until config('seo_tools.public') is on they answer but stay noindex. */
+    public function toolsHub(Request $request): Response
+    {
+        $lang = $request->route('lang', 'ar') === 'en' ? 'en' : 'ar';
+        $public = (bool) config('seo_tools.public');
+        $response = response()->view('public.tools.index', [
+            'lang' => $lang,
+            'noindex' => ! $public,
+        ]);
+        if (! $public) {
+            $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+        }
+        return $response;
+    }
+
     public function seoTool(string $lang = 'ar', string $tool = 'serp-preview'): Response
     {
         $public = (bool) config('seo_tools.public');
@@ -289,7 +303,7 @@ class PublicSiteController extends Controller
             '/privacy' => 'legal/page',
             '/terms' => 'legal/page',
             '/data-deletion' => 'legal/page',
-        ];
+        ] + (config('seo_tools.public') ? (['/tools' => 'public/tools/index'] + collect(config('seo_tools.tools', []))->mapWithKeys(fn (string $t) => ['/tools/'.$t => 'public/tools/'.$t])->all()) : []);
     }
 
     /** R-13: /sitemap.xml is a sitemap index; children are added as sections ship (features, guides, blog, …). */

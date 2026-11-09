@@ -51,5 +51,8 @@ class SeoSlice0ToolsTest extends TestCase
 
         config(['seo_tools.public' => true]);
         $this->get('/tools/serp-preview')->assertOk()->assertHeaderMissing('X-Robots-Tag')->assertDontSee('<meta name="robots"', false);
+        $this->get('/tools')->assertOk()->assertSee('الأدوات المجانية')->assertSee('/tools/page-audit', false);
+        $this->get('/en/tools')->assertOk()->assertSee('Free tools')->assertSee('/en/tools/page-audit', false);
+        $this->get('/sitemaps/pages.xml')->assertSee('https://adsranger.com/tools/page-audit', false);
     }
 }

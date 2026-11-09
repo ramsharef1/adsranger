@@ -24,6 +24,8 @@ Route::middleware(PublicTrailingSlash::class)->group(function () {
 
     Route::get('/ramadan-2027', [PublicSiteController::class, 'ramadan'])->defaults('lang', 'ar');
     Route::get('/en/ramadan-2027', [PublicSiteController::class, 'ramadan'])->defaults('lang', 'en');
+    Route::get('/tools', [PublicSiteController::class, 'toolsHub'])->defaults('lang', 'ar');
+    Route::get('/en/tools', [PublicSiteController::class, 'toolsHub'])->defaults('lang', 'en');
     Route::get('/tools/ramadan-budget-calculator', [PublicSiteController::class, 'ramadanCalculator'])->defaults('lang', 'ar');
     Route::get('/en/tools/ramadan-budget-calculator', [PublicSiteController::class, 'ramadanCalculator'])->defaults('lang', 'en');
     // Free tools (SEO slice 0 step 0.4 + D-90 ad tools): reachable for checks, noindex until config('seo_tools.public').
