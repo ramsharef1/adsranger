@@ -192,6 +192,7 @@ class PublicSiteController extends Controller
 
     public function ramadanCalculator(string $lang = 'ar')
     {
+        \App\Support\Seo\ToolRateLimiter::recordToolUse('ramadan-budget-calculator');
         return view('public.ramadan-calculator', ['lang' => $lang === 'en' ? 'en' : 'ar']);
     }
 
@@ -212,6 +213,7 @@ class PublicSiteController extends Controller
 
     public function seoTool(string $lang = 'ar', string $tool = 'serp-preview'): Response
     {
+        \App\Support\Seo\ToolRateLimiter::recordToolUse($tool);
         $public = (bool) config('seo_tools.public');
         $response = response()->view('public.tools.'.$tool, [
             'lang' => $lang === 'en' ? 'en' : 'ar',
@@ -242,6 +244,7 @@ class PublicSiteController extends Controller
         }
         RateLimiter::hit('hreflang-day:'.$who.':'.now()->toDateString(), 86400);
         RateLimiter::hit('hreflang-hour:'.$who, 3600);
+        \App\Support\Seo\ToolRateLimiter::recordToolUse('hreflang-checker-run');
 
         return response()->json(Hreflang::check($data['url']));
     }
@@ -260,6 +263,7 @@ class PublicSiteController extends Controller
         }
         RateLimiter::hit("page-audit-day:".$who.":".now()->toDateString(), 86400);
         RateLimiter::hit("page-audit-hour:".$who, 3600);
+        \App\Support\Seo\ToolRateLimiter::recordToolUse('page-audit-run');
 
         $fetched = \App\Support\Seo\SafeFetcher::fetch($data["url"]);
         if (! ($fetched["ok"] ?? false) || ($fetched["status"] ?? 0) !== 200) {
@@ -300,6 +304,13 @@ class PublicSiteController extends Controller
             '/contact' => 'public/contact',
             '/partners' => 'public/partners',
             '/solutions/business-owners' => 'public/business-owners',
+            '/features' => 'public/product/show',
+            '/reports' => 'public/product/show',
+            '/studio' => 'public/product/show',
+            '/search' => 'public/product/show',
+            '/ai' => 'public/product/show',
+            '/glossary' => 'public/glossary/index',
+            '/blog' => 'public/blog/index',
             '/privacy' => 'legal/page',
             '/terms' => 'legal/page',
             '/data-deletion' => 'legal/page',
@@ -354,5 +365,67 @@ class PublicSiteController extends Controller
     public function resources(Request $request): View
     {
         return view('public.resources', ['lang' => $request->segment(1) === 'en' ? 'en' : 'ar']);
+    }
+
+    public function requestAuditEmail(Request $request, string $lang = 'ar')
+    {
+        $lang = $lang === 'en' ? 'en' : 'ar';
+        $tool = in_array($request->input('tool'), ['page-audit', 'hreflang-checker'], true) ? $request->input('tool') : 'page-audit';
+        $target = ($lang === 'en' ? '/en/tools/' : '/tools/').$tool;
+        if (filled($request->input('website'))) {
+            return redirect($target)->with('tool_report_saved', true);
+        }
+        $data = $request->validate([
+            'email' => ['required', 'email:filter', 'max:190'],
+            'agency_name' => ['required', 'string', 'min:2', 'max:140'],
+            'country' => ['required', Rule::in(WaitlistEntry::COUNTRIES)],
+            'consent' => ['accepted'],
+        ]);
+        WaitlistEntry::updateOrCreate(
+            ['email' => strtolower(trim($data['email']))],
+            [
+                'agency_name' => trim($data['agency_name']),
+                'country' => $data['country'],
+                'lang' => $lang,
+                'consent_at' => now(),
+                'consent_text_version' => WaitlistEntry::CONSENT_TEXT_VERSION,
+            ]
+        );
+
+        return redirect($target)->with('tool_report_saved', true);
+    }
+
+    public function productPage(string $lang = 'ar', string $slug = 'features'): Response
+    {
+        abort_unless(isset(\App\Support\Seo\PublicCatalog::products()[$slug]), 404);
+        return response()->view('public.product.show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'slug' => $slug]);
+    }
+
+    public function platformPage(string $lang = 'ar', string $platform = 'meta'): Response
+    {
+        abort_unless(isset(\App\Support\Seo\PublicCatalog::platforms()[$platform]), 404);
+        return response()->view('public.platform-show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'platform' => $platform]);
+    }
+
+    public function glossaryIndex(string $lang = 'ar'): Response
+    {
+        return response()->view('public.glossary.index', ['lang' => $lang === 'en' ? 'en' : 'ar']);
+    }
+
+    public function glossaryTerm(string $lang = 'ar', string $term = 'roas'): Response
+    {
+        abort_unless(isset(\App\Support\Seo\PublicCatalog::glossary()[$term]), 404);
+        return response()->view('public.glossary.show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'term' => $term]);
+    }
+
+    public function blogIndex(string $lang = 'ar'): Response
+    {
+        return response()->view('public.blog.index', ['lang' => $lang === 'en' ? 'en' : 'ar']);
+    }
+
+    public function blogShow(string $lang = 'ar', string $slug = ''): Response
+    {
+        abort_unless(isset(\App\Support\Seo\PublicCatalog::posts()[$slug]), 404);
+        return response()->view('public.blog.show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'slug' => $slug]);
     }
 }

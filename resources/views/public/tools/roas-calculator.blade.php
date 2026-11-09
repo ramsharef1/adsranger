@@ -44,6 +44,7 @@ $curs = ['USD', 'SAR', 'AED', 'JOD', 'KWD', 'QAR', 'EGP'];
     </div>
 </section>
 <p><a class="btn" href="{{ $u('/waitlist') }}?type=agency">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a></p>
+@include('public.tools.partials.tool-guide-faq', ['toolSlug' => 'roas-calculator', 'ar' => $ar])
 @endsection
 @push('scripts')
 <script>

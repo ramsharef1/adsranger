@@ -18,11 +18,18 @@ class PublicSite
         return [
             '/' => ['الرئيسية', 'Home', '', ''],
             '/demo-report' => ['تقرير تجريبي', 'Sample report', 'تقرير عميل كامل ببيانات تجريبية', 'A full client report with demo data'],
+            '/features' => ['الميزات', 'Features', 'كل ميزات المنصة للوكالات', 'All platform features for agencies'],
+            '/reports' => ['التقارير الموحدة', 'Unified reports', 'تقارير إعلانات موحدة للعملاء', 'Cross-platform client reporting'],
+            '/studio' => ['استوديو الإعلانات', 'Ad Studio', 'تجهيز الإعلانات واعتمادها', 'Draft and approve ads across platforms'],
+            '/search' => ['أدوات البحث والسيو', 'Search & SEO', 'إعلانات البحث والسيو العربي', 'Search ads and Arabic SEO tools'],
+            '/ai' => ['الذكاء الاصطناعي', 'AI assistant', 'ملخصات ذكية من أرقام حسابك', 'Grounded bilingual AI summaries'],
+            '/glossary' => ['قاموس المصطلحات', 'Glossary', 'مصطلحات الإعلانات والسيو ومعادلاتها', 'Ad and SEO terms with formulas'],
+            '/blog' => ['المدونة والأدلة', 'Blog & guides', 'أدلة عملية لحملات المنطقة', 'Practical guides for MENA campaigns'],
             '/integrations' => ['المنصات الإعلانية', 'Ad platforms', 'المنصات التي نخطط لربطها، وكيف', 'The platforms we plan to connect, and how'],
             '/pricing' => ['الباقات', 'Plans', 'ما تخطط كل باقة لتقديمه', 'What each plan is planned to include'],
             '/security' => ['الأمان وبياناتك', 'Security and your data', 'كيف نحمي بيانات وكالتك وعملائك', 'How we protect agency and client data'],
             '/ramadan-2027' => ['دليل رمضان 2027', 'Ramadan 2027 guide', 'خطة إعلانية لكل مرحلة من الشهر', 'An ad plan for every stage of the month'],
-            '/tools' => ['الأدوات المجانية', 'Free tools', 'أدوات مجانية للسيو العربي والإعلانات', 'Free Arabic SEO and ad tools'],
+            '/tools' => ['/tools/page-audit', '/tools/ramadan-budget-calculator', '/ramadan-2027'],
             '/tools/ramadan-budget-calculator' => ['حاسبة ميزانية رمضان', 'Ramadan budget calculator', 'قدّر إنفاق رمضان ونتائجه', 'Estimate Ramadan spend and results'],
             '/tools/serp-preview' => ['معاينة نتائج البحث', 'Search results preview', 'كيف يظهر عنوان صفحتك ووصفها', 'How your title and description may look'],
             '/tools/meta-length-checker' => ['فاحص طول العنوان والوصف', 'Title and description length checker', 'حتى 50 صفحة في كل مرة', 'Up to 50 pages at a time'],
@@ -63,7 +70,7 @@ class PublicSite
     public static function menu(bool $ar): array
     {
         return [
-            ['label' => $ar ? 'المنتج' : 'Product', 'items' => ['/demo-report', '/security', '/partners']],
+            ['label' => $ar ? 'المنتج' : 'Product', 'items' => ['/features', '/reports', '/studio', '/search', '/ai', '/demo-report', '/security', '/partners']],
             ['label' => $ar ? 'أدوات وأدلة مجانية' : 'Free tools & guides', 'items' => array_merge(['/tools/ramadan-budget-calculator', '/ramadan-2027', '/mena-calendar'], config('seo_tools.public') ? array_merge(['/tools'], array_map(fn (string $t) => '/tools/'.$t, config('seo_tools.tools', []))) : [])],
             ['label' => $ar ? 'الباقات' : 'Plans', 'path' => '/pricing'],
             ['label' => $ar ? 'المنصات الإعلانية' : 'Ad platforms', 'path' => '/integrations'],
@@ -75,7 +82,7 @@ class PublicSite
     public static function footer(bool $ar): array
     {
         return [
-            [$ar ? 'المنتج' : 'Product', ['/demo-report', '/integrations', '/pricing', '/security']],
+            [$ar ? 'المنتج' : 'Product', ['/features', '/reports', '/studio', '/search', '/ai', '/demo-report', '/integrations', '/pricing', '/security']],
             [$ar ? 'أدوات وأدلة مجانية' : 'Free tools & guides', array_merge(config('seo_tools.public') ? ['/tools'] : [], ['/tools/ramadan-budget-calculator', '/ramadan-2027', '/mena-calendar'])],
             [$ar ? 'الشركة' : 'Company', ['/about', '/partners', '/contact', '/solutions/business-owners']],
             [$ar ? 'القانونية' : 'Legal', ['/privacy', '/terms', '/data-deletion']],
@@ -87,7 +94,14 @@ class PublicSite
     {
         return match ($path) {
             '/ramadan-2027' => ['/tools/ramadan-budget-calculator', '/mena-calendar', '/demo-report'],
-            '/tools' => ['الأدوات المجانية', 'Free tools', 'أدوات مجانية للسيو العربي والإعلانات', 'Free Arabic SEO and ad tools'],
+            '/features' => ['/reports', '/studio', '/search'],
+            '/reports' => ['/demo-report', '/features', '/integrations'],
+            '/studio' => ['/features', '/ai', '/integrations'],
+            '/search' => ['/features', '/tools/page-audit', '/tools/arabic-keyword-generator'],
+            '/ai' => ['/features', '/studio', '/security'],
+            '/glossary' => ['/tools/roas-calculator', '/tools/budget-pacing-calculator', '/ramadan-2027'],
+            '/blog' => ['/ramadan-2027', '/mena-calendar', '/tools/ramadan-budget-calculator'],
+            '/tools' => ['/tools/page-audit', '/tools/ramadan-budget-calculator', '/ramadan-2027'],
             '/tools/ramadan-budget-calculator' => ['/ramadan-2027', '/mena-calendar', '/pricing'],
             '/mena-calendar' => ['/ramadan-2027', '/tools/ramadan-budget-calculator', '/demo-report'],
             '/pricing' => ['/demo-report', '/integrations', '/security'],

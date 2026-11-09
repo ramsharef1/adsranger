@@ -115,6 +115,7 @@ $t = $ar ? [
 </section>
 <p>{{ $t['other'] }} <a href="{{ $u('/tools/meta-length-checker') }}">{{ $t['other_link'] }}</a>.</p>
 <p><a class="btn" href="{{ $u('/waitlist') }}?type=agency">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a></p>
+@include('public.tools.partials.tool-guide-faq', ['toolSlug' => 'serp-preview', 'ar' => $ar])
 @endsection
 
 @push('scripts')

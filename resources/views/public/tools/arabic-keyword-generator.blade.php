@@ -54,6 +54,7 @@ $t = $ar ? [
     </div>
 </section>
 <p><a class="btn" href="{{ $u('/waitlist') }}?type=agency">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a></p>
+@include('public.tools.partials.tool-guide-faq', ['toolSlug' => 'arabic-keyword-generator', 'ar' => $ar])
 @endsection
 
 @push('scripts')

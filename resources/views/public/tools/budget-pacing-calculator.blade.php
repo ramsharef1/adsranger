@@ -50,6 +50,7 @@ $today = now('Asia/Amman');
     </div>
 </section>
 <p><a class="btn" href="{{ $u('/waitlist') }}?type=agency">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a></p>
+@include('public.tools.partials.tool-guide-faq', ['toolSlug' => 'budget-pacing-calculator', 'ar' => $ar])
 @endsection
 @push('scripts')
 <script>

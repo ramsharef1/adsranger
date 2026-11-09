@@ -35,11 +35,33 @@ Route::middleware(PublicTrailingSlash::class)->group(function () {
     }
     Route::post('/tools/hreflang-checker/run', [PublicSiteController::class, 'hreflangRun'])->middleware('throttle:30,1');
     Route::post('/tools/page-audit/run', [PublicSiteController::class, 'pageAuditRun'])->middleware('throttle:30,1');
+    Route::post('/tools/audit-report-request', [PublicSiteController::class, 'requestAuditEmail'])->defaults('lang', 'ar')->middleware('throttle:10,1');
+    Route::post('/en/tools/audit-report-request', [PublicSiteController::class, 'requestAuditEmail'])->defaults('lang', 'en')->middleware('throttle:10,1');
 
     Route::get('/pricing', [PublicSiteController::class, 'pricing'])->defaults('lang', 'ar');
     Route::get('/en/pricing', [PublicSiteController::class, 'pricing'])->defaults('lang', 'en');
 
     Route::get('/integrations', [PublicSiteController::class, 'integrations'])->defaults('lang', 'ar');
+    foreach (['features', 'reports', 'studio', 'search', 'ai'] as $prodSlug) {
+        Route::get('/'.$prodSlug, [PublicSiteController::class, 'productPage'])->defaults('lang', 'ar')->defaults('slug', $prodSlug);
+        Route::get('/en/'.$prodSlug, [PublicSiteController::class, 'productPage'])->defaults('lang', 'en')->defaults('slug', $prodSlug);
+    }
+    foreach (array_keys(\App\Support\Seo\PublicCatalog::platforms()) as $platSlug) {
+        Route::get('/integrations/'.$platSlug, [PublicSiteController::class, 'platformPage'])->defaults('lang', 'ar')->defaults('platform', $platSlug);
+        Route::get('/en/integrations/'.$platSlug, [PublicSiteController::class, 'platformPage'])->defaults('lang', 'en')->defaults('platform', $platSlug);
+    }
+    Route::get('/glossary', [PublicSiteController::class, 'glossaryIndex'])->defaults('lang', 'ar');
+    Route::get('/en/glossary', [PublicSiteController::class, 'glossaryIndex'])->defaults('lang', 'en');
+    foreach (array_keys(\App\Support\Seo\PublicCatalog::glossary()) as $termSlug) {
+        Route::get('/glossary/'.$termSlug, [PublicSiteController::class, 'glossaryTerm'])->defaults('lang', 'ar')->defaults('term', $termSlug);
+        Route::get('/en/glossary/'.$termSlug, [PublicSiteController::class, 'glossaryTerm'])->defaults('lang', 'en')->defaults('term', $termSlug);
+    }
+    Route::get('/blog', [PublicSiteController::class, 'blogIndex'])->defaults('lang', 'ar');
+    Route::get('/en/blog', [PublicSiteController::class, 'blogIndex'])->defaults('lang', 'en');
+    foreach (array_keys(\App\Support\Seo\PublicCatalog::posts()) as $postSlug) {
+        Route::get('/blog/'.$postSlug, [PublicSiteController::class, 'blogShow'])->defaults('lang', 'ar')->defaults('slug', $postSlug);
+        Route::get('/en/blog/'.$postSlug, [PublicSiteController::class, 'blogShow'])->defaults('lang', 'en')->defaults('slug', $postSlug);
+    }
     Route::get('/en/integrations', [PublicSiteController::class, 'integrations'])->defaults('lang', 'en');
 
     Route::get('/demo-report', [PublicSiteController::class, 'demoReport'])->defaults('lang', 'ar');

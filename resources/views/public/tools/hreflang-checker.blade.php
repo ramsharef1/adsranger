@@ -53,6 +53,7 @@ $t = $ar ? [
     <div class="tl-out" aria-live="polite" id="hl-out" hidden></div>
 </section>
 <p><a class="btn" href="{{ $u('/waitlist') }}?type=agency">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a></p>
+@include('public.tools.partials.tool-guide-faq', ['toolSlug' => 'hreflang-checker', 'ar' => $ar])
 @endsection
 @push('scripts')
 <script>

@@ -38,6 +38,7 @@ $t = $ar ? ['link' => 'الرابط', 'copy' => 'انسخ الرابط', 'copied
     </div>
 </section>
 <p><a class="btn" href="{{ $u('/waitlist') }}?type=agency">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a></p>
+@include('public.tools.partials.tool-guide-faq', ['toolSlug' => 'utm-builder', 'ar' => $ar])
 @endsection
 @push('scripts')
 <script>
