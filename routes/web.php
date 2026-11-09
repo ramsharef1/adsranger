@@ -56,6 +56,16 @@ Route::middleware(PublicTrailingSlash::class)->group(function () {
         Route::get('/glossary/'.$termSlug, [PublicSiteController::class, 'glossaryTerm'])->defaults('lang', 'ar')->defaults('term', $termSlug);
         Route::get('/en/glossary/'.$termSlug, [PublicSiteController::class, 'glossaryTerm'])->defaults('lang', 'en')->defaults('term', $termSlug);
     }
+        Route::get('/guides', [PublicSiteController::class, 'guidesIndex'])->defaults('lang', 'ar');
+    Route::get('/en/guides', [PublicSiteController::class, 'guidesIndex'])->defaults('lang', 'en');
+    foreach (array_keys(\App\Support\Seo\PublicCatalog::guides()) as $guideSlug) {
+        Route::get('/guides/'.$guideSlug, [PublicSiteController::class, 'guidesShow'])->defaults('lang', 'ar')->defaults('slug', $guideSlug);
+        Route::get('/en/guides/'.$guideSlug, [PublicSiteController::class, 'guidesShow'])->defaults('lang', 'en')->defaults('slug', $guideSlug);
+    }
+    foreach (array_keys(\App\Support\Seo\PublicCatalog::solutionsAndRoles()) as $srKey) {
+        Route::get('/'.$srKey, [PublicSiteController::class, 'solutionOrRolePage'])->defaults('lang', 'ar')->defaults('pageKey', $srKey);
+        Route::get('/en/'.$srKey, [PublicSiteController::class, 'solutionOrRolePage'])->defaults('lang', 'en')->defaults('pageKey', $srKey);
+    }
     Route::get('/blog', [PublicSiteController::class, 'blogIndex'])->defaults('lang', 'ar');
     Route::get('/en/blog', [PublicSiteController::class, 'blogIndex'])->defaults('lang', 'en');
     foreach (array_keys(\App\Support\Seo\PublicCatalog::posts()) as $postSlug) {

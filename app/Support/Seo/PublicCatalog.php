@@ -463,4 +463,256 @@ class PublicCatalog
             ],
         ];
     }
+
+    /**
+     * B-10 Evergreen Pillar Guides (/guides and /guides/{slug})
+     *
+     * @return array<string, array{title_ar: string, title_en: string, meta_ar: string, meta_en: string, summary_ar: string, summary_en: string, sections_ar: list<array{h: string, p: string}>, sections_en: list<array{h: string, p: string}>, product_link: string, related_links: list<string>}>
+     */
+    public static function guides(): array
+    {
+        return [
+            'meta-ads-mena' => [
+                'title_ar' => 'دليل إعلانات Meta (فيسبوك وإنستغرام) في الخليج والمنطقة | AdsRanger',
+                'title_en' => 'Meta Ads (Facebook & Instagram) Guide for MENA Agencies | AdsRanger',
+                'meta_ar' => 'دليل شامل لوكالات الإعلان لإدارة حملات Meta في أسواق الخليج والمنطقة: هيكلة الحسابات، صياغة الإعلانات العربية، وحملات الرسائل والعملاء المحتملين.',
+                'meta_en' => 'Comprehensive agency guide to managing Meta Ads across Gulf and MENA markets: account structure, Arabic copy, messaging ads, and lead forms.',
+                'summary_ar' => 'إرشادات عملية لوكالات التسويق لإدارة حملات فيسبوك وإنستغرام في أسواق الخليج والمنطقة، من كتابة النصوص العربية إلى مراقبة التشبع الإعلاني.',
+                'summary_en' => 'Actionable framework for agencies running Facebook and Instagram campaigns in MENA—covering Arabic copy, lead quality, and creative fatigue.',
+                'sections_ar' => [
+                    ['h' => '1. هيكلة الحملات حسب هدف العمل الفعلي', 'p' => 'افصل بوضوح بين حملات المبيعات المباشرة، وحملات رسائل واتساب، وحملات نماذج العملاء المحتملين حتى تظل تكلفة النتيجة قابلة للمقارنة في تقارير العميل.'],
+                    ['h' => '2. صياغة النصوص الإعلانية العربية ومراعاة اللهجات', 'p' => 'اختر بين العربية الفصحى الواضحة أو اللهجة المحلية المناسبة للسوق المستهدف، وتأكد من عدم انعكاس الأرقام أو الأسماء اللاتينية في العناوين.'],
+                    ['h' => '3. مراقبة التكرار (Frequency) وتشبع الجمهور', 'p' => 'في الأسواق المحدودة جغرافيًا يرتفع معدل تكرار ظهور الإعلان بسرعة؛ راقب ارتفاع تكلفة النتيجة بالتوازي مع التكرار لتجديد التصاميم في الوقت المناسب.'],
+                ],
+                'sections_en' => [
+                    ['h' => '1. Structure campaigns around primary client outcomes', 'p' => 'Keep purchase conversions, click-to-message campaigns, and instant lead forms clearly separated so cost per result stays accurate in client reporting.'],
+                    ['h' => '2. Write natural Arabic ad copy and verify RTL rendering', 'p' => 'Match Modern Standard Arabic or regional dialect tone to the client market, and test mixed Arabic-Latin headlines on mobile placements.'],
+                    ['h' => '3. Track frequency and audience saturation early', 'p' => 'In focused city or country targets, frequency climbs quickly—pair frequency monitoring with CPR trends to rotate creatives before performance drops.'],
+                ],
+                'product_link' => '/integrations/meta',
+                'related_links' => ['/integrations', '/studio', '/tools/roas-calculator'],
+            ],
+            'google-ads-for-agencies' => [
+                'title_ar' => 'دليل إدارة إعلانات جوجل للوكالات في المنطقة | AdsRanger',
+                'title_en' => 'Google Ads Guide for MENA Marketing Agencies | AdsRanger',
+                'meta_ar' => 'كيف تدير وكالات التسويق حملات بحث جوجل وPerformance Max بالعربية والإنجليزية: أنواع المطابقة، الكلمات السلبية، وجاهزية صفحات الهبوط.',
+                'meta_en' => 'How MENA agencies structure Arabic and English Google Search and Performance Max campaigns: match types, negatives, and landing page readiness.',
+                'summary_ar' => 'منهجية عملية لإدارة حملات بحث جوجل وPerformance Max للعملاء باللغتين العربية والإنجليزية، مع تغطية اختلافات الهمزات والكلمات السلبية.',
+                'summary_en' => 'Practical blueprint for running bilingual Google Search and Performance Max accounts—covering Arabic spelling variants, negative lists, and landing page checks.',
+                'sections_ar' => [
+                    ['h' => '1. تغطية صيغ الكتابة العربية في مجموعات الإعلانات', 'p' => 'استخدم مولد الكلمات المفتاحية العربية لرصد صيغ الهمزات والتاء المربوطة ومرادفات اللهجات التي يكتبها الباحثون فعليًا في محرك البحث.'],
+                    ['h' => '2. بناء قوائم الكلمات السلبية المشتركة للوكالة', 'p' => 'حدّث قوائم الكلمات السلبية بانتظام لاستبعاد استعلامات الوظائف أو البحث المجاني غير التجاري وحماية ميزانية العميل.'],
+                    ['h' => '3. رفع نقاط الجودة عبر فحص صفحات الهبوط العربية', 'p' => 'تأكد من تطابق الكلمة المفتاحية مع العنوان الرئيسي (H1) وعنوان الصفحة (Title) وسلامة اتجاه الصفحة RTL قبل تفعيل الحملة.'],
+                ],
+                'sections_en' => [
+                    ['h' => '1. Account for Arabic spelling and dialect variations', 'p' => 'Use Arabic keyword expansion to cover hamza omissions, ta-marbuta variations, and regional terms alongside English queries.'],
+                    ['h' => '2. Maintain disciplined negative keyword lists', 'p' => 'Filter out non-commercial queries, job seekers, and unrelated Arabizi terms before they drain daily search budgets.'],
+                    ['h' => '3. Audit Arabic landing pages to lift Quality Score', 'p' => 'Verify title pixel widths, H1 alignment, and clean dir="rtl" markup using the Arabic page SEO audit tool.'],
+                ],
+                'product_link' => '/search',
+                'related_links' => ['/integrations/google-ads', '/tools/arabic-keyword-generator', '/tools/page-audit'],
+            ],
+            'snapchat-tiktok-ads-gulf' => [
+                'title_ar' => 'دليل إعلانات سناب شات وتيك توك في السعودية والخليج | AdsRanger',
+                'title_en' => 'Snapchat & TikTok Ads Guide for Gulf Campaigns | AdsRanger',
+                'meta_ar' => 'إرشادات لوكالات الإعلان لإدارة حملات الفيديو العمودي على سناب شات وتيك توك في أسواق الخليج: المقاسات، الرسائل التسويقية، ومتابعة الميزانيات.',
+                'meta_en' => 'Agency guide to running vertical video campaigns on Snapchat and TikTok in Gulf markets: creative specs, hooks, and budget pacing.',
+                'summary_ar' => 'كيف تخطط وتدير حملات الفيديو العمودي على منصتي سناب شات وتيك توك لعملاء التجارة الإلكترونية والخدمات في أسواق الخليج.',
+                'summary_en' => 'How agencies plan, test, and pace vertical video campaigns across Snapchat and TikTok for Gulf e-commerce and service brands.',
+                'sections_ar' => [
+                    ['h' => '1. تصميم الفيديو العمودي الكامل منذ الثواني الأولى', 'p' => 'اعتمد مقاس 9:16 الكامل مع نص عربي واضح في المنطقة الآمنة بعيدًا عن أزرار التفاعل، واذكر العرض الأساسي خلال أول ثانيتين.'],
+                    ['h' => '2. موازنة الميزانيات خلال مواسم الذروة الخليجية', 'p' => 'خلال مواسم مثل رمضان والجمعة البيضاء واليوم الوطني، راقب وتيرة الصرف اليومية لتفادي استهلاك الميزانية في ساعات الذروة الأولى فقط.'],
+                    ['h' => '3. توحيد قراءة التحويلات مع باقي المنصات', 'p' => 'استخدم معاملات UTM قياسية لكل حملة ومجموعة إعلانية لمقارنة أداء الفيديو القصير مع حملات البحث والمنصات الأخرى.'],
+                ],
+                'sections_en' => [
+                    ['h' => '1. Build native 9:16 creatives with safe-zone Arabic captions', 'p' => 'Keep Arabic text overlays inside platform safe zones and lead with the core offer in the opening seconds.'],
+                    ['h' => '2. Pace budgets carefully during Gulf retail peaks', 'p' => 'Monitor daily spend velocity during Ramadan, Eid, and White Friday so budgets pace evenly through the month.'],
+                    ['h' => '3. Standardize UTM attribution across video channels', 'p' => 'Tag every Snapchat and TikTok ad with consistent UTM parameters so results reconcile cleanly in client reports.'],
+                ],
+                'product_link' => '/integrations',
+                'related_links' => ['/integrations/snapchat', '/integrations/tiktok', '/tools/utm-builder'],
+            ],
+            'client-ad-reporting' => [
+                'title_ar' => 'دليل إعداد تقارير الحملات الإعلانية للعملاء | AdsRanger',
+                'title_en' => 'Client Ad Reporting Guide for Agencies | AdsRanger',
+                'meta_ar' => 'كيف تبني تقرير حملات إعلانية شهري واضح لعملاء الوكالة يجمع نتائج المنصات الإعلانية وتحليلات الموقع (GA4) بلغة يفهمها صاحب القرار.',
+                'meta_en' => 'How to structure clear monthly client ad reports combining cross-platform ad results and web analytics (GA4) for decision-makers.',
+                'summary_ar' => 'منهجية عملية لتحويل أرقام المنصات الإعلانية وتحليلات الموقع إلى تقرير شهري واضح يربط الإنفاق بالنتائج الفعلية للعميل.',
+                'summary_en' => 'A practical standard for turning multi-platform ad metrics and web analytics into a concise, decision-ready client report.',
+                'sections_ar' => [
+                    ['h' => '1. ابدأ بالنتائج التجارية قبل التفاصيل التقنية', 'p' => 'يحتاج العميل في الصفحة الأولى إلى رؤية إجمالي الإنفاق، والنتائج المحققة حسب الهدف، ومتوسط تكلفة النتيجة مقارنة بالمستهدف الشهري.'],
+                    ['h' => '2. توضيح الفروق بين أرقام المنصات الإعلانية وبيانات تحليلات الموقع (GA4)', 'p' => 'اشرح للعميل سبب اختلاف أرقام التحويل بين المنصات الإعلانية وتقارير تحليلات الموقع نتيجة اختلاف نوافذ الإحالة ومعاملات التتبع (UTM).'],
+                    ['h' => '3. تقديم خطة واضحة للشهر القادم', 'p' => 'اختم التقرير دائمًا بثلاث توصيات محددة للشهر التالي تشمل توزيع الميزانية والتصاميم المطلوب اختبارها.'],
+                ],
+                'sections_en' => [
+                    ['h' => '1. Lead with business outcomes before channel breakdowns', 'p' => 'Open every report with total spend, primary conversions achieved, and cost per result against the agreed monthly goal.'],
+                    ['h' => '2. Reconcile ad platform conversions with web analytics (GA4)', 'p' => 'Explain how attribution windows work alongside UTM-tagged sessions in GA4 so clients understand why platform and analytics totals differ.'],
+                    ['h' => '3. Close with concrete next-month actions', 'p' => 'End with three clear priorities covering budget shifts, creative refreshes, and landing page improvements.'],
+                ],
+                'product_link' => '/reports',
+                'related_links' => ['/demo-report', '/tools/utm-builder', '/glossary/roas'],
+            ],
+            'ad-budget-pacing' => [
+                'title_ar' => 'دليل إدارة وتيرة إنفاق الإعلانات الشهرية للوكالات | AdsRanger',
+                'title_en' => 'Ad Budget Pacing Guide for Marketing Agencies | AdsRanger',
+                'meta_ar' => 'كيف تتابع وتيرة إنفاق حسابات العملاء يوميًا وتوزع الميزانيات بين المنصات وتتجنب نفاد الميزانية المبكر أو نقص الصرف في نهاية الشهر.',
+                'meta_en' => 'How agencies monitor daily ad budget pacing across clients, split spend across platforms, and prevent overspend or under-delivery.',
+                'summary_ar' => 'قواعد عملية لضبط وتيرة الصرف اليومي عبر حسابات العملاء وتوقع نهاية الشهر قبل فوات الأوان.',
+                'summary_en' => 'Operational rules for tracking daily spend velocity, forecasting month-end totals, and keeping every client account on budget.',
+                'sections_ar' => [
+                    ['h' => '1. حساب وتيرة الصرف اليومية مقارنة بالأيام المنقضية', 'p' => 'راقب نسبة الصرف الفعلي إلى الصرف المخطط له حتى اليوم؛ أي انحراف يتجاوز 10% يستدعي مراجعة حدود الميزانية اليومية للحملات.'],
+                    ['h' => '2. التعامل مع المواسم ذات الذروة غير المتساوية', 'p' => 'في مواسم مثل رمضان أو العروض الكبرى، خطط لتوزيع متدرج للميزانية بدل القسمة المتساوية على أيام الشهر.'],
+                    ['h' => '3. استخدام حاسبة وتيرة الإنفاق لتحديد الصرف اليومي المتبقي', 'p' => 'احسب المبلغ اليومي المطلوب للأيام المتبقية من الشهر بدقة لتجنب التعديلات العشوائية في الأيام الأخيرة.'],
+                ],
+                'sections_en' => [
+                    ['h' => '1. Track spend-to-date against elapsed calendar time', 'p' => 'Check pacing percentages twice a week; when an account drifts beyond 10% above or below plan, adjust daily caps early.'],
+                    ['h' => '2. Plan weighted pacing curves for seasonal peaks', 'p' => 'During Ramadan or major retail events, weight daily targets around peak conversion days rather than flat daily averages.'],
+                    ['h' => '3. Calculate exact remaining daily spend targets', 'p' => 'Use the budget pacing calculator to compute the exact daily spend needed for the remaining days of the month.'],
+                ],
+                'product_link' => '/reports',
+                'related_links' => ['/tools/budget-pacing-calculator', '/tools/ramadan-budget-calculator', '/glossary/pacing'],
+            ],
+        ];
+    }
+
+    /**
+     * B-12 Solutions, Role & Roadmap pages (/solutions/agencies, /solutions/freelancers, /for-clients, /for-teams, /roadmap)
+     *
+     * @return array<string, array{ar: array{nav: string, title: string, meta: string, h1: string, lead: string, cards: list<array{h: string, p: string, link: string, link_label: string}>}, en: array{nav: string, title: string, meta: string, h1: string, lead: string, cards: list<array{h: string, p: string, link: string, link_label: string}>}}>
+     */
+    public static function solutionsAndRoles(): array
+    {
+        return [
+            'solutions/agencies' => [
+                'ar' => [
+                    'nav' => 'للوكالات',
+                    'title' => 'حلول إدارة الإعلانات والتقارير لوكالات التسويق | AdsRanger',
+                    'meta' => 'صمّمت AdsRanger لوكالات التسويق في المنطقة لإدارة حسابات العملاء، مراقبة وتيرة الميزانيات، وإصدار تقارير موحدة بالعربية والإنجليزية.',
+                    'h1' => 'مساحة عمل واحدة لإدارة حسابات عملاء وكالتك وتقاريرهم',
+                    'lead' => 'بدل التنقل بين عشرات الحسابات الإعلانية والجداول اليدوية، تبني <bdi dir="ltr">AdsRanger</bdi> مكتب عمليات يومي للوكالات في المنطقة. قيد التطوير · الإطلاق في 2027.',
+                    'cards' => [
+                        ['h' => 'متابعة يومية لميزانيات جميع العملاء', 'p' => 'شاهد وتيرة الإنفاق والتنبيهات الصباحية لكل عميل في شاشة واحدة قبل أن تتأثر الحملة.', 'link' => '/features', 'link_label' => 'استعرض ميزات المنصة'],
+                        ['h' => 'تقارير عملاء جاهزة للمشاركة', 'p' => 'روابط تقارير قراءة فقط وملفات PDF باللغتين العربية والإنجليزية تعكس هوية وكالتك.', 'link' => '/demo-report', 'link_label' => 'شاهد التقرير التجريبي'],
+                        ['h' => 'صلاحيات دقيقة لأعضاء الفريق', 'p' => 'حدّد ما يراه كل عضو في الوكالة حسب دوره والعملاء المسندين إليه.', 'link' => '/for-teams', 'link_label' => 'تعرّف على أدوار الفريق'],
+                    ],
+                ],
+                'en' => [
+                    'nav' => 'For agencies',
+                    'title' => 'Ad Operations & Client Reporting for Marketing Agencies | AdsRanger',
+                    'meta' => 'AdsRanger is built for MENA marketing agencies to monitor client budgets, catch pacing issues early, and share bilingual client reports.',
+                    'h1' => 'One daily operations desk for every client your agency manages',
+                    'lead' => 'Replace scattered tabs and manual end-of-month spreadsheets with a unified bilingual workspace built for agencies. In development · launching in 2027.',
+                    'cards' => [
+                        ['h' => 'Morning budget pacing & alerts', 'p' => 'Spot overspend, stalled delivery, and CPR spikes across all client accounts in one view.', 'link' => '/en/features', 'link_label' => 'Explore platform features'],
+                        ['h' => 'Client-ready bilingual reports', 'p' => 'Share read-only report links and monthly PDF summaries in Arabic and English.', 'link' => '/en/demo-report', 'link_label' => 'See sample report'],
+                        ['h' => 'Role-based team access', 'p' => 'Assign specific clients and permissions across account managers and analysts.', 'link' => '/en/for-teams', 'link_label' => 'See team workflows'],
+                    ],
+                ],
+            ],
+            'solutions/freelancers' => [
+                'ar' => [
+                    'nav' => 'للمستقلين',
+                    'title' => 'إدارة حملات العملاء وتقاريرهم للمستقلين | AdsRanger',
+                    'meta' => 'أدوات عملية للمسوقين المستقلين ومديري الحملات لإدارة ميزانيات العملاء وإصدار تقارير احترافية بالعربية والإنجليزية.',
+                    'h1' => 'أدِر حسابات عملائك كمحترف وقدّم تقارير واضحة في دقائق',
+                    'lead' => 'تخطط <bdi dir="ltr">AdsRanger</bdi> لتقديم باقة المستقل (مخطط لها) لتمنحك متابعة دقيقة للميزانيات وتقارير عملاء احترافية دون تعقيد. قيد التطوير · الإطلاق في 2027.',
+                    'cards' => [
+                        ['h' => 'باقة مصمَّمة للمسوق المستقل', 'p' => 'مقعد واحد يغطي حتى 5 عملاء و3 حسابات إعلانية مع تنبيهات الميزانية الأساسية (مخطط لها).', 'link' => '/pricing', 'link_label' => 'راجع مقارنة الباقات'],
+                        ['h' => 'أدوات مجانية جاهزة للاستخدام اليوم', 'p' => 'استخدم حاسبات العائد ووتيرة الإنفاق وفاحص السيو العربي مجانًا أثناء التخطيط لحملات عملائك.', 'link' => '/tools', 'link_label' => 'افتح الأدوات المجانية'],
+                        ['h' => 'رابط تقرير مباشر لكل عميل', 'p' => 'وفّر ساعات إعداد التقارير الأسبوعية عبر رابط قراءة فقط يعرض الأرقام بوضوح.', 'link' => '/demo-report', 'link_label' => 'شاهد نموذج التقرير'],
+                    ],
+                ],
+                'en' => [
+                    'nav' => 'For freelancers',
+                    'title' => 'Client Ad Tracking & Reporting for Freelancers | AdsRanger',
+                    'meta' => 'Built for independent media buyers and freelance marketers managing multiple client accounts in Arabic and English.',
+                    'h1' => 'Keep every freelance client on budget without spreadsheet busywork',
+                    'lead' => 'AdsRanger plans a dedicated Solo tier so independent marketers can track client pacing, catch alerts, and share polished bilingual links. In development · launching in 2027.',
+                    'cards' => [
+                        ['h' => 'Planned Solo tier for independents', 'p' => '1 seat covering up to 5 clients and 3 ad accounts with core pacing and alert rules.', 'link' => '/en/pricing', 'link_label' => 'Compare planned tiers'],
+                        ['h' => '10 free tools available right now', 'p' => 'Use our Arabic SEO audit, keyword generator, and pacing calculators today with no sign-up.', 'link' => '/en/tools', 'link_label' => 'Browse free tools'],
+                        ['h' => 'Shareable read-only client links', 'p' => 'Send clients a clean bilingual summary link instead of manually formatting weekly decks.', 'link' => '/en/demo-report', 'link_label' => 'View sample report'],
+                    ],
+                ],
+            ],
+            'for-clients' => [
+                'ar' => [
+                    'nav' => 'لعملاء الوكالات',
+                    'title' => 'كيف تعمل روابط مشاركة الأداء لعملاء الوكالات | AdsRanger',
+                    'meta' => 'تعرّف على طريقة عمل روابط المشاهدة المخصصة لعملاء الوكالات في AdsRanger: عرض قراءة فقط، دون تسجيل دخول، وباللغتين العربية والإنجليزية.',
+                    'h1' => 'متابعة واضحة لما تحققه ميزانيتك الإعلانية مع وكالتك',
+                    'lead' => 'عندما تشاركك وكالتك رابطًا من <bdi dir="ltr">AdsRanger</bdi>، يمكنك الاطلاع على ملخص الأداء بلغة عربية أو إنجليزية واضحة دون الحاجة لإنشاء حساب أو كلمة مرور. قيد التطوير · الإطلاق في 2027.',
+                    'cards' => [
+                        ['h' => 'عرض قراءة فقط ودون تسجيل دخول', 'p' => 'يعرض الرابط الملخص المعتمد لحسابك فقط، ولا يطلب منك ربط أي حساب أو إدخال بيانات دخول.', 'link' => '/demo-report', 'link_label' => 'شاهد مثالًا حيًا'],
+                        ['h' => 'حماية وخصوصية بياناتك', 'p' => 'يمكن للوكالة إيقاف الرابط أو تقييده بكلمة مرور أو تاريخ انتهاء في أي وقت لضمان سرية أرقامك.', 'link' => '/security', 'link_label' => 'كيف نحمي البيانات'],
+                        ['h' => 'أرقام واضحة حسب هدف نشاطك', 'p' => 'يركّز العرض على النتائج التي تهم نشاطك التجاري ومؤشر صحة الحملة بدل الجداول المعقدة.', 'link' => '/features', 'link_label' => 'تعرّف على المنصة'],
+                    ],
+                ],
+                'en' => [
+                    'nav' => 'For agency clients',
+                    'title' => 'How Shared Agency Performance Links Work for Clients | AdsRanger',
+                    'meta' => 'Learn how AdsRanger read-only links let agency clients view campaign progress in Arabic or English without creating an account.',
+                    'h1' => 'A clear view of what your marketing budget achieves with your agency',
+                    'lead' => 'When your agency shares an AdsRanger link with you, you can view approved campaign outcomes in Arabic or English—read-only and with no login required. In development · launching in 2027.',
+                    'cards' => [
+                        ['h' => 'Read-only access with zero sign-up', 'p' => 'Open your agency\'s signed link on mobile or desktop without managing passwords or platform logins.', 'link' => '/en/demo-report', 'link_label' => 'See a sample view'],
+                        ['h' => 'Controlled and revocable by your agency', 'p' => 'Links can be password-protected, given an expiry date, or revoked at any time.', 'link' => '/en/security', 'link_label' => 'Security & data protection'],
+                        ['h' => 'Focused on real business outcomes', 'p' => 'See spend pacing, primary outcomes, and plain-language summaries tailored to your goals.', 'link' => '/en/features', 'link_label' => 'Platform overview'],
+                    ],
+                ],
+            ],
+            'for-teams' => [
+                'ar' => [
+                    'nav' => 'لفرق العمل',
+                    'title' => 'تنظيم صلاحيات وأدوار فريق الوكالة الإعلانية | AdsRanger',
+                    'meta' => 'صمّمت AdsRanger صلاحيات واضحة لأعضاء فريق الوكالة: المالك، المدير، مدير علاقات العملاء، والمحلل، مع سجل تدقيق للتغييرات.',
+                    'h1' => 'أدوار وصلاحيات واضحة لكل عضو في فريق وكالتك',
+                    'lead' => 'تمنح <bdi dir="ltr">AdsRanger</bdi> كل عضو في الفريق الصلاحيات التي يحتاجها فقط، مع إمكانية تخصيص العملاء المرئيين لكل عضو ومعاينة الواجهة بصفته. قيد التطوير · الإطلاق في 2027.',
+                    'cards' => [
+                        ['h' => 'أربعة أدوار قياسية للوكالات', 'p' => 'تشمل الأدوار: مالك مساحة العمل، المدير، مدير علاقات العملاء (إدارة العملاء والحملات والتقارير)، والمحلل (عرض فقط).', 'link' => '/security', 'link_label' => 'الأمان وسجل التدقيق'],
+                        ['h' => 'تخصيص العملاء لكل عضو', 'p' => 'قصر رؤية الحسابات والتقارير على العملاء المسندين لمدير علاقات العملاء أو المحلل المعني.', 'link' => '/solutions/agencies', 'link_label' => 'حلول الوكالات'],
+                        ['h' => 'المعاينة بصفة عضو آخر (View As)', 'p' => 'يمكن لمالك الوكالة أو المدير معاينة مساحة العمل بوضع القراءة فقط للتأكد مما يراه كل عضو.', 'link' => '/features', 'link_label' => 'كل ميزات المنصة'],
+                    ],
+                ],
+                'en' => [
+                    'nav' => 'For agency teams',
+                    'title' => 'Agency Team Roles, Permissions & Client Scopes | AdsRanger',
+                    'meta' => 'Manage workspace permissions across Owners, Admins, Account Managers, and Analysts with per-client visibility and audit logs.',
+                    'h1' => 'Clear roles and per-client permissions for your agency team',
+                    'lead' => 'AdsRanger scopes workspace access by role and assigned clients, complete with an audit log and read-only role previewing. In development · launching in 2027.',
+                    'cards' => [
+                        ['h' => 'Four purpose-built agency roles', 'p' => 'Owner, Admin (everything except billing), Account Manager (clients, ads, and reports), and Analyst (view only).', 'link' => '/en/security', 'link_label' => 'Security & audit log'],
+                        ['h' => 'Per-client visibility assignment', 'p' => 'Restrict team members to specific client portfolios so sensitive accounts stay compartmentalized.', 'link' => '/en/solutions/agencies', 'link_label' => 'Solutions for agencies'],
+                        ['h' => 'Read-only "View As" preview mode', 'p' => 'Workspace owners and admins can preview the exact navigation and client list any teammate sees.', 'link' => '/en/features', 'link_label' => 'All platform features'],
+                    ],
+                ],
+            ],
+            'roadmap' => [
+                'ar' => [
+                    'nav' => 'خارطة الطريق',
+                    'title' => 'خارطة طريق بناء منصة AdsRanger | AdsRanger',
+                    'meta' => 'اطّلع على ما بنيناه في AdsRanger وما هو قيد التطوير أو مخطط له للإطلاق في 2027 لوكالات التسويق في المنطقة.',
+                    'h1' => 'خارطة الطريق: ما هو متاح الآن وما نبنيه للإطلاق في 2027',
+                    'lead' => 'نشارك هنا حالة وحدات <bdi dir="ltr">AdsRanger</bdi> بشفافية: الأدوات المجانية المتاحة اليوم، والميزات الأساسية قيد التطوير، والتكاملات المخطط لها للإطلاق في 2027.',
+                    'cards' => [
+                        ['h' => 'متاح الآن مجانًا على الموقع', 'p' => '10 أدوات مجانية للسيو العربي وحاسبات الإعلانات، وتقويم مواسم 2027، ودليل حملات رمضان، والتقرير التجريبي.', 'link' => '/tools', 'link_label' => 'جرّب الأدوات المجانية'],
+                        ['h' => 'قيد التطوير (مساحة عمل الوكالة)', 'p' => 'متابعة وتيرة الميزانيات، قواعد التنبيه الصباحية، روابط تقارير العملاء (قراءة فقط + PDF)، وفحص السيو العربي داخل المنصة.', 'link' => '/features', 'link_label' => 'استعرض الميزات'],
+                        ['h' => 'مخطط له للإطلاق في 2027', 'p' => 'ربط مباشر لمنصات المرحلة الأولى الإعلانية، استوديو اعتماد الإعلانات، وتنبيهات وتقارير إضافية.', 'link' => '/integrations', 'link_label' => 'المنصات المخطط لربطها'],
+                    ],
+                ],
+                'en' => [
+                    'nav' => 'Roadmap',
+                    'title' => 'AdsRanger Product Roadmap (2027 Launch) | AdsRanger',
+                    'meta' => 'See what is live today on adsranger.com, what is in active development inside the workspace, and what is planned for launch in 2027.',
+                    'h1' => 'Product roadmap: live free tools, in-development core, and 2027 plans',
+                    'lead' => 'We label every capability transparently: free Arabic SEO and ad tools live today, core workspace modules in development, and platform integrations planned for 2027.',
+                    'cards' => [
+                        ['h' => 'Live today (free public tools & guides)', 'p' => '10 free Arabic SEO and ad calculators, the 2027 MENA seasons calendar, Ramadan guide, and interactive sample report.', 'link' => '/en/tools', 'link_label' => 'Open free tools'],
+                        ['h' => 'In development (core agency workspace)', 'p' => 'Multi-client budget pacing, morning alert rules, signed client report links & PDFs, and the in-app Arabic SEO workspace.', 'link' => '/en/features', 'link_label' => 'Explore features'],
+                        ['h' => 'Planned for 2027 launch', 'p' => 'Direct Stage-1 ad platform OAuth connections, multi-platform Ad Studio sign-off flows, and automated digests.', 'link' => '/en/integrations', 'link_label' => 'See planned integrations'],
+                    ],
+                ],
+            ],
+        ];
+    }
 }

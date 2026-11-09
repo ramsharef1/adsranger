@@ -62,5 +62,17 @@ class PublicCatalogExpansionTest extends TestCase
             $this->get('/blog/'.$postSlug)->assertOk()->assertSee('"@type":"Article"', false);
             $this->get('/en/blog/'.$postSlug)->assertOk()->assertSee('"@type":"Article"', false);
         }
+        $this->get('/guides')->assertOk()->assertSee('"@type":"CollectionPage"', false);
+        $this->get('/en/guides')->assertOk()->assertSee('Pillar Guides');
+        foreach (array_keys(PublicCatalog::guides()) as $gSlug) {
+            $this->get('/guides/'.$gSlug)->assertOk()->assertSee('"@type":"Article"', false);
+            $this->get('/en/guides/'.$gSlug)->assertOk()->assertSee('"@type":"Article"', false);
+        }
+
+        foreach (array_keys(PublicCatalog::solutionsAndRoles()) as $srKey) {
+            $this->get('/'.$srKey)->assertOk()->assertSee('2027');
+            $this->get('/en/'.$srKey)->assertOk()->assertSee('2027');
+        }
+        $this->get('/for-teams')->assertSee('مدير علاقات العملاء');
     }
 }

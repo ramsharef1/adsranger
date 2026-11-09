@@ -311,6 +311,12 @@ class PublicSiteController extends Controller
             '/ai' => 'public/product/show',
             '/glossary' => 'public/glossary/index',
             '/blog' => 'public/blog/index',
+            '/guides' => 'public/guides/index',
+            '/solutions/agencies' => 'public/solution-role',
+            '/solutions/freelancers' => 'public/solution-role',
+            '/for-clients' => 'public/solution-role',
+            '/for-teams' => 'public/solution-role',
+            '/roadmap' => 'public/solution-role',
             '/privacy' => 'legal/page',
             '/terms' => 'legal/page',
             '/data-deletion' => 'legal/page',
@@ -427,5 +433,22 @@ class PublicSiteController extends Controller
     {
         abort_unless(isset(\App\Support\Seo\PublicCatalog::posts()[$slug]), 404);
         return response()->view('public.blog.show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'slug' => $slug]);
+    }
+
+    public function guidesIndex(string $lang = 'ar'): Response
+    {
+        return response()->view('public.guides.index', ['lang' => $lang === 'en' ? 'en' : 'ar']);
+    }
+
+    public function guidesShow(string $lang = 'ar', string $slug = ''): Response
+    {
+        abort_unless(isset(\App\Support\Seo\PublicCatalog::guides()[$slug]), 404);
+        return response()->view('public.guides.show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'slug' => $slug]);
+    }
+
+    public function solutionOrRolePage(string $lang = 'ar', string $pageKey = 'roadmap'): Response
+    {
+        abort_unless(isset(\App\Support\Seo\PublicCatalog::solutionsAndRoles()[$pageKey]), 404);
+        return response()->view('public.solution-role', ['lang' => $lang === 'en' ? 'en' : 'ar', 'pageKey' => $pageKey]);
     }
 }
