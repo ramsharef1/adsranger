@@ -15,6 +15,10 @@ class OAuthTokenVaultService
 {
     public const REFRESH_BUFFER_SECONDS = 900; // 15 minutes before expiry
 
+    public function __construct(
+        private readonly StageOneOAuthAdapter $adapter = new StageOneOAuthAdapter,
+    ) {}
+
     /**
      * Store encrypted OAuth credentials directly on the AdAccount's Connection record and reset any error state.
      *
@@ -55,6 +59,7 @@ class OAuthTokenVaultService
 
     /**
      * Retrieve a valid decrypted access token, refreshing atomically under a lock if within the 15-minute expiry buffer.
+     * When $refreshCallback is null, uses StageOneOAuthAdapter automatically.
      *
      * @param  null|callable(string $refreshToken, AdAccount $account, Connection $connection): array{access_token: string, refresh_token?: ?string, expires_in?: int}  $refreshCallback
      */
@@ -73,10 +78,12 @@ class OAuthTokenVaultService
             return (string) $connection->access_token;
         }
 
-        if ($refreshCallback === null || empty($connection->refresh_token)) {
-            $this->tripCircuitBreaker($account, 'token_expired', 'OAuth access token expired and no refresh token or handler is available.');
+        if (empty($connection->refresh_token)) {
+            $this->tripCircuitBreaker($account, 'token_expired', 'OAuth access token expired and no refresh token is available.');
             throw new RuntimeException("OAuth token expired for AdAccount [{$account->id}].");
         }
+
+        $callback = $refreshCallback ?? fn (string $rt, AdAccount $acc, Connection $conn): array => $this->adapter->refresh($rt, $acc, $conn);
 
         $lock = Cache::lock("oauth:refresh:connection:{$connection->id}", 30);
         if (! $lock->get()) {
@@ -91,11 +98,16 @@ class OAuthTokenVaultService
                 return (string) $fresh->access_token;
             }
 
-            $newTokens = $refreshCallback((string) $fresh->refresh_token, $account, $fresh);
+            $newTokens = $callback((string) $fresh->refresh_token, $account, $fresh);
             $updated = $this->storeCredentials($account, [
                 'access_token' => $newTokens['access_token'],
                 'refresh_token' => $newTokens['refresh_token'] ?? $fresh->refresh_token,
                 'expires_in' => $newTokens['expires_in'] ?? 3600,
+            ]);
+
+            AuditLog::record('connection.oauth_refreshed', $account->agency, [
+                'connection_id' => $connection->id,
+                'ad_account_id' => $account->id,
             ]);
 
             return (string) $updated->access_token;
@@ -116,7 +128,7 @@ class OAuthTokenVaultService
 
     /**
      * Trip the circuit breaker on permanent OAuth failure (e.g., 190 OAuthException / invalid_grant),
-     * mark the Connection as 'error', and open/refresh one deduplicated critical Alert on the agency desk.
+     * mark the Connection as 'error', and open/refresh one deduplicated critical Alert using UX-121 AlertText patterns.
      */
     public function tripCircuitBreaker(AdAccount $account, string $errorCode, string $reason): void
     {
@@ -133,11 +145,10 @@ class OAuthTokenVaultService
         ]);
 
         $fp = self::alertFingerprint($account);
-        $title = __('Ad account connection requires re-authentication');
-        $detail = __('Sync paused for account :name because the platform token expired or was revoked (:code).', [
-            'name' => $account->name ?: '#'.$account->id,
-            'code' => $errorCode,
-        ]);
+        $entityName = $account->name ?: ('#'.$account->id);
+        // Stored in canonical English per UX-121 so AlertText translates dynamically with Unicode isolates
+        $title = 'Connection problem: '.$entityName;
+        $detail = 'The connection needs attention: '.$errorCode;
 
         $existing = Alert::where('agency_id', $account->agency_id)
             ->where('fingerprint', $fp)
@@ -163,7 +174,7 @@ class OAuthTokenVaultService
             'severity' => 'critical',
             'entity_type' => 'ad_account',
             'entity_id' => $account->id,
-            'entity_name' => $account->name ?: $account->external_id,
+            'entity_name' => $entityName,
             'title' => $title,
             'detail' => $detail,
             'payload' => ['error_code' => $errorCode, 'reason' => $reason],
