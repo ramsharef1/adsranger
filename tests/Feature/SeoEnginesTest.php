@@ -50,4 +50,13 @@ class SeoEnginesTest extends TestCase
         $this->assertGreaterThanOrEqual(70, $eval["score"]);
         $this->assertTrue($eval["needs_ltr_bdi"]);
     }
+
+    public function test_search_console_analyzer_flags_opportunities_and_tags_dialects(): void
+    {
+        $res = \App\Support\Seo\SearchConsole::analyze();
+        $this->assertSame('simulated', $res['source']);
+        $this->assertNotEmpty($res['rows']);
+        $opportunities = array_filter($res['rows'], fn (array $r) => $r['opportunity']);
+        $this->assertNotEmpty($opportunities);
+    }
 }

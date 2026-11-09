@@ -229,7 +229,7 @@ class PlanGatingTest extends TestCase
     public function test_every_agency_page_renders_on_each_tier_and_role(): void
     {
         $pages = ['desk', 'alerts', 'alert-rules', 'clients', 'compare', 'pacing', 'budget-plan', 'calendar', 'insights', 'benchmarks',
-            'google', 'landing-pages', 'competitors', 'networks', 'connections', 'ad-accounts', 'imports', 'members', 'invitations', 'notifications', 'plan', 'whats-new', 'utm-builder', 'goal-calculator', 'network-catalog', 'top-ads'];
+            'google', 'landing-pages', 'competitors', 'networks', 'connections', 'ad-accounts', 'imports', 'members', 'invitations', 'notifications', 'plan', 'whats-new', 'utm-builder', 'goal-calculator', 'network-catalog', 'top-ads', 'arabic-seo'];
         if (! extension_loaded('intl')) {
             // Filament tables format numbers with intl (installed on the server); without it only the non-table pages can render.
             $pages = array_values(array_diff($pages, ['alerts', 'clients', 'connections', 'ad-accounts', 'imports', 'members', 'invitations']));

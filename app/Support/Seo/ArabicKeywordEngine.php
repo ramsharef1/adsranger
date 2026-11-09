@@ -13,7 +13,7 @@ class ArabicKeywordEngine
     {
         $seed = trim($seed);
         $key = Normaliser::key($seed);
-        $variants = method_exists(Normaliser::class, "variants") ? array_values(array_unique(array_filter(array_merge([$seed, $key], (array) Normaliser::variants($seed))))) : [$seed];
+        $variants = method_exists(Normaliser::class, "variants") ? array_values(array_unique(array_filter(array_merge([$seed, $key], array_filter((array) Normaliser::variants($seed), 'is_string'))))) : [$seed];
         $arabizi = method_exists(Normaliser::class, "arabicToArabizi")
             ? array_values(array_unique((array) Normaliser::arabicToArabizi($seed)))
             : [];
