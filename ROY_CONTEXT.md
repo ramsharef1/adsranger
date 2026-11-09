@@ -1,10 +1,10 @@
 # ROY_CONTEXT — AdsRanger
 
 ## 1. Latest Sanitized Pulse
-- **Timestamp**: 2026-11-09T14:52:15+00:00 (`8665779`)
+- **Timestamp**: 2026-11-09T14:54:57+00:00 (`a8e3fe8`)
 - **Mail / Flags**: `mailer=log`, `SEO_TOOLS_PUBLIC=false`, `MODULE_VIEW_AS=false`, `SELF_SIGNUP=false`
 - **Counts**: `agencies=0`, `users=0`, `clients=0`, `ad_accounts=0`, `alerts=0`, `waitlist_entries=0`, `jobs=0`, `failed_jobs=0`
-- **Tech-Debt Triggers**: [TD-002 ACTIVE] MAIL_MAILER=log (outbound mails are not using live SMTP yet); [TD-001 OK] waitlist_entries=0/250 threshold
+- **Tech-Debt Triggers**: [TD-002 ACTIVE] mailer=log host=127.0.0.1 (loopback/non-external SMTP — cut over to Brevo SMTP); [TD-001 OK] waitlist_entries=0/250 threshold
 
 ## 2. Active Tech-Debt Triggers
 - **[TD-001]**: Migrate `EmailSuppressionGuard` cache keys to a dedicated `email_suppressions` table + Brevo bounce webhook when `waitlist_entries >= 250` or outbound volume exceeds `100/day`.
@@ -16,3 +16,4 @@
 
 ## 4. Recent Sprint Changes
 - `2026-11-09` | `app/Console/Commands/RoyPulseCommand.php`, `app/Support/Mail/EmailSuppressionGuard.php`, `app/Providers/AppServiceProvider.php` | Added `roy:pulse` sanitized telemetry command and `MessageSending` suppression guard (`E2-046`).
+- `2026-11-09` | `app/Console/Commands/MailSmokeTestCommand.php`, `app/Console/Commands/RoyPulseCommand.php` | Added `mail:smoke-test` CLI and loopback SMTP detection for `[TD-002]` (`E2-047`).

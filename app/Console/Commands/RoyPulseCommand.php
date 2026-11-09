@@ -28,8 +28,9 @@ class RoyPulseCommand extends Command
         $head = $this->resolveGitHeadShortSha();
 
         $triggers = [];
-        if ($mailer === 'log' || $mailer === 'array') {
-            $triggers[] = "[TD-002 ACTIVE] MAIL_MAILER={$mailer} (outbound mails are not using live SMTP yet)";
+        $isLoopbackSmtp = in_array(strtolower($mailHost), ['', '127.0.0.1', 'localhost', 'mailpit', 'mailhog'], true);
+        if ($mailer === 'log' || $mailer === 'array' || ($mailer === 'smtp' && $isLoopbackSmtp)) {
+            $triggers[] = "[TD-002 ACTIVE] mailer={$mailer} host={$mailHost} (loopback/non-external SMTP — cut over to Brevo SMTP)";
         }
         if ($counts['failed_jobs'] > 0) {
             $triggers[] = "[ALERT] failed_jobs={$counts['failed_jobs']} (inspect queue failures)";

@@ -34,4 +34,16 @@ class RoyPulseAndMailGuardTest extends TestCase
 
         $this->assertFalse(EmailSuppressionGuard::isSuppressed('active@agency.test'));
     }
+
+    public function test_mail_smoke_test_dry_run_and_suppression_abort(): void
+    {
+        $this->artisan('mail:smoke-test', ['recipient' => 'clean@agency.test', '--dry-run' => true])
+            ->expectsOutputToContain('DRY-RUN OK')
+            ->assertExitCode(0);
+
+        EmailSuppressionGuard::suppress('blocked@agency.test', 'manual');
+        $this->artisan('mail:smoke-test', ['recipient' => 'blocked@agency.test', '--dry-run' => true])
+            ->expectsOutputToContain('ABORTED: Recipient [blocked@agency.test] is blocked')
+            ->assertExitCode(1);
+    }
 }
