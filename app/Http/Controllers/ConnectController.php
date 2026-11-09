@@ -7,8 +7,10 @@ use App\Connectors\ConnectorRegistry;
 use App\Models\AdAccount;
 use App\Models\AdNetwork;
 use App\Models\Agency;
+use App\Models\Alert;
 use App\Models\AuditLog;
 use App\Models\Connection;
+use App\Services\AdNetworks\OAuthTokenVaultService;
 use App\Support\NetworkAccess;
 use App\Support\PlanLimits;
 use App\Support\TeamRoles;
@@ -67,36 +69,85 @@ class ConnectController extends Controller
             return redirect($back)->with('connect_error', Str::limit($e->getMessage(), 200));
         }
 
-        $connection = Connection::create([
-            'agency_id' => $agency->id, 'ad_network_id' => $net->id, 'created_by' => $user->id,
-            'status' => 'active', 'environment' => $net->environment,
-            'external_user_id' => $tok['user_id'], 'external_user_name' => $tok['user_name'],
-            'access_token' => $tok['access_token'], 'refresh_token' => $tok['refresh_token'],
-            'token_expires_at' => $tok['expires_in'] ? now()->addSeconds((int) $tok['expires_in'] - 60) : null,
-            'scopes' => $tok['scopes'],
-        ]);
-        AuditLog::record('connection.created', $agency, ['network' => $net->key, 'connection_id' => $connection->id]);
+        // Reuse an existing broken/disconnected connection or matching external_user_id connection on reconnect
+        $existing = Connection::where('agency_id', $agency->id)
+            ->where('ad_network_id', $net->id)
+            ->where(function ($q) use ($tok) {
+                if (! empty($tok['user_id'])) {
+                    $q->where('external_user_id', $tok['user_id'])->orWhereIn('status', ['error', 'disconnected']);
+                } else {
+                    $q->whereIn('status', ['error', 'disconnected']);
+                }
+            })
+            ->latest('id')
+            ->first();
+
+        $attrs = [
+            'agency_id' => $agency->id,
+            'ad_network_id' => $net->id,
+            'created_by' => $user->id,
+            'status' => 'active',
+            'environment' => $net->environment,
+            'external_user_id' => $tok['user_id'] ?? null,
+            'external_user_name' => $tok['user_name'] ?? null,
+            'access_token' => $tok['access_token'],
+            'refresh_token' => $tok['refresh_token'] ?? ($existing?->refresh_token),
+            'token_expires_at' => ! empty($tok['expires_in']) ? now()->addSeconds((int) $tok['expires_in'] - 60) : null,
+            'scopes' => $tok['scopes'] ?? null,
+            'last_error' => null,
+        ];
+
+        if ($existing) {
+            $existing->update($attrs);
+            $connection = $existing->refresh();
+            AuditLog::record('connection.reconnected', $agency, ['network' => $net->key, 'connection_id' => $connection->id]);
+        } else {
+            $connection = Connection::create($attrs);
+            AuditLog::record('connection.created', $agency, ['network' => $net->key, 'connection_id' => $connection->id]);
+        }
 
         $found = static::importAccounts($connector, $connection, $agency);
 
         return redirect($back)->with('connect_ok', $net->name.' connected. '.$found.' account(s) found.');
     }
 
-    /** Save the ad accounts a new connection can reach. New accounts are tracked while the plan allows. Returns how many were found. */
+    /** Save the ad accounts a new or reconnected connection can reach. Preserves client_id and heals open OAuth alerts. */
     public static function importAccounts(Connector $connector, Connection $connection, Agency $agency): int
     {
         $found = 0;
         try {
             foreach ($connector->accounts($connection) as $a) {
-                $acc = AdAccount::firstOrNew(['connection_id' => $connection->id, 'external_id' => $a['id']]);
-                $acc->fill(['agency_id' => $agency->id, 'ad_network_id' => $connection->ad_network_id, 'name' => $a['name'], 'currency' => $a['currency'], 'timezone' => $a['timezone'], 'status' => $a['status']] + (isset($a['meta']) ? ['meta' => $a['meta']] : []));
+                $acc = AdAccount::where('agency_id', $agency->id)
+                    ->where('ad_network_id', $connection->ad_network_id)
+                    ->where('external_id', (string) $a['id'])
+                    ->first()
+                    ?? new AdAccount(['connection_id' => $connection->id, 'external_id' => (string) $a['id']]);
+
+                $acc->fill([
+                    'agency_id' => $agency->id,
+                    'connection_id' => $connection->id,
+                    'ad_network_id' => $connection->ad_network_id,
+                    'name' => $a['name'],
+                    'currency' => $a['currency'],
+                    'timezone' => $a['timezone'],
+                    'status' => $a['status'],
+                    'sync_error' => null,
+                ] + (isset($a['meta']) ? ['meta' => $a['meta']] : []));
+
                 if (! $acc->exists) {
                     $acc->is_active = PlanLimits::canActivateAdAccount($agency);
                 }
                 $acc->save();
+
+                // Auto-resolve any open oauth_reauth_required alert for this account on reconnect
+                Alert::where('agency_id', $agency->id)
+                    ->where('fingerprint', OAuthTokenVaultService::alertFingerprint($acc))
+                    ->whereIn('status', ['open', 'snoozed'])
+                    ->update(['status' => 'resolved', 'resolved_at' => now()]);
+
                 $found++;
             }
-            $connection->update(['last_synced_at' => now(), 'last_error' => null]);
+            $connection->update(['last_synced_at' => now(), 'status' => 'active', 'last_error' => null]);
         } catch (\Throwable $e) {
             $connection->update(['status' => 'error', 'last_error' => Str::limit($e->getMessage(), 500)]);
         }

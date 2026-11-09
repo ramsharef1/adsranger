@@ -158,4 +158,55 @@ class OAuthTokenVaultTest extends TestCase
         $this->assertStringContainsString('Sync paused: connection requires re-authentication.', (string) $run->error);
         $this->assertSame('error', $account->fresh()->sync_status);
     }
+
+    public function test_connect_controller_import_accounts_deduplicates_on_reconnect_and_heals_alert(): void
+    {
+        $account = $this->makeAccount('meta');
+        $vault = app(OAuthTokenVaultService::class);
+        $vault->tripCircuitBreaker($account, '190', 'Token revoked');
+
+        $this->assertTrue($vault->isCircuitOpen($account));
+        $this->assertSame(1, Alert::where('ad_account_id', $account->id)->where('status', 'open')->count());
+
+        // Simulate a reconnect with a new or refreshed Connection importing the same external_id
+        $newConnection = Connection::create([
+            'agency_id' => $account->agency_id,
+            'ad_network_id' => $account->ad_network_id,
+            'status' => 'active',
+            'environment' => 'live',
+            'access_token' => 'fresh_reconnect_token',
+        ]);
+
+        $fakeConnector = new class($account->network) extends \App\Connectors\Connector {
+            public function accounts(Connection $c): array
+            {
+                return [[
+                    'id' => 'act_meta_998877',
+                    'name' => 'Noor META Account Updated',
+                    'currency' => 'USD',
+                    'timezone' => 'Asia/Amman',
+                    'status' => 'ACTIVE',
+                ]];
+            }
+            public function pull(AdAccount $a, string $from, string $to): array
+            {
+                return [];
+            }
+            public function test(): array
+            {
+                return [true, "OK"];
+            }
+        };
+
+        $found = \App\Http\Controllers\ConnectController::importAccounts($fakeConnector, $newConnection, $account->agency);
+        $this->assertSame(1, $found);
+
+        // Ensure no duplicate AdAccount row was created, client_id was preserved, connection_id updated, and alert resolved
+        $this->assertSame(1, AdAccount::where('agency_id', $account->agency_id)->where('external_id', 'act_meta_998877')->count());
+        $freshAcc = $account->fresh();
+        $this->assertSame($newConnection->id, $freshAcc->connection_id);
+        $this->assertNotNull($freshAcc->client_id);
+        $this->assertFalse($vault->isCircuitOpen($freshAcc));
+        $this->assertSame(0, Alert::where('ad_account_id', $account->id)->where('status', 'open')->count());
+    }
 }
