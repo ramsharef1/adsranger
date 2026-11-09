@@ -146,4 +146,16 @@ class OAuthTokenVaultTest extends TestCase
         $this->assertFalse($vault->isCircuitOpen($account));
         $this->assertSame(0, Alert::where('ad_account_id', $account->id)->where('rule_key', 'oauth_reauth_required')->where('status', 'open')->count());
     }
+
+    public function test_sync_service_short_circuits_when_circuit_breaker_is_open(): void
+    {
+        $account = $this->makeAccount('meta');
+        $vault = app(OAuthTokenVaultService::class);
+        $vault->tripCircuitBreaker($account, 'invalid_grant', 'Token revoked by user');
+
+        $run = \App\Sync\SyncService::sync($account, '2026-11-01', '2026-11-07');
+        $this->assertSame('error', $run->status);
+        $this->assertStringContainsString('Sync paused: connection requires re-authentication.', (string) $run->error);
+        $this->assertSame('error', $account->fresh()->sync_status);
+    }
 }

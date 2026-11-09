@@ -1,7 +1,7 @@
 # ROY_CONTEXT — AdsRanger
 
 ## 1. Latest Sanitized Pulse
-- **Timestamp**: 2026-11-09T19:53:46+00:00 (`c79d397`)
+- **Timestamp**: 2026-11-09T19:55:59+00:00 (`4fdb89b`)
 - **Mail / Flags**: `mailer=log`, `SEO_TOOLS_PUBLIC=false`, `MODULE_VIEW_AS=false`, `SELF_SIGNUP=false`
 - **Counts**: `agencies=0`, `users=0`, `clients=0`, `ad_accounts=0`, `alerts=0`, `waitlist_entries=0`, `jobs=0`, `failed_jobs=0`
 - **Tech-Debt Triggers**: [TD-002 ACTIVE] mailer=log host=127.0.0.1 (loopback/non-external SMTP — cut over to Brevo SMTP); [TD-001 OK] waitlist_entries=0/250 threshold
@@ -21,3 +21,4 @@
 - `2026-11-09` | `app/Console/Commands/MailSmokeTestCommand.php`, `app/Console/Commands/RoyPulseCommand.php` | Added `mail:smoke-test` CLI and loopback SMTP detection for `[TD-002]` (`E2-047`).
 - `2026-11-09` | `app/Services/AdNetworks/OAuthTokenVaultService.php`, `lang/ar.json`, `tests/Feature/OAuthTokenVaultTest.php` | Added encrypted Stage-1 OAuth Token Vault, atomic refresh lock, and Sync Circuit Breaker (`E2-048`).
 - `2026-11-09` | `app/Services/AdNetworks/StageOneOAuthAdapter.php`, `app/Services/AdNetworks/OAuthTokenVaultService.php`, `tests/Feature/OAuthTokenVaultTest.php` | Added Stage-1 OAuth HTTP adapter (`meta`, `google_ads`/`ga4`/`google_merchant`, `tiktok`, `snapchat`) and wired `UX-121` `AlertText` Arabic translations (`E2-049`).
+- `2026-11-09` | `app/Sync/SyncService.php`, `tests/Feature/OAuthTokenVaultTest.php` | Wired `OAuthTokenVaultService` pre-flight circuit breaker and transparent pre-sync token refresh into `SyncService::sync()` (`E2-050`).

@@ -14,6 +14,7 @@ use App\Models\Campaign;
 use App\Models\DailyMetric;
 use App\Models\SyncRun;
 use App\Support\LandingPages;
+use App\Services\AdNetworks\OAuthTokenVaultService;
 use App\Support\ResultResolver;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -26,10 +27,33 @@ class SyncService
 
     public static function sync(AdAccount $account, string $from, string $to, string $kind = 'daily'): SyncRun
     {
+        $vault = app(OAuthTokenVaultService::class);
+        if ($vault->isCircuitOpen($account)) {
+            $msg = 'Sync paused: connection requires re-authentication.';
+            $account->update(['sync_status' => 'error', 'sync_error' => $msg]);
+
+            return SyncRun::create([
+                'agency_id' => $account->agency_id,
+                'ad_account_id' => $account->id,
+                'kind' => $kind,
+                'from' => $from,
+                'to' => $to,
+                'status' => 'error',
+                'error' => $msg,
+                'started_at' => now(),
+                'finished_at' => now(),
+            ]);
+        }
+
         $run = SyncRun::create(['agency_id' => $account->agency_id, 'ad_account_id' => $account->id, 'kind' => $kind,
             'from' => $from, 'to' => $to, 'status' => 'running', 'started_at' => now()]);
         $account->update(['sync_status' => 'running']);
         try {
+            $conn = $account->connection;
+            if ($conn && filled($conn->access_token) && $conn->token_expires_at !== null) {
+                $vault->getValidAccessToken($account);
+                $account->unsetRelation('connection');
+            }
             $net = $account->network;
             $connector = ConnectorRegistry::for($net);
             $payload = $connector->pull($account, $from, $to);
@@ -55,7 +79,9 @@ class SyncService
             $run->update(['status' => 'error', 'error' => $msg, 'finished_at' => now()]);
             $account->update(['sync_status' => 'error', 'sync_error' => $msg, 'sync_failures' => $account->sync_failures + 1]);
             if (preg_match('/token|session|OAuth|expired|revoked|invalid_grant|permission/i', $msg)) {
-                $account->connection?->update(['status' => 'error', 'last_error' => $msg]);
+                if ($account->connection) {
+                    $vault->tripCircuitBreaker($account, 'oauth_sync_error', $msg);
+                }
             }
         }
 
