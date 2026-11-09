@@ -31,6 +31,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Mail\Events\MessageSending::class, [\App\Support\Mail\EmailSuppressionGuard::class, 'handle']);
         // #158 / #73: every completed password reset is audit-logged (no token, no password).
         Event::listen(PasswordReset::class, function (PasswordReset $e): void {
             AuditLog::create(['user_id' => $e->user->getAuthIdentifier(), 'action' => 'auth.password_reset',

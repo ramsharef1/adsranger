@@ -1,0 +1,37 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Support\Mail\EmailSuppressionGuard;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
+use Tests\TestCase;
+
+class RoyPulseAndMailGuardTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_roy_pulse_outputs_sanitized_telemetry_without_secrets(): void
+    {
+        $this->artisan('roy:pulse')
+            ->expectsOutputToContain('=== ROY SANITIZED TELEMETRY PULSE')
+            ->expectsOutputToContain('waitlist_entries=0')
+            ->assertExitCode(0);
+    }
+
+    public function test_email_suppression_guard_blocks_suppressed_recipient_and_allows_clean_recipient(): void
+    {
+        EmailSuppressionGuard::suppress('bounced@agency.test', 'hard_bounce');
+        $this->assertTrue(EmailSuppressionGuard::isSuppressed('BOUNCED@agency.test'));
+
+        Mail::raw('Test body', function ($msg) {
+            $msg->to('bounced@agency.test')->subject('Should be blocked');
+        });
+
+        Mail::raw('Clean body', function ($msg) {
+            $msg->to('active@agency.test')->subject('Should pass');
+        });
+
+        $this->assertFalse(EmailSuppressionGuard::isSuppressed('active@agency.test'));
+    }
+}
