@@ -97,6 +97,21 @@ class Agency extends Model
         return $this->hasMany(WorkspaceMagicLink::class);
     }
 
+    public function aeoTrackedPrompts(): HasMany
+    {
+        return $this->hasMany(AeoTrackedPrompt::class);
+    }
+
+    public function aeoCitationRuns(): HasMany
+    {
+        return $this->hasMany(AeoCitationRun::class);
+    }
+
+    public function aeoDomainAudits(): HasMany
+    {
+        return $this->hasMany(AeoDomainAudit::class);
+    }
+
     /** Admin override: networks switched ON for this agency even if off globally or not in its plan. */
     public function allowedNetworks(): BelongsToMany
     {

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\ViewAs;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -53,7 +54,7 @@ class Client extends Model
         if (! $user) {
             return $q;
         }
-        $preview = \App\Support\ViewAs::current($user, $agency);
+        $preview = ViewAs::current($user, $agency);
         $role = $preview ? $preview['role'] : $user->rawRoleIn($agency);
         if (in_array($role, ['owner', 'admin'], true) || (! $preview && $user->isSuperAdmin())) {
             return $q;
@@ -86,8 +87,23 @@ class Client extends Model
         return $this->hasOne(ReportSchedule::class);
     }
 
-    public function brandKit(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function brandKit(): HasOne
     {
         return $this->hasOne(BrandKit::class);
+    }
+
+    public function aeoTrackedPrompts(): HasMany
+    {
+        return $this->hasMany(AeoTrackedPrompt::class);
+    }
+
+    public function aeoCitationRuns(): HasMany
+    {
+        return $this->hasMany(AeoCitationRun::class);
+    }
+
+    public function aeoDomainAudits(): HasMany
+    {
+        return $this->hasMany(AeoDomainAudit::class);
     }
 }

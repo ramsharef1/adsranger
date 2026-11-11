@@ -84,7 +84,7 @@ class SafeFetcher
      * for plain-text / XML resources such as /robots.txt, /llms.txt, and XML sitemaps (#293, #300).
      *
      * @param  list<string>  $allowedTypes
-     * @return array{ok: bool, status: ?int, url: string, body: string, content_type: string, error: ?string}
+     * @return array{ok: bool, status: ?int, url: string, body: string, content_type: string, x_robots_tag?: string, error: ?string}
      */
     public static function fetchResource(string $url, array $allowedTypes = ['html', 'plain', 'xml', 'text']): array
     {
@@ -149,6 +149,7 @@ class SafeFetcher
                 'url' => $url,
                 'body' => $body,
                 'content_type' => $type,
+                'x_robots_tag' => trim((string) $res->header('X-Robots-Tag')), // AEO crawler check (#185)
                 'error' => $res->status() === 200 ? null : 'status',
             ];
         }
