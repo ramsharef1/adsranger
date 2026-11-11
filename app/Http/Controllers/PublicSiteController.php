@@ -5,7 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\PartnerApplication;
 use App\Models\WaitlistEntry;
 use App\Support\PublicUrl;
+use App\Support\Seo\CapiPixelChecker;
 use App\Support\Seo\Hreflang;
+use App\Support\Seo\LlmsTxtAuditor;
+use App\Support\Seo\PageAudit;
+use App\Support\Seo\PublicCatalog;
+use App\Support\Seo\RobotsSitemapChecker;
+use App\Support\Seo\SafeFetcher;
+use App\Support\Seo\ToolRateLimiter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -192,7 +199,8 @@ class PublicSiteController extends Controller
 
     public function ramadanCalculator(string $lang = 'ar')
     {
-        \App\Support\Seo\ToolRateLimiter::recordToolUse('ramadan-budget-calculator');
+        ToolRateLimiter::recordToolUse('ramadan-budget-calculator');
+
         return view('public.ramadan-calculator', ['lang' => $lang === 'en' ? 'en' : 'ar']);
     }
 
@@ -208,12 +216,13 @@ class PublicSiteController extends Controller
         if (! $public) {
             $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
         }
+
         return $response;
     }
 
     public function seoTool(string $lang = 'ar', string $tool = 'serp-preview'): Response
     {
-        \App\Support\Seo\ToolRateLimiter::recordToolUse($tool);
+        ToolRateLimiter::recordToolUse($tool);
         $public = (bool) config('seo_tools.public');
         $response = response()->view('public.tools.'.$tool, [
             'lang' => $lang === 'en' ? 'en' : 'ar',
@@ -244,7 +253,7 @@ class PublicSiteController extends Controller
         }
         RateLimiter::hit('hreflang-day:'.$who.':'.now()->toDateString(), 86400);
         RateLimiter::hit('hreflang-hour:'.$who, 3600);
-        \App\Support\Seo\ToolRateLimiter::recordToolUse('hreflang-checker-run');
+        ToolRateLimiter::recordToolUse('hreflang-checker-run');
 
         return response()->json(Hreflang::check($data['url']));
     }
@@ -252,34 +261,36 @@ class PublicSiteController extends Controller
     public function pageAuditRun(Request $request): JsonResponse
     {
         $data = $request->validate([
-            "url" => ["required", "string", "max:500", "regex:#^https?://#i"],
-            "keyword" => ["nullable", "string", "max:120"],
+            'url' => ['required', 'string', 'max:500', 'regex:#^https?://#i'],
+            'keyword' => ['nullable', 'string', 'max:120'],
         ]);
-        $who = hash("sha256", config("app.key")."|".$request->ip());
-        foreach ([["page-audit-day:".$who.":".now()->toDateString(), 5, 86400], ["page-audit-hour:".$who, 10, 3600]] as [$key, $max, $decay]) {
+        $who = hash('sha256', config('app.key').'|'.$request->ip());
+        foreach ([['page-audit-day:'.$who.':'.now()->toDateString(), 5, 86400], ['page-audit-hour:'.$who, 10, 3600]] as [$key, $max, $decay]) {
             if (RateLimiter::tooManyAttempts($key, $max)) {
-                return response()->json(["error" => "limit"], 429);
+                return response()->json(['error' => 'limit'], 429);
             }
         }
-        RateLimiter::hit("page-audit-day:".$who.":".now()->toDateString(), 86400);
-        RateLimiter::hit("page-audit-hour:".$who, 3600);
-        \App\Support\Seo\ToolRateLimiter::recordToolUse('page-audit-run');
+        RateLimiter::hit('page-audit-day:'.$who.':'.now()->toDateString(), 86400);
+        RateLimiter::hit('page-audit-hour:'.$who, 3600);
+        ToolRateLimiter::recordToolUse('page-audit-run');
 
-        $fetched = \App\Support\Seo\SafeFetcher::fetch($data["url"]);
-        if (! ($fetched["ok"] ?? false) || ($fetched["status"] ?? 0) !== 200) {
-            $err = ($fetched["error"] ?? "") === "blocked" ? "blocked" : (($fetched["status"] ?? null) ? "not_200" : "fetch_failed");
-            return response()->json(["ok" => false, "error" => $err, "status" => $fetched["status"] ?? null, "url" => $fetched["url"] ?? $data["url"]]);
+        $fetched = SafeFetcher::fetch($data['url']);
+        if (! ($fetched['ok'] ?? false) || ($fetched['status'] ?? 0) !== 200) {
+            $err = ($fetched['error'] ?? '') === 'blocked' ? 'blocked' : (($fetched['status'] ?? null) ? 'not_200' : 'fetch_failed');
+
+            return response()->json(['ok' => false, 'error' => $err, 'status' => $fetched['status'] ?? null, 'url' => $fetched['url'] ?? $data['url']]);
         }
 
-        $audit = \App\Support\Seo\PageAudit::auditHtml((string) ($fetched["body"] ?? ""), $data["keyword"] ?? null);
+        $audit = PageAudit::auditHtml((string) ($fetched['body'] ?? ''), $data['keyword'] ?? null);
+
         return response()->json([
-            "ok" => true,
-            "url" => $fetched["url"],
-            "status" => $fetched["status"],
-            "score" => $audit["score"],
-            "checks" => $audit["checks"],
-            "issues" => $audit["issues"],
-            "serp" => $audit["serp"],
+            'ok' => true,
+            'url' => $fetched['url'],
+            'status' => $fetched['status'],
+            'score' => $audit['score'],
+            'checks' => $audit['checks'],
+            'issues' => $audit['issues'],
+            'serp' => $audit['serp'],
         ]);
     }
 
@@ -288,6 +299,66 @@ class PublicSiteController extends Controller
      *
      * @return array<string, string>
      */
+
+    /** #289 Public CAPI & Pixel HTML inspector (SafeFetcher + 5/day & 10/hour visitor rate limit). */
+    public function capiPixelRun(Request $request): JsonResponse
+    {
+        $data = $request->validate(['url' => ['required', 'string', 'max:500', 'regex:#^https?://#i']]);
+        if ($resp = $this->enforceUrlToolLimit($request, 'capi-pixel')) {
+            return $resp;
+        }
+        ToolRateLimiter::recordToolUse('capi-pixel-checker-run');
+
+        $fetched = SafeFetcher::fetch($data['url']);
+        if (! ($fetched['ok'] ?? false) || ($fetched['status'] ?? 0) !== 200) {
+            $err = ($fetched['error'] ?? '') === 'blocked' ? 'blocked' : (($fetched['status'] ?? null) ? 'not_200' : 'fetch_failed');
+
+            return response()->json(['ok' => false, 'error' => $err, 'status' => $fetched['status'] ?? null, 'url' => $fetched['url'] ?? $data['url']]);
+        }
+
+        $report = CapiPixelChecker::inspectHtml((string) ($fetched['html'] ?? ''));
+
+        return response()->json(['ok' => true, 'url' => $fetched['url'], 'status' => $fetched['status']] + $report);
+    }
+
+    /** #293 AI crawler robots.txt & llms.txt check (SafeFetcher + 5/day & 10/hour visitor rate limit). */
+    public function llmsTxtCheck(Request $request): JsonResponse
+    {
+        $data = $request->validate(['url' => ['required', 'string', 'max:500', 'regex:#^https?://#i']]);
+        if ($resp = $this->enforceUrlToolLimit($request, 'llms-txt')) {
+            return $resp;
+        }
+        ToolRateLimiter::recordToolUse('llms-txt-generator-check');
+
+        return response()->json(LlmsTxtAuditor::checkOrigin($data['url']));
+    }
+
+    /** #300 Robots.txt, XML sitemap & canonical inspector (SafeFetcher + 5/day & 10/hour visitor rate limit). */
+    public function robotsSitemapRun(Request $request): JsonResponse
+    {
+        $data = $request->validate(['url' => ['required', 'string', 'max:500', 'regex:#^https?://#i']]);
+        if ($resp = $this->enforceUrlToolLimit($request, 'robots-sitemap')) {
+            return $resp;
+        }
+        ToolRateLimiter::recordToolUse('robots-sitemap-checker-run');
+
+        return response()->json(RobotsSitemapChecker::check($data['url']));
+    }
+
+    protected function enforceUrlToolLimit(Request $request, string $prefix): ?JsonResponse
+    {
+        $who = hash('sha256', config('app.key').'|'.$request->ip());
+        foreach ([[$prefix.'-day:'.$who.':'.now()->toDateString(), 5, 86400], [$prefix.'-hour:'.$who, 10, 3600]] as [$key, $max]) {
+            if (RateLimiter::tooManyAttempts($key, $max)) {
+                return response()->json(['error' => 'limit'], 429);
+            }
+        }
+        RateLimiter::hit($prefix.'-day:'.$who.':'.now()->toDateString(), 86400);
+        RateLimiter::hit($prefix.'-hour:'.$who, 3600);
+
+        return null;
+    }
+
     public static function sitemapPageViews(): array
     {
         return [
@@ -376,7 +447,7 @@ class PublicSiteController extends Controller
     public function requestAuditEmail(Request $request, string $lang = 'ar')
     {
         $lang = $lang === 'en' ? 'en' : 'ar';
-        $tool = in_array($request->input('tool'), ['page-audit', 'hreflang-checker'], true) ? $request->input('tool') : 'page-audit';
+        $tool = in_array($request->input('tool'), ['page-audit', 'hreflang-checker', 'capi-pixel-checker', 'robots-sitemap-checker'], true) ? $request->input('tool') : 'page-audit';
         $target = ($lang === 'en' ? '/en/tools/' : '/tools/').$tool;
         if (filled($request->input('website'))) {
             return redirect($target)->with('tool_report_saved', true);
@@ -403,13 +474,15 @@ class PublicSiteController extends Controller
 
     public function productPage(string $lang = 'ar', string $slug = 'features'): Response
     {
-        abort_unless(isset(\App\Support\Seo\PublicCatalog::products()[$slug]), 404);
+        abort_unless(isset(PublicCatalog::products()[$slug]), 404);
+
         return response()->view('public.product.show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'slug' => $slug]);
     }
 
     public function platformPage(string $lang = 'ar', string $platform = 'meta'): Response
     {
-        abort_unless(isset(\App\Support\Seo\PublicCatalog::platforms()[$platform]), 404);
+        abort_unless(isset(PublicCatalog::platforms()[$platform]), 404);
+
         return response()->view('public.platform-show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'platform' => $platform]);
     }
 
@@ -420,7 +493,8 @@ class PublicSiteController extends Controller
 
     public function glossaryTerm(string $lang = 'ar', string $term = 'roas'): Response
     {
-        abort_unless(isset(\App\Support\Seo\PublicCatalog::glossary()[$term]), 404);
+        abort_unless(isset(PublicCatalog::glossary()[$term]), 404);
+
         return response()->view('public.glossary.show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'term' => $term]);
     }
 
@@ -431,7 +505,8 @@ class PublicSiteController extends Controller
 
     public function blogShow(string $lang = 'ar', string $slug = ''): Response
     {
-        abort_unless(isset(\App\Support\Seo\PublicCatalog::posts()[$slug]), 404);
+        abort_unless(isset(PublicCatalog::posts()[$slug]), 404);
+
         return response()->view('public.blog.show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'slug' => $slug]);
     }
 
@@ -442,13 +517,15 @@ class PublicSiteController extends Controller
 
     public function guidesShow(string $lang = 'ar', string $slug = ''): Response
     {
-        abort_unless(isset(\App\Support\Seo\PublicCatalog::guides()[$slug]), 404);
+        abort_unless(isset(PublicCatalog::guides()[$slug]), 404);
+
         return response()->view('public.guides.show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'slug' => $slug]);
     }
 
     public function solutionOrRolePage(string $lang = 'ar', string $pageKey = 'roadmap'): Response
     {
-        abort_unless(isset(\App\Support\Seo\PublicCatalog::solutionsAndRoles()[$pageKey]), 404);
+        abort_unless(isset(PublicCatalog::solutionsAndRoles()[$pageKey]), 404);
+
         return response()->view('public.solution-role', ['lang' => $lang === 'en' ? 'en' : 'ar', 'pageKey' => $pageKey]);
     }
 }

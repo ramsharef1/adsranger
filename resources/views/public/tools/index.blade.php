@@ -4,8 +4,8 @@ extract(\App\Support\ToolPage::head($lang ?? 'ar', '/tools',
     ['مجموعة أدوات مجانية من AdsRanger لفحص السيو العربي وروابط اللغات وحساب ميزانيات الإعلانات وعائد الإنفاق، فورًا ودون تسجيل.',
         'Free Arabic SEO and ad calculators by AdsRanger: audit Arabic pages, check hreflang, preview SERPs, and plan ad budgets with no sign-up.']));
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
-$seoSlugs = ['/tools/page-audit', '/tools/hreflang-checker', '/tools/arabic-keyword-generator', '/tools/arabizi-converter', '/tools/serp-preview', '/tools/meta-length-checker'];
-$adSlugs = ['/tools/ramadan-budget-calculator', '/tools/roas-calculator', '/tools/budget-pacing-calculator', '/tools/utm-builder'];
+$seoSlugs = ['/tools/page-audit', '/tools/hreflang-checker', '/tools/robots-sitemap-checker', '/tools/llms-txt-generator', '/tools/schema-generator', '/tools/arabic-keyword-generator', '/tools/arabizi-converter', '/tools/serp-preview', '/tools/meta-length-checker'];
+$adSlugs = ['/tools/ramadan-budget-calculator', '/tools/cod-poas-calculator', '/tools/roas-calculator', '/tools/cpm-cpc-cpa-calculator', '/tools/budget-pacing-calculator', '/tools/agency-fee-vat-calculator', '/tools/ab-significance-calculator', '/tools/capi-pixel-checker', '/tools/whatsapp-link-generator', '/tools/ad-mockup-preview', '/tools/safe-zone-checker', '/tools/ksa-ad-compliance-checker', '/tools/utm-builder'];
 @endphp
 @extends('layouts.public')
 @push('styles')

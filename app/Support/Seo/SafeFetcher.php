@@ -79,6 +79,83 @@ class SafeFetcher
         return self::fail($url, 'redirects');
     }
 
+    /**
+     * Same strict SSRF guard (public IP only, pinned per hop, <= 3 redirects, 5s timeout, <= 2MB, no cookies)
+     * for plain-text / XML resources such as /robots.txt, /llms.txt, and XML sitemaps (#293, #300).
+     *
+     * @param  list<string>  $allowedTypes
+     * @return array{ok: bool, status: ?int, url: string, body: string, content_type: string, error: ?string}
+     */
+    public static function fetchResource(string $url, array $allowedTypes = ['html', 'plain', 'xml', 'text']): array
+    {
+        $resolve = self::$resolver ?? fn (string $host) => self::ownHostIp($host) ?? LandingPages::publicIp($host);
+        for ($hop = 0; $hop <= self::MAX_REDIRECTS; $hop++) {
+            $p = parse_url($url);
+            $scheme = strtolower($p['scheme'] ?? '');
+            $host = strtolower($p['host'] ?? '');
+            $port = $p['port'] ?? ($scheme === 'https' ? 443 : 80);
+            if (! in_array($scheme, ['http', 'https'], true) || $host === '' || ! in_array($port, [80, 443], true) || isset($p['user']) || isset($p['pass'])) {
+                return ['ok' => false, 'status' => null, 'url' => $url, 'body' => '', 'content_type' => '', 'error' => 'blocked'];
+            }
+            $ip = $resolve($host);
+            if (! $ip) {
+                return ['ok' => false, 'status' => null, 'url' => $url, 'body' => '', 'content_type' => '', 'error' => 'blocked'];
+            }
+            try {
+                $res = Http::withOptions([
+                    'allow_redirects' => false,
+                    'cookies' => false,
+                    'on_headers' => function ($response): void {
+                        if ((int) $response->getHeaderLine('Content-Length') > self::MAX_BYTES) {
+                            throw new \RuntimeException('too_large');
+                        }
+                    },
+                    'progress' => fn ($total, $downloaded) => $downloaded > self::MAX_BYTES ? throw new \RuntimeException('too_large') : null,
+                    'curl' => [CURLOPT_RESOLVE => ["$host:$port:".(str_contains($ip, ':') ? "[$ip]" : $ip)]],
+                ])->withHeaders([
+                    'User-Agent' => self::USER_AGENT,
+                    'Accept' => 'text/plain, application/xml, text/xml, text/html;q=0.9',
+                    'Accept-Language' => 'ar,en;q=0.8',
+                ])->timeout(self::TIMEOUT)->connectTimeout(self::TIMEOUT)->get($url);
+            } catch (Throwable) {
+                return ['ok' => false, 'status' => null, 'url' => $url, 'body' => '', 'content_type' => '', 'error' => 'unreachable'];
+            }
+            if (in_array($res->status(), [301, 302, 303, 307, 308], true) && ($loc = $res->header('Location'))) {
+                $url = self::absolute($url, $loc);
+
+                continue;
+            }
+            $type = strtolower((string) $res->header('Content-Type'));
+            $body = (string) $res->body();
+            if ($type !== '') {
+                $matched = false;
+                foreach ($allowedTypes as $sub) {
+                    if (str_contains($type, $sub)) {
+                        $matched = true;
+                        break;
+                    }
+                }
+                if (! $matched) {
+                    return ['ok' => false, 'status' => $res->status(), 'url' => $url, 'body' => '', 'content_type' => $type, 'error' => 'unsupported_type'];
+                }
+            }
+            if (strlen($body) > self::MAX_BYTES) {
+                return ['ok' => false, 'status' => $res->status(), 'url' => $url, 'body' => '', 'content_type' => $type, 'error' => 'too_large'];
+            }
+
+            return [
+                'ok' => $res->status() === 200,
+                'status' => $res->status(),
+                'url' => $url,
+                'body' => $body,
+                'content_type' => $type,
+                'error' => $res->status() === 200 ? null : 'status',
+            ];
+        }
+
+        return ['ok' => false, 'status' => null, 'url' => $url, 'body' => '', 'content_type' => '', 'error' => 'redirects'];
+    }
+
     /** Our own hosts (config seo_tools.own_hosts) map to a fixed IP, used only if that IP is itself public. */
     public static function ownHostIp(string $host): ?string
     {
