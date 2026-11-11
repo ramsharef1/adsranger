@@ -1,0 +1,154 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Support\Seo\CapiPixelChecker;
+use App\Support\Seo\LlmsTxtAuditor;
+use App\Support\Seo\RobotsSitemapChecker;
+use App\Support\Seo\SafeFetcher;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\RateLimiter;
+use Tests\TestCase;
+
+class WaveA2PublicToolsTest extends TestCase
+{
+    private const WAVE_A2_SLUGS = [
+        'capi-pixel-checker',
+        'cod-poas-calculator',
+        'whatsapp-link-generator',
+        'ad-mockup-preview',
+        'llms-txt-generator',
+        'schema-generator',
+        'ab-significance-calculator',
+        'safe-zone-checker',
+        'ksa-ad-compliance-checker',
+        'cpm-cpc-cpa-calculator',
+        'agency-fee-vat-calculator',
+        'robots-sitemap-checker',
+    ];
+
+    protected function tearDown(): void
+    {
+        SafeFetcher::$resolver = null;
+        parent::tearDown();
+    }
+
+    public function test_all_12_ar_and_12_en_wave_a2_tool_pages_render_with_seo_head_and_respect_visibility_gate(): void
+    {
+        config(['seo_tools.public' => false]);
+
+        foreach (self::WAVE_A2_SLUGS as $slug) {
+            $ar = $this->get('/tools/'.$slug);
+            $ar->assertOk();
+            $ar->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+            $arHtml = $ar->getContent();
+            $this->assertStringContainsString('dir="rtl"', $arHtml, "AR RTL missing on $slug");
+            $this->assertStringContainsString('rel="canonical"', $arHtml, "Canonical missing on $slug");
+            $this->assertStringContainsString('hreflang="en"', $arHtml, "EN hreflang missing on $slug");
+            $this->assertStringContainsString('"@type":"FAQPage"', $arHtml, "FAQPage JSON-LD missing on $slug");
+            $this->assertStringNotContainsString('#f97316', strtolower($arHtml), "Banned orange on $slug");
+
+            $en = $this->get('/en/tools/'.$slug);
+            $en->assertOk();
+            $en->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+            $enHtml = $en->getContent();
+            $this->assertStringContainsString('lang="en"', $enHtml, "EN lang missing on $slug");
+            $this->assertStringContainsString('hreflang="ar"', $enHtml, "AR hreflang missing on $slug");
+            $this->assertStringContainsString('"@type":"FAQPage"', $enHtml, "EN FAQPage JSON-LD missing on $slug");
+        }
+
+        // Sitemap hides tools when SEO_TOOLS_PUBLIC=false, and includes all 12 AR+EN pairs when SEO_TOOLS_PUBLIC=true
+        $hiddenXml = $this->get('/sitemaps/pages.xml')->assertOk()->getContent();
+        $this->assertStringNotContainsString('/tools/capi-pixel-checker', $hiddenXml);
+
+        config(['seo_tools.public' => true]);
+        $publicXml = $this->get('/sitemaps/pages.xml')->assertOk()->getContent();
+        $hubAr = $this->get('/tools')->assertOk()->getContent();
+        $hubEn = $this->get('/en/tools')->assertOk()->getContent();
+
+        foreach (self::WAVE_A2_SLUGS as $slug) {
+            $this->assertStringContainsString('/tools/'.$slug, $publicXml);
+            $this->assertStringContainsString('/en/tools/'.$slug, $publicXml);
+            $this->assertStringContainsString('/tools/'.$slug, $hubAr);
+            $this->assertStringContainsString('/en/tools/'.$slug, $hubEn);
+        }
+    }
+
+    public function test_ssrf_guard_and_5_per_day_rate_limit_on_all_three_safe_fetcher_endpoints(): void
+    {
+        RateLimiter::clear('capi-pixel-day:'.hash('sha256', config('app.key').'|127.0.0.1').':'.now()->toDateString());
+        RateLimiter::clear('capi-pixel-hour:'.hash('sha256', config('app.key').'|127.0.0.1'));
+
+        // Private / loopback / metadata addresses are refused by SafeFetcher
+        SafeFetcher::$resolver = fn () => null;
+
+        $r1 = $this->postJson('/tools/capi-pixel-checker/run', ['url' => 'http://169.254.169.254/latest/meta-data/']);
+        $r1->assertOk()->assertJson(['ok' => false, 'error' => 'blocked']);
+
+        $r2 = $this->postJson('/tools/llms-txt-generator/check', ['url' => 'http://127.0.0.1/']);
+        $r2->assertOk()->assertJson(['ok' => false, 'error' => 'blocked']);
+
+        $r3 = $this->postJson('/tools/robots-sitemap-checker/run', ['url' => 'http://10.0.0.5/']);
+        $r3->assertOk()->assertJson(['ok' => false, 'error' => 'blocked']);
+
+        // 5 runs/day visitor limit: 4 more runs on capi-pixel-checker succeed (total 5), 6th returns 429
+        for ($i = 2; $i <= 5; $i++) {
+            $this->postJson('/tools/capi-pixel-checker/run', ['url' => 'https://private.example/'])->assertOk();
+        }
+        $this->postJson('/tools/capi-pixel-checker/run', ['url' => 'https://private.example/'])
+            ->assertStatus(429)
+            ->assertJson(['error' => 'limit']);
+    }
+
+    public function test_capi_pixel_llms_txt_and_robots_sitemap_analyzers_detect_tags_bots_and_conflicts(): void
+    {
+        $sampleHtml = <<<'HTML'
+<!doctype html>
+<html>
+<head>
+<link rel="canonical" href="https://store.example/ar">
+<script>window.dataLayer = window.dataLayer || []; gtag('config', 'G-ABC1234567'); gtag('config', 'AW-99887766');</script>
+<script src="https://www.googletagmanager.com/gtm.js?id=GTM-KSA999"></script>
+<script>fbq('init', '123456789012345'); ttq.load('C9ABCDEF123456'); snaptr('init', '11112222-3333-4444-5555-666677778888'); _linkedin_partner_id = "654321";</script>
+<script src="https://cdn.salla.network/js/app.js"></script>
+</head>
+<body><noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KSA999"></iframe></noscript></body>
+</html>
+HTML;
+
+        $pixelReport = CapiPixelChecker::inspectHtml($sampleHtml);
+        $keys = array_column($pixelReport['detected'], 'key');
+        $this->assertContains('meta_pixel', $keys);
+        $this->assertContains('gtm', $keys);
+        $this->assertContains('ga4', $keys);
+        $this->assertContains('google_ads', $keys);
+        $this->assertContains('tiktok_pixel', $keys);
+        $this->assertContains('snap_pixel', $keys);
+        $this->assertContains('linkedin_insight', $keys);
+        $this->assertContains('salla_hooks', $keys);
+        $this->assertSame('salla', $pixelReport['ecommerce_platform']);
+        $this->assertTrue($pixelReport['has_datalayer']);
+        $this->assertTrue($pixelReport['has_noscript']);
+        $this->assertSame([], $pixelReport['missing_basics']);
+
+        $robots = "User-agent: GPTBot\nDisallow: /\n\nUser-agent: ClaudeBot\nAllow: /\n\nUser-agent: *\nDisallow: /checkout\nSitemap: https://store.example/sitemap.xml\n";
+        $bots = LlmsTxtAuditor::auditRobotsText($robots);
+        $this->assertSame('blocked', $bots['GPTBot']);
+        $this->assertSame('allowed', $bots['ClaudeBot']);
+        $this->assertSame('unspecified', $bots['PerplexityBot']);
+
+        SafeFetcher::$resolver = fn () => '93.184.216.34';
+        Http::fake([
+            'https://store.example/robots.txt' => Http::response($robots, 200, ['Content-Type' => 'text/plain']),
+            'https://store.example/checkout' => Http::response($sampleHtml, 200, ['Content-Type' => 'text/html']),
+            'https://store.example/sitemap.xml' => Http::response('<?xml version="1.0"?><urlset></urlset>', 200, ['Content-Type' => 'application/xml']),
+        ]);
+
+        $rs = RobotsSitemapChecker::check('https://store.example/checkout');
+        $this->assertTrue($rs['ok']);
+        $this->assertTrue($rs['blocked_by_robots']);
+        $this->assertContains('url_disallowed', $rs['issues']);
+        $this->assertContains('canonical_points_elsewhere', $rs['issues']);
+        $this->assertTrue($rs['sitemaps'][0]['valid_xml']);
+    }
+}

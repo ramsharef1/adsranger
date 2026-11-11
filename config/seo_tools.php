@@ -13,6 +13,9 @@ return [
     'tools' => [
         'serp-preview', 'meta-length-checker', 'arabic-keyword-generator', 'arabizi-converter',
         'roas-calculator', 'budget-pacing-calculator', 'utm-builder', 'hreflang-checker', 'page-audit',
+        'capi-pixel-checker', 'cod-poas-calculator', 'whatsapp-link-generator', 'ad-mockup-preview',
+        'llms-txt-generator', 'schema-generator', 'ab-significance-calculator', 'safe-zone-checker',
+        'ksa-ad-compliance-checker', 'cpm-cpc-cpa-calculator', 'agency-fee-vat-calculator', 'robots-sitemap-checker',
     ],
 
     // Our own hosts, pinned to the server's public IP for SafeFetcher: the VPS resolves adsranger.com to ::1 in its hosts
