@@ -19,6 +19,7 @@ return [
         // Real but held until Rami's review / consent policy.
         'self_serve_deletion' => (bool) env('MODULE_SELF_SERVE_DELETION', false), // #79 delete actions: Rami sees them first (901 queue 14)
         'whatsapp_reports' => (bool) env('MODULE_WHATSAPP_REPORTS', false),       // #106 WhatsApp half belongs to #162 (D-94), needs #171 consent
+        'custom_domains' => (bool) env('MODULE_CUSTOM_DOMAINS', false),           // #60 custom report domain: no SSL / routing on the server yet (D-249)
         'view_as' => (bool) env('MODULE_VIEW_AS', false),                         // #71 View as: hidden until E2's fix passes experience's re-check (D-163, UX-97)
     ],
 

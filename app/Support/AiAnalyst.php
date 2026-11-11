@@ -109,8 +109,9 @@ class AiAnalyst
             }
 
             if ($provider === 'gemini') {
-                $url = 'https://generativelanguage.googleapis.com/v1beta/models/'.urlencode($model).':generateContent?key='.urlencode($key);
-                $r = Http::timeout(15)->post($url, [
+                // The key goes in a header, never the URL (URLs end up in logs).
+                $url = 'https://generativelanguage.googleapis.com/v1beta/models/'.urlencode($model).':generateContent';
+                $r = Http::timeout(15)->withHeaders(['x-goog-api-key' => $key])->post($url, [
                     'contents' => [['parts' => [['text' => $sys."\n\n".$prompt]]]],
                 ]);
 

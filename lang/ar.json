@@ -1536,5 +1536,7 @@
     "Point a CNAME record (for example reports.agency.com → adsranger.com) via your DNS or Cloudflare proxy for shared client report links.": "وجّه سجل نطاق فرعي إلى نطاق المنصة عبر إعدادات النطاق أو خدمة الوكيل السحابي لروابط تقارير العملاء.",
     "Custom report domain": "نطاق التقارير المخصص",
     "CNAME target: adsranger.com (Cloudflare for SaaS / DNS proxy supported).": "هدف السجل الفرعي هو نطاق المنصة الرئيسي مع دعم التوجيه السحابي.",
-    "Domain verification status": "حالة التحقق من النطاق"
+    "Domain verification status": "حالة التحقق من النطاق",
+    "This email already has an account. Send a normal invitation instead.": "هذا البريد مسجّل بحساب من قبل. أرسل دعوة عادية بدلًا من ذلك.",
+    "Client report links on the agency's own domain.": "روابط تقارير العملاء على نطاق الوكالة نفسها."
 }

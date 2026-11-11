@@ -86,7 +86,13 @@ class WaitlistEntries extends Page
             return;
         }
 
-        $res = WorkspaceOnboarding::provisionAndIssueMagicLink($entry, $this->selectedPlan, $this->selectedTrial, $actor);
+        try {
+            $res = WorkspaceOnboarding::provisionAndIssueMagicLink($entry, $this->selectedPlan, $this->selectedTrial, $actor);
+        } catch (\DomainException) {
+            Notification::make()->title(__('This email already has an account. Send a normal invitation instead.'))->danger()->send();
+
+            return;
+        }
         $this->issuedMagicUrl = $res['url'];
         $this->issuedForEmail = $entry->email;
         $this->activeEntryId = null;
@@ -97,7 +103,13 @@ class WaitlistEntries extends Page
     {
         abort_unless(static::canAccess(), 403);
         $entry = WaitlistEntry::query()->findOrFail($entryId);
-        $res = WorkspaceOnboarding::regenerateMagicLink($entry, auth()->user());
+        try {
+            $res = WorkspaceOnboarding::regenerateMagicLink($entry, auth()->user());
+        } catch (\DomainException) {
+            Notification::make()->title(__('This email already has an account. Send a normal invitation instead.'))->danger()->send();
+
+            return;
+        }
         $this->issuedMagicUrl = $res['url'];
         $this->issuedForEmail = $entry->email;
         Notification::make()->title(__('7-day setup link regenerated'))->success()->send();

@@ -35,6 +35,12 @@ class WorkspaceMagicLink extends Model
         return $this->used_at === null && $this->expires_at->isFuture();
     }
 
+    public static function canIssueFor(User $user): bool
+    {
+        return ! $user->isSuperAdmin() && ! $user->hasTwoStep()
+            && ! static::query()->where('user_id', $user->id)->whereNotNull('used_at')->exists();
+    }
+
     public static function findByToken(string $token): ?self
     {
         return static::query()->where('token_hash', hash('sha256', $token))->first();
@@ -47,6 +53,12 @@ class WorkspaceMagicLink extends Model
      */
     public static function issue(Agency $agency, User $user, ?User $actor = null): array
     {
+        // E1 review (D-249): a magic link signs in without a password or two-step code, so it is only for a brand-new
+        // account that has never been set up. Never for a super admin, a user with two-step on, or one who used a link.
+        if (! static::canIssueFor($user)) {
+            throw new \DomainException('existing_account');
+        }
+
         static::query()
             ->where('agency_id', $agency->id)
             ->where('user_id', $user->id)

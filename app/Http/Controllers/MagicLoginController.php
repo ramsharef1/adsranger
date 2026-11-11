@@ -32,18 +32,15 @@ class MagicLoginController extends Controller
     {
         $link = WorkspaceMagicLink::findByToken($token);
         abort_unless($link && $link->isUsable() && $link->agency && $link->user, 410);
+        abort_if($link->user->isSuperAdmin() || $link->user->hasTwoStep(), 410);
 
         $data = $request->validate([
             'name' => ['required', 'string', 'max:120'],
-            'password' => ['nullable', 'confirmed', Password::min(10)],
+            'password' => ['required', 'confirmed', Password::min(10)],
         ]);
 
         $user = $link->user;
-        $updates = ['name' => trim($data['name']), 'email_verified_at' => $user->email_verified_at ?? now()];
-        if (! empty($data['password'])) {
-            $updates['password'] = $data['password'];
-        }
-        $user->forceFill($updates)->save();
+        $user->forceFill(['name' => trim($data['name']), 'email_verified_at' => $user->email_verified_at ?? now(), 'password' => $data['password']])->save();
 
         $link->forceFill(['used_at' => now()])->save();
         Auth::login($user);

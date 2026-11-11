@@ -37,8 +37,8 @@
             <input id="ms-name" name="name" type="text" required maxlength="120" value="{{ old('name', $user->name) }}">
             @error('name')<div class="err">{{ $message }}</div>@enderror
 
-            <label for="ms-pass">{{ $ar ? 'تعيين كلمة مرور (اختياري، 10 أحرف على الأقل)' : 'Set a password (optional, min 10 chars)' }}</label>
-            <input id="ms-pass" name="password" type="password" dir="ltr" autocomplete="new-password">
+            <label for="ms-pass">{{ $ar ? 'كلمة المرور (10 أحرف على الأقل)' : 'Password (at least 10 characters)' }}</label>
+            <input id="ms-pass" name="password" type="password" dir="ltr" autocomplete="new-password" required minlength="10">
             @error('password')<div class="err">{{ $message }}</div>@enderror
 
             <label for="ms-pass2">{{ $ar ? 'تأكيد كلمة المرور' : 'Confirm password' }}</label>

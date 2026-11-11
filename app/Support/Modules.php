@@ -58,6 +58,11 @@ class Modules
                 'description' => __('Read-only workspace preview from another team member\'s role.'),
                 'beta_requestable' => false,
             ],
+            'custom_domains' => [
+                'label' => __('Custom report domain'),
+                'description' => __('Client report links on the agency\'s own domain.'),
+                'beta_requestable' => false,
+            ],
         ];
     }
 

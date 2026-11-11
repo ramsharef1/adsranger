@@ -5,6 +5,7 @@ namespace App\Filament\Pages\Tenancy;
 use App\Models\AuditLog;
 use App\Support\AgencyLogo;
 use App\Support\CustomDomainManager;
+use App\Support\Modules;
 use Closure;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
@@ -47,6 +48,7 @@ class EditAgencyProfile extends EditTenantProfile
                 ->helperText(__('SVG or PNG, up to 200 KB, at least 400 px wide; a transparent background works best. Shown on client links, the monthly PDF and report emails. Without a logo, your agency name is shown.')),
             // #74: members without two-step verification are sent to set it up before they can open this workspace.
             Section::make(__('White-label custom domain'))->description(__('Point a CNAME record (for example reports.agency.com → adsranger.com) via your DNS or Cloudflare proxy for shared client report links.'))
+                ->visible(fn (): bool => Modules::on('custom_domains'))
                 ->columns(2)->schema([
                     TextInput::make('custom_domain')->label(__('Custom report domain'))
                         ->placeholder('reports.agency.com')

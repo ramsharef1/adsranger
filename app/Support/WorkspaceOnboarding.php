@@ -94,6 +94,10 @@ class WorkspaceOnboarding
         return DB::transaction(function () use ($entry, $plan, $trialLength, $actor): array {
             $email = Str::lower(trim($entry->email));
             $user = User::query()->where('email', $email)->first();
+            if ($user) {
+                // E1 review (D-249): an existing account gets a normal invitation, never a password-less link.
+                throw new \DomainException('existing_account');
+            }
 
             if (! $user) {
                 $user = new User([
@@ -101,10 +105,7 @@ class WorkspaceOnboarding
                     'email' => $email,
                     'password' => Str::random(32),
                 ]);
-                $user->email_verified_at = now();
-                $user->save();
-            } elseif (! $user->email_verified_at) {
-                $user->forceFill(['email_verified_at' => now()])->save();
+                $user->save(); // verified when the link is used: the link reaching the inbox proves the address
             }
 
             $agency = static::resolveOrCreateAgency($entry, $plan, $trialLength, 'admin');

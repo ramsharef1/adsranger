@@ -135,7 +135,7 @@ class AiSettings
                     'x-api-key' => $key,
                     'anthropic-version' => '2023-06-01',
                 ])->get('https://api.anthropic.com/v1/models'),
-                'gemini' => Http::timeout(8)->get('https://generativelanguage.googleapis.com/v1beta/models?key='.urlencode($key)),
+                'gemini' => Http::timeout(8)->withHeaders(['x-goog-api-key' => $key])->get('https://generativelanguage.googleapis.com/v1beta/models'),
                 default => null,
             };
 
