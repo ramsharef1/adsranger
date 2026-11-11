@@ -1574,5 +1574,6 @@
     "Citation check completed": "اكتمل فحص الذكر",
     "Tracked prompt removed": "أُزيل السؤال المتتبع",
     "Domain check blocked or unreachable": "تعذّر الوصول إلى النطاق أو أنه محظور أمنيًا",
-    "Domain AEO & GEO audit saved": "حُفظ فحص النطاق بنجاح"
+    "Domain AEO & GEO audit saved": "حُفظ فحص النطاق بنجاح",
+    "Planned: needs Google Analytics 4, which is not connected yet.": "«مخطط له»: يحتاج ربط Google Analytics 4، ولم يُربط بعد."
 }

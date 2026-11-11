@@ -3,14 +3,10 @@
 namespace Tests\Feature;
 
 use App\Filament\Pages\AeoGeoHubPage;
-use App\Models\AdAccount;
-use App\Models\AdNetwork;
 use App\Models\AeoCitationRun;
 use App\Models\AeoTrackedPrompt;
 use App\Models\Agency;
 use App\Models\Client;
-use App\Models\Connection;
-use App\Models\DailyMetric;
 use App\Models\User;
 use App\Support\CurrentClient;
 use App\Support\Modules;
@@ -93,8 +89,10 @@ class WaveB1AeoGeoSuiteTest extends TestCase
         foreach ($runs as $r) {
             $this->assertSame('deterministic', $r->mode);
             $this->assertStringContainsString('not connected yet', $r->response_excerpt);
-            $this->assertTrue($r->client_mentioned);
-            $this->assertContains('RivalOne', $r->competitor_mentions_json);
+            // D-249: no AI answer, so no mention is recorded; names in the prompt wording go in the excerpt only.
+            $this->assertFalse($r->client_mentioned);
+            $this->assertSame([], $r->competitor_mentions_json);
+            $this->assertStringContainsString('RivalOne', $r->response_excerpt);
         }
 
         // Add a competitor-only cited run to verify #182 Share-of-Model & #187 Third-Party Citation Gaps
@@ -133,34 +131,22 @@ class WaveB1AeoGeoSuiteTest extends TestCase
         ]);
 
         $matrixA = AeoGeoManager::shareOfModelMatrix($clientA);
-        $this->assertSame(3, $matrixA['total_runs']);
+        // D-249: only live answers count; the 2 deterministic runs are reported but never counted as mentions.
+        $this->assertSame(1, $matrixA['total_runs']);
         $this->assertSame(1, $matrixA['live_runs']);
         $this->assertSame(2, $matrixA['deterministic_runs']);
-        $this->assertSame(66.7, $matrixA['client_share_pct']);
+        $this->assertSame(0.0, $matrixA['client_share_pct']);
+        $noLive = Client::create(['agency_id' => $agencyA->id, 'name' => 'No live runs', 'currency' => 'SAR', 'status' => 'active']);
+        $this->assertNull(AeoGeoManager::shareOfModelMatrix($noLive)['client_share_pct']);
 
         $gapsA = AeoGeoManager::findCitationGaps($clientA, 'https://oasisbrand.sa');
         $this->assertCount(1, $gapsA);
         $this->assertSame('g2.com', $gapsA[0]['domain']);
         $this->assertNotContains('clutch.co', array_column($gapsA, 'domain'));
 
-        // #183: LLM referral slice returns no_synced_rows honestly when empty, and aggregates real rows accurately
-        $emptyRef = AeoGeoManager::llmReferralSlice($clientA);
-        $this->assertSame('no_synced_rows', $emptyRef['status']);
-        $this->assertSame(0, $emptyRef['totals']['sessions']);
-
-        $net = AdNetwork::firstOrCreate(['key' => 'meta'], ['name' => 'Meta Ads', 'category' => 'social', 'stage' => 1, 'auth_type' => 'oauth', 'is_active' => true]);
-        $conn = Connection::create(['agency_id' => $agencyA->id, 'ad_network_id' => $net->id, 'status' => 'active']);
-        $acct = AdAccount::create([
-            'agency_id' => $agencyA->id, 'client_id' => $clientA->id, 'ad_network_id' => $net->id, 'connection_id' => $conn->id,
-            'external_id' => 'act_aeo', 'name' => 'AEO Acct', 'currency' => 'SAR', 'is_active' => true,
-        ]);
-        DailyMetric::create([
-            'agency_id' => $agencyA->id, 'client_id' => $clientA->id, 'ad_account_id' => $acct->id,
-            'date' => now()->toDateString(), 'network' => 'perplexity', 'currency' => 'SAR',
-            'spend' => 0, 'impressions' => 0, 'clicks' => 42, 'results' => 5, 'revenue' => 1850,
-        ]);
-
-        $liveRef = AeoGeoManager::llmReferralSlice($clientA->fresh());
+        // #183: GA4 is not connected (D-246), so nothing is read from ad-network data; synced GA4 rows are aggregated.
+        $this->assertSame('not_connected', AeoGeoManager::llmReferralSlice($clientA)['status']);
+        $liveRef = AeoGeoManager::llmReferralSlice($clientA, [['source' => 'perplexity.ai', 'sessions' => 42, 'conversions' => 5, 'revenue' => 1850]]);
         $this->assertSame('live', $liveRef['status']);
         $this->assertSame(42, $liveRef['by_engine']['perplexity.ai']['sessions']);
         $this->assertSame(5, $liveRef['by_engine']['perplexity.ai']['conversions']);
@@ -256,8 +242,8 @@ class WaveB1AeoGeoSuiteTest extends TestCase
         $this->assertSame('اضغط هنا', $links['weak_anchors'][0]['anchor']);
 
         // #192 Programmatic comparison & regional brief builder
-        $brief = AeoGeoManager::buildComparisonBrief('AdsRanger', 'Supermetrics', 'Riyadh', 'en', 'vs');
-        $this->assertStringContainsString('AdsRanger vs Supermetrics', $brief['h1']);
+        $brief = AeoGeoManager::buildComparisonBrief('AdsRanger', 'BrandB', 'Riyadh', 'en', 'vs');
+        $this->assertStringContainsString('AdsRanger vs BrandB', $brief['h1']);
         $this->assertCount(4, $brief['h2_sections']);
     }
 
@@ -270,7 +256,7 @@ class WaveB1AeoGeoSuiteTest extends TestCase
         $this->actingAs($owner);
         Filament::setCurrentPanel(Filament::getPanel('app'));
         Filament::setTenant($agency);
-        session([CurrentClient::SESSION_KEY => $client->id]);
+        CurrentClient::remember($client->id, $agency);
 
         // Read-only preview action is allowed
         $lw = Livewire::test(AeoGeoHubPage::class)

@@ -17,7 +17,7 @@
                 <div style="display:grid;gap:8px;font-size:13.5px">
                     <div style="display:flex;justify-content:space-between">
                         <span>{{ __('Client citation share') }}</span>
-                        <strong dir="ltr">{{ number_format($matrix['client_share_pct'], 1) }}%</strong>
+                        <strong dir="ltr">{{ $matrix['client_share_pct'] === null ? '—' : number_format($matrix['client_share_pct'], 1).'%' }}</strong>
                     </div>
                     <div style="display:flex;justify-content:space-between">
                         <span>{{ __('Average mention rank') }}</span>
@@ -39,19 +39,23 @@
             <x-filament::section>
                 <x-slot name="heading">{{ __('LLM Referral Revenue Slice') }}</x-slot>
                 <x-slot name="description">
-                    @if ($referrals['status'] === 'no_synced_rows')
+                    @if ($referrals['status'] === 'not_connected')
+                        {{ __('Planned: needs Google Analytics 4, which is not connected yet.') }}
+                    @elseif ($referrals['status'] === 'no_synced_rows')
                         {{ __('No synced GA4 / UTM AI referrer rows yet.') }}
                     @else
                         {{ __('Attributed from synced analytics rows.') }}
                     @endif
                 </x-slot>
                 <div style="display:grid;gap:8px;font-size:13.5px">
+                    @if ($referrals['status'] !== 'not_connected')
                     @foreach ($referrals['by_engine'] as $engHost => $vals)
                         <div style="display:flex;justify-content:space-between">
                             <span><bdi dir="ltr">{{ $engHost }}</bdi></span>
                             <strong dir="ltr">{{ $vals['sessions'] }} · {{ $vals['conversions'] }} · {{ number_format($vals['revenue'], 2) }} {{ $client->currency }}</strong>
                         </div>
                     @endforeach
+                    @endif
                 </div>
             </x-filament::section>
         </div>

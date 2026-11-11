@@ -11,7 +11,6 @@ use App\Models\AuditLog;
 use App\Models\Client;
 use App\Support\CurrentClient;
 use App\Support\Seo\AeoGeoManager;
-use App\Support\Seo\SearchConsole;
 use App\Support\TeamRoles;
 use BackedEnum;
 use Filament\Facades\Filament;
@@ -103,7 +102,7 @@ class AeoGeoHubPage extends Page
         $agency = Filament::getTenant();
         $user = auth()->user();
         $client = $this->resolveScopedClient();
-        abort_unless($agency && $client && TeamRoles::canEdit($user, $agency), 403);
+        abort_unless($agency && $client && TeamRoles::canManageData($user, $agency), 403);
 
         $this->validate([
             'promptText' => ['required', 'string', 'min:4', 'max:500'],
@@ -138,7 +137,7 @@ class AeoGeoHubPage extends Page
         $agency = Filament::getTenant();
         $user = auth()->user();
         $client = $this->resolveScopedClient();
-        abort_unless($agency && $client && TeamRoles::canEdit($user, $agency), 403);
+        abort_unless($agency && $client && TeamRoles::canManageData($user, $agency), 403);
 
         $query = AeoTrackedPrompt::query()
             ->where('agency_id', $agency->id)
@@ -164,7 +163,7 @@ class AeoGeoHubPage extends Page
         $agency = Filament::getTenant();
         $user = auth()->user();
         $client = $this->resolveScopedClient();
-        abort_unless($agency && $client && TeamRoles::canEdit($user, $agency), 403);
+        abort_unless($agency && $client && TeamRoles::canManageData($user, $agency), 403);
 
         AeoTrackedPrompt::query()
             ->where('agency_id', $agency->id)
@@ -180,7 +179,7 @@ class AeoGeoHubPage extends Page
         $agency = Filament::getTenant();
         $user = auth()->user();
         $client = $this->resolveScopedClient();
-        abort_unless($agency && $client && TeamRoles::canEdit($user, $agency), 403);
+        abort_unless($agency && $client && TeamRoles::canManageData($user, $agency), 403);
 
         $this->validate([
             'auditDomainUrl' => ['required', 'string', 'max:500', 'regex:#^https?://#i'],
@@ -287,17 +286,16 @@ class AeoGeoHubPage extends Page
             ->latest('audited_at')
             ->first();
 
-        $gscSample = array_map(fn (array $r): array => $r + ['url' => 'https://example.com/'], SearchConsole::sampleRows());
-
         return [
             'client' => $client,
-            'canEdit' => TeamRoles::canEdit($user, $agency),
+            'canEdit' => TeamRoles::canManageData($user, $agency),
             'prompts' => $prompts,
             'matrix' => AeoGeoManager::shareOfModelMatrix($client),
             'referrals' => AeoGeoManager::llmReferralSlice($client),
             'citationGaps' => AeoGeoManager::findCitationGaps($client, $latestAudit?->domain_url),
             'latestAudit' => $latestAudit,
-            'cannibalization' => AeoGeoManager::detectCannibalizationAndDecay($gscSample),
+            // E1 (D-249): Search Console is not connected (D-246), so no sample rows are shown as if they were real.
+            'cannibalization' => ['cannibalized' => [], 'decaying_pages' => []],
         ];
     }
 }
