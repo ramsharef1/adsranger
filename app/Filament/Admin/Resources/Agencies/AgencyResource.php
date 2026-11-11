@@ -8,12 +8,15 @@ use App\Filament\Admin\Resources\Agencies\Pages\ListAgencies;
 use App\Filament\Concerns\TranslatesResourceLabels;
 use App\Models\Agency;
 use App\Models\Plan;
+use App\Models\PlanUpgradeRequest;
 use App\Support\DemoData;
+use App\Support\Modules;
 use App\Support\Trial;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
@@ -99,6 +102,12 @@ class AgencyResource extends Resource
                     TextEntry::make('deletion_notified_at')->label(__('"Deletion in 7 days" mail'))->state(fn (Agency $record) => $record->deletion_notified_at?->format('Y-m-d H:i') ?? '—'),
                     TextEntry::make('deleted_at')->label(__('Archived'))->state(fn (Agency $record) => $record->deleted_at?->format('Y-m-d H:i') ?? '—'),
                 ])->columnSpan(2),
+            Section::make(__('Module overrides'))->description(__('Per-agency beta module switches (M3.1). Enabling a module here unlocks it for this workspace regardless of plan tier while global defaults stay off.'))->columns(3)->schema(
+                collect(array_keys((array) config('modules.enabled', [])))->map(
+                    fn (string $mKey): Checkbox => Checkbox::make("module_overrides.$mKey")
+                        ->label((Modules::catalog()[$mKey]['label'] ?? $mKey)." ($mKey)")
+                )->all()
+            )->columnSpan(2),
             Section::make(__('Network overrides'))->description(__('Layer 3 of the access rules. "Always allow" turns a network on for this agency even when it is off globally or not in its plan (good for beta tests). "Block" hides it, and wins over everything.'))->columns(2)->schema([
                 CheckboxList::make('allowedNetworks')->label(__('Always allow'))->relationship('allowedNetworks', 'name'),
                 CheckboxList::make('blockedNetworks')->label(__('Block'))->relationship('blockedNetworks', 'name'),
@@ -135,6 +144,10 @@ class AgencyResource extends Resource
                     })
                     ->tooltip(fn (Agency $r) => Trial::stage($r) === Trial::NONE ? null : __('Read-only until').' '.(Trial::readOnlyUntil($r)?->format('Y-m-d') ?? '—').' · '.__('Data deleted on').' '.(Trial::deleteOn($r)?->format('Y-m-d') ?? '—'))
                     ->placeholder('—'),
+                TextColumn::make('pending_upgrade')->label(__('Upgrade request'))->badge()->color('warning')
+                    ->state(fn (Agency $r): ?string => $r->upgradeRequests()->where('status', 'pending')->latest()->value('target_plan'))
+                    ->formatStateUsing(fn (?string $state): ?string => $state ? __('Requested: :plan', ['plan' => strtoupper($state)]) : null)
+                    ->placeholder('—'),
                 TextColumn::make('country'),
                 TextColumn::make('created_at')->label(__('Created'))->since(),
             ])
@@ -145,6 +158,25 @@ class AgencyResource extends Resource
                 TrashedFilter::make()->label(__('Archived')),
             ])
             ->recordActions([EditAction::make(), ActionGroup::make([
+                Action::make('extendTrial7Days')->label(__('Extend Trial +7 Days'))->icon('heroicon-o-plus-circle')->color('success')
+                    ->visible(fn (Agency $r): bool => in_array($r->status, Trial::LIFECYCLE_STATUSES, true) || $r->trashed())
+                    ->requiresConfirmation()
+                    ->action(function (Agency $r): void {
+                        $to = Trial::extend($r, 7);
+                        Notification::make()->title(__('Trial extended for :agency until :date', ['agency' => $r->name, 'date' => $to->format('Y-m-d')]))->success()->send();
+                    }),
+                Action::make('approveUpgrade')->label(__('Approve upgrade request'))->icon('heroicon-o-arrow-up-circle')->color('warning')
+                    ->visible(fn (Agency $r): bool => $r->upgradeRequests()->where('status', 'pending')->exists())
+                    ->requiresConfirmation()
+                    ->action(function (Agency $r): void {
+                        $req = PlanUpgradeRequest::query()->where('agency_id', $r->id)->where('status', 'pending')->latest()->first();
+                        if (! $req) {
+                            return;
+                        }
+                        $r->forceFill(['plan' => $req->target_plan, 'status' => 'active'])->save();
+                        $req->forceFill(['status' => 'approved', 'resolved_by' => auth()->id(), 'resolved_at' => now()])->save();
+                        Notification::make()->title(__('Plan upgraded to :plan', ['plan' => strtoupper($req->target_plan)]))->success()->send();
+                    }),
                 static::extendTrialAction(),
                 Action::make('demo')->label(__('Load demo data'))->icon('heroicon-o-beaker')->requiresConfirmation()
                     ->modalDescription(__('Adds 3 sample clients with 90 days of Meta-style results and runs the alert rules. Remove it any time.'))

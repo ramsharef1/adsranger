@@ -18,6 +18,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -134,7 +135,7 @@ class PublicSiteController extends Controller
 
     public function partners(string $lang = 'ar')
     {
-        return view('public.partners', ['lang' => $lang === 'en' ? 'en' : 'ar']);
+        return view('public.partners', ['lang' => $lang === 'en' ? 'en' : 'ar', 'publishedPartners' => (Schema::hasTable('partner_applications') && Schema::hasColumn('partner_applications', 'is_published') ? PartnerApplication::query()->where('is_published', true)->orderByDesc('published_at')->limit(48)->get() : collect())]);
     }
 
     public function businessOwners(string $lang = 'ar')

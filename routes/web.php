@@ -5,6 +5,7 @@ use App\Http\Controllers\ClientOnboardingController;
 use App\Http\Controllers\ClientReportController;
 use App\Http\Controllers\ConnectController;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\MagicLoginController;
 use App\Http\Controllers\PublicSiteController;
 use App\Http\Controllers\ReportUnsubscribeController;
 use App\Http\Controllers\StudioBriefController;
@@ -128,6 +129,8 @@ Route::post('/reports/unsubscribe/{schedule}', [ReportUnsubscribeController::cla
     ->whereNumber('schedule');
 
 // Agency invitations
+Route::get('/magic-login/{token}', [MagicLoginController::class, 'show'])->middleware('throttle:20,1')->name('magic.login.show');
+Route::post('/magic-login/{token}', [MagicLoginController::class, 'consume'])->middleware('throttle:10,1')->name('magic.login.consume');
 Route::get('/invite/{token}', [InvitationController::class, 'show']);
 Route::post('/invite/{token}', [InvitationController::class, 'accept'])->middleware('throttle:10,1');
 

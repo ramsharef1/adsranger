@@ -4,10 +4,14 @@ namespace App\Filament\Pages\Tenancy;
 
 use App\Models\AuditLog;
 use App\Support\AgencyLogo;
+use App\Support\CustomDomainManager;
 use Closure;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Pages\Tenancy\EditTenantProfile;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
@@ -42,6 +46,18 @@ class EditAgencyProfile extends EditTenantProfile
                 }])
                 ->helperText(__('SVG or PNG, up to 200 KB, at least 400 px wide; a transparent background works best. Shown on client links, the monthly PDF and report emails. Without a logo, your agency name is shown.')),
             // #74: members without two-step verification are sent to set it up before they can open this workspace.
+            Section::make(__('White-label custom domain'))->description(__('Point a CNAME record (for example reports.agency.com → adsranger.com) via your DNS or Cloudflare proxy for shared client report links.'))
+                ->columns(2)->schema([
+                    TextInput::make('custom_domain')->label(__('Custom report domain'))
+                        ->placeholder('reports.agency.com')
+                        ->maxLength(190)
+                        ->dehydrateStateUsing(fn (?string $state): ?string => $state ? CustomDomainManager::normalizeHost($state) : null)
+                        ->helperText(__('CNAME target: adsranger.com (Cloudflare for SaaS / DNS proxy supported).')),
+                    TextEntry::make('custom_domain_verification')->label(__('Domain verification status'))
+                        ->state(fn (): string => $this->tenant->custom_domain
+                            ? __(ucfirst((string) ($this->tenant->custom_domain_status ?: 'pending')))
+                            : __('Not configured')),
+                ]),
             Toggle::make('require_two_factor')->label(__('Require two-step verification for all members'))
                 ->helperText(__('Members who haven\'t set it up are asked to add an authenticator app before they can open this workspace. This includes you.')),
         ]);
@@ -85,6 +101,16 @@ class EditAgencyProfile extends EditTenantProfile
 
         if ($this->tenant->wasChanged('require_two_factor')) {
             AuditLog::record('agency.require_2fa_changed', $this->tenant, ['on' => (bool) $this->tenant->require_two_factor]);
+        }
+
+        if ($this->tenant->wasChanged('custom_domain')) {
+            $this->tenant->forceFill([
+                'custom_domain_status' => 'pending',
+                'custom_domain_verified_at' => null,
+            ])->saveQuietly();
+            if ($this->tenant->custom_domain) {
+                AuditLog::record('agency.custom_domain_configured', $this->tenant, ['domain' => $this->tenant->custom_domain]);
+            }
         }
     }
 }

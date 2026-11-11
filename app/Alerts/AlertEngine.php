@@ -147,16 +147,32 @@ class AlertEngine
     {
         $now = MetricsQuery::totals($c, $d->copy()->subDays(6)->toDateString(), $d->toDateString());
         $prev = MetricsQuery::totals($c, $d->copy()->subDays(13)->toDateString(), $d->copy()->subDays(7)->toDateString());
-        $min = (float) $r['t']['min_results'];
+        $min = (float) ($r['t']['min_results'] ?? 5);
         if (! $now['cpr'] || ! $prev['cpr'] || $now['main_results'] < $min || $prev['main_results'] < $min || $now['main_type'] !== $prev['main_type']) {
             return;
         }
+
+        // M5.2: Minimum 7-day spend floor (>= $50 USD-equivalent OR >= 3x Target CPR) so tiny test budgets never trigger false alarms.
+        $minSpendUsd = (float) ($r['t']['min_spend_usd'] ?? 50);
+        $targetMult = (float) ($r['t']['target_cpr_multiplier'] ?? 3);
+        $spendUsd = Fx::convert((float) $now['spend'], $c->currency ?: 'USD', 'USD', $d->toDateString());
+        $meetsUsdFloor = $spendUsd >= $minSpendUsd;
+        $meetsTargetFloor = ((float) ($c->target_cpr ?? 0) > 0) && ((float) $now['spend'] >= ($targetMult * (float) $c->target_cpr));
+        if (! $meetsUsdFloor && ! $meetsTargetFloor) {
+            return;
+        }
+
         $pct = ($now['cpr'] / $prev['cpr'] - 1) * 100;
-        if ($pct >= (float) $r['t']['pct']) {
-            static::add($found, 'cpr_rising', $r, ['client_id' => $c->id, 'entity_type' => 'client', 'entity_id' => $c->id, 'entity_name' => $c->name,
+        $warnPct = (float) ($r['t']['pct'] ?? 20);
+        $critPct = (float) ($r['t']['critical_pct'] ?? 40);
+
+        if ($pct > $warnPct) {
+            $effectiveRule = $r;
+            $effectiveRule['severity'] = $pct > $critPct ? 'critical' : 'warning';
+            static::add($found, 'cpr_rising', $effectiveRule, ['client_id' => $c->id, 'entity_type' => 'client', 'entity_id' => $c->id, 'entity_name' => $c->name,
                 'title' => 'Cost per result up '.round($pct).'%: '.$c->name,
                 'detail' => 'Last 7 days '.number_format($now['cpr'], 2).' vs '.number_format($prev['cpr'], 2).' '.$c->currency.' the week before.',
-                'payload' => ['now' => round($now['cpr'], 4), 'prev' => round($prev['cpr'], 4), 'pct' => round($pct, 1)]]);
+                'payload' => ['now' => round($now['cpr'], 4), 'prev' => round($prev['cpr'], 4), 'pct' => round($pct, 1), 'spend_usd' => round($spendUsd, 2)]]);
         }
     }
 
@@ -437,7 +453,7 @@ class AlertEngine
         $new = [];
         foreach ($found as $fp => $data) {
             if ($ex = $live[$fp] ?? null) {
-                $ex->update(['title' => $data['title'], 'detail' => $data['detail'] ?? null, 'payload' => $data['payload'] ?? null, 'last_seen_at' => now()]
+                $ex->update(['severity' => $data['severity'], 'title' => $data['title'], 'detail' => $data['detail'] ?? null, 'payload' => $data['payload'] ?? null, 'last_seen_at' => now()]
                     + ($ex->status === 'snoozed' && $ex->snoozed_until?->isPast() ? ['status' => 'open', 'snoozed_until' => null] : []));
                 $stats['refreshed']++;
             } else {
