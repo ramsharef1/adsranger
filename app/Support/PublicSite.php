@@ -54,7 +54,7 @@ class PublicSite
             '/tools/schema-generator' => ['مولد البيانات المنظمة JSON-LD', 'JSON-LD schema generator', 'أنشئ كود البيانات المنظمة بالعربية والإنجليزية', 'Build and validate bilingual JSON-LD structured data'],
             '/tools/ab-significance-calculator' => ['حاسبة الدلالة الإحصائية للاختبارات', 'A/B significance calculator', 'احسب ثقة الاختبار واحتمال الفوز وحجم العينة', 'Frequentist Z-test, Bayesian win probability and sample size'],
             '/tools/safe-zone-checker' => ['فاحص المناطق الآمنة للفيديو العمودي', '9:16 ad safe-zone checker', 'تأكّد ألا تغطي واجهة المنصة نصوص إعلانك', 'Overlay Reels, TikTok and Snap UI zones inside your browser'],
-            '/tools/ksa-ad-compliance-checker' => ['فاحص امتثال الإعلانات الخليجية', 'MENA ad compliance checker', 'قائمة مراجعة لتراخيص الإعلانات في السعودية والإمارات', 'Checklist and copy scan for KSA & UAE ad disclosures'],
+            '/tools/ksa-ad-compliance-checker' => ['قائمة إفصاحات الإعلانات الخليجية', 'MENA ad disclosure checklist', 'قائمة مراجعة لتراخيص الإعلانات في السعودية والإمارات', 'Checklist and copy scan for KSA & UAE ad disclosures'],
             '/tools/cpm-cpc-cpa-calculator' => ['حاسبة مؤشرات الإعلانات الشاملة', 'CPM, CPC & CPA calculator', 'حوّل بين الميزانية والظهور والنقرات والتكلفة', 'Full-funnel media math converter from budget to CPA'],
             '/tools/agency-fee-vat-calculator' => ['حاسبة أتعاب الوكالة وضريبة القيمة المضافة', 'Agency fee & MENA VAT calculator', 'قارن الأتعاب الثابتة والنسبة مع ضريبة الدول العربية', 'Compare retainer vs % of spend, media float and MENA VAT'],
             '/tools/robots-sitemap-checker' => ['فاحص robots.txt وخريطة الموقع', 'Robots.txt & sitemap checker', 'اكشف تعارضات الحظر وخريطة الموقع والرابط المعتمد', 'Check robots.txt rules, XML sitemaps and page canonicals'],
@@ -85,11 +85,17 @@ class PublicSite
      *
      * @return list<array{label: string, path?: string, items?: list<string>}>
      */
+    /** Tools that are published: SEO_TOOLS_PUBLIC on and not held back (D-249). @return list<string> slugs */
+    public static function publicTools(): array
+    {
+        return config('seo_tools.public') ? array_values(array_diff(config('seo_tools.tools', []), config('seo_tools.held', []))) : [];
+    }
+
     public static function menu(bool $ar): array
     {
         return [
             ['label' => $ar ? 'المنتج' : 'Product', 'items' => ['/features', '/reports', '/studio', '/search', '/ai', '/demo-report', '/security', '/partners']],
-            ['label' => $ar ? 'أدوات وأدلة مجانية' : 'Free tools & guides', 'items' => array_merge(['/tools/ramadan-budget-calculator', '/ramadan-2027', '/mena-calendar'], config('seo_tools.public') ? array_merge(['/tools'], array_map(fn (string $t) => '/tools/'.$t, config('seo_tools.tools', []))) : [])],
+            ['label' => $ar ? 'أدوات وأدلة مجانية' : 'Free tools & guides', 'items' => array_merge(['/tools/ramadan-budget-calculator', '/ramadan-2027', '/mena-calendar'], config('seo_tools.public') ? array_merge(['/tools'], array_map(fn (string $t) => '/tools/'.$t, self::publicTools())) : [])],
             ['label' => $ar ? 'الباقات' : 'Plans', 'path' => '/pricing'],
             ['label' => $ar ? 'المنصات الإعلانية' : 'Ad platforms', 'path' => '/integrations'],
             ['label' => $ar ? 'عن AdsRanger' : 'About', 'items' => ['/about', '/contact']],

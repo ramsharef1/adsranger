@@ -6,6 +6,9 @@ extract(\App\Support\ToolPage::head($lang ?? 'ar', '/tools',
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
 $seoSlugs = ['/tools/page-audit', '/tools/hreflang-checker', '/tools/robots-sitemap-checker', '/tools/llms-txt-generator', '/tools/schema-generator', '/tools/arabic-keyword-generator', '/tools/arabizi-converter', '/tools/serp-preview', '/tools/meta-length-checker'];
 $adSlugs = ['/tools/ramadan-budget-calculator', '/tools/cod-poas-calculator', '/tools/roas-calculator', '/tools/cpm-cpc-cpa-calculator', '/tools/budget-pacing-calculator', '/tools/agency-fee-vat-calculator', '/tools/ab-significance-calculator', '/tools/capi-pixel-checker', '/tools/whatsapp-link-generator', '/tools/ad-mockup-preview', '/tools/safe-zone-checker', '/tools/ksa-ad-compliance-checker', '/tools/utm-builder'];
+$held = array_map(fn (string $t) => '/tools/'.$t, config('seo_tools.held', []));
+$seoSlugs = array_values(array_diff($seoSlugs, $held));
+$adSlugs = array_values(array_diff($adSlugs, $held));
 @endphp
 @extends('layouts.public')
 @push('styles')

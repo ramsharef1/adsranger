@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PartnerApplication;
 use App\Models\WaitlistEntry;
+use App\Support\PublicSite;
 use App\Support\PublicUrl;
 use App\Support\Seo\CapiPixelChecker;
 use App\Support\Seo\Hreflang;
@@ -223,7 +224,7 @@ class PublicSiteController extends Controller
     public function seoTool(string $lang = 'ar', string $tool = 'serp-preview'): Response
     {
         ToolRateLimiter::recordToolUse($tool);
-        $public = (bool) config('seo_tools.public');
+        $public = in_array($tool, PublicSite::publicTools(), true);
         $response = response()->view('public.tools.'.$tool, [
             'lang' => $lang === 'en' ? 'en' : 'ar',
             'noindex' => ! $public,
@@ -391,7 +392,7 @@ class PublicSiteController extends Controller
             '/privacy' => 'legal/page',
             '/terms' => 'legal/page',
             '/data-deletion' => 'legal/page',
-        ] + (config('seo_tools.public') ? (['/tools' => 'public/tools/index'] + collect(config('seo_tools.tools', []))->mapWithKeys(fn (string $t) => ['/tools/'.$t => 'public/tools/'.$t])->all()) : []);
+        ] + (config('seo_tools.public') ? (['/tools' => 'public/tools/index'] + collect(PublicSite::publicTools())->mapWithKeys(fn (string $t) => ['/tools/'.$t => 'public/tools/'.$t])->all()) : []);
     }
 
     /** R-13: /sitemap.xml is a sitemap index; children are added as sections ship (features, guides, blog, …). */

@@ -44,6 +44,7 @@ class RobotsSitemapChecker
         $issues = [];
         $declaredSitemaps = [];
         $disallows = [];
+        $allows = [];
 
         if ($robots['status'] === 200) {
             $inWildcard = false;
@@ -64,19 +65,17 @@ class RobotsSitemapChecker
                     $inWildcard = ($v === '*');
                 } elseif ($kl === 'disallow' && $inWildcard && $v !== '') {
                     $disallows[] = $v;
+                } elseif ($kl === 'allow' && $inWildcard && $v !== '') {
+                    $allows[] = $v;
                 }
             }
         } else {
             $issues[] = 'missing_robots';
         }
 
-        $blockedByRobots = false;
-        foreach ($disallows as $rule) {
-            if ($rule === '/' || str_starts_with($path, $rule)) {
-                $blockedByRobots = true;
-                break;
-            }
-        }
+        // Longest matching rule wins; Allow wins a tie (Google's robots.txt rules). Wildcards are not expanded.
+        $longest = fn (array $rules): int => max(array_map(fn (string $r): int => str_starts_with($path, $r) ? strlen($r) : -1, $rules ?: ['']));
+        $blockedByRobots = $disallows !== [] && $longest($disallows) >= 0 && $longest($disallows) > ($allows === [] ? -1 : $longest($allows));
         if ($blockedByRobots) {
             $issues[] = 'url_disallowed';
         }

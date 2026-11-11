@@ -1,8 +1,8 @@
 @php
 extract(\App\Support\ToolPage::head($lang ?? 'ar', '/tools/ksa-ad-compliance-checker',
-    ['فاحص امتثال الإعلانات في السعودية والإمارات | AdsRanger', 'KSA & UAE Ad Compliance Checklist & Copy Scanner | AdsRanger'],
+    ['قائمة إفصاحات الإعلانات في السعودية والإمارات | AdsRanger', 'KSA & UAE Ad Disclosure Checklist | AdsRanger'],
     ['قائمة فحص إرشادية ومسح لنص الإعلان لمراجعة متطلبات ترخيص فال العقاري والغذاء والدواء ووزارة الصحة ووسم معلن وإفصاحات التقسيط.',
-        'Interactive MENA ad compliance checklist and copy scanner for Saudi REGA/Fal, SFDA, MOH disclaimers, UAE Media Council permit tags, and BNPL disclosures.']));
+        'Reminder checklist and word search for Saudi REGA/Fal, SFDA, MOH disclaimers, UAE Media Council permit tags, and BNPL disclosures.']));
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
 @endphp
 @extends('layouts.public')
@@ -10,8 +10,8 @@ $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
 @include('public.tools.partials.styles')
 @endpush
 @section('hero')
-<h1>{{ $ar ? 'فاحص امتثال الإعلانات في السعودية والإمارات' : 'KSA & UAE Ad Compliance Checklist & Scanner' }}</h1>
-<p class="muted" style="font-size:17px">{{ $ar ? 'افحص مسودة إعلانك قبل الإطلاق للتحقق من وجود تراخيص فال والغذاء والدواء والصحة ووسم #معلن وإفصاحات التقسيط.' : 'Pre-flight your Arabic or English ad copy against Saudi REGA/Fal, SFDA, MOH, UAE Media Council, and BNPL disclosure rules.' }}</p>
+<h1>{{ $ar ? 'قائمة إفصاحات الإعلانات في السعودية والإمارات' : 'KSA & UAE Ad Disclosure Checklist' }}</h1>
+<p class="muted" style="font-size:17px">{{ $ar ? 'قائمة تذكير قبل نشر الإعلان: هل ذكرت رقم الترخيص، وتنبيهات الصحة والغذاء والدواء، ووسم #معلن، وشروط التقسيط؟' : 'A reminder list before you publish: licence numbers, health and SFDA notes, the #معلن tag, and instalment terms.' }}</p>
 @endsection
 @section('content')
 <section class="tl">
@@ -29,7 +29,7 @@ $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
         <textarea id="kc-copy" rows="5">{{ $ar ? 'شقق تمليك فاخرة في شمال الرياض بأسعار تبدأ من 750,000 ريال.' : 'Luxury apartments in North Riyadh starting from 750,000 SAR.' }}</textarea>
 
         <p class="tl-hint" style="margin-top:12px">
-            {{ $ar ? 'تنبيه شفافية: هذه الأداة قائمة تدقيق تشغيلية لفرق التسويق وليست استشارة قانونية رسمية؛ راجع دائمًا اللوائح المحدثة للجهة التنظيمية المختصة.' : 'Disclaimer: Operational pre-flight checklist only — not legal advice. Always verify current rules with official regulators or legal counsel.' }}
+            {{ $ar ? 'هذه قائمة تذكير لفريق التسويق، لا فحص قانوني: نبحث فقط عن كلمات في النص، ولا نحكم إن كان الإعلان مطابقًا للأنظمة. راجع اللوائح الحالية لدى الجهة المختصة أو مستشارًا قانونيًا قبل النشر.' : 'This is a reminder checklist for marketing teams, not a legal check: it only looks for words in your text and does not decide whether an ad complies. Check the current rules with the regulator or a lawyer before publishing.' }}
         </p>
     </form>
 
@@ -71,12 +71,15 @@ $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
     ul.innerHTML = '';
     (rules[sec] || []).forEach(function(r){
       var hit = r.re.test(txt);
-      var pass = r.invert ? !hit : hit;
+      var ok = r.invert ? !hit : hit;
       var li = document.createElement('li');
       var lbl = document.createElement('span'); lbl.textContent = isAr ? r.ar : r.en;
       var st = document.createElement('strong');
-      st.textContent = pass ? (isAr ? 'مستوفى' : 'Pass') : (isAr ? 'يحتاج مراجعة' : 'Needs review');
-      st.style.color = pass ? 'var(--acc)' : 'var(--bad)';
+      // A word match is not a legal check (D-249): we only say what the text contains, never pass / fail.
+      st.textContent = r.invert
+        ? (hit ? (isAr ? 'وُجدت عبارة تحتاج مراجعة' : 'Phrase found: review it') : (isAr ? 'لم نجد هذه العبارة' : 'Phrase not found'))
+        : (hit ? (isAr ? 'وُجد في النص' : 'Found in the text') : (isAr ? 'لم نجده في النص' : 'Not found in the text'));
+      st.style.color = ok ? 'var(--acc)' : '#b45309';
       li.appendChild(lbl); li.appendChild(st); ul.appendChild(li);
     });
   }

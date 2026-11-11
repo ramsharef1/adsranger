@@ -61,7 +61,14 @@ class WaveA2PublicToolsTest extends TestCase
         $hiddenXml = $this->get('/sitemaps/pages.xml')->assertOk()->getContent();
         $this->assertStringNotContainsString('/tools/capi-pixel-checker', $hiddenXml);
 
+        // D-249: with the tools public, the held-back ones still stay out of the sitemap and hub and keep noindex.
         config(['seo_tools.public' => true]);
+        $heldXml = $this->get('/sitemaps/pages.xml')->assertOk()->getContent();
+        $this->assertStringNotContainsString('/tools/capi-pixel-checker', $heldXml);
+        $this->assertStringNotContainsString('/tools/capi-pixel-checker', $this->get('/tools')->getContent());
+        $this->get('/tools/capi-pixel-checker')->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+
+        config(['seo_tools.held' => []]);
         $publicXml = $this->get('/sitemaps/pages.xml')->assertOk()->getContent();
         $hubAr = $this->get('/tools')->assertOk()->getContent();
         $hubEn = $this->get('/en/tools')->assertOk()->getContent();
@@ -150,5 +157,25 @@ HTML;
         $this->assertContains('url_disallowed', $rs['issues']);
         $this->assertContains('canonical_points_elsewhere', $rs['issues']);
         $this->assertTrue($rs['sitemaps'][0]['valid_xml']);
+    }
+
+    public function test_robots_allow_rule_beats_a_shorter_disallow(): void
+    {
+        SafeFetcher::$resolver = fn () => '93.184.216.34';
+        Http::fake([
+            'https://store.example/robots.txt' => Http::response("User-agent: *\nDisallow: /checkout\nAllow: /checkout/help\n", 200, ['Content-Type' => 'text/plain']),
+            'https://store.example/checkout/help' => Http::response('<html><head><link rel="canonical" href="https://store.example/checkout/help"></head></html>', 200, ['Content-Type' => 'text/html']),
+            'https://store.example/checkout/pay' => Http::response('<html><head><link rel="canonical" href="https://store.example/checkout/pay"></head></html>', 200, ['Content-Type' => 'text/html']),
+        ]);
+
+        $this->assertFalse(RobotsSitemapChecker::check('https://store.example/checkout/help')['blocked_by_robots']);
+        $this->assertTrue(RobotsSitemapChecker::check('https://store.example/checkout/pay')['blocked_by_robots']);
+    }
+
+    public function test_disclosure_checklist_never_gives_a_pass_verdict(): void
+    {
+        $html = $this->get('/en/tools/ksa-ad-compliance-checker')->assertOk()->getContent();
+        $this->assertStringNotContainsString("'Pass'", $html);
+        $this->assertStringContainsString('not a legal check', $html);
     }
 }

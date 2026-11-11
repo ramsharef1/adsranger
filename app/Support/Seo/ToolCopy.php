@@ -492,7 +492,7 @@ class ToolCopy
             ],
             'ksa-ad-compliance-checker' => [
                 'ar' => [
-                    'how_title' => 'كيف يعمل فاحص امتثال الإعلانات في السعودية والإمارات',
+                    'how_title' => 'كيف يعمل قائمة إفصاحات الإعلانات في السعودية والإمارات',
                     'how_steps' => [
                         'اختر القطاع الإعلاني (عقارات، صحة وتجميل، غذاء ومكملات، تقسيط وتمويل، أو مؤثرين).',
                         'ألصق نص الإعلان لفحص وجود عبارات الإفصاح وأرقام التراخيص المطلوبة ومراجعة قائمة التحقق.',
@@ -501,11 +501,11 @@ class ToolCopy
                     'faq_title' => 'أسئلة شائعة حول ضوابط الإعلانات الخليجية',
                     'faqs' => [
                         ['q' => 'هل يُعدّ هذا الفحص استشارة قانونية رسمية؟', 'a' => 'لا؛ هذه الأداة قائمة إرشادية تشغيلية لفرق التسويق وليست استشارة قانونية، ويجب دائمًا الرجوع للأنظمة الرسمية المحدثة لكل جهة مختصة.'],
-                        ['q' => 'متى يلزم ذكر ترخيص فال في الإعلانات العقارية السعودية؟', 'a' => 'تشترط ضوابط الهيئة العامة للعقار تضمين رقم ترخيص الإعلان العقاري ورقم رخصة فال سارية المفعول في الإعلانات العقارية داخل المملكة.'],
+                        ['q' => 'ما الإفصاحات التي تذكّر بها القائمة؟', 'a' => 'رقم ترخيص الإعلان العقاري ورخصة فال في السعودية، وتنبيهات الصحة والغذاء والدواء، ووسم #معلن في الإمارات، وشروط التقسيط ورسومه. القواعد تتغيّر، فتحقّق منها لدى الجهة المختصة.'],
                     ],
                 ],
                 'en' => [
-                    'how_title' => 'How the KSA & UAE ad compliance checker works',
+                    'how_title' => 'How the KSA & UAE ad disclosure checklist works',
                     'how_steps' => [
                         'Select your campaign vertical (Real Estate, Healthcare, Food/SFDA, BNPL/Finance, or Creator/Influencer).',
                         'Paste your Arabic or English ad copy to scan for required permit markers and work through the regulatory checklist.',
@@ -514,7 +514,7 @@ class ToolCopy
                     'faq_title' => 'Frequently asked questions',
                     'faqs' => [
                         ['q' => 'Is this tool legal advice?', 'a' => 'No. This is an operational pre-flight checklist for marketing teams, not legal counsel. Always verify current regulations with REGA, SFDA, MOH, the UAE Media Council, or qualified legal advisors.'],
-                        ['q' => 'What disclosures are commonly checked?', 'a' => 'Saudi REGA/Fal real estate license numbers, SFDA/MOH health disclaimers, UAE Media Council advertiser (#معلن) tags, and BNPL fee/terms disclosures.'],
+                        ['q' => 'Which disclosures does the checklist remind you of?', 'a' => 'Saudi REGA / Fal real estate licence numbers, SFDA / MOH health notes, the UAE Media Council advertiser tag (#معلن), and instalment fees and terms. Rules change, so confirm them with the regulator.'],
                     ],
                 ],
             ],
