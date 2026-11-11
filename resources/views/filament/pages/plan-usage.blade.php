@@ -14,8 +14,47 @@
                     </div>
                 </div>
             @endforeach
+
+            @if ($canUpgrade)
+                <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:4px">
+                    <button type="button" wire:click="openUpgradeModal" style="min-height:44px;padding:0 18px;border-radius:10px;border:0;background:#0f766e;color:#fff;font-weight:600;cursor:pointer">
+                        {{ __('Request Plan Upgrade') }}
+                    </button>
+                    @if ($pendingUpgrade)
+                        <span style="font-size:13px;padding:6px 12px;border-radius:99px;background:rgba(20,184,166,.15);font-weight:600">
+                            {{ __('Pending upgrade request: :plan', ['plan' => \App\Support\PlanGate::tierLabel($pendingUpgrade->target_plan)]) }}
+                        </span>
+                    @endif
+                </div>
+            @endif
         </div>
     </x-filament::section>
+
+    @if ($showUpgradeModal && $canUpgrade)
+        <x-filament::section>
+            <x-slot name="heading">{{ __('Request Plan Upgrade') }}</x-slot>
+            <x-slot name="description">{{ __('Select your target plan tier. Our team reviews and activates plan changes directly for your workspace.') }}</x-slot>
+            <form wire:submit="submitUpgradeRequest" style="display:grid;gap:14px;max-width:520px">
+                <div>
+                    <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">{{ __('Target plan tier') }}</label>
+                    <select wire:model="targetPlan" style="width:100%;min-height:44px;padding:8px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.35);background:transparent">
+                        @foreach (array_keys($byTier) as $tKey)
+                            <option value="{{ $tKey }}">{{ \App\Support\PlanGate::tierLabel($tKey) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px">{{ __('Optional note') }}</label>
+                    <textarea wire:model="upgradeNote" rows="3" maxlength="500" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.35);background:transparent;font-size:14px"></textarea>
+                </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap">
+                    <button type="submit" style="min-height:44px;padding:0 18px;border-radius:8px;border:0;background:#0f766e;color:#fff;font-weight:600;cursor:pointer">{{ __('Submit upgrade request') }}</button>
+                    <button type="button" wire:click="closeUpgradeModal" style="min-height:44px;padding:0 16px;border-radius:8px;border:1px solid rgba(148,163,184,.35);background:transparent;cursor:pointer">{{ __('Cancel') }}</button>
+                </div>
+            </form>
+        </x-filament::section>
+    @endif
+
     <x-filament::section>
         <x-slot name="heading">{{ __('plan.unlocks') }}</x-slot>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
@@ -49,9 +88,38 @@
         </div>
         <p style="font-size:13px;opacity:.7;margin-top:8px">{{ __('plan.contact') }}</p>
     </x-filament::section>
+
     <x-filament::section>
         <x-slot name="heading">{{ __('Networks in your plan') }}</x-slot>
         <p style="font-size:14px;line-height:1.8">{{ $networks->isEmpty() ? __('None yet — networks appear as they are switched on.') : $networks->implode(' · ') }}</p>
         <p style="font-size:13px;opacity:.7;margin-top:8px">{{ __('Need a bigger plan or another network? Contact support@adsranger.com. Online upgrades come with billing.') }}</p>
     </x-filament::section>
+
+    @if (! empty($betaModules))
+        <x-filament::section>
+            <x-slot name="heading">{{ __('Available Beta Modules — Request Early Access') }}</x-slot>
+            <x-slot name="description">{{ __('Beta modules stay hidden from your navigation until enabled for your workspace.') }}</x-slot>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px">
+                @foreach ($betaModules as $mKey => $meta)
+                    <div style="border:1px solid rgba(148,163,184,.35);border-radius:12px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;gap:10px">
+                        <div>
+                            <strong style="font-size:14px">{{ $meta['label'] }}</strong>
+                            <p style="font-size:13px;opacity:.75;margin:6px 0 0;line-height:1.6">{{ $meta['description'] }}</p>
+                        </div>
+                        @if ($canUpgrade)
+                            <div>
+                                @if (in_array($mKey, $requestedModules, true))
+                                    <span style="display:inline-block;padding:6px 12px;border-radius:8px;background:rgba(20,184,166,.15);font-size:12.5px;font-weight:600">{{ __('Early access requested') }}</span>
+                                @else
+                                    <button type="button" wire:click="requestModuleEarlyAccess('{{ $mKey }}')" style="min-height:44px;padding:0 14px;border-radius:8px;border:1px solid #0f766e;background:transparent;font-size:13px;font-weight:600;cursor:pointer">
+                                        {{ __('Request Early Access') }}
+                                    </button>
+                                @endif
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        </x-filament::section>
+    @endif
 </x-filament-panels::page>

@@ -22,7 +22,7 @@ class Agency extends Model
 
     protected function casts(): array
     {
-        return ['trial_ends_at' => 'datetime', 'digest_sent_on' => 'date', 'alerts_run_on' => 'date', 'benchmarks_opt_in' => 'boolean', 'benchmarks_opt_in_at' => 'datetime', 'require_two_factor' => 'boolean',
+        return ['trial_ends_at' => 'datetime', 'digest_sent_on' => 'date', 'alerts_run_on' => 'date', 'benchmarks_opt_in' => 'boolean', 'benchmarks_opt_in_at' => 'datetime', 'require_two_factor' => 'boolean', 'module_overrides' => 'array', 'custom_domain_verified_at' => 'datetime',
             'trial_readonly_at' => 'datetime', 'trial_expired_at' => 'datetime', 'trial_ending_notified_at' => 'datetime',
             'trial_ended_notified_at' => 'datetime', 'deletion_notified_at' => 'datetime'];
     }
@@ -80,6 +80,21 @@ class Agency extends Model
     public function dataImports(): HasMany
     {
         return $this->hasMany(DataImport::class);
+    }
+
+    public function upgradeRequests(): HasMany
+    {
+        return $this->hasMany(PlanUpgradeRequest::class);
+    }
+
+    public function earlyAccessRequests(): HasMany
+    {
+        return $this->hasMany(ModuleEarlyAccessRequest::class);
+    }
+
+    public function magicLinks(): HasMany
+    {
+        return $this->hasMany(WorkspaceMagicLink::class);
     }
 
     /** Admin override: networks switched ON for this agency even if off globally or not in its plan. */

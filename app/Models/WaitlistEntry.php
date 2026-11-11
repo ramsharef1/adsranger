@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class WaitlistEntry extends Model
 {
@@ -25,10 +26,15 @@ class WaitlistEntry extends Model
 
     protected function casts(): array
     {
-        return ['consent_at' => 'datetime'];
+        return ['consent_at' => 'datetime', 'invited_at' => 'datetime', 'magic_link_expires_at' => 'datetime'];
     }
 
     /** Only rows with recorded consent may ever be emailed (D-152). */
+    public function provisionedAgency(): BelongsTo
+    {
+        return $this->belongsTo(Agency::class, 'provisioned_agency_id');
+    }
+
     public function mayBeEmailed(): bool
     {
         return $this->consent_at !== null;

@@ -13,7 +13,7 @@ return [
         'under_delivery' => ['label' => 'Under-delivery', 'severity' => 'warning',
             'help' => 'Yesterday\'s spend below this % of the daily budget.', 'thresholds' => ['pct' => 30]],
         'cpr_rising' => ['label' => 'Cost per result rising', 'severity' => 'warning',
-            'help' => 'Cost per result up by at least this % vs the 7 days before (needs 5+ results in each week).', 'thresholds' => ['pct' => 30, 'min_results' => 5]],
+            'help' => 'Cost per result up by more than 20% (Warning) or 40% (Critical) over 7 days, with at least 50 USD-equivalent spend or 3x target CPR.', 'thresholds' => ['pct' => 20, 'critical_pct' => 40, 'min_spend_usd' => 50, 'target_cpr_multiplier' => 3, 'min_results' => 5]],
         'ending_soon' => ['label' => 'Ending soon', 'severity' => 'info',
             'help' => 'An active campaign or ad set ends within this many days.', 'thresholds' => ['days' => 3]],
         'connection_problem' => ['label' => 'Connection problem', 'severity' => 'critical',

@@ -58,6 +58,23 @@ $fieldIds = ['email' => 'pa-email', 'agency_name' => 'pa-agency', 'country' => '
     </ul>
     <p>{!! $ar ? 'ونشرح لكل شريك <a href="'.$u('/security').'">كيف نحمي بياناته</a>.' : 'We show each partner <a href="'.$u('/security').'">how we protect their data</a>.' !!}</p>
 
+    @if (! empty($publishedPartners) && $publishedPartners->isNotEmpty())
+        <h2>{{ $ar ? 'الوكالات الشريكة المعتمدة' : 'Approved Partner Agencies' }}</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:24px">
+            @foreach ($publishedPartners as $partner)
+                <div class="card" style="padding:16px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+                        <strong>{{ $partner->agency_name }}</strong>
+                        <span style="font-size:12px;padding:3px 8px;border-radius:99px;background:var(--info-bg);border:1px solid var(--acc);font-weight:600">
+                            {{ $partner->partner_badge === 'premier' ? ($ar ? 'شريك مميز' : 'Premier Partner') : ($ar ? 'شريك معتمد' : 'Certified Partner') }}
+                        </span>
+                    </div>
+                    <p class="muted" style="margin:8px 0 0;font-size:13px"><bdi dir="ltr">{{ $partner->country }}</bdi></p>
+                </div>
+            @endforeach
+        </div>
+    @endif
+
     <h2 id="apply">{{ $ar ? 'قدّم طلبك' : 'Apply' }}</h2>
     <div class="card">
         @if (session('partners_saved'))

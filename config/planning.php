@@ -4,7 +4,7 @@
 return [
     // Decided by Rami 2026-11-04: 40 / 20 / 20 / 20.
     'health' => [
-        'weights' => ['results' => 40, 'pacing' => 20, 'trend' => 20, 'tracking' => 20],
+        'weights' => ['pacing' => 35, 'alerts' => 35, 'targets' => 30],
         'bands' => [80 => ['Healthy', 'success'], 60 => ['Watch', 'warning'], 0 => ['At risk', 'danger']],
         'window_days' => 14,
     ],

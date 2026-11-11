@@ -61,12 +61,12 @@
         <div style="{{ $card }}">
             <div style="display:flex;justify-content:space-between;align-items:center">
                 <div style="{{ $muted }}">{{ __('Health score (last 14 days)') }}</div>
-                <x-filament::badge :color="$health['color']">{{ __($health['band']) }}</x-filament::badge>
+                <div style="display:flex;gap:6px;align-items:center">@if (! empty($health['no_target_set']))<x-filament::badge color="gray">{{ __('No target set') }}</x-filament::badge>@endif<x-filament::badge :color="$health['color']">{{ __($health['band']) }}</x-filament::badge></div>
             </div>
             <div style="font-size:28px;font-weight:700;margin:4px 0 8px">{{ $health['score'] ?? '–' }}<span style="{{ $muted }}"> / 100</span></div>
             @forelse ($health['parts'] as $k => $part)
                 <div style="display:grid;grid-template-columns:90px 1fr 54px;gap:8px;align-items:center;font-size:12px;margin-top:4px">
-                    <div>{{ __(['results' => 'Results', 'pacing' => 'Pacing', 'trend' => 'Trend', 'tracking' => 'Tracking'][$k] ?? $k) }}</div>
+                    <div>{{ __(['pacing' => 'Pacing', 'alerts' => 'Alerts & ads', 'targets' => 'Targets', 'results' => 'Results', 'trend' => 'Trend', 'tracking' => 'Tracking'][$k] ?? $k) }}</div>
                     <div style="height:8px;border-radius:6px;background:rgba(148,163,184,.18);overflow:hidden" role="img" aria-label="{{ __(':points of :max', ['points' => $part['points'], 'max' => $part['max']]) }}">
                         <div style="height:8px;width:{{ $part['max'] ? round($part['points'] / $part['max'] * 100) : 0 }}%;background:#14B8A6"></div>
                     </div>

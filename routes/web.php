@@ -5,10 +5,12 @@ use App\Http\Controllers\ClientOnboardingController;
 use App\Http\Controllers\ClientReportController;
 use App\Http\Controllers\ConnectController;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\MagicLoginController;
 use App\Http\Controllers\PublicSiteController;
 use App\Http\Controllers\ReportUnsubscribeController;
 use App\Http\Controllers\StudioBriefController;
 use App\Http\Middleware\PublicTrailingSlash;
+use App\Support\Seo\PublicCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -46,29 +48,29 @@ Route::middleware(PublicTrailingSlash::class)->group(function () {
         Route::get('/'.$prodSlug, [PublicSiteController::class, 'productPage'])->defaults('lang', 'ar')->defaults('slug', $prodSlug);
         Route::get('/en/'.$prodSlug, [PublicSiteController::class, 'productPage'])->defaults('lang', 'en')->defaults('slug', $prodSlug);
     }
-    foreach (array_keys(\App\Support\Seo\PublicCatalog::platforms()) as $platSlug) {
+    foreach (array_keys(PublicCatalog::platforms()) as $platSlug) {
         Route::get('/integrations/'.$platSlug, [PublicSiteController::class, 'platformPage'])->defaults('lang', 'ar')->defaults('platform', $platSlug);
         Route::get('/en/integrations/'.$platSlug, [PublicSiteController::class, 'platformPage'])->defaults('lang', 'en')->defaults('platform', $platSlug);
     }
     Route::get('/glossary', [PublicSiteController::class, 'glossaryIndex'])->defaults('lang', 'ar');
     Route::get('/en/glossary', [PublicSiteController::class, 'glossaryIndex'])->defaults('lang', 'en');
-    foreach (array_keys(\App\Support\Seo\PublicCatalog::glossary()) as $termSlug) {
+    foreach (array_keys(PublicCatalog::glossary()) as $termSlug) {
         Route::get('/glossary/'.$termSlug, [PublicSiteController::class, 'glossaryTerm'])->defaults('lang', 'ar')->defaults('term', $termSlug);
         Route::get('/en/glossary/'.$termSlug, [PublicSiteController::class, 'glossaryTerm'])->defaults('lang', 'en')->defaults('term', $termSlug);
     }
-        Route::get('/guides', [PublicSiteController::class, 'guidesIndex'])->defaults('lang', 'ar');
+    Route::get('/guides', [PublicSiteController::class, 'guidesIndex'])->defaults('lang', 'ar');
     Route::get('/en/guides', [PublicSiteController::class, 'guidesIndex'])->defaults('lang', 'en');
-    foreach (array_keys(\App\Support\Seo\PublicCatalog::guides()) as $guideSlug) {
+    foreach (array_keys(PublicCatalog::guides()) as $guideSlug) {
         Route::get('/guides/'.$guideSlug, [PublicSiteController::class, 'guidesShow'])->defaults('lang', 'ar')->defaults('slug', $guideSlug);
         Route::get('/en/guides/'.$guideSlug, [PublicSiteController::class, 'guidesShow'])->defaults('lang', 'en')->defaults('slug', $guideSlug);
     }
-    foreach (array_keys(\App\Support\Seo\PublicCatalog::solutionsAndRoles()) as $srKey) {
+    foreach (array_keys(PublicCatalog::solutionsAndRoles()) as $srKey) {
         Route::get('/'.$srKey, [PublicSiteController::class, 'solutionOrRolePage'])->defaults('lang', 'ar')->defaults('pageKey', $srKey);
         Route::get('/en/'.$srKey, [PublicSiteController::class, 'solutionOrRolePage'])->defaults('lang', 'en')->defaults('pageKey', $srKey);
     }
     Route::get('/blog', [PublicSiteController::class, 'blogIndex'])->defaults('lang', 'ar');
     Route::get('/en/blog', [PublicSiteController::class, 'blogIndex'])->defaults('lang', 'en');
-    foreach (array_keys(\App\Support\Seo\PublicCatalog::posts()) as $postSlug) {
+    foreach (array_keys(PublicCatalog::posts()) as $postSlug) {
         Route::get('/blog/'.$postSlug, [PublicSiteController::class, 'blogShow'])->defaults('lang', 'ar')->defaults('slug', $postSlug);
         Route::get('/en/blog/'.$postSlug, [PublicSiteController::class, 'blogShow'])->defaults('lang', 'en')->defaults('slug', $postSlug);
     }
@@ -124,6 +126,8 @@ Route::post('/reports/unsubscribe/{schedule}', [ReportUnsubscribeController::cla
     ->whereNumber('schedule');
 
 // Agency invitations
+Route::get('/magic-login/{token}', [MagicLoginController::class, 'show'])->middleware('throttle:20,1')->name('magic.login.show');
+Route::post('/magic-login/{token}', [MagicLoginController::class, 'consume'])->middleware('throttle:10,1')->name('magic.login.consume');
 Route::get('/invite/{token}', [InvitationController::class, 'show']);
 Route::post('/invite/{token}', [InvitationController::class, 'accept'])->middleware('throttle:10,1');
 

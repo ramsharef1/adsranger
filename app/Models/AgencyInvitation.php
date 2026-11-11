@@ -47,7 +47,7 @@ class AgencyInvitation extends Model
     }
 
     /** Create (or replace) an invite and email it. Only the hash of the token is stored. */
-    public static function send(Agency $agency, string $email, string $role, User $inviter): self
+    public static function send(Agency $agency, string $email, string $role, User $inviter, ?int $validMinutes = null): self
     {
         $email = Str::lower(trim($email));
         static::where('agency_id', $agency->id)->where('email', $email)->whereNull('accepted_at')->delete();
@@ -59,7 +59,7 @@ class AgencyInvitation extends Model
             'role' => $role,
             'token_hash' => hash('sha256', $token),
             'invited_by' => $inviter->id,
-            'expires_at' => now()->addMinutes(static::VALID_MINUTES),
+            'expires_at' => now()->addMinutes($validMinutes ?? static::VALID_MINUTES),
         ]);
 
         Mail::to($email)->send(new AgencyInvitationMail($invite, url('/invite/'.$token)));

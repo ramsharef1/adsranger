@@ -22,7 +22,7 @@ class ArabicBodyCopyTest extends TestCase
         $u = User::factory()->create();
         $a->members()->attach($u->id, ['role' => 'owner']);
         if ($demo) {
-            DemoData::seed($a, 40);
+            DemoData::seed($a, 65);
         }
 
         return [$a, $u];

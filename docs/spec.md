@@ -122,10 +122,10 @@ The slow approvals are Meta App Review and LinkedIn Standard tier. Both need a w
 
 **Shared prerequisites (do these first):**
 
-- [ ] Privacy policy and terms pages live on adsranger.com
+- [x] Privacy policy and terms pages live on adsranger.com
 - [ ] Business email on adsranger.com (e.g. dev@ / support@)
 - [ ] Legal business documents for verification (Meta Business Verification, Google brand verification). Open: which entity they will be in
-- [ ] OAuth callback URLs on https://adsranger.com/app/connect/\*
+- [x] OAuth callback URLs on https://adsranger.com/app/connect/\*
 - [ ] A demo ad account on each network for review videos
 
 | # | Network | Where to apply | What it needs | Review time |
@@ -601,8 +601,8 @@ Estimates assume Rami building solo with Claude Code, full time after 12 Nov. Pl
 - [x] Product name and domain
 - [ ] Legal entity: decided 2026-11-04, a Jordan company (LLC). Register it; it is needed for Meta Business Verification and Google brand verification
 - [ ] Pricing per tier (USD/month)
-- [ ] Health score weights
-- [ ] Default CPR-rising threshold (X%)
-- [ ] Livewire or Inertia + Vue for app screens
+- [x] Health score weights (35% Pacing, 35% Active Alerts & Rejected Ads, 30% Target CPR/ROAS; 50/50 re-weight when no target is set)
+- [x] Default CPR-rising threshold (>20% Warning, >40% Critical over 7 days, gated by >= 50 USD-eq or >= 3x Target CPR spend floor)
+- [x] Livewire or Inertia + Vue for app screens (Filament 5 + Livewire)
 - [ ] Same VPS or a separate server (decide later; build first)
 - [ ] Beta agencies: who to invite

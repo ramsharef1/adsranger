@@ -7,38 +7,67 @@ use App\Models\Client;
 use Carbon\Carbon;
 
 /**
- * Client health score 0–100 (#35). Weights from config/planning.php (40 results vs target, 20 pacing, 20 trend, 20 tracking + accounts).
- * Each part returns points and a plain-language note so the score can always be explained.
+ * M5.1 Client health score 0–100 (#35):
+ * - Standard weights: 35% Budget Pacing accuracy + 35% Active Alerts & Rejected Ads + 30% Target CPR/ROAS achievement.
+ * - When a client has neither Target CPR nor Target ROAS set, proportionally re-weights to 50% Pacing + 50% Alerts/Rejected Ads
+ *   and exposes `no_target_set = true` (`No target set` / `لم يُحدَّد مستهدف` badge).
  */
 class HealthScore
 {
-    public const TRACKING_RULES = ['tracking_break', 'tracking_issue', 'spend_no_results', 'connection_problem', 'account_health'];
-
-    /** @return array{score:?int, band:string, color:string, parts:array<string,array{points:float,max:int,note:string}>} */
+    /** @return array{score:?int, band:string, color:string, no_target_set:bool, no_target_badge:?string, parts:array<string,array{points:float,max:int,note:string}>} */
     public static function compute(Client $c, ?Carbon $today = null): array
     {
         $tz = $c->agency?->timezone ?: 'UTC';
         $today = ($today ?? now($tz))->copy()->startOfDay();
-        $w = config('planning.health.weights');
-        $days = (int) config('planning.health.window_days');
+        $w = (array) config('planning.health.weights', ['pacing' => 35, 'alerts' => 35, 'targets' => 30]);
+        $days = (int) config('planning.health.window_days', 14);
         $to = $today->copy()->subDay()->toDateString();
         $t = MetricsQuery::totals($c, $today->copy()->subDays($days)->toDateString(), $to);
 
+        $hasTarget = ((float) ($c->target_cpr ?? 0) > 0) || ((float) ($c->target_roas ?? 0) > 0);
+        $noTargetBadge = $hasTarget ? null : __('No target set');
+
         if ($t['spend'] <= 0 && array_sum($t['by_type']) <= 0) {
-            return ['score' => null, 'band' => 'No recent data', 'color' => 'gray', 'parts' => []];
+            return [
+                'score' => null,
+                'band' => 'No recent data',
+                'color' => 'gray',
+                'no_target_set' => ! $hasTarget,
+                'no_target_badge' => $noTargetBadge,
+                'parts' => [],
+            ];
         }
 
         $pace = Pacing::month($c, $today);
-        $parts = [
-            'results' => static::results($c, $t, $pace, $w['results']),
-            'pacing' => static::pacing($pace, $w['pacing']),
-            'trend' => static::trend($c, $today, $w['trend']),
-            'tracking' => static::tracking($c, $w['tracking']),
-        ];
+
+        if ($hasTarget) {
+            $pacingMax = (int) ($w['pacing'] ?? 35);
+            $alertsMax = (int) ($w['alerts'] ?? 35);
+            $targetsMax = (int) ($w['targets'] ?? 30);
+
+            $parts = [
+                'pacing' => static::pacing($pace, $pacingMax),
+                'alerts' => static::alertsAndRejected($c, $alertsMax),
+                'targets' => static::targets($c, $t, $targetsMax),
+            ];
+        } else {
+            $parts = [
+                'pacing' => static::pacing($pace, 50),
+                'alerts' => static::alertsAndRejected($c, 50),
+            ];
+        }
+
         $score = (int) round(array_sum(array_column($parts, 'points')));
         [$band, $color] = static::band($score);
 
-        return ['score' => $score, 'band' => $band, 'color' => $color, 'parts' => $parts];
+        return [
+            'score' => $score,
+            'band' => $band,
+            'color' => $color,
+            'no_target_set' => ! $hasTarget,
+            'no_target_badge' => $noTargetBadge,
+            'parts' => $parts,
+        ];
     }
 
     public static function band(?int $score): array
@@ -60,29 +89,33 @@ class HealthScore
         return ['points' => round(max(0, min(1, $share)) * $max, 1), 'max' => $max, 'note' => $note];
     }
 
-    protected static function results(Client $c, array $t, array $pace, int $max): array
+    protected static function targets(Client $c, array $t, int $max): array
     {
         $cur = $c->currency;
         if ($t['spend'] > 0 && array_sum($t['by_type']) <= 0) {
             return static::part(0, $max, 'Spend with no results in the last 14 days.');
         }
-        if ($c->target_roas && $t['roas']) {
-            return static::part($t['roas'] / $c->target_roas, $max, 'ROAS '.number_format($t['roas'], 2).'× vs target '.number_format($c->target_roas, 2).'×.');
+        if ((float) ($c->target_roas ?? 0) > 0) {
+            if (! $t['roas'] || $t['roas'] <= 0) {
+                return static::part(0, $max, 'No tracked ROAS in the last 14 days vs target '.number_format((float) $c->target_roas, 2).'×.');
+            }
+
+            return static::part($t['roas'] / (float) $c->target_roas, $max, 'ROAS '.number_format($t['roas'], 2).'× vs target '.number_format((float) $c->target_roas, 2).'×.');
         }
-        if ($c->target_cpr && $t['cpr']) {
-            return static::part($c->target_cpr / $t['cpr'], $max, 'Cost per result '.ResultResolver::money($t['cpr'], $cur).' vs target '.ResultResolver::money($c->target_cpr, $cur).'.');
-        }
-        if ($pace['target_results'] && $pace['forecast_results'] > 0) {
-            return static::part($pace['forecast_results'] / $pace['target_results'], $max,
-                'Forecast '.number_format($pace['forecast_results']).' results this month vs target '.number_format($pace['target_results']).'.');
+        if ((float) ($c->target_cpr ?? 0) > 0) {
+            if (! $t['cpr'] || $t['cpr'] <= 0) {
+                return static::part(0, $max, 'No cost per result yet vs target '.ResultResolver::money((float) $c->target_cpr, $cur).'.');
+            }
+
+            return static::part((float) $c->target_cpr / $t['cpr'], $max, 'Cost per result '.ResultResolver::money($t['cpr'], $cur).' vs target '.ResultResolver::money((float) $c->target_cpr, $cur).'.');
         }
 
-        return static::part(0.75, $max, 'No target set: add a target CPR, ROAS or monthly results on the client.');
+        return static::part(0, $max, 'No target set.');
     }
 
     protected static function pacing(array $p, int $max): array
     {
-        $tol = (float) config('planning.pacing.tolerance');
+        $tol = (float) config('planning.pacing.tolerance', 10);
 
         return match ($p['status']) {
             'no_budget' => static::part(0.75, $max, 'No monthly budget set.'),
@@ -92,30 +125,37 @@ class HealthScore
         };
     }
 
-    protected static function trend(Client $c, Carbon $today, int $max): array
+    protected static function alertsAndRejected(Client $c, int $max): array
     {
-        $now = MetricsQuery::totals($c, $today->copy()->subDays(7)->toDateString(), $today->copy()->subDay()->toDateString());
-        $prev = MetricsQuery::totals($c, $today->copy()->subDays(14)->toDateString(), $today->copy()->subDays(8)->toDateString());
-        if (! $now['cpr'] || ! $prev['cpr'] || $now['main_type'] !== $prev['main_type'] || $now['main_results'] < 5 || $prev['main_results'] < 5) {
-            return static::part(0.75, $max, 'Not enough results in the last 2 weeks to judge the trend.');
-        }
-        $pct = ($now['cpr'] / $prev['cpr'] - 1) * 100;
-
-        return static::part(1 - max(0, $pct) / 50, $max, 'Cost per result '.($pct >= 0 ? 'up ' : 'down ').number_format(abs($pct), 1).'% vs the week before.');
-    }
-
-    protected static function tracking(Client $c, int $max): array
-    {
-        $open = Alert::where('client_id', $c->id)->where('status', 'open')->whereIn('rule_key', self::TRACKING_RULES)->get(['severity']);
+        $open = Alert::query()->where('client_id', $c->id)->where('status', 'open')->get(['severity']);
         $accounts = $c->adAccounts()->where('is_active', true)->get(['sync_status', 'health']);
-        $penalty = $open->sum(fn ($a) => $a->severity === 'critical' ? 0.5 : 0.25)
-            + $accounts->where('sync_status', 'error')->count() * 0.25
-            + $accounts->sum(fn ($a) => collect((array) $a->health)->filter(fn ($i) => \App\Support\Severity::normalize($i[0] ?? null) === 'critical')->count()) * 0.25;
+
+        $rejectedCount = 0;
+        $criticalHealthCount = 0;
+        foreach ($accounts as $acct) {
+            foreach ((array) $acct->health as $issue) {
+                [$sev, $msg] = array_pad((array) $issue, 2, '');
+                if (stripos((string) $msg, 'rejected') !== false) {
+                    $num = (int) preg_replace('/\D+/', '', (string) $msg);
+                    $rejectedCount += max(1, $num);
+                } elseif (Severity::normalize($sev) === 'critical') {
+                    $criticalHealthCount++;
+                }
+            }
+        }
+
+        $syncErrors = $accounts->where('sync_status', 'error')->count();
+        $penalty = $open->sum(fn ($a) => $a->severity === 'critical' ? 0.35 : ($a->severity === 'warning' ? 0.20 : 0.10))
+            + ($rejectedCount * 0.20)
+            + ($criticalHealthCount * 0.25)
+            + ($syncErrors * 0.25);
+
         $bits = array_filter([
-            $open->count() ? $open->count().' open tracking/account alert(s)' : null,
-            ($e = $accounts->where('sync_status', 'error')->count()) ? "$e account(s) failing to sync" : null,
+            $open->count() ? $open->count().' active alert(s)' : null,
+            $rejectedCount ? $rejectedCount.' rejected ad(s)' : null,
+            $syncErrors ? $syncErrors.' account(s) failing to sync' : null,
         ]);
 
-        return static::part(1 - $penalty, $max, $bits ? implode('; ', $bits).'.' : 'Tracking and accounts look fine.');
+        return static::part(1 - $penalty, $max, $bits ? implode('; ', $bits).'.' : 'No active alerts or rejected ads.');
     }
 }

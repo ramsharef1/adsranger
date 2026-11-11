@@ -35,6 +35,9 @@ class PlanGate
 
     public static function allows(Agency $agency, string $feature): bool
     {
+        if (Modules::overridesFeature($agency, $feature)) {
+            return true;
+        }
         $need = static::requiredTier($feature);
         if ($need === null) {
             return true;
