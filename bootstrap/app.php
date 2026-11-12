@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(NoIndexPrivateRoutes::class);
         // Website W2 (2026-11-08): baseline security headers on every response.
         $middleware->append(SecurityHeaders::class);
+        $middleware->validateCsrfTokens(except: ['collect/*']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // UX-9: the reference shown on 5xx pages is in every logged error, so support can find it.
