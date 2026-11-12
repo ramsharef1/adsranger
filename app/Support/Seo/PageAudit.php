@@ -35,15 +35,16 @@ class PageAudit
      */
     public static function serpWidths(string $title, string $description): array
     {
-        $path = resource_path("seo/serp_widths.json");
+        $path = resource_path('seo/serp_widths.json');
         $table = is_file($path) ? (json_decode((string) file_get_contents($path), true) ?: []) : [];
         $tChars = mb_strlen(trim($title));
         $dChars = mb_strlen(trim($description));
         $tPx = (int) round($tChars * 9.5);
         $dPx = (int) round($dChars * 7.2);
-        $tMax = (int) ($table["limits"]["title_px"] ?? $table["title_max_px"] ?? 580);
-        $dMax = (int) ($table["limits"]["description_px"] ?? $table["description_max_px"] ?? 960);
-        return ["title_px" => $tPx, "description_px" => $dPx, "title_chars" => $tChars, "description_chars" => $dChars, "title_truncated" => $tPx > $tMax, "description_truncated" => $dPx > $dMax];
+        $tMax = (int) ($table['limits']['title_px'] ?? $table['title_max_px'] ?? 580);
+        $dMax = (int) ($table['limits']['description_px'] ?? $table['description_max_px'] ?? 960);
+
+        return ['title_px' => $tPx, 'description_px' => $dPx, 'title_chars' => $tChars, 'description_chars' => $dChars, 'title_truncated' => $tPx > $tMax, 'description_truncated' => $dPx > $dMax];
     }
 
     public static function auditHtml(string $html, ?string $keyword = null, ?string $country = null): array
@@ -169,6 +170,7 @@ class PageAudit
             'score' => $score,
             'checks' => $checks,
             'issues' => $issues,
+            'serp' => self::serpWidths($title, $desc),
         ];
     }
 }
