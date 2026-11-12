@@ -1,7 +1,7 @@
 @php
 extract(\App\Support\ToolPage::head($lang ?? 'ar', '/tools/ad-mockup-preview',
     ['معاينة الإعلانات الحية بالعربية والإنجليزية | AdsRanger', 'Live RTL & LTR Ad Mockup Previewer | AdsRanger'],
-    ['عاين نصوص إعلاناتك بالعربية والإنجليزية عبر خلاصة ميتا وريلز وتيك توك وسناب شات وإعلانات بحث جوجل مع تنبيهات القطع.',
+    ['عاين نصوص إعلاناتك بالعربية والإنجليزية في خلاصة Meta، Reels، TikTok، Snapchat، وإعلانات البحث في Google، مع تنبيهات القطع.',
         'Preview Arabic RTL and English LTR ad copy across Meta Feed, 9:16 Reels/TikTok, Snapchat Story, and Google Search RSA with truncation warnings.']));
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
 @endphp
@@ -18,7 +18,7 @@ $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
 @endpush
 @section('hero')
 <h1>{{ $ar ? 'معاينة الإعلانات الحية قبل النشر' : 'Live RTL & LTR Ad Mockup Previewer' }}</h1>
-<p class="muted" style="font-size:17px">{!! $ar ? 'اختبر كيف يظهر إعلانك في خلاصة <bdi dir="ltr">Meta</bdi> و<bdi dir="ltr">Reels / TikTok</bdi> و<bdi dir="ltr">Snapchat</bdi> وإعلانات بحث <bdi dir="ltr">Google</bdi>.' : 'Test your Arabic RTL or English LTR copy across Meta Feed, 9:16 Reels/TikTok, Snapchat Story, and Google Search RSA.' !!}</p>
+<p class="muted" style="font-size:17px">{!! $ar ? 'اختبر كيف يظهر إعلانك في خلاصة <bdi dir="ltr">Meta</bdi>، <bdi dir="ltr">Reels</bdi>، <bdi dir="ltr">TikTok</bdi>، <bdi dir="ltr">Snapchat</bdi>، وإعلانات البحث في <bdi dir="ltr">Google</bdi>.' : 'Test your Arabic RTL or English LTR copy across Meta Feed, 9:16 Reels/TikTok, Snapchat Story, and Google Search RSA.' !!}</p>
 @endsection
 @section('content')
 <section class="tl">

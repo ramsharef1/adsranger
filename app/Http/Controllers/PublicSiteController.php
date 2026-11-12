@@ -117,6 +117,12 @@ class PublicSiteController extends Controller
         return view('public.mena-calendar', ['lang' => $lang === 'en' ? 'en' : 'ar']);
     }
 
+    /** /bot: what AdsRangerBot is (Product slice 0; copy Business 913 · 2026-11-12 16:54, checked against SafeFetcher). */
+    public function bot(string $lang = 'ar')
+    {
+        return view('public.bot', ['lang' => $lang === 'en' ? 'en' : 'ar']);
+    }
+
     public function security(string $lang = 'ar')
     {
         return view('public.security', ['lang' => $lang === 'en' ? 'en' : 'ar']);
@@ -373,6 +379,7 @@ class PublicSiteController extends Controller
             '/demo-report' => 'public/demo-report',
             '/mena-calendar' => 'public/mena-calendar',
             '/security' => 'public/security',
+            '/bot' => 'public/bot',
             '/about' => 'public/about',
             '/contact' => 'public/contact',
             '/partners' => 'public/partners',

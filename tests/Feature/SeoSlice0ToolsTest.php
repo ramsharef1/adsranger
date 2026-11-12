@@ -13,7 +13,7 @@ class SeoSlice0ToolsTest extends TestCase
     public function test_harness_scores_the_test_set_and_marks_missing_files_pending(): void
     {
         $this->artisan('seo:arabic-test-set')
-            ->expectsOutputToContain('must_match_spelling 113/113 pass · must_not_match 50/50 pass · arabizi 74/77 pass · dialect_tags 63/63 pass · expected.json 20/20 pass')
+            ->expectsOutputToContain('must_match_spelling 113/113 pass · must_not_match 50/50 pass · arabizi 77/77 pass · dialect_tags 63/63 pass · expected.json 23/23 pass')
             ->assertSuccessful();
         $this->assertFileExists(storage_path('app/arabic-seo/results-'.now('Asia/Amman')->format('Y-m-d').'.json'));
     }

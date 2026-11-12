@@ -10,6 +10,7 @@ $t = $ar ? [
     'url' => 'رابط الصفحة', 'run' => 'افحص', 'running' => 'جارٍ الفحص…', 'pages' => 'الصفحات التي فُحصت', 'ok' => 'لم نجد مشكلات في روابط اللغات.',
     'bad_url' => 'أدخل رابطًا يبدأ بـ https://', 'limit' => 'بلغت الحد اليومي لهذه الأداة؛ جرّبها غدًا.', 'failed' => 'تعذّر الفحص الآن؛ جرّب بعد قليل.',
     'privacy' => 'نفتح الصفحات التي تطلبها فقط لهذا الفحص، ولا نحفظ الروابط أو النتائج.',
+    'ip' => 'لاحتساب حد الفحص اليومي نستخدم عنوان <bdi dir=\"ltr\">IP</bdi> بصيغة مشفّرة فقط، ونحذفه بعد 24 ساعة.',
     'm' => [
         'blocked' => 'لا يمكن فحص هذا الرابط.', 'fetch_failed' => 'تعذّر فتح الصفحة.', 'not_200' => 'الصفحة لا تفتح بنجاح (رمز :v).',
         'no_hreflang' => 'لا توجد روابط hreflang في الصفحة.', 'bad_code' => 'الرمز :v غير صالح؛ استخدم رمز اللغة ثم رمز الدولة، مثل ar-AE وen-GB.',
@@ -22,6 +23,7 @@ $t = $ar ? [
     'url' => 'Page URL', 'run' => 'Check', 'running' => 'Checking…', 'pages' => 'Pages checked', 'ok' => 'No problems found in the language links.',
     'bad_url' => 'Enter a URL starting with https://', 'limit' => 'You\'ve reached today\'s limit for this tool; try again tomorrow.', 'failed' => 'The check couldn\'t run now; try again shortly.',
     'privacy' => 'We open the pages you ask for only for this check, and we don\'t store the URLs or results.',
+    'ip' => 'To count the daily limit, we use your IP address only in hashed form and delete it after 24 hours.',
     'm' => [
         'blocked' => 'This URL can\'t be checked.', 'fetch_failed' => 'The page couldn\'t be opened.', 'not_200' => 'The page doesn\'t open successfully (code :v).',
         'no_hreflang' => 'The page has no hreflang links.', 'bad_code' => 'The code :v isn\'t valid; use a language code then a country code, like ar-AE or en-GB.',
@@ -49,6 +51,7 @@ $t = $ar ? [
         <p class="tl-err" id="hl-err" hidden></p>
         <div class="tl-actions"><button type="submit" class="btn" id="hl-run">{{ $t['run'] }}</button></div>
         <p class="muted" style="margin-top:12px">{{ $t['privacy'] }}</p>
+        <p class="muted" style="margin-top:4px">{!! $t['ip'] !!}</p>
     </form>
     <div class="tl-out" aria-live="polite" id="hl-out" hidden></div>
 </section>

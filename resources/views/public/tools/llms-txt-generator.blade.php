@@ -11,7 +11,7 @@ $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
 @endpush
 @section('hero')
 <h1>{!! $ar ? 'منشئ ملف <bdi dir="ltr">llms.txt</bdi> وفاحص زواحف الذكاء' : 'llms.txt Generator & AI Crawler Checker' !!}</h1>
-<p class="muted" style="font-size:17px">{!! $ar ? 'جهّز دليل <bdi dir="ltr">llms.txt</bdi> القياسي لموقعك وتحقّق من حالة زواحف البحث الذكية في <bdi dir="ltr">robots.txt</bdi>.' : 'Build a clean llms.txt markdown file and check how your robots.txt treats AI search crawlers.' !!}</p>
+<p class="muted" style="font-size:17px">{!! $ar ? 'جهّز ملف <bdi dir="ltr">llms.txt</bdi> بالصيغة المقترحة لموقعك وتحقّق من حالة زواحف البحث الذكية في <bdi dir="ltr">robots.txt</bdi>.' : 'Build a clean llms.txt markdown file and check how your robots.txt treats AI search crawlers.' !!}</p>
 @endsection
 @section('content')
 <section class="tl">

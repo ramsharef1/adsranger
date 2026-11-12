@@ -28,7 +28,7 @@ $t = $ar ? [
 @endpush
 @section('hero')
 <h1>{{ $ar ? 'فاحص البكسل ووسوم التتبع الإعلانية' : 'Ad pixel & tag checker' }}</h1>
-<p class="muted" style="font-size:17px">{!! $ar ? 'تحقق في ثوانٍ من وجود <bdi dir="ltr">Meta Pixel</bdi> و<bdi dir="ltr">GTM</bdi> و<bdi dir="ltr">GA4</bdi> وبكسلات المنصات وتكاملات سلة وزد على صفحة الهبوط.' : 'Verify Meta Pixel, Google Tag Manager, GA4, Google Ads, TikTok, Snap, LinkedIn, and Salla/Zid hooks on any public page.' !!}</p>
+<p class="muted" style="font-size:17px">{!! $ar ? 'تحقّق من وجود <bdi dir="ltr">Meta Pixel</bdi>، <bdi dir="ltr">GTM</bdi>، <bdi dir="ltr">GA4</bdi>، وبكسلات المنصات الأخرى، وتكاملات سلة وزد في صفحة الهبوط.' : 'Verify Meta Pixel, Google Tag Manager, GA4, Google Ads, TikTok, Snap, LinkedIn, and Salla/Zid hooks on any public page.' !!}</p>
 @endsection
 @section('content')
 <section class="tl">

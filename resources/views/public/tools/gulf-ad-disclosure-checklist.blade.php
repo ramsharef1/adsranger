@@ -1,8 +1,8 @@
 @php
 extract(\App\Support\ToolPage::head($lang ?? 'ar', '/tools/gulf-ad-disclosure-checklist',
     ['قائمة إفصاحات الإعلانات في السعودية والإمارات | AdsRanger', 'KSA & UAE Ad Disclosure Checklist | AdsRanger'],
-    ['قائمة فحص إرشادية ومسح لنص الإعلان لمراجعة متطلبات ترخيص فال العقاري والغذاء والدواء ووزارة الصحة ووسم معلن وإفصاحات التقسيط.',
-        'Reminder checklist and word search for Saudi REGA/Fal, SFDA, MOH disclaimers, UAE Media Council permit tags, and BNPL disclosures.']));
+    ['قائمة فحص إرشادية ومسح لنص الإعلان لمراجعة متطلبات ترخيص فال العقاري والغذاء والدواء ووزارة الصحة ووسم الإعلان للمؤثرين وإفصاحات التقسيط.',
+        'Reminder checklist and word search for Saudi REGA/Fal, SFDA, MOH disclaimers, influencer ad labels, and BNPL disclosures.']));
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
 @endphp
 @extends('layouts.public')
@@ -11,7 +11,7 @@ $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
 @endpush
 @section('hero')
 <h1>{{ $ar ? 'قائمة إفصاحات الإعلانات في السعودية والإمارات' : 'KSA & UAE Ad Disclosure Checklist' }}</h1>
-<p class="muted" style="font-size:17px">{{ $ar ? 'قائمة تذكير قبل نشر الإعلان: هل ذكرت رقم الترخيص، وتنبيهات الصحة والغذاء والدواء، ووسم #معلن، وشروط التقسيط؟' : 'A reminder list before you publish: licence numbers, health and SFDA notes, the #معلن tag, and instalment terms.' }}</p>
+<p class="muted" style="font-size:17px">{{ $ar ? 'قائمة تذكير قبل نشر الإعلان: هل ذكرت رقم الترخيص، وتنبيهات الصحة والغذاء والدواء، ووسم الإعلان للمؤثرين، وشروط التقسيط؟' : 'A reminder list before you publish: did you include the licence number, health and food-and-drug warnings, the ad label for influencers, and instalment terms?' }}</p>
 @endsection
 @section('content')
 <section class="tl">
@@ -21,7 +21,7 @@ $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
             <option value="realestate">{{ $ar ? 'عقارات (السعودية - الهيئة العامة للعقار / فال)' : 'Real Estate (KSA REGA / Fal License)' }}</option>
             <option value="health">{{ $ar ? 'صحة وعيادات وتجميل (وزارة الصحة السعودية / الإمارات)' : 'Healthcare & Clinics (KSA / UAE MOH)' }}</option>
             <option value="sfda">{{ $ar ? 'أغذية ومكملات ومستحضرات (هيئة الغذاء والدواء SFDA)' : 'Food, Supplements & Cosmetics (SFDA)' }}</option>
-            <option value="influencer">{{ $ar ? 'إعلانات المؤثرين وصناع المحتوى (موثوق / #معلن)' : 'Creator & Influencer Ads (Mawthooq / #معلن)' }}</option>
+            <option value="influencer">{{ $ar ? 'إعلانات المؤثرين وصناع المحتوى (ترخيص المعلن ووسم الإعلان)' : 'Influencer and creator ads (advertiser licence and ad label)' }}</option>
             <option value="bnpl">{{ $ar ? 'تمويل وتقسيط (تابي / تمارا / بنوك)' : 'BNPL & Consumer Finance Disclosures' }}</option>
         </select>
 
@@ -60,7 +60,7 @@ $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
       {re:/(يعالج|يشفي|cures|treats\s+disease)/i, invert:true, ar:'عدم نسبة ادعاءات علاجية طبية لمكمل غذائي أو منتج تجميلي', en:'No disease-treatment claims on supplements/cosmetics'}
     ],
     influencer: [
-      {re:/(#?معلن|#?اعلان|#?إعلان|\bad\b|#sponsored|ترخيص\s*إعلامي|موثوق)/i, ar:'وسم الإفصاح الإعلاني الصريح (#معلن / #إعلان / ترخيص إعلامي)', en:'Explicit disclosure tag (#معلن / #Ad / UAE Media Council / Mawthooq permit)'}
+      {re:/(#?معلن|#?اعلان|#?إعلان|\bad\b|#sponsored|ترخيص\s*إعلامي|موثوق)/i, ar:'وسم إعلان واضح أو رقم ترخيص المعلن', en:'A clear ad label or the advertiser licence number'}
     ],
     bnpl: [
       {re:/(تطبق\s*الشروط|الشروط\s*والأحكام|رسوم|معدل\s*النسبة\s*السنوي|terms\s*apply|apr)/i, ar:'إفصاح الشروط والأحكام أو الرسوم المرتبطة بالتقسيط', en:'Terms & conditions / fee / APR disclosure'}

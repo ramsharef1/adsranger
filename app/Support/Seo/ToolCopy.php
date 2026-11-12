@@ -503,7 +503,7 @@ class ToolCopy
                     'faq_title' => 'أسئلة شائعة حول ضوابط الإعلانات الخليجية',
                     'faqs' => [
                         ['q' => 'هل يُعدّ هذا الفحص استشارة قانونية رسمية؟', 'a' => 'لا؛ هذه الأداة قائمة إرشادية تشغيلية لفرق التسويق وليست استشارة قانونية، ويجب دائمًا الرجوع للأنظمة الرسمية المحدثة لكل جهة مختصة.'],
-                        ['q' => 'ما الإفصاحات التي تذكّر بها القائمة؟', 'a' => 'رقم ترخيص الإعلان العقاري ورخصة فال في السعودية، وتنبيهات الصحة والغذاء والدواء، ووسم #معلن في الإمارات، وشروط التقسيط ورسومه. القواعد تتغيّر، فتحقّق منها لدى الجهة المختصة.'],
+                        ['q' => 'ما الإفصاحات التي تذكّر بها القائمة؟', 'a' => 'رقم ترخيص الإعلان العقاري ورخصة فال في السعودية، وتنبيهات الصحة والغذاء والدواء، ووسم الإعلان وترخيص المعلن للمؤثرين حيث تشترطه الجهة المختصة، وشروط التقسيط ورسومه. القواعد تتغيّر، فتحقّق منها لدى الجهة المختصة.'],
                     ],
                 ],
                 'en' => [
@@ -516,7 +516,7 @@ class ToolCopy
                     'faq_title' => 'Frequently asked questions',
                     'faqs' => [
                         ['q' => 'Is this tool legal advice?', 'a' => 'No. This is an operational pre-flight checklist for marketing teams, not legal counsel. Always verify current regulations with REGA, SFDA, MOH, the UAE Media Council, or qualified legal advisors.'],
-                        ['q' => 'Which disclosures does the checklist remind you of?', 'a' => 'Saudi REGA / Fal real estate licence numbers, SFDA / MOH health notes, the UAE Media Council advertiser tag (#معلن), and instalment fees and terms. Rules change, so confirm them with the regulator.'],
+                        ['q' => 'Which disclosures does the checklist remind you of?', 'a' => 'The Saudi real-estate ad licence and FAL number, health and food-and-drug warnings, an ad label and advertiser licence for influencers where the regulator requires them, and instalment terms and fees. Rules change, so check them with the regulator.'],
                     ],
                 ],
             ],

@@ -2,7 +2,7 @@
 extract(\App\Support\ToolPage::head($lang ?? 'ar', '/tools/safe-zone-checker',
     ['فاحص المناطق الآمنة لفيديو 9:16 | AdsRanger', '9:16 Reels, TikTok & Snapchat Safe-Zone Checker | AdsRanger'],
     ['اختبر تصميم إعلانك العمودي 9:16 داخل المتصفح لتتأكد أن أزرار Reels وTikTok وSnapchat لا تغطي النصوص والترجمة العربية.',
-        'Drag and drop a 9:16 frame in your browser to overlay Instagram Reels, TikTok, and Snapchat UI danger zones with zero server uploads.']));
+        'Drag and drop a 9:16 frame in your browser to overlay Instagram Reels, TikTok, and Snapchat UI zones. Nothing is uploaded.']));
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
 @endphp
 @extends('layouts.public')
@@ -29,7 +29,7 @@ $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
             <option value="snap"><bdi dir="ltr">Snapchat Story Ad (9:16)</bdi></option>
         </select>
 
-        <label for="sz-file">{{ $ar ? 'اختر صورة تصميم أو لقطة شاشة (تُعالج محليًا في متصفحك فقط)' : 'Choose a 9:16 image/frame (processed 100% locally in browser)' }}</label>
+        <label for="sz-file">{{ $ar ? 'اختر صورة تصميم أو لقطة شاشة (تُعالج محليًا في متصفحك فقط)' : 'Choose a 9:16 image/frame (read in your browser only)' }}</label>
         <input id="sz-file" type="file" accept="image/*">
         <p class="tl-hint">{{ $ar ? 'المناطق الحمراء تمثل مواضع اسم الحساب وأزرار الإعجاب والمشاركة والوصف السفلي؛ أبقِ النصوص المهمة داخل الإطار الفيروزي.' : 'Red shaded bands mark top headers, side engagement icons, and bottom caption/CTA drawers. Keep key Arabic/English text inside the teal safe frame.' }}</p>
         <p class="muted" style="margin-top:12px">{{ $privacy }}</p>

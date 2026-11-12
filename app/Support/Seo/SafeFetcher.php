@@ -21,7 +21,7 @@ class SafeFetcher
 
     public const TIMEOUT = 5;
 
-    public const USER_AGENT = 'AdsRangerHreflangChecker/1.0 (+https://adsranger.com/tools/hreflang-checker)';
+    public const USER_AGENT = 'AdsRangerBot/1.0 (+https://adsranger.com/bot)';
 
     /** @var (Closure(string): ?string)|null resolves a host to one public IP or null; tests swap it. */
     public static ?Closure $resolver = null;

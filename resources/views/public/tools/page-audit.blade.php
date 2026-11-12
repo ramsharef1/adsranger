@@ -9,6 +9,7 @@ $t = $ar ? [
     'score' => 'نتيجة فحص الصفحة', 'ok' => 'لم نجد مشكلات أساسية في تهيئة الصفحة.',
     'bad_url' => 'أدخل رابطًا يبدأ بـ https://', 'limit' => 'بلغت الحد اليومي لهذه الأداة؛ جرّبها غدًا.', 'failed' => 'تعذّر الفحص الآن؛ جرّب بعد قليل.',
     'privacy' => 'نفتح الصفحة التي تطلبها فقط لهذا الفحص، ولا نحفظ الروابط أو النتائج.',
+    'ip' => 'لاحتساب حد الفحص اليومي نستخدم عنوان <bdi dir=\"ltr\">IP</bdi> بصيغة مشفّرة فقط، ونحذفه بعد 24 ساعة.',
     'm' => [
         'blocked' => 'لا يمكن فحص هذا الرابط.', 'fetch_failed' => 'تعذّر فتح الصفحة.', 'not_200' => 'الصفحة لا تفتح بنجاح.',
         'missing_ar_lang' => 'الصفحة بلا سمة lang="ar".', 'missing_rtl_dir' => 'الصفحة بلا اتجاه dir="rtl".',
@@ -22,6 +23,7 @@ $t = $ar ? [
     'score' => 'Page audit score', 'ok' => 'No core on-page issues found.',
     'bad_url' => 'Enter a URL starting with https://', 'limit' => 'You have reached today’s limit for this tool; try again tomorrow.', 'failed' => 'The check could not run now; try again shortly.',
     'privacy' => 'We open the page you ask for only for this check, and we do not store URLs or results.',
+    'ip' => 'To count the daily limit, we use your IP address only in hashed form and delete it after 24 hours.',
     'm' => [
         'blocked' => 'This URL cannot be checked.', 'fetch_failed' => 'The page could not be opened.', 'not_200' => 'The page did not return HTTP 200.',
         'missing_ar_lang' => 'Missing lang="ar" on <html>.', 'missing_rtl_dir' => 'Missing dir="rtl" on <html>.',
@@ -51,6 +53,7 @@ $t = $ar ? [
         <p class="tl-err" id="pa-err" hidden></p>
         <div class="tl-actions"><button type="submit" class="btn" id="pa-run">{{ $t['run'] }}</button></div>
         <p class="muted" style="margin-top:12px">{{ $t['privacy'] }}</p>
+        <p class="muted" style="margin-top:4px">{!! $t['ip'] !!}</p>
     </form>
     <div class="tl-out" aria-live="polite" id="pa-out" hidden></div>
 </section>

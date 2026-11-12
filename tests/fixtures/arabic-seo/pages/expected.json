@@ -434,5 +434,68 @@
             "cities": []
         },
         "issues": []
+    },
+    "page-21.html": {
+        "score": 100,
+        "checks": {
+            "ar_lang": true,
+            "rtl_dir": true,
+            "has_title": true,
+            "has_meta_description": true,
+            "has_h1": true,
+            "single_h1": true,
+            "has_canonical": true,
+            "has_json_ld": true,
+            "has_question_heading": true,
+            "images_have_alt": true,
+            "noindex": false,
+            "keyword_in_title": null,
+            "keyword_in_h1": null,
+            "dialect_tags": [],
+            "cities": []
+        },
+        "issues": []
+    },
+    "page-22.html": {
+        "score": 100,
+        "checks": {
+            "ar_lang": true,
+            "rtl_dir": true,
+            "has_title": true,
+            "has_meta_description": true,
+            "has_h1": true,
+            "single_h1": true,
+            "has_canonical": true,
+            "has_json_ld": true,
+            "has_question_heading": true,
+            "images_have_alt": true,
+            "noindex": false,
+            "keyword_in_title": null,
+            "keyword_in_h1": null,
+            "dialect_tags": [],
+            "cities": []
+        },
+        "issues": []
+    },
+    "page-23.html": {
+        "score": 100,
+        "checks": {
+            "ar_lang": true,
+            "rtl_dir": true,
+            "has_title": true,
+            "has_meta_description": true,
+            "has_h1": true,
+            "single_h1": true,
+            "has_canonical": true,
+            "has_json_ld": true,
+            "has_question_heading": true,
+            "images_have_alt": true,
+            "noindex": false,
+            "keyword_in_title": null,
+            "keyword_in_h1": null,
+            "dialect_tags": [],
+            "cities": []
+        },
+        "issues": []
     }
 }

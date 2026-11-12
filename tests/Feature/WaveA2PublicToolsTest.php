@@ -198,4 +198,12 @@ HTML;
         $this->get('/tools/capi-pixel-checker')->assertStatus(301)->assertRedirect('/tools/ad-pixel-checker');
         $this->get('/en/tools/ksa-ad-compliance-checker')->assertStatus(301)->assertRedirect('/en/tools/gulf-ad-disclosure-checklist');
     }
+
+    public function test_bot_page_names_the_user_agent_the_fetcher_sends_and_is_in_the_sitemap(): void
+    {
+        $this->assertSame('AdsRangerBot/1.0 (+https://adsranger.com/bot)', SafeFetcher::USER_AGENT);
+        $this->get('/bot')->assertOk()->assertSee('AdsRangerBot/1.0 (+https://adsranger.com/bot)')->assertSee('لا يسجّل الدخول');
+        $this->get('/en/bot')->assertOk()->assertSee('never signs in or submits forms', false);
+        $this->assertStringContainsString('/bot', $this->get('/sitemaps/pages.xml')->getContent());
+    }
 }
