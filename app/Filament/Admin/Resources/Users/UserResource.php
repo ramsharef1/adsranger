@@ -2,10 +2,12 @@
 
 namespace App\Filament\Admin\Resources\Users;
 
+use App\Filament\Admin\Resources\Users\Pages\CreateUser;
 use App\Filament\Admin\Resources\Users\Pages\EditUser;
 use App\Filament\Admin\Resources\Users\Pages\ListUsers;
 use App\Filament\Concerns\TranslatesResourceLabels;
 use App\Mail\TwoStepResetMail;
+use App\Models\Agency;
 use App\Models\AuditLog;
 use App\Models\User;
 use BackedEnum;
@@ -22,6 +24,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rules\Password;
 use UnitEnum;
 
 class UserResource extends Resource
@@ -47,7 +50,7 @@ class UserResource extends Resource
 
     public static function canCreate(): bool
     {
-        return false;
+        return auth()->user()?->role === 'super_admin';
     }
 
     public static function canDelete(Model $record): bool
@@ -60,11 +63,49 @@ class UserResource extends Resource
         return $schema->columns(1)->components([
             Section::make(__('User'))->columns(2)->schema([
                 TextInput::make('name')->label(__('Name'))->required()->maxLength(120),
-                TextInput::make('email')->disabled(),
-                Select::make('role')->label(__('Platform role'))->options(['member' => __('Member'), 'super_admin' => __('Super admin')])->required()
-                    ->disabled(fn ($record) => $record?->id === auth()->id())
+                TextInput::make('email')
+                    ->label(__('Email'))
+                    ->email()
+                    ->maxLength(190)
+                    ->required(fn (string $operation): bool => $operation === 'create')
+                    ->disabled(fn (string $operation): bool => $operation !== 'create')
+                    ->unique(table: User::class, column: 'email', ignoreRecord: true),
+                TextInput::make('password')
+                    ->label(__('Password'))
+                    ->password()
+                    ->revealable()
+                    ->rule(Password::min(10))
+                    ->required(fn (string $operation): bool => $operation === 'create')
+                    ->dehydrated(fn (?string $state): bool => filled($state))
+                    ->visible(fn (string $operation): bool => $operation === 'create')
+                    ->helperText(__('At least 10 characters. Super admins will be prompted to set up two-step verification on first sign-in to /admin.')),
+                Select::make('role')->label(__('Platform role'))
+                    ->options(['member' => __('Member'), 'super_admin' => __('Super admin')])
+                    ->default('member')
+                    ->required()
+                    ->disabled(fn (?User $record): bool => $record !== null && $record->id === auth()->id())
                     ->helperText(__('Super admins can open /admin and manage the whole platform. You cannot change your own role.')),
             ]),
+            Section::make(__('Optional workspace assignment'))
+                ->description(__('Optionally attach this user directly to an existing agency workspace right now.'))
+                ->columns(2)
+                ->visible(fn (string $operation): bool => $operation === 'create')
+                ->schema([
+                    Select::make('agency_id')
+                        ->label(__('Agency'))
+                        ->options(fn () => Agency::query()->orderBy('name')->pluck('name', 'id'))
+                        ->searchable()
+                        ->placeholder(__('None (platform account only)')),
+                    Select::make('workspace_role')
+                        ->label(__('Workspace role'))
+                        ->options([
+                            'owner' => __('Owner'),
+                            'admin' => __('Admin'),
+                            'manager' => __('Manager'),
+                            'analyst' => __('Analyst'),
+                        ])
+                        ->default('admin'),
+                ]),
         ]);
     }
 
@@ -82,11 +123,6 @@ class UserResource extends Resource
         ])->recordActions([EditAction::make(), static::resetTwoStepAction()]);
     }
 
-    /**
-     * Super admin: "Reset two-step verification" for a user who lost their authenticator and recovery codes.
-     * EX-32 confirm naming what changes; never for your own account; audit `auth.2fa_reset_by_admin`; the user is
-     * told by email. An agency that requires two-step sends them to set it up again at the next sign-in.
-     */
     public static function resetTwoStepAction(): Action
     {
         return Action::make('resetTwoStep')->label(__('Reset two-step verification'))->icon('heroicon-o-shield-exclamation')->color('danger')
@@ -107,6 +143,10 @@ class UserResource extends Resource
 
     public static function getPages(): array
     {
-        return ['index' => ListUsers::route('/'), 'edit' => EditUser::route('/{record}/edit')];
+        return [
+            'index' => ListUsers::route('/'),
+            'create' => CreateUser::route('/create'),
+            'edit' => EditUser::route('/{record}/edit'),
+        ];
     }
 }
