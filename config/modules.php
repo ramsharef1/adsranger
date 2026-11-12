@@ -20,7 +20,9 @@ return [
         'self_serve_deletion' => (bool) env('MODULE_SELF_SERVE_DELETION', false), // #79 delete actions: Rami sees them first (901 queue 14)
         'whatsapp_reports' => (bool) env('MODULE_WHATSAPP_REPORTS', false),       // #106 WhatsApp half belongs to #162 (D-94), needs #171 consent
         'custom_domains' => (bool) env('MODULE_CUSTOM_DOMAINS', false),           // #60 custom report domain: no SSL / routing on the server yet (D-249)
-        'view_as' => (bool) env('MODULE_VIEW_AS', false),                         // #71 View as: hidden until E2's fix passes experience's re-check (D-163, UX-97)
+        'view_as' => (bool) env('MODULE_VIEW_AS', false),
+        // SEO suite (D-239 slice 0.3): site audit A1 (FR-089, #183) + the E2 Arabic SEO workspace scaffold. Off until Product's EX check + Rami's go.
+        'seo_audit' => (bool) env('MODULE_SEO_AUDIT', false),                         // #71 View as: hidden until E2's fix passes experience's re-check (D-163, UX-97)
     ],
 
     'preview_agencies' => array_values(array_filter(array_map('trim', explode(',', (string) env('MODULES_PREVIEW_AGENCIES', ''))))),

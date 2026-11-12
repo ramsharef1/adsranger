@@ -1,7 +1,7 @@
 @php
-// /bot (Product slice 0; Business copy 913 · 2026-11-12 16:54). Every line checked against SafeFetcher + Hreflang + routes on 2026-11-12:
-// one GET per page a person asks for (hreflang: up to 10 pages), no private or internal addresses, no sign-in, no forms, nothing stored by the free tools.
-// Business's robots.txt / 1 per second / 200 pages lines are left out: no site crawler exists yet and robots.txt is not read for a single requested page.
+// /bot (Product slice 0; Business copy 913 · 2026-11-12 16:54, robots / rate / page-cap lines added with site audit A1, E1-049).
+// Checked against the code: free tools = one GET per page a person asks for (hreflang: up to 10 pages); the site audit (Crawler) reads
+// robots.txt, waits 1 s between requests, stays on the same host, stops at 200 pages. Never private addresses, sign-in or forms; the free tools store nothing.
 $ar = ($lang ?? 'ar') === 'ar';
 $arPath = '/bot';
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $ar ? 'ar' : 'en');
@@ -13,12 +13,14 @@ $schema = [['@type' => 'WebPage', 'name' => $title, 'url' => \App\Support\Public
 $bdi = fn (string $t) => '<bdi dir="ltr">'.$t.'</bdi>';
 $ua = \App\Support\Seo\SafeFetcher::USER_AGENT;
 $how = $ar ? [
-    'يفتح فقط الصفحة التي يطلب شخص فحصها، وفي فاحص روابط اللغات حتى 10 صفحات مرتبطة بها.',
+    'في الأدوات المجانية يفتح فقط الصفحة التي يطلب شخص فحصها، وفي فاحص روابط اللغات حتى 10 صفحات مرتبطة بها.',
+    'في فحص الموقع الكامل (لعملاء '.$bdi('AdsRanger').' الذين أكدوا إذن صاحب الموقع) يحترم ملف '.$bdi('robots.txt').'، ويرسل طلبًا واحدًا في الثانية على الأكثر، ويبقى على النطاق نفسه، ويتوقف عند 200 صفحة في الفحص الواحد.',
     'طلب '.$bdi('GET').' عادي للصفحة العامة كما يراها الزائر.',
     'لا يتصل بعناوين خاصة أو داخلية.',
     'لا يسجّل الدخول ولا يرسل النماذج.',
 ] : [
-    'It opens only the page a person asks to check, and for the hreflang checker up to 10 pages linked from it.',
+    'In the free tools it opens only the page a person asks to check, and for the hreflang checker up to 10 pages linked from it.',
+    'In the full site audit (for AdsRanger customers who confirmed the site owner\'s permission) it follows robots.txt, sends at most 1 request per second, stays on the same host and stops at 200 pages per audit.',
     'A plain GET request for the public page, as a visitor sees it.',
     'It never connects to private or internal addresses.',
     'It never signs in or submits forms.',
@@ -53,8 +55,13 @@ $how = $ar ? [
 
     <h2>{{ $ar ? 'كيف تمنعه' : 'How to block it' }}</h2>
     <p>{!! $ar
-        ? 'لأن كل فحص يطلبه شخص بعينه، يفتح الزاحف الصفحة كما يفعل المتصفح ولا يقرأ ملف '.$bdi('robots.txt').'. لمنعه، احظر اسم '.$bdi('AdsRangerBot').' في إعدادات الخادم أو جدار الحماية لديك، أو راسلنا.'
-        : 'Because a specific person asks for each check, it opens the page the way a browser does and doesn\'t read robots.txt. To block it, block the name AdsRangerBot in your server or firewall settings, or email us.' !!}</p>
+        ? 'لمنع فحص الموقع الكامل، أضف إلى ملف '.$bdi('robots.txt').':'
+        : 'To block the full site audit, add to your robots.txt:' !!}</p>
+    <pre>User-agent: AdsRangerBot
+Disallow: /</pre>
+    <p>{!! $ar
+        ? 'الأدوات المجانية تفتح الصفحة التي يطلبها شخص بعينه كما يفعل المتصفح، فلا تقرأ '.$bdi('robots.txt').'؛ لمنعها احظر اسم '.$bdi('AdsRangerBot').' في إعدادات الخادم أو جدار الحماية، أو راسلنا.'
+        : 'The free tools open the page a specific person asks for the way a browser does, so they don\'t read robots.txt; to block them, block the name AdsRangerBot in your server or firewall settings, or email us.' !!}</p>
 
     <h2>{{ $ar ? 'البيانات' : 'Data' }}</h2>
     <p>{{ $ar ? 'الأدوات المجانية لا تحفظ الروابط أو النتائج.' : 'The free tools don\'t store the URLs or results.' }}</p>

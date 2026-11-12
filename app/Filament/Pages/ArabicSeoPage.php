@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\HeldBackModule;
 use App\Filament\Concerns\TranslatesPageLabels;
 use App\Support\Seo\ArabicKeywordEngine;
 use App\Support\Seo\SafeFetcher;
@@ -19,7 +20,11 @@ use UnitEnum;
  */
 class ArabicSeoPage extends Page
 {
+    use HeldBackModule;
     use TranslatesPageLabels;
+
+    /** E2-041 scaffold (sample Search Console rows, single-page audit): held with the SEO suite until the A1 EX check (D-249). */
+    protected static string $module = 'seo_audit';
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
@@ -65,9 +70,10 @@ class ArabicSeoPage extends Page
             return;
         }
 
-        $this->auditResult = SiteAuditRunner::run([
-            ['url' => (string) $fetched['url'], 'html' => (string) ($fetched['body'] ?? '')],
-        ], trim($this->seedKeyword) !== '' ? trim($this->seedKeyword) : null);
+        $this->auditResult = SiteAuditRunner::auditBatch(
+            [(string) $fetched['url'] => (string) ($fetched['html'] ?? '')],
+            trim($this->seedKeyword) !== '' ? trim($this->seedKeyword) : null,
+        );
     }
 
     protected function getViewData(): array

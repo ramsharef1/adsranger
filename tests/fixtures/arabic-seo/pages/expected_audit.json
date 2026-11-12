@@ -1,0 +1,83 @@
+{
+    "page-01.html": [
+        "AR-TITLE-01"
+    ],
+    "page-02.html": [
+        "AR-LANG-01",
+        "AR-RTL-01",
+        "H1-01",
+        "HREF-01",
+        "IDX-02",
+        "IMG-01",
+        "META-02",
+        "SCHEMA-01"
+    ],
+    "page-03.html": [],
+    "page-04.html": [],
+    "page-05.html": [],
+    "page-06.html": [],
+    "page-07.html": [],
+    "page-08.html": [
+        "AR-TITLE-01",
+        "SCHEMA-01"
+    ],
+    "page-09.html": [],
+    "page-10.html": [],
+    "page-11.html": [
+        "HREF-01"
+    ],
+    "page-12.html": [
+        "SCHEMA-01"
+    ],
+    "page-13.html": [
+        "AR-TITLE-01",
+        "HREF-01"
+    ],
+    "page-14.html": [
+        "AR-TITLE-01",
+        "SCHEMA-01"
+    ],
+    "page-15.html": [
+        "AR-TITLE-01",
+        "HREF-01"
+    ],
+    "page-16.html": [],
+    "page-17.html": [],
+    "page-18.html": [],
+    "page-19.html": [],
+    "page-20.html": [],
+    "page-21.html": [
+        "HREF-01"
+    ],
+    "page-22.html": [
+        "URL-01"
+    ],
+    "page-23.html": [
+        "HREF-01"
+    ],
+    "page-24.html": [
+        "HREF-04",
+        "HREF-05",
+        "IDX-03"
+    ],
+    "page-25.html": [
+        "HREF-02"
+    ],
+    "page-26.html": [
+        "HREF-03"
+    ],
+    "page-27.html": [
+        "HREF-01",
+        "IMG-01",
+        "SCHEMA-02",
+        "SCHEMA-03",
+        "URL-01",
+        "URL-02"
+    ],
+    "page-28.html": [
+        "HREF-01",
+        "IDX-01",
+        "META-01",
+        "SCHEMA-01"
+    ]
+}
