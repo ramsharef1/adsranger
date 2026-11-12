@@ -122,7 +122,7 @@ class SeoAuditA1Test extends TestCase
         $this->assertContains($this->actingAs($owner)->get("/app/{$agency->slug}/arabic-seo")->status(), [403, 404], 'the E2 Arabic SEO scaffold is held with the suite');
 
         config(['modules.preview_agencies' => ['gate']]);
-        $this->actingAs($owner)->get("/app/{$agency->slug}/seo-audit?lang=ar")->assertOk()->assertSee('أؤكد أن لدى الوكالة إذن العميل');
+        $this->actingAs($owner)->get("/app/{$agency->slug}/seo-audit?lang=ar")->assertOk()->assertSee('أؤكد أنني أملك هذا الموقع');
 
         Queue::fake();
         $this->actingAs($owner);
@@ -152,7 +152,7 @@ class SeoAuditA1Test extends TestCase
         SeoAudit::create(['agency_id' => $agencyA->id, 'seo_site_id' => $site->id, 'status' => 'done', 'score' => 77, 'pages_done' => 3, 'finished_at' => now()]);
 
         $this->actingAs($ownerA)->get("/app/{$agencyA->slug}/seo-audit")->assertOk()->assertSee('www.audit-site.test')->assertSee('77');
-        $this->actingAs($analystB)->get("/app/{$agencyB->slug}/seo-audit")->assertOk()->assertDontSee('www.audit-site.test')->assertDontSee('I confirm the agency');
+        $this->actingAs($analystB)->get("/app/{$agencyB->slug}/seo-audit")->assertOk()->assertDontSee('www.audit-site.test')->assertDontSee('I confirm I own this site');
 
         $this->actingAs($analystB);
         Filament::setTenant($agencyB);
@@ -174,5 +174,22 @@ class SeoAuditA1Test extends TestCase
         Filament::setTenant($agency);
         $response = Livewire::test(SeoAuditPage::class)->call('downloadCsv');
         $response->assertFileDownloaded();
+    }
+
+    public function test_a_windows_1256_site_is_converted_and_stored(): void
+    {
+        $title = iconv('UTF-8', 'CP1256', 'صوت المدينة');
+        Http::fake([
+            'www.legacy.test/robots.txt' => Http::response('', 404),
+            'www.legacy.test/' => Http::response('<html lang="ar" dir="rtl"><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1256"><title>'.$title.'</title></head><body><h1>'.$title.'</h1></body></html>', 200, ['Content-Type' => 'text/html; charset=windows-1256']),
+        ]);
+        [$agency, $owner, $client] = $this->workspace('legacy');
+        $site = SeoSite::create(['agency_id' => $agency->id, 'client_id' => $client->id, 'url' => 'https://www.legacy.test/', 'host' => 'www.legacy.test', 'consent_user_id' => $owner->id, 'consent_at' => now()]);
+        $audit = SeoAudit::create(['agency_id' => $agency->id, 'seo_site_id' => $site->id, 'status' => 'queued']);
+        (new SiteAuditor(fn () => null))->run($audit);
+
+        $this->assertSame('done', $audit->fresh()->status);
+        $this->assertSame('صوت المدينة', $audit->pages()->first()->title);
+        $this->assertSame('ok', json_encode(['t' => SafeFetcher::toUtf8("bad \xd5\xe6 bytes")]) ? 'ok' : 'fail');
     }
 }

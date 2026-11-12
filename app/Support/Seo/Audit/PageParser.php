@@ -3,6 +3,7 @@
 namespace App\Support\Seo\Audit;
 
 use App\Support\Seo\PageAudit;
+use App\Support\Seo\SafeFetcher;
 
 /**
  * Reads the parts of one HTML page the A1 rules need (regex over the raw HTML, no DOM: pages in the wild are often not well-formed).
@@ -19,6 +20,7 @@ class PageParser
     /** @return Parsed */
     public static function parse(string $html, string $pageUrl): array
     {
+        $html = mb_check_encoding($html, 'UTF-8') ? $html : SafeFetcher::toUtf8($html);
         $head = preg_match('/<head\b.*?<\/head>/is', $html, $hm) ? $hm[0] : substr($html, 0, 20000);
         $htmlTag = preg_match('/<html\b[^>]*>/i', $html, $tm) ? $tm[0] : '';
         $lang = preg_match('/\blang=["\']?([A-Za-z]{2,3}(?:[-_][A-Za-z0-9]{2,8})?)["\']?/i', $htmlTag, $m) ? $m[1] : '';

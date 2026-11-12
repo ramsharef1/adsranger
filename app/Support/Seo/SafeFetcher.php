@@ -73,7 +73,7 @@ class SafeFetcher
                 return self::fail($url, 'too_large', $res->status());
             }
 
-            return ['ok' => $res->status() === 200, 'status' => $res->status(), 'url' => $url, 'html' => $body, 'error' => $res->status() === 200 ? null : 'status'];
+            return ['ok' => $res->status() === 200, 'status' => $res->status(), 'url' => $url, 'html' => self::toUtf8($body, $type), 'error' => $res->status() === 200 ? null : 'status'];
         }
 
         return self::fail($url, 'redirects');
@@ -147,7 +147,7 @@ class SafeFetcher
                 'ok' => $res->status() === 200,
                 'status' => $res->status(),
                 'url' => $url,
-                'body' => $body,
+                'body' => self::toUtf8($body, $type),
                 'content_type' => $type,
                 'x_robots_tag' => trim((string) $res->header('X-Robots-Tag')), // AEO crawler check (#185)
                 'error' => $res->status() === 200 ? null : 'status',
@@ -187,5 +187,32 @@ class SafeFetcher
         $dir = preg_replace('#/[^/]*$#', '/', $p['path'] ?? '/');
 
         return $root.$dir.$loc;
+    }
+
+    /**
+     * Pages in the region are still served in windows-1256 / ISO-8859-6. Everything we parse, store (PostgreSQL rejects invalid
+     * UTF-8) or return as JSON must be valid UTF-8: convert from the declared charset (header, then <meta>), else drop bad bytes.
+     */
+    public static function toUtf8(string $body, string $contentType = ''): string
+    {
+        if ($body === '' || mb_check_encoding($body, 'UTF-8')) {
+            return $body;
+        }
+        $charset = '';
+        if (preg_match('/charset=["\']?([A-Za-z0-9_\-]+)/i', $contentType, $m)) {
+            $charset = $m[1];
+        } elseif (preg_match('/<meta[^>]+charset=["\']?([A-Za-z0-9_\-]+)/i', substr($body, 0, 4096), $m)) {
+            $charset = $m[1];
+        }
+        $charset = strtoupper($charset);
+        $map = ['WINDOWS-1256' => 'CP1256', 'CP1256' => 'CP1256', 'ISO-8859-6' => 'ISO-8859-6', 'WINDOWS-1252' => 'CP1252', 'ISO-8859-1' => 'CP1252'];
+        if (isset($map[$charset]) && function_exists('iconv')) {
+            $converted = @iconv($map[$charset], 'UTF-8//IGNORE', $body);
+            if (is_string($converted) && $converted !== '' && mb_check_encoding($converted, 'UTF-8')) {
+                return $converted;
+            }
+        }
+
+        return mb_scrub($body, 'UTF-8');
     }
 }

@@ -50,7 +50,7 @@
         @if ($canRun)
             <div class="sa-form">
                 <input type="url" wire:model="newSiteUrl" placeholder="https://example.com" dir="ltr" aria-label="{{ __('Site address') }}">
-                <label><input type="checkbox" wire:model="consent" style="margin-top:5px"> <span>{{ __('I confirm the agency has the client\'s permission to audit and track this site.') }}</span></label>
+                <label><input type="checkbox" wire:model="consent" style="margin-top:5px"> <span>{{ __('I confirm I own this site or have its owner\'s permission to audit it.') }}</span></label>
                 @error('newSiteUrl')<div class="sa-err">{{ $message }}</div>@enderror
                 <div><button type="button" class="sa-btn" wire:click="addSite">{{ __('Add site') }}</button></div>
                 <p class="sa-muted">{{ __('Your plan allows :sites and :pages a month. Used this month: :used.', ['sites' => trans_choice('{1} one site|{2} two sites|[3,10] :n sites|[11,*] :n sites', $limits['sites'], ['n' => $limits['sites']]), 'pages' => trans_choice('{1} one page|{2} two pages|[3,10] :n pages|[11,*] :n pages', $limits['pages'], ['n' => number_format($limits['pages'])]), 'used' => number_format($pagesUsed)]) }}</p>

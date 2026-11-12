@@ -1583,7 +1583,6 @@
     "Add or select a client first to audit its website.": "أضف عميلًا أو اختره أولًا لفحص موقعه.",
     "Sites": "المواقع",
     "Site address": "عنوان الموقع",
-    "I confirm the agency has the client's permission to audit and track this site.": "أؤكد أن لدى الوكالة إذن العميل بفحص هذا الموقع وتتبّعه.",
     "Add site": "أضف موقعًا",
     "Add the client's site to start auditing it.": "أضف موقع العميل لبدء فحصه.",
     "Only the workspace owner or an admin can add sites and run audits.": "إضافة المواقع وتشغيل الفحص لمالك مساحة العمل أو المسؤول فقط.",
@@ -1689,5 +1688,6 @@
     "Your quick answer helps us improve your shopping experience.": "إجابتك السريعة تساعدنا على تحسين تجربة التسوق.",
     "Thank you! Your response has been recorded.": "شكرًا لك! تم تسجيل إجابتك بنجاح.",
     "Friend or family recommendation": "توصية من صديق أو أحد الأقارب",
-    "Submit answer": "إرسال الإجابة"
+    "Submit answer": "إرسال الإجابة",
+    "I confirm I own this site or have its owner's permission to audit it.": "أؤكد أنني أملك هذا الموقع أو أن لدي إذن صاحبه بفحصه."
 }

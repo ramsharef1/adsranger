@@ -14,13 +14,13 @@ $bdi = fn (string $t) => '<bdi dir="ltr">'.$t.'</bdi>';
 $ua = \App\Support\Seo\SafeFetcher::USER_AGENT;
 $how = $ar ? [
     'في الأدوات المجانية يفتح فقط الصفحة التي يطلب شخص فحصها، وفي فاحص روابط اللغات حتى 10 صفحات مرتبطة بها.',
-    'في فحص الموقع الكامل (لعملاء '.$bdi('AdsRanger').' الذين أكدوا إذن صاحب الموقع) يحترم ملف '.$bdi('robots.txt').'، ويرسل طلبًا واحدًا في الثانية على الأكثر، ويبقى على النطاق نفسه، ويتوقف عند 200 صفحة في الفحص الواحد.',
+    'في فحص الموقع الكامل (قيد التطوير، وبإذن صاحب الموقع فقط) يحترم ملف '.$bdi('robots.txt').'، ويرسل طلبًا واحدًا في الثانية على الأكثر، ويبقى على النطاق نفسه، ويتوقف عند 200 صفحة في الفحص الواحد.',
     'طلب '.$bdi('GET').' عادي للصفحة العامة كما يراها الزائر.',
     'لا يتصل بعناوين خاصة أو داخلية.',
     'لا يسجّل الدخول ولا يرسل النماذج.',
 ] : [
     'In the free tools it opens only the page a person asks to check, and for the hreflang checker up to 10 pages linked from it.',
-    'In the full site audit (for AdsRanger customers who confirmed the site owner\'s permission) it follows robots.txt, sends at most 1 request per second, stays on the same host and stops at 200 pages per audit.',
+    'In the full site audit (in development; only with the site owner\'s permission) it follows robots.txt, sends at most 1 request per second, stays on the same host and stops at 200 pages per audit.',
     'A plain GET request for the public page, as a visitor sees it.',
     'It never connects to private or internal addresses.',
     'It never signs in or submits forms.',
@@ -38,8 +38,8 @@ $how = $ar ? [
 @section('hero')
 <h1>{!! $ar ? 'زاحف '.$bdi('AdsRanger').' ('.$bdi('AdsRangerBot').')' : 'AdsRangerBot: the AdsRanger crawler' !!}</h1>
 <p class="muted" style="font-size:17px">{!! $ar
-? 'يفتح '.$bdi('AdsRangerBot').' صفحات عامة فقط، عندما يشغّل شخص إحدى أدوات '.$bdi('AdsRanger').' المجانية، مثل فاحص روابط اللغات أو فحص الصفحة.'
-: 'AdsRangerBot opens public pages only when someone runs one of AdsRanger\'s free tools, such as the hreflang checker or the page audit.' !!}</p>
+? 'يفتح '.$bdi('AdsRangerBot').' صفحات عامة فقط، عندما يشغّل شخص إحدى أدوات '.$bdi('AdsRanger').' المجانية، مثل فاحص روابط اللغات أو فحص الصفحة، أو عندما يُجري فحصًا كاملًا لموقع أذن صاحبه بذلك (قيد التطوير).'
+: 'AdsRangerBot opens public pages only when someone runs one of AdsRanger\'s free tools, such as the hreflang checker or the page audit, or runs a full site audit of a site whose owner gave permission (in development).' !!}</p>
 @endsection
 
 @section('content')
@@ -65,6 +65,7 @@ Disallow: /</pre>
 
     <h2>{{ $ar ? 'البيانات' : 'Data' }}</h2>
     <p>{{ $ar ? 'الأدوات المجانية لا تحفظ الروابط أو النتائج.' : 'The free tools don\'t store the URLs or results.' }}</p>
+    <p>{{ $ar ? 'تُحفظ نتائج فحص الموقع الكامل في مساحة العمل التي أجرت الفحص فقط.' : 'Full site audit results are kept only in the workspace that ran the audit.' }}</p>
 
     <p style="margin-top:20px">{!! $ar
         ? 'لأي سؤال أو مشكلة: <a href="mailto:support@adsranger.com"><bdi dir="ltr">support@adsranger.com</bdi></a>'
