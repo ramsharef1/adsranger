@@ -3,12 +3,15 @@
 namespace App\Filament\Admin\Resources\Agencies;
 
 use App\Alerts\AlertEngine;
+use App\Filament\Admin\Resources\Agencies\Pages\CreateAgency;
 use App\Filament\Admin\Resources\Agencies\Pages\EditAgency;
 use App\Filament\Admin\Resources\Agencies\Pages\ListAgencies;
 use App\Filament\Concerns\TranslatesResourceLabels;
 use App\Models\Agency;
+use App\Models\AuditLog;
 use App\Models\Plan;
 use App\Models\PlanUpgradeRequest;
+use App\Models\User;
 use App\Support\DemoData;
 use App\Support\Modules;
 use App\Support\Trial;
@@ -33,6 +36,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Validation\Rules\Password;
 use UnitEnum;
 
 class AgencyResource extends Resource
@@ -58,7 +62,7 @@ class AgencyResource extends Resource
 
     public static function canCreate(): bool
     {
-        return false;
+        return auth()->user()?->role === 'super_admin';
     }
 
     public static function canDelete(Model $record): bool
@@ -77,14 +81,38 @@ class AgencyResource extends Resource
         return $schema->columns(2)->components([
             Section::make(__('Agency'))->columns(2)->schema([
                 TextInput::make('name')->label(__('Name'))->required()->maxLength(120),
-                TextInput::make('slug')->disabled()->helperText(__('Used in the agency\'s /app URL.')),
-                Select::make('country')->label(__('Country'))->options(config('adsranger.countries'))->searchable(),
-                Select::make('currency')->options(collect(config('adsranger.currencies'))->mapWithKeys(fn ($c) => [$c => $c])),
+                TextInput::make('slug')
+                    ->label(__('Slug'))
+                    ->maxLength(80)
+                    ->disabled(fn (string $operation): bool => $operation !== 'create')
+                    ->placeholder(__('Auto-generated from name if left blank'))
+                    ->helperText(__('Used in the agency\'s /app URL.')),
+                Select::make('country')->label(__('Country'))->options(config('adsranger.countries'))->default('JO')->searchable(),
+                Select::make('currency')->options(collect(config('adsranger.currencies'))->mapWithKeys(fn ($c) => [$c => $c]))->default('USD'),
+                Select::make('language')->label(__('Workspace language'))->options(['ar' => 'العربية (AR)', 'en' => 'English (EN)'])->default('ar'),
             ])->columnSpan(2),
+            Section::make(__('Initial workspace owner / admin (optional)'))
+                ->description(__('Assign an existing user by email or enter a password to create a new verified owner/admin account immediately.'))
+                ->columns(2)
+                ->visible(fn (string $operation): bool => $operation === 'create')
+                ->schema([
+                    TextInput::make('owner_email')->label(__('Owner / admin email'))->email()->maxLength(190),
+                    TextInput::make('owner_name')->label(__('Owner / admin name'))->maxLength(120),
+                    TextInput::make('owner_password')
+                        ->label(__('Password (required only if email is new)'))
+                        ->password()
+                        ->revealable()
+                        ->rule(Password::min(10))
+                        ->required(fn ($get): bool => filled($get('owner_email')) && ! User::query()->whereRaw('LOWER(email) = ?', [strtolower(trim((string) $get('owner_email')))])->exists()),
+                    Select::make('owner_workspace_role')
+                        ->label(__('Workspace role'))
+                        ->options(['owner' => __('Owner'), 'admin' => __('Admin')])
+                        ->default('owner'),
+                ])->columnSpan(2),
             Section::make(__('Plan and status'))->columns(2)->schema([
-                Select::make('plan')->options(fn () => Plan::orderBy('sort')->pluck('name', 'key'))->required()
+                Select::make('plan')->options(fn () => Plan::orderBy('sort')->pluck('name', 'key'))->default('pro')->required()
                     ->helperText(__('Controls which features and networks the agency gets.')),
-                Select::make('status')->options(config('adsranger.agency_statuses'))->required()
+                Select::make('status')->options(config('adsranger.agency_statuses'))->default('active')->required()
                     ->helperText(__('Suspended agencies cannot sign in to their workspace.')),
                 DateTimePicker::make('trial_ends_at')->label(__('Trial ends'))->seconds(false),
                 Select::make('signup_source')->label(__('Signup source'))->options(static::sources())->disabled()->dehydrated(false),
@@ -158,6 +186,58 @@ class AgencyResource extends Resource
                 TrashedFilter::make()->label(__('Archived')),
             ])
             ->recordActions([EditAction::make(), ActionGroup::make([
+                Action::make('attachMember')
+                    ->label(__('Add / attach user'))
+                    ->icon('heroicon-o-user-plus')
+                    ->color('info')
+                    ->modalHeading(fn (Agency $r): string => __('Add or attach user to :agency', ['agency' => $r->name]))
+                    ->schema([
+                        TextInput::make('email')->label(__('Email'))->email()->required()->maxLength(190),
+                        TextInput::make('name')->label(__('Name (for new users)'))->maxLength(120),
+                        TextInput::make('password')
+                            ->label(__('Password (required only for new users)'))
+                            ->password()
+                            ->revealable()
+                            ->rule(Password::min(10)),
+                        Select::make('role')
+                            ->label(__('Workspace role'))
+                            ->options([
+                                'owner' => __('Owner'),
+                                'admin' => __('Admin'),
+                                'manager' => __('Manager'),
+                                'analyst' => __('Analyst'),
+                            ])
+                            ->default('admin')
+                            ->required(),
+                    ])
+                    ->action(function (Agency $r, array $data): void {
+                        abort_unless(auth()->user()?->role === 'super_admin', 403);
+                        $email = strtolower(trim((string) $data['email']));
+                        $user = User::query()->whereRaw('LOWER(email) = ?', [$email])->first();
+                        if (! $user) {
+                            if (empty($data['password'])) {
+                                Notification::make()->title(__('Enter a password (min 10 chars) to create a new user account.'))->danger()->send();
+
+                                return;
+                            }
+                            $user = new User;
+                            $user->forceFill([
+                                'name' => trim((string) ($data['name'] ?? '')) ?: explode('@', $email)[0],
+                                'email' => $email,
+                                'password' => (string) $data['password'],
+                                'role' => 'member',
+                                'email_verified_at' => now(),
+                            ])->save();
+                            AuditLog::record('user.created_by_admin', $user, ['role' => 'member', 'agency_id' => $r->id]);
+                        }
+                        $wRole = $data['role'];
+                        $r->members()->syncWithoutDetaching([$user->id => ['role' => $wRole]]);
+                        if ($wRole === 'owner' && ! $r->owner_id) {
+                            $r->forceFill(['owner_id' => $user->id])->save();
+                        }
+                        AuditLog::record('agency.member_attached_by_admin', $r, ['user_id' => $user->id, 'role' => $wRole]);
+                        Notification::make()->title(__('User :email attached as :role', ['email' => $email, 'role' => $wRole]))->success()->send();
+                    }),
                 Action::make('extendTrial7Days')->label(__('Extend Trial +7 Days'))->icon('heroicon-o-plus-circle')->color('success')
                     ->visible(fn (Agency $r): bool => in_array($r->status, Trial::LIFECYCLE_STATUSES, true) || $r->trashed())
                     ->requiresConfirmation()
@@ -220,6 +300,7 @@ class AgencyResource extends Resource
     {
         return [
             'index' => ListAgencies::route('/'),
+            'create' => CreateAgency::route('/create'),
             'edit' => EditAgency::route('/{record}/edit'),
         ];
     }
