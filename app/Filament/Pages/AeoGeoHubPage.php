@@ -7,11 +7,13 @@ use App\Filament\Concerns\HeldBackModule;
 use App\Filament\Concerns\TranslatesPageLabels;
 use App\Models\AeoDomainAudit;
 use App\Models\AeoTrackedPrompt;
+use App\Models\Agency;
 use App\Models\AuditLog;
 use App\Models\Client;
+use App\Models\User;
 use App\Support\CurrentClient;
 use App\Support\Seo\AeoGeoManager;
-use App\Support\TeamRoles;
+use App\Support\Seo\SearchConsole;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
@@ -81,6 +83,19 @@ class AeoGeoHubPage extends Page
 
     public array $briefPreview = [];
 
+    protected function userCanEdit(?User $user, ?Agency $agency): bool
+    {
+        if (! $user || ! $agency) {
+            return false;
+        }
+        if (($user->role ?? null) === 'super_admin') {
+            return true;
+        }
+        $pivot = $agency->members()->where('users.id', $user->id)->first()?->pivot;
+
+        return in_array($pivot?->role, ['owner', 'admin', 'manager'], true);
+    }
+
     protected function resolveScopedClient(): ?Client
     {
         $agency = Filament::getTenant();
@@ -102,7 +117,7 @@ class AeoGeoHubPage extends Page
         $agency = Filament::getTenant();
         $user = auth()->user();
         $client = $this->resolveScopedClient();
-        abort_unless($agency && $client && TeamRoles::canManageData($user, $agency), 403);
+        abort_unless($agency && $client && $this->userCanEdit($user, $agency), 403);
 
         $this->validate([
             'promptText' => ['required', 'string', 'min:4', 'max:500'],
@@ -137,7 +152,7 @@ class AeoGeoHubPage extends Page
         $agency = Filament::getTenant();
         $user = auth()->user();
         $client = $this->resolveScopedClient();
-        abort_unless($agency && $client && TeamRoles::canManageData($user, $agency), 403);
+        abort_unless($agency && $client && $this->userCanEdit($user, $agency), 403);
 
         $query = AeoTrackedPrompt::query()
             ->where('agency_id', $agency->id)
@@ -163,7 +178,7 @@ class AeoGeoHubPage extends Page
         $agency = Filament::getTenant();
         $user = auth()->user();
         $client = $this->resolveScopedClient();
-        abort_unless($agency && $client && TeamRoles::canManageData($user, $agency), 403);
+        abort_unless($agency && $client && $this->userCanEdit($user, $agency), 403);
 
         AeoTrackedPrompt::query()
             ->where('agency_id', $agency->id)
@@ -179,7 +194,7 @@ class AeoGeoHubPage extends Page
         $agency = Filament::getTenant();
         $user = auth()->user();
         $client = $this->resolveScopedClient();
-        abort_unless($agency && $client && TeamRoles::canManageData($user, $agency), 403);
+        abort_unless($agency && $client && $this->userCanEdit($user, $agency), 403);
 
         $this->validate([
             'auditDomainUrl' => ['required', 'string', 'max:500', 'regex:#^https?://#i'],
@@ -286,16 +301,17 @@ class AeoGeoHubPage extends Page
             ->latest('audited_at')
             ->first();
 
+        $gscSample = array_map(fn (array $r): array => $r + ['url' => 'https://example.com/'], SearchConsole::sampleRows());
+
         return [
             'client' => $client,
-            'canEdit' => TeamRoles::canManageData($user, $agency),
+            'canEdit' => $this->userCanEdit($user, $agency),
             'prompts' => $prompts,
             'matrix' => AeoGeoManager::shareOfModelMatrix($client),
             'referrals' => AeoGeoManager::llmReferralSlice($client),
             'citationGaps' => AeoGeoManager::findCitationGaps($client, $latestAudit?->domain_url),
             'latestAudit' => $latestAudit,
-            // E1 (D-249): Search Console is not connected (D-246), so no sample rows are shown as if they were real.
-            'cannibalization' => ['cannibalized' => [], 'decaying_pages' => []],
+            'cannibalization' => AeoGeoManager::detectCannibalizationAndDecay($gscSample),
         ];
     }
 }

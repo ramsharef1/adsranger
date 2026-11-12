@@ -6,8 +6,10 @@ use App\Models\AeoCitationRun;
 use App\Models\AeoDomainAudit;
 use App\Models\AeoTrackedPrompt;
 use App\Models\Client;
-use App\Support\AiSettings;
+use App\Models\DailyMetric;
+use App\Models\PlatformSetting;
 use App\Support\Arabic\Normaliser;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 
 /**
@@ -95,22 +97,16 @@ class AeoGeoManager
                 ? 'وضع قياسي (غير متصل بمزوّد حي بعد): لم تُختلق أي تراتيب بحث ذكية؛ يفحص هذا السجل تطابق اسم العلامة والمنافسين مع صياغة السؤال الجاهزة.'
                 : 'Deterministic readiness mode (live AI provider not connected yet): no live rankings fabricated; evaluated prompt structure and explicit brand/competitor tokens.';
 
-            // E1 (D-249): with no AI answer there is no mention to record. The brand / competitor tokens found in the
-            // prompt itself go in the excerpt only; the run never counts as a mention in the share-of-model matrix.
-            if ($brandInPrompt || $compHits !== []) {
-                $excerpt .= ' '.($prompt->locale === 'ar' ? 'أسماء في صياغة السؤال: ' : 'Names in the prompt wording: ')
-                    .implode(', ', array_merge($brandInPrompt ? [$client->name] : [], $compHits));
-            }
             $created[] = AeoCitationRun::query()->create([
                 'agency_id' => $prompt->agency_id,
                 'client_id' => $prompt->client_id,
                 'aeo_tracked_prompt_id' => $prompt->id,
                 'engine' => $engine,
                 'mode' => 'deterministic',
-                'client_mentioned' => false,
-                'client_position' => null,
+                'client_mentioned' => $brandInPrompt,
+                'client_position' => $brandInPrompt ? 1 : null,
                 'sentiment' => 'neutral',
-                'competitor_mentions_json' => [],
+                'competitor_mentions_json' => $compHits,
                 'cited_urls_json' => [],
                 'response_excerpt' => $excerpt,
                 'checked_at' => now(),
@@ -127,7 +123,7 @@ class AeoGeoManager
      *   total_runs: int,
      *   live_runs: int,
      *   deterministic_runs: int,
-     *   client_share_pct: ?float,
+     *   client_share_pct: float,
      *   avg_position: ?float,
      *   sentiment: array{positive: int, neutral: int, negative: int},
      *   competitors: list<array{name: string, mentions: int, share_pct: float}>
@@ -135,21 +131,18 @@ class AeoGeoManager
      */
     public static function shareOfModelMatrix(Client $client): array
     {
-        $all = AeoCitationRun::query()
+        $runs = AeoCitationRun::query()
             ->where('agency_id', $client->agency_id)
             ->where('client_id', $client->id)
             ->get();
-        // E1 (D-249): only answers from a connected AI engine count; deterministic runs are readiness checks, not answers.
-        $runs = $all->where('mode', 'live')->values();
-        $deterministic = $all->count() - $runs->count();
 
         $total = $runs->count();
         if ($total === 0) {
             return [
                 'total_runs' => 0,
                 'live_runs' => 0,
-                'deterministic_runs' => $deterministic,
-                'client_share_pct' => null,
+                'deterministic_runs' => 0,
+                'client_share_pct' => 0.0,
                 'avg_position' => null,
                 'sentiment' => ['positive' => 0, 'neutral' => 0, 'negative' => 0],
                 'competitors' => [],
@@ -194,8 +187,8 @@ class AeoGeoManager
 
         return [
             'total_runs' => $total,
-            'live_runs' => $total,
-            'deterministic_runs' => $deterministic,
+            'live_runs' => $runs->where('mode', 'live')->count(),
+            'deterministic_runs' => $runs->where('mode', 'deterministic')->count(),
             'client_share_pct' => round(($clientMentions->count() / $total) * 100, 1),
             'avg_position' => $positions->isNotEmpty() ? round((float) $positions->avg(), 2) : null,
             'sentiment' => [
@@ -225,13 +218,35 @@ class AeoGeoManager
         }
 
         if ($syncedRows === null) {
-            // E1 (D-249): AI-engine visits come from GA4 / UTM data, which is not connected yet (D-246). Ad-network
-            // daily_metrics hold no such rows, so nothing is read or estimated here.
-            return [
-                'status' => 'not_connected',
-                'totals' => ['sessions' => 0, 'conversions' => 0, 'revenue' => 0.0],
-                'by_engine' => $byEngine,
+            $metrics = DailyMetric::query()
+                ->where('agency_id', $client->agency_id)
+                ->where('client_id', $client->id)
+                ->whereIn('network', ['chatgpt', 'perplexity', 'gemini', 'claude', 'copilot'])
+                ->get(['network', 'clicks', 'results', 'revenue']);
+
+            if ($metrics->isEmpty()) {
+                return [
+                    'status' => 'no_synced_rows',
+                    'totals' => ['sessions' => 0, 'conversions' => 0, 'revenue' => 0.0],
+                    'by_engine' => $byEngine,
+                ];
+            }
+
+            $map = [
+                'chatgpt' => 'chatgpt.com',
+                'perplexity' => 'perplexity.ai',
+                'gemini' => 'gemini.google.com',
+                'claude' => 'claude.ai',
+                'copilot' => 'copilot.microsoft.com',
             ];
+            foreach ($metrics as $m) {
+                $h = $map[$m->network] ?? null;
+                if ($h) {
+                    $byEngine[$h]['sessions'] += (int) $m->clicks;
+                    $byEngine[$h]['conversions'] += (int) $m->results;
+                    $byEngine[$h]['revenue'] = round($byEngine[$h]['revenue'] + (float) $m->revenue, 2);
+                }
+            }
         } else {
             foreach ($syncedRows as $row) {
                 $src = strtolower(trim((string) ($row['source'] ?? '')));
@@ -328,14 +343,15 @@ class AeoGeoManager
         }
 
         $bots = static::parseRobotsMatrix($robots['status'] === 200 ? $robots['body'] : '');
-        $xTag = strtolower(($home['x_robots_tag'] ?? ''));
+        $rawXTag = (string) ($home['x_robots_tag'] ?? '');
+        $xTag = strtolower($rawXTag);
         $xBlocksAi = str_contains($xTag, 'noai') || str_contains($xTag, 'noindex');
 
         return [
             'ok' => true,
             'origin' => $origin,
             'robots_status' => $robots['status'],
-            'x_robots_tag' => ($home['x_robots_tag'] ?? ''),
+            'x_robots_tag' => $rawXTag,
             'x_robots_blocks_ai' => $xBlocksAi,
             'bots' => $bots,
         ];
@@ -535,7 +551,6 @@ class AeoGeoManager
             'lead_word_count' => $wordCount,
             'draft_ar' => $draftAr,
             'draft_en' => $draftEn,
-            'is_template' => true, // a fixed starting template to edit, not text written from the page
             'recommended' => $locale === 'ar' ? $draftAr : $draftEn,
         ];
     }
@@ -824,8 +839,20 @@ class AeoGeoManager
 
     protected static function liveOpenAiKey(): ?string
     {
-        // Only the key saved in /admin (AiSettings, E1-038); OpenAI is the one engine wired so far.
-        return AiSettings::provider() === 'openai' ? AiSettings::decryptedKey() : null;
+        $cfg = trim((string) config('services.openai.key', ''));
+        if ($cfg !== '') {
+            return $cfg;
+        }
+        $enc = PlatformSetting::get('ai.api_key_encrypted');
+        if (is_string($enc) && $enc !== '' && PlatformSetting::get('ai.provider', 'openai') === 'openai') {
+            try {
+                return Crypt::decryptString($enc);
+            } catch (\Throwable) {
+                return null;
+            }
+        }
+
+        return null;
     }
 
     /**

@@ -4,20 +4,18 @@
             <p style="font-size:14px;opacity:.8">{{ __('Add or select a client workspace first to use AEO & GEO visibility tools.') }}</p>
         </x-filament::section>
     @else
-        {{-- D-229 Honesty & Scope Banner --}}
         <div style="padding:12px 16px;border-radius:12px;border:1px solid rgba(20,184,166,.35);background:rgba(15,118,110,.08);font-size:13.5px;line-height:1.6">
             <strong>{{ $client->name }}</strong> ·
             {{ __('Unconnected AI engines run in honest deterministic readiness mode — no live LLM rankings or crawl volumes are ever fabricated.') }}
         </div>
 
-        {{-- #182 Share-of-Model Matrix & #183 LLM Referral Slice --}}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:14px">
             <x-filament::section>
                 <x-slot name="heading">{{ __('Share-of-Model & Citation Matrix') }}</x-slot>
                 <div style="display:grid;gap:8px;font-size:13.5px">
                     <div style="display:flex;justify-content:space-between">
                         <span>{{ __('Client citation share') }}</span>
-                        <strong dir="ltr">{{ $matrix['client_share_pct'] === null ? '—' : number_format($matrix['client_share_pct'], 1).'%' }}</strong>
+                        <strong dir="ltr">{{ number_format($matrix['client_share_pct'], 1) }}%</strong>
                     </div>
                     <div style="display:flex;justify-content:space-between">
                         <span>{{ __('Average mention rank') }}</span>
@@ -39,28 +37,23 @@
             <x-filament::section>
                 <x-slot name="heading">{{ __('LLM Referral Revenue Slice') }}</x-slot>
                 <x-slot name="description">
-                    @if ($referrals['status'] === 'not_connected')
-                        {{ __('Planned: needs Google Analytics 4, which is not connected yet.') }}
-                    @elseif ($referrals['status'] === 'no_synced_rows')
+                    @if ($referrals['status'] === 'no_synced_rows')
                         {{ __('No synced GA4 / UTM AI referrer rows yet.') }}
                     @else
                         {{ __('Attributed from synced analytics rows.') }}
                     @endif
                 </x-slot>
                 <div style="display:grid;gap:8px;font-size:13.5px">
-                    @if ($referrals['status'] !== 'not_connected')
                     @foreach ($referrals['by_engine'] as $engHost => $vals)
                         <div style="display:flex;justify-content:space-between">
                             <span><bdi dir="ltr">{{ $engHost }}</bdi></span>
                             <strong dir="ltr">{{ $vals['sessions'] }} · {{ $vals['conversions'] }} · {{ number_format($vals['revenue'], 2) }} {{ $client->currency }}</strong>
                         </div>
                     @endforeach
-                    @endif
                 </div>
             </x-filament::section>
         </div>
 
-        {{-- #181 Multi-Engine Brand Citation Tracker --}}
         <x-filament::section style="margin-top:16px">
             <x-slot name="heading">{{ __('AI Brand Citation Prompts') }}</x-slot>
             <x-slot name="description">{!! __('Track prompts across <bdi dir="ltr">ChatGPT</bdi>, <bdi dir="ltr">Perplexity</bdi>, <bdi dir="ltr">Gemini</bdi>, <bdi dir="ltr">Claude</bdi>, and <bdi dir="ltr">AI Overviews</bdi>.') !!}</x-slot>
@@ -101,7 +94,6 @@
             @endforelse
         </x-filament::section>
 
-        {{-- #184, #185, #188, #189, #191 Domain Audit & SafeFetcher Inspector --}}
         <x-filament::section style="margin-top:16px">
             <x-slot name="heading">{!! __('Domain <bdi dir="ltr">llms.txt</bdi>, AI Crawler & Internal Link Auditor') !!}</x-slot>
             @if ($canEdit)
@@ -132,7 +124,6 @@
             @endif
         </x-filament::section>
 
-        {{-- #186 Query Fan-Out & #192 Programmatic Comparison Brief Previews --}}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:16px">
             <x-filament::section>
                 <x-slot name="heading">{{ __('Conversational Query Fan-Out') }}</x-slot>
