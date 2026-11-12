@@ -3,9 +3,11 @@
 namespace Tests\Feature;
 
 use App\Support\Seo\PageAudit;
+use App\Support\Seo\SafeFetcher;
 use App\Support\Seo\ToolRateLimiter;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class PageAuditTest extends TestCase
@@ -68,5 +70,25 @@ class PageAuditTest extends TestCase
         $this->assertSame(0, $exit, $out);
         $this->assertStringContainsString('must_match_spelling 113/113 pass', $out);
         $this->assertStringContainsString('expected.json 23/23 pass', $out);
+    }
+
+    public function test_live_page_audit_reads_the_fetched_html_and_refuses_an_empty_page(): void
+    {
+        SafeFetcher::$resolver = fn (string $host) => '93.184.216.34';
+        Http::fake([
+            'www.audit-site.test/full' => Http::response('<!doctype html><html lang="ar" dir="rtl"><head><title>عيادة أسنان في عمّان</title><meta name="description" content="وصف"></head><body><h1>عيادة أسنان</h1></body></html>', 200, ['Content-Type' => 'text/html']),
+            'www.audit-site.test/empty' => Http::response('', 200, ['Content-Type' => 'text/html']),
+        ]);
+        try {
+            $full = $this->postJson('/tools/page-audit/run', ['url' => 'https://www.audit-site.test/full'])->assertOk()->json();
+            $this->assertTrue($full['ok']);
+            $this->assertTrue($full['checks']['has_title']);
+            $this->assertTrue($full['checks']['ar_lang']);
+            $this->assertGreaterThan(0, $full['serp']['title_chars']);
+
+            $this->postJson('/tools/page-audit/run', ['url' => 'https://www.audit-site.test/empty'])->assertOk()->assertJson(['ok' => false, 'error' => 'empty']);
+        } finally {
+            SafeFetcher::$resolver = null;
+        }
     }
 }

@@ -1,0 +1,744 @@
+[
+    {
+        "slug": "home",
+        "lang": "ar",
+        "eyebrow": "قيد التطوير · الإطلاق في 2027",
+        "headline": "منصة الإعلانات والسيو للوكالات بالعربية",
+        "subline": "منصة عربية أولًا لوكالات المنطقة"
+    },
+    {
+        "slug": "home",
+        "lang": "en",
+        "eyebrow": "In development · launching 2027",
+        "headline": "Arabic-first ads and SEO for agencies",
+        "subline": "An Arabic-first platform for agencies in the region"
+    },
+    {
+        "slug": "waitlist",
+        "lang": "ar",
+        "eyebrow": "قيد التطوير · الإطلاق في 2027",
+        "headline": "قائمة الانتظار",
+        "subline": ""
+    },
+    {
+        "slug": "waitlist",
+        "lang": "en",
+        "eyebrow": "In development · launching 2027",
+        "headline": "Waitlist",
+        "subline": ""
+    },
+    {
+        "slug": "ramadan-2027",
+        "lang": "ar",
+        "eyebrow": "دليل للوكالات",
+        "headline": "دليل حملات رمضان 2027 للوكالات",
+        "subline": "تواريخ متوقعة مع مصدر لكل تاريخ"
+    },
+    {
+        "slug": "ramadan-2027",
+        "lang": "en",
+        "eyebrow": "Guide for agencies",
+        "headline": "Ramadan 2027 ad guide for agencies",
+        "subline": "Expected dates, with a source for each"
+    },
+    {
+        "slug": "tools-ramadan-budget-calculator",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "حاسبة ميزانية إعلانات رمضان 2027",
+        "subline": "مجانًا، دون تسجيل، ولا نحفظ شيئًا"
+    },
+    {
+        "slug": "tools-ramadan-budget-calculator",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "Ramadan 2027 ad budget calculator",
+        "subline": "Free, no sign-up, nothing stored"
+    },
+    {
+        "slug": "pricing",
+        "lang": "ar",
+        "eyebrow": "قيد التطوير · الإطلاق في 2027",
+        "headline": "الباقات",
+        "subline": ""
+    },
+    {
+        "slug": "pricing",
+        "lang": "en",
+        "eyebrow": "In development · launching 2027",
+        "headline": "Plans",
+        "subline": ""
+    },
+    {
+        "slug": "integrations",
+        "lang": "ar",
+        "eyebrow": "قيد التطوير · الإطلاق في 2027",
+        "headline": "المنصات الإعلانية",
+        "subline": ""
+    },
+    {
+        "slug": "integrations",
+        "lang": "en",
+        "eyebrow": "In development · launching 2027",
+        "headline": "Ad platforms",
+        "subline": ""
+    },
+    {
+        "slug": "demo-report",
+        "lang": "ar",
+        "eyebrow": "قيد التطوير · الإطلاق في 2027",
+        "headline": "تقرير تجريبي",
+        "subline": ""
+    },
+    {
+        "slug": "demo-report",
+        "lang": "en",
+        "eyebrow": "In development · launching 2027",
+        "headline": "Sample report",
+        "subline": ""
+    },
+    {
+        "slug": "mena-calendar",
+        "lang": "ar",
+        "eyebrow": "دليل للوكالات",
+        "headline": "تقويم المواسم 2027 للمنطقة",
+        "subline": "تواريخ متوقعة مع مصدر لكل تاريخ"
+    },
+    {
+        "slug": "mena-calendar",
+        "lang": "en",
+        "eyebrow": "Guide for agencies",
+        "headline": "MENA ad calendar 2027",
+        "subline": "Expected dates, with a source for each"
+    },
+    {
+        "slug": "security",
+        "lang": "ar",
+        "eyebrow": "",
+        "headline": "الأمان وبياناتك",
+        "subline": ""
+    },
+    {
+        "slug": "security",
+        "lang": "en",
+        "eyebrow": "",
+        "headline": "Security and your data",
+        "subline": ""
+    },
+    {
+        "slug": "bot",
+        "lang": "ar",
+        "eyebrow": "",
+        "headline": "زاحف AdsRanger لفحص الصفحات",
+        "subline": ""
+    },
+    {
+        "slug": "bot",
+        "lang": "en",
+        "eyebrow": "",
+        "headline": "AdsRangerBot: our page checker",
+        "subline": ""
+    },
+    {
+        "slug": "accessibility",
+        "lang": "ar",
+        "eyebrow": "",
+        "headline": "إمكانية الوصول",
+        "subline": ""
+    },
+    {
+        "slug": "accessibility",
+        "lang": "en",
+        "eyebrow": "",
+        "headline": "Accessibility",
+        "subline": ""
+    },
+    {
+        "slug": "about",
+        "lang": "ar",
+        "eyebrow": "",
+        "headline": "من نحن ولماذا نبني في عمّان",
+        "subline": ""
+    },
+    {
+        "slug": "about",
+        "lang": "en",
+        "eyebrow": "",
+        "headline": "Why we build AdsRanger in Amman",
+        "subline": ""
+    },
+    {
+        "slug": "contact",
+        "lang": "ar",
+        "eyebrow": "",
+        "headline": "تواصل معنا",
+        "subline": ""
+    },
+    {
+        "slug": "contact",
+        "lang": "en",
+        "eyebrow": "",
+        "headline": "Contact",
+        "subline": ""
+    },
+    {
+        "slug": "partners",
+        "lang": "ar",
+        "eyebrow": "قيد التطوير · الإطلاق في 2027",
+        "headline": "شراكة التصميم",
+        "subline": ""
+    },
+    {
+        "slug": "partners",
+        "lang": "en",
+        "eyebrow": "In development · launching 2027",
+        "headline": "Design partners",
+        "subline": ""
+    },
+    {
+        "slug": "solutions-business-owners",
+        "lang": "ar",
+        "eyebrow": "قيد التطوير · الإطلاق في 2027",
+        "headline": "لأصحاب المشاريع",
+        "subline": ""
+    },
+    {
+        "slug": "solutions-business-owners",
+        "lang": "en",
+        "eyebrow": "In development · launching 2027",
+        "headline": "For business owners",
+        "subline": ""
+    },
+    {
+        "slug": "features",
+        "lang": "ar",
+        "eyebrow": "قيد التطوير · الإطلاق في 2027",
+        "headline": "الميزات",
+        "subline": ""
+    },
+    {
+        "slug": "features",
+        "lang": "en",
+        "eyebrow": "In development · launching 2027",
+        "headline": "Features",
+        "subline": ""
+    },
+    {
+        "slug": "reports",
+        "lang": "ar",
+        "eyebrow": "قيد التطوير · الإطلاق في 2027",
+        "headline": "التقارير الموحدة",
+        "subline": ""
+    },
+    {
+        "slug": "reports",
+        "lang": "en",
+        "eyebrow": "In development · launching 2027",
+        "headline": "Unified reports",
+        "subline": ""
+    },
+    {
+        "slug": "studio",
+        "lang": "ar",
+        "eyebrow": "قيد التطوير · الإطلاق في 2027",
+        "headline": "استوديو الإعلانات",
+        "subline": ""
+    },
+    {
+        "slug": "studio",
+        "lang": "en",
+        "eyebrow": "In development · launching 2027",
+        "headline": "Ad Studio",
+        "subline": ""
+    },
+    {
+        "slug": "search",
+        "lang": "ar",
+        "eyebrow": "قيد التطوير · الإطلاق في 2027",
+        "headline": "أدوات البحث والسيو",
+        "subline": ""
+    },
+    {
+        "slug": "search",
+        "lang": "en",
+        "eyebrow": "In development · launching 2027",
+        "headline": "Search & SEO",
+        "subline": ""
+    },
+    {
+        "slug": "ai",
+        "lang": "ar",
+        "eyebrow": "قيد التطوير · الإطلاق في 2027",
+        "headline": "الذكاء الاصطناعي",
+        "subline": ""
+    },
+    {
+        "slug": "ai",
+        "lang": "en",
+        "eyebrow": "In development · launching 2027",
+        "headline": "AI assistant",
+        "subline": ""
+    },
+    {
+        "slug": "glossary",
+        "lang": "ar",
+        "eyebrow": "دليل للوكالات",
+        "headline": "قاموس المصطلحات",
+        "subline": ""
+    },
+    {
+        "slug": "glossary",
+        "lang": "en",
+        "eyebrow": "Guide for agencies",
+        "headline": "Glossary",
+        "subline": ""
+    },
+    {
+        "slug": "blog",
+        "lang": "ar",
+        "eyebrow": "دليل للوكالات",
+        "headline": "المدونة والأدلة",
+        "subline": ""
+    },
+    {
+        "slug": "blog",
+        "lang": "en",
+        "eyebrow": "Guide for agencies",
+        "headline": "Blog & guides",
+        "subline": ""
+    },
+    {
+        "slug": "guides",
+        "lang": "ar",
+        "eyebrow": "دليل للوكالات",
+        "headline": "الأدلة الشاملة",
+        "subline": ""
+    },
+    {
+        "slug": "guides",
+        "lang": "en",
+        "eyebrow": "Guide for agencies",
+        "headline": "Pillar guides",
+        "subline": ""
+    },
+    {
+        "slug": "solutions-agencies",
+        "lang": "ar",
+        "eyebrow": "قيد التطوير · الإطلاق في 2027",
+        "headline": "للوكالات",
+        "subline": ""
+    },
+    {
+        "slug": "solutions-agencies",
+        "lang": "en",
+        "eyebrow": "In development · launching 2027",
+        "headline": "For agencies",
+        "subline": ""
+    },
+    {
+        "slug": "solutions-freelancers",
+        "lang": "ar",
+        "eyebrow": "قيد التطوير · الإطلاق في 2027",
+        "headline": "للمستقلين",
+        "subline": ""
+    },
+    {
+        "slug": "solutions-freelancers",
+        "lang": "en",
+        "eyebrow": "In development · launching 2027",
+        "headline": "For freelancers",
+        "subline": ""
+    },
+    {
+        "slug": "for-clients",
+        "lang": "ar",
+        "eyebrow": "قيد التطوير · الإطلاق في 2027",
+        "headline": "لعملاء الوكالات",
+        "subline": ""
+    },
+    {
+        "slug": "for-clients",
+        "lang": "en",
+        "eyebrow": "In development · launching 2027",
+        "headline": "For agency clients",
+        "subline": ""
+    },
+    {
+        "slug": "for-teams",
+        "lang": "ar",
+        "eyebrow": "قيد التطوير · الإطلاق في 2027",
+        "headline": "لفرق العمل",
+        "subline": ""
+    },
+    {
+        "slug": "for-teams",
+        "lang": "en",
+        "eyebrow": "In development · launching 2027",
+        "headline": "For agency teams",
+        "subline": ""
+    },
+    {
+        "slug": "roadmap",
+        "lang": "ar",
+        "eyebrow": "قيد التطوير · الإطلاق في 2027",
+        "headline": "خارطة الطريق",
+        "subline": ""
+    },
+    {
+        "slug": "roadmap",
+        "lang": "en",
+        "eyebrow": "In development · launching 2027",
+        "headline": "Roadmap",
+        "subline": ""
+    },
+    {
+        "slug": "privacy",
+        "lang": "ar",
+        "eyebrow": "",
+        "headline": "الخصوصية",
+        "subline": ""
+    },
+    {
+        "slug": "privacy",
+        "lang": "en",
+        "eyebrow": "",
+        "headline": "Privacy",
+        "subline": ""
+    },
+    {
+        "slug": "terms",
+        "lang": "ar",
+        "eyebrow": "",
+        "headline": "الشروط",
+        "subline": ""
+    },
+    {
+        "slug": "terms",
+        "lang": "en",
+        "eyebrow": "",
+        "headline": "Terms",
+        "subline": ""
+    },
+    {
+        "slug": "data-deletion",
+        "lang": "ar",
+        "eyebrow": "",
+        "headline": "حذف البيانات",
+        "subline": ""
+    },
+    {
+        "slug": "data-deletion",
+        "lang": "en",
+        "eyebrow": "",
+        "headline": "Data deletion",
+        "subline": ""
+    },
+    {
+        "slug": "tools",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "أدوات عربية مجانية للسيو والإعلانات",
+        "subline": "مجانًا ودون تسجيل"
+    },
+    {
+        "slug": "tools",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "Free Arabic SEO and ad tools",
+        "subline": "Free, no sign-up"
+    },
+    {
+        "slug": "tools-serp-preview",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "معاينة نتائج البحث",
+        "subline": "مجانًا، دون تسجيل، ولا نحفظ شيئًا"
+    },
+    {
+        "slug": "tools-serp-preview",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "Search results preview",
+        "subline": "Free, no sign-up, nothing stored"
+    },
+    {
+        "slug": "tools-meta-length-checker",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "فاحص طول العنوان والوصف",
+        "subline": "مجانًا، دون تسجيل، ولا نحفظ شيئًا"
+    },
+    {
+        "slug": "tools-meta-length-checker",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "Title and description length checker",
+        "subline": "Free, no sign-up, nothing stored"
+    },
+    {
+        "slug": "tools-arabic-keyword-generator",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "مولّد الكلمات المفتاحية العربية",
+        "subline": "مجانًا، دون تسجيل، ولا نحفظ شيئًا"
+    },
+    {
+        "slug": "tools-arabic-keyword-generator",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "Arabic keyword generator",
+        "subline": "Free, no sign-up, nothing stored"
+    },
+    {
+        "slug": "tools-arabizi-converter",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "محوّل العربيزي",
+        "subline": "مجانًا، دون تسجيل، ولا نحفظ شيئًا"
+    },
+    {
+        "slug": "tools-arabizi-converter",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "Arabizi converter",
+        "subline": "Free, no sign-up, nothing stored"
+    },
+    {
+        "slug": "tools-roas-calculator",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "حاسبة العائد على الإنفاق الإعلاني",
+        "subline": "مجانًا، دون تسجيل، ولا نحفظ شيئًا"
+    },
+    {
+        "slug": "tools-roas-calculator",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "ROAS calculator",
+        "subline": "Free, no sign-up, nothing stored"
+    },
+    {
+        "slug": "tools-budget-pacing-calculator",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "حاسبة وتيرة الإنفاق",
+        "subline": "مجانًا، دون تسجيل، ولا نحفظ شيئًا"
+    },
+    {
+        "slug": "tools-budget-pacing-calculator",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "Budget pacing calculator",
+        "subline": "Free, no sign-up, nothing stored"
+    },
+    {
+        "slug": "tools-utm-builder",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "منشئ روابط التتبّع",
+        "subline": "مجانًا، دون تسجيل، ولا نحفظ شيئًا"
+    },
+    {
+        "slug": "tools-utm-builder",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "UTM link builder",
+        "subline": "Free, no sign-up, nothing stored"
+    },
+    {
+        "slug": "tools-hreflang-checker",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "فاحص روابط اللغات",
+        "subline": "مجانًا ودون تسجيل"
+    },
+    {
+        "slug": "tools-hreflang-checker",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "Hreflang checker",
+        "subline": "Free, no sign-up"
+    },
+    {
+        "slug": "tools-page-audit",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "فحص سيو الصفحة العربية",
+        "subline": "مجانًا ودون تسجيل"
+    },
+    {
+        "slug": "tools-page-audit",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "Arabic page SEO audit",
+        "subline": "Free, no sign-up"
+    },
+    {
+        "slug": "tools-ad-pixel-checker",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "فاحص بكسلات الإعلانات ووسومها",
+        "subline": "مجانًا ودون تسجيل"
+    },
+    {
+        "slug": "tools-ad-pixel-checker",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "Ad pixel and tag checker",
+        "subline": "Free, no sign-up"
+    },
+    {
+        "slug": "tools-cod-poas-calculator",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "حاسبة ربح الدفع عند الاستلام",
+        "subline": "مجانًا، دون تسجيل، ولا نحفظ شيئًا"
+    },
+    {
+        "slug": "tools-cod-poas-calculator",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "Cash-on-delivery profit calculator",
+        "subline": "Free, no sign-up, nothing stored"
+    },
+    {
+        "slug": "tools-whatsapp-link-generator",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "مولّد روابط WhatsApp للإعلانات",
+        "subline": "مجانًا، دون تسجيل، ولا نحفظ شيئًا"
+    },
+    {
+        "slug": "tools-whatsapp-link-generator",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "WhatsApp ad link generator",
+        "subline": "Free, no sign-up, nothing stored"
+    },
+    {
+        "slug": "tools-ad-mockup-preview",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "معاينة الإعلانات الحية",
+        "subline": "مجانًا، دون تسجيل، ولا نحفظ شيئًا"
+    },
+    {
+        "slug": "tools-ad-mockup-preview",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "Ad mockup previewer",
+        "subline": "Free, no sign-up, nothing stored"
+    },
+    {
+        "slug": "tools-llms-txt-generator",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "منشئ ملف llms.txt لموقعك",
+        "subline": "مجانًا ودون تسجيل"
+    },
+    {
+        "slug": "tools-llms-txt-generator",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "llms.txt generator",
+        "subline": "Free, no sign-up"
+    },
+    {
+        "slug": "tools-schema-generator",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "مولّد البيانات المنظمة للصفحات",
+        "subline": "مجانًا، دون تسجيل، ولا نحفظ شيئًا"
+    },
+    {
+        "slug": "tools-schema-generator",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "JSON-LD schema generator",
+        "subline": "Free, no sign-up, nothing stored"
+    },
+    {
+        "slug": "tools-ab-significance-calculator",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "حاسبة دلالة اختبارات المقارنة",
+        "subline": "مجانًا، دون تسجيل، ولا نحفظ شيئًا"
+    },
+    {
+        "slug": "tools-ab-significance-calculator",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "A\/B test significance calculator",
+        "subline": "Free, no sign-up, nothing stored"
+    },
+    {
+        "slug": "tools-safe-zone-checker",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "فاحص مقاس 9:16 والمناطق الآمنة",
+        "subline": "مجانًا، دون تسجيل، ولا نحفظ شيئًا"
+    },
+    {
+        "slug": "tools-safe-zone-checker",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "9:16 safe-zone checker",
+        "subline": "Free, no sign-up, nothing stored"
+    },
+    {
+        "slug": "tools-gulf-ad-disclosure-checklist",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "قائمة إفصاحات الإعلانات الخليجية",
+        "subline": "مجانًا، دون تسجيل، ولا نحفظ شيئًا"
+    },
+    {
+        "slug": "tools-gulf-ad-disclosure-checklist",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "KSA and UAE ad disclosure checklist",
+        "subline": "Free, no sign-up, nothing stored"
+    },
+    {
+        "slug": "tools-cpm-cpc-cpa-calculator",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "حاسبة مؤشرات تكلفة الإعلانات",
+        "subline": "مجانًا، دون تسجيل، ولا نحفظ شيئًا"
+    },
+    {
+        "slug": "tools-cpm-cpc-cpa-calculator",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "CPM, CPC and CPA calculator",
+        "subline": "Free, no sign-up, nothing stored"
+    },
+    {
+        "slug": "tools-agency-fee-vat-calculator",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "حاسبة أتعاب الوكالة والضريبة",
+        "subline": "مجانًا، دون تسجيل، ولا نحفظ شيئًا"
+    },
+    {
+        "slug": "tools-agency-fee-vat-calculator",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "Agency fee and VAT calculator",
+        "subline": "Free, no sign-up, nothing stored"
+    },
+    {
+        "slug": "tools-robots-sitemap-checker",
+        "lang": "ar",
+        "eyebrow": "أداة مجانية",
+        "headline": "فاحص ملف robots.txt وخريطة الموقع",
+        "subline": "مجانًا ودون تسجيل"
+    },
+    {
+        "slug": "tools-robots-sitemap-checker",
+        "lang": "en",
+        "eyebrow": "Free tool",
+        "headline": "Robots.txt and sitemap checker",
+        "subline": "Free, no sign-up"
+    }
+]

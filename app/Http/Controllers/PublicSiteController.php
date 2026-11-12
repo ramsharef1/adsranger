@@ -302,7 +302,12 @@ class PublicSiteController extends Controller
             return response()->json(['ok' => false, 'error' => $err, 'status' => $fetched['status'] ?? null, 'url' => $fetched['url'] ?? $data['url']]);
         }
 
-        $audit = PageAudit::auditHtml((string) ($fetched['body'] ?? ''), $data['keyword'] ?? null);
+        // SafeFetcher::fetch() returns the page as `html` (fetchResource() uses `body`); reading `body` here gave every page an empty audit (UX-242).
+        $html = (string) ($fetched['html'] ?? $fetched['body'] ?? '');
+        if (trim($html) === '') {
+            return response()->json(['ok' => false, 'error' => 'empty', 'status' => $fetched['status'] ?? null, 'url' => $fetched['url'] ?? $data['url']]);
+        }
+        $audit = PageAudit::auditHtml($html, $data['keyword'] ?? null);
 
         return response()->json([
             'ok' => true,
