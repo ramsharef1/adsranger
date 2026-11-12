@@ -21,9 +21,7 @@ return [
     // Built but held back (D-249): they answer at their URLs with noindex and stay out of the menu, hub and sitemap even
     // while `public` is on, until Rami publishes each one (remove it from this list).
     'held' => [
-        'capi-pixel-checker', 'cod-poas-calculator', 'whatsapp-link-generator', 'ad-mockup-preview',
-        'llms-txt-generator', 'schema-generator', 'ab-significance-calculator', 'safe-zone-checker',
-        'ksa-ad-compliance-checker', 'cpm-cpc-cpa-calculator', 'agency-fee-vat-calculator', 'robots-sitemap-checker',
+        // all 12 Wave A.2 tools published by Rami, 2026-11-12 (D-250)
     ],
 
     // Our own hosts, pinned to the server's public IP for SafeFetcher: the VPS resolves adsranger.com to ::1 in its hosts

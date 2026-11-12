@@ -62,7 +62,7 @@ class WaveA2PublicToolsTest extends TestCase
         $this->assertStringNotContainsString('/tools/capi-pixel-checker', $hiddenXml);
 
         // D-249: with the tools public, the held-back ones still stay out of the sitemap and hub and keep noindex.
-        config(['seo_tools.public' => true]);
+        config(['seo_tools.public' => true, 'seo_tools.held' => ['capi-pixel-checker']]);
         $heldXml = $this->get('/sitemaps/pages.xml')->assertOk()->getContent();
         $this->assertStringNotContainsString('/tools/capi-pixel-checker', $heldXml);
         $this->assertStringNotContainsString('/tools/capi-pixel-checker', $this->get('/tools')->getContent());
