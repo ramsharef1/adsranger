@@ -18,6 +18,9 @@ return [
         'ksa-ad-compliance-checker', 'cpm-cpc-cpa-calculator', 'agency-fee-vat-calculator', 'robots-sitemap-checker',
     ],
 
+    // The few tools shown in the header menu (the rest are on /tools). Order = menu order.
+    'menu' => ['page-audit', 'arabic-keyword-generator', 'roas-calculator', 'cod-poas-calculator'],
+
     // Built but held back (D-249): they answer at their URLs with noindex and stay out of the menu, hub and sitemap even
     // while `public` is on, until Rami publishes each one (remove it from this list).
     'held' => [

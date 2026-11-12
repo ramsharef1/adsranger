@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Support\PublicSite;
 use App\Support\Seo\CapiPixelChecker;
 use App\Support\Seo\LlmsTxtAuditor;
 use App\Support\Seo\RobotsSitemapChecker;
@@ -177,5 +178,18 @@ HTML;
         $html = $this->get('/en/tools/ksa-ad-compliance-checker')->assertOk()->getContent();
         $this->assertStringNotContainsString("'Pass'", $html);
         $this->assertStringContainsString('not a legal check', $html);
+    }
+
+    public function test_header_menu_is_short_and_points_to_the_full_tools_page(): void
+    {
+        config(['seo_tools.public' => true, 'seo_tools.held' => []]);
+        $menu = PublicSite::toolsMenu();
+        $this->assertSame('/tools', $menu[0]);
+        $this->assertContains('/tools/page-audit', $menu);
+        $this->assertNotContains('/tools/safe-zone-checker', $menu);
+        $this->assertLessThanOrEqual(8, count($menu));
+
+        config(['seo_tools.public' => false]);
+        $this->assertSame(['/tools/ramadan-budget-calculator', '/ramadan-2027', '/mena-calendar'], PublicSite::toolsMenu());
     }
 }

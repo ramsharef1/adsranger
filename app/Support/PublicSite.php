@@ -91,11 +91,30 @@ class PublicSite
         return config('seo_tools.public') ? array_values(array_diff(config('seo_tools.tools', []), config('seo_tools.held', []))) : [];
     }
 
+    /**
+     * Short "Free tools & guides" menu (Rami, 2026-11-12): the /tools page first, then the picks in config
+     * seo_tools.menu that are published, then the two guides. The full list lives on /tools.
+     *
+     * @return list<string>
+     */
+    public static function toolsMenu(): array
+    {
+        $published = self::publicTools();
+        $picks = array_values(array_filter(config('seo_tools.menu', []), fn (string $t) => in_array($t, $published, true)));
+
+        return array_merge(
+            config('seo_tools.public') ? ['/tools'] : [],
+            ['/tools/ramadan-budget-calculator'],
+            array_map(fn (string $t) => '/tools/'.$t, $picks),
+            ['/ramadan-2027', '/mena-calendar'],
+        );
+    }
+
     public static function menu(bool $ar): array
     {
         return [
             ['label' => $ar ? 'المنتج' : 'Product', 'items' => ['/features', '/reports', '/studio', '/search', '/ai', '/demo-report', '/security', '/partners']],
-            ['label' => $ar ? 'أدوات وأدلة مجانية' : 'Free tools & guides', 'items' => array_merge(['/tools/ramadan-budget-calculator', '/ramadan-2027', '/mena-calendar'], config('seo_tools.public') ? array_merge(['/tools'], array_map(fn (string $t) => '/tools/'.$t, self::publicTools())) : [])],
+            ['label' => $ar ? 'أدوات وأدلة مجانية' : 'Free tools & guides', 'items' => self::toolsMenu()],
             ['label' => $ar ? 'الباقات' : 'Plans', 'path' => '/pricing'],
             ['label' => $ar ? 'المنصات الإعلانية' : 'Ad platforms', 'path' => '/integrations'],
             ['label' => $ar ? 'عن AdsRanger' : 'About', 'items' => ['/about', '/contact']],
