@@ -35,7 +35,7 @@ class PublicSite
             '/pricing' => ['الباقات', 'Plans', 'ما تخطط كل باقة لتقديمه', 'What each plan is planned to include'],
             '/security' => ['الأمان وبياناتك', 'Security and your data', 'كيف نحمي بيانات وكالتك وعملائك', 'How we protect agency and client data'],
             '/ramadan-2027' => ['دليل رمضان 2027', 'Ramadan 2027 guide', 'خطة إعلانية لكل مرحلة من الشهر', 'An ad plan for every stage of the month'],
-            '/tools' => ['/tools/page-audit', '/tools/ramadan-budget-calculator', '/ramadan-2027'],
+            '/tools' => ['كل الأدوات المجانية', 'All free tools', 'أدوات مجانية للإعلانات والسيو', 'Free ad and SEO tools'],
             '/tools/ramadan-budget-calculator' => ['حاسبة ميزانية رمضان', 'Ramadan budget calculator', 'قدّر إنفاق رمضان ونتائجه', 'Estimate Ramadan spend and results'],
             '/tools/serp-preview' => ['معاينة نتائج البحث', 'Search results preview', 'كيف يظهر عنوان صفحتك ووصفها', 'How your title and description may look'],
             '/tools/meta-length-checker' => ['فاحص طول العنوان والوصف', 'Title and description length checker', 'حتى 50 صفحة في كل مرة', 'Up to 50 pages at a time'],

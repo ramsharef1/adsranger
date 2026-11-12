@@ -9,7 +9,7 @@
     $arPath = $arPath ?? \App\Support\PublicUrl::arPathOf(request()->path());
     $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
     // UX-226: the Latin brand inside Arabic menu / footer text gets its own direction.
-    $bd = fn (string $t) => $ar ? str_replace('AdsRanger', '<bdi dir="ltr">AdsRanger</bdi>', e($t)) : e($t);
+    $bd = fn (string $t) => (string) \App\Support\Seo\ToolCopy::html($t, $ar);
     $selfUrl = \App\Support\PublicUrl::absolute($arPath, $lang);
     $arUrl = \App\Support\PublicUrl::absolute($arPath, 'ar');
     $enUrl = \App\Support\PublicUrl::absolute($arPath, 'en');

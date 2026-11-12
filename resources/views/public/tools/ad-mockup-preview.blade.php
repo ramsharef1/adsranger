@@ -25,20 +25,20 @@ $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
     <form class="card" onsubmit="return false" novalidate>
         <label for="mp-dir">{{ $ar ? 'اتجاه نص الإعلان' : 'Ad copy direction' }}</label>
         <select id="mp-dir">
-            <option value="rtl">{{ $ar ? 'عربي (RTL)' : 'Arabic (RTL)' }}</option>
-            <option value="ltr" @selected(! $ar)>{{ $ar ? 'إنجليزي (LTR)' : 'English (LTR)' }}</option>
+            <option value="rtl">{{ $ar ? 'عربي (من اليمين)' : 'Arabic (RTL)' }}</option>
+            <option value="ltr" @selected(! $ar)>{{ $ar ? 'إنجليزي (من اليسار)' : 'English (LTR)' }}</option>
         </select>
 
         <label for="mp-brand">{{ $ar ? 'اسم العلامة التجارية' : 'Brand name' }}</label>
         <input id="mp-brand" type="text" maxlength="60" value="{{ $ar ? 'متجر الواحة' : 'Oasis Living' }}">
 
-        <label for="mp-head">{{ $ar ? 'العنوان الرئيسي (Headline)' : 'Headline' }}</label>
+        <label for="mp-head">{!! $ar ? 'العنوان الرئيسي (<bdi dir="ltr">Headline</bdi>)' : 'Headline' !!}</label>
         <input id="mp-head" type="text" maxlength="90" value="{{ $ar ? 'توصيل مجاني خلال 24 ساعة' : 'Free 24-Hour Express Delivery' }}">
 
         <label for="mp-body">{{ $ar ? 'النص الأساسي / الوصف' : 'Primary text / description' }}</label>
         <textarea id="mp-body" rows="3" maxlength="300">{{ $ar ? 'اكتشف تشكيلة الأثاث الجديدة لعام 2027 مع ضمان لمدة سنتين وخيارات تقسيط مريحة.' : 'Explore our 2027 home collection with a 2-year warranty and flexible installment plans.' }}</textarea>
 
-        <label for="mp-cta">{{ $ar ? 'زر الدعوة لاتخاذ إجراء (CTA)' : 'Call-to-action button' }}</label>
+        <label for="mp-cta">{!! $ar ? 'زر الدعوة لاتخاذ إجراء (<bdi dir="ltr">CTA</bdi>)' : 'Call-to-action button' !!}</label>
         <input id="mp-cta" type="text" maxlength="30" value="{{ $ar ? 'تسوق الآن' : 'Shop Now' }}">
     </form>
 

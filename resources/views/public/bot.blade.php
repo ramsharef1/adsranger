@@ -5,7 +5,7 @@
 $ar = ($lang ?? 'ar') === 'ar';
 $arPath = '/bot';
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $ar ? 'ar' : 'en');
-$title = $ar ? 'AdsRangerBot: زاحف AdsRanger | AdsRanger' : 'AdsRangerBot: the AdsRanger crawler | AdsRanger';
+$title = $ar ? 'زاحف AdsRanger (AdsRangerBot) | AdsRanger' : 'AdsRangerBot: the AdsRanger crawler | AdsRanger';
 $meta = $ar
     ? 'ما هو AdsRangerBot، ومتى يفتح صفحات موقعك، وكيف تتعرّف عليه أو تمنعه.'
     : 'What AdsRangerBot is, when it opens pages on your site, and how to recognise or block it.';
@@ -29,12 +29,12 @@ $how = $ar ? [
 @push('styles')
 <style>
 .bot{padding-top:24px;max-width:860px}
-.bot pre{direction:ltr;text-align:left;background:var(--surface);padding:12px 16px;border-radius:8px;overflow-x:auto;font-size:14px}
+.bot pre{direction:ltr;text-align:left;background:var(--surface);padding:12px 16px;border-radius:8px;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}
 </style>
 @endpush
 
 @section('hero')
-<h1>{!! $ar ? $bdi('AdsRangerBot').': زاحف '.$bdi('AdsRanger') : 'AdsRangerBot: the AdsRanger crawler' !!}</h1>
+<h1>{!! $ar ? 'زاحف '.$bdi('AdsRanger').' ('.$bdi('AdsRangerBot').')' : 'AdsRangerBot: the AdsRanger crawler' !!}</h1>
 <p class="muted" style="font-size:17px">{!! $ar
 ? 'يفتح '.$bdi('AdsRangerBot').' صفحات عامة فقط، عندما يشغّل شخص إحدى أدوات '.$bdi('AdsRanger').' المجانية، مثل فاحص روابط اللغات أو فحص الصفحة.'
 : 'AdsRangerBot opens public pages only when someone runs one of AdsRanger\'s free tools, such as the hreflang checker or the page audit.' !!}</p>

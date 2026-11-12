@@ -206,4 +206,11 @@ HTML;
         $this->get('/en/bot')->assertOk()->assertSee('never signs in or submits forms', false);
         $this->assertStringContainsString('/bot', $this->get('/sitemaps/pages.xml')->getContent());
     }
+
+    public function test_tools_menu_link_shows_its_label_not_raw_paths(): void
+    {
+        config(['seo_tools.public' => true]);
+        $this->get('/')->assertOk()->assertSee('كل الأدوات المجانية')->assertDontSee('>/tools/page-audit<', false);
+        $this->get('/en/about')->assertOk()->assertSee('All free tools');
+    }
 }

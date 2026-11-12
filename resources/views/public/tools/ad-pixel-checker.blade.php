@@ -37,7 +37,7 @@ $t = $ar ? [
         <input id="cp-url" type="url" dir="ltr" inputmode="url" maxlength="500" placeholder="https://example.com" value="https://adsranger.com/">
         <p class="tl-err" id="cp-err" hidden></p>
         <div class="tl-actions"><button type="submit" class="btn" id="cp-btn">{{ $t['run'] }}</button></div>
-        <p class="tl-hint" style="margin-top:12px">{{ $t['scope'] }}</p>
+        <p class="tl-hint" style="margin-top:12px">{{ \App\Support\Seo\ToolCopy::html($t['scope'], $ar) }}</p>
     </form>
     <div class="tl-out" id="cp-out" aria-live="polite">
         <p class="muted" style="margin:0">{{ $privacy }}</p>
