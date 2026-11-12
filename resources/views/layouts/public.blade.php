@@ -42,7 +42,16 @@
 <meta property="og:title" content="{{ $title }}">
 <meta property="og:description" content="{{ $meta }}">
 <meta property="og:url" content="{{ $selfUrl }}">
+@php($shareImage = \App\Support\ShareCard::imageUrl($arPath, $ar))
+@if ($shareImage)
+<meta property="og:image" content="{{ $shareImage }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{ \App\Support\ShareCard::card($arPath, $ar)['headline'] }}">
+<meta name="twitter:image" content="{{ $shareImage }}">
+@else
 <meta property="og:image" content="https://adsranger.com/brand/icon-512.png">
+@endif
 <meta property="og:locale" content="{{ $ar ? 'ar_AR' : 'en_US' }}">
 <meta property="og:locale:alternate" content="{{ $ar ? 'en_US' : 'ar_AR' }}">
 <meta name="twitter:card" content="summary_large_image">

@@ -33,6 +33,8 @@ class PublicSite
             '/roadmap' => ['خارطة الطريق', 'Roadmap', 'ما هو متاح الآن وما نبنيه للإطلاق في 2027', 'What is live today and planned for 2027'],
             '/integrations' => ['المنصات الإعلانية', 'Ad platforms', 'المنصات التي نخطط لربطها، وكيف', 'The platforms we plan to connect, and how'],
             '/pricing' => ['الباقات', 'Plans', 'ما تخطط كل باقة لتقديمه', 'What each plan is planned to include'],
+            '/accessibility' => ['إمكانية الوصول', 'Accessibility', 'كيف نجعل الموقع سهل الاستخدام للجميع', 'How we make the site usable for everyone'],
+            '/bot' => ['زاحف AdsRanger', 'AdsRangerBot', 'متى يفتح فاحصنا صفحات موقعك', 'When our checker opens pages on your site'],
             '/security' => ['الأمان وبياناتك', 'Security and your data', 'كيف نحمي بيانات وكالتك وعملائك', 'How we protect agency and client data'],
             '/ramadan-2027' => ['دليل رمضان 2027', 'Ramadan 2027 guide', 'خطة إعلانية لكل مرحلة من الشهر', 'An ad plan for every stage of the month'],
             '/tools' => ['كل الأدوات المجانية', 'All free tools', 'أدوات مجانية للإعلانات والسيو', 'Free ad and SEO tools'],
@@ -128,7 +130,7 @@ class PublicSite
             [$ar ? 'المنتج' : 'Product', ['/features', '/reports', '/studio', '/search', '/ai', '/demo-report', '/integrations', '/pricing', '/security']],
             [$ar ? 'أدوات وأدلة مجانية' : 'Free tools & guides', array_merge(config('seo_tools.public') ? ['/tools'] : [], ['/tools/ramadan-budget-calculator', '/ramadan-2027', '/mena-calendar'])],
             [$ar ? 'الشركة' : 'Company', ['/about', '/roadmap', '/partners', '/contact', '/solutions/agencies', '/solutions/freelancers', '/solutions/business-owners']],
-            [$ar ? 'القانونية' : 'Legal', ['/privacy', '/terms', '/data-deletion']],
+            [$ar ? 'القانونية' : 'Legal', ['/privacy', '/terms', '/data-deletion', '/accessibility']],
         ];
     }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PartnerApplication;
 use App\Models\WaitlistEntry;
+use App\Support\LlmsTxt;
 use App\Support\PublicSite;
 use App\Support\PublicUrl;
 use App\Support\Seo\CapiPixelChecker;
@@ -121,6 +122,18 @@ class PublicSiteController extends Controller
     public function bot(string $lang = 'ar')
     {
         return view('public.bot', ['lang' => $lang === 'en' ? 'en' : 'ar']);
+    }
+
+    /** /accessibility (R2-46, D-263; copy Growth Site_Adds_R2-46-48). */
+    public function accessibility(string $lang = 'ar')
+    {
+        return view('public.accessibility', ['lang' => $lang === 'en' ? 'en' : 'ar']);
+    }
+
+    /** /llms.txt (R2-48, D-263): plain text from App\Support\LlmsTxt. */
+    public function llmsTxt(): Response
+    {
+        return response(LlmsTxt::text(), 200, ['Content-Type' => 'text/plain; charset=utf-8']);
     }
 
     public function security(string $lang = 'ar')
@@ -380,6 +393,7 @@ class PublicSiteController extends Controller
             '/mena-calendar' => 'public/mena-calendar',
             '/security' => 'public/security',
             '/bot' => 'public/bot',
+            '/accessibility' => 'public/accessibility',
             '/about' => 'public/about',
             '/contact' => 'public/contact',
             '/partners' => 'public/partners',

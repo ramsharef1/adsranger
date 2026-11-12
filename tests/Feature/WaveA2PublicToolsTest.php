@@ -213,4 +213,20 @@ HTML;
         $this->get('/')->assertOk()->assertSee('كل الأدوات المجانية')->assertDontSee('>/tools/page-audit<', false);
         $this->get('/en/about')->assertOk()->assertSee('All free tools');
     }
+
+    public function test_llms_txt_accessibility_page_and_share_images(): void
+    {
+        config(['seo_tools.public' => true]);
+        $txt = $this->get('/llms.txt')->assertOk()->assertHeader('Content-Type', 'text/plain; charset=utf-8')->getContent();
+        $this->assertStringStartsWith('# AdsRanger', $txt);
+        $this->assertStringContainsString('(https://adsranger.com/en/tools/page-audit)', $txt);
+        $this->assertStringNotContainsString('never trained', $this->get('/en/ai')->getContent());
+
+        $this->get('/accessibility')->assertOk()->assertSee('إمكانية الوصول')->assertDontSee('compliant');
+        $this->get('/en/accessibility')->assertOk()->assertSee('WCAG 2.2 level AA');
+        $this->assertStringContainsString('/accessibility', $this->get('/sitemaps/pages.xml')->getContent());
+
+        $this->get('/tools/roas-calculator')->assertSee('https://adsranger.com/brand/og/ar/tools-roas-calculator.jpg', false);
+        $this->artisan('site:share-cards', ['--out' => 'storage/framework/testing-share-cards.json'])->assertExitCode(0);
+    }
 }

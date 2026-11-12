@@ -127,7 +127,7 @@ class PublicCatalog
                 'ar' => [
                     'nav' => 'الذكاء الاصطناعي',
                     'title' => 'الذكاء الاصطناعي لوكالات الإعلان بالعربية | AdsRanger',
-                    'meta' => 'مساعد ذكاء اصطناعي يشرح تغيرات الأداء ووتيرة الإنفاق بالعربية والإنجليزية اعتمادًا على بيانات مساحة عملك فقط، دون تدريب على بيانات العملاء.',
+                    'meta' => 'ملخّصات بالذكاء الاصطناعي بالعربية والإنجليزية تشرح تغيّر الحملات وتقترح ملاحظات التقرير من بيانات مساحة عملك. قيد التطوير، والإطلاق في 2027.',
                     'h1' => 'ذكاء اصطناعي يشرح أرقام حملاتك بالعربية دون اختلاق',
                     'lead' => 'تستخدم <bdi dir="ltr">AdsRanger</bdi> الذكاء الاصطناعي لتلخيص التنبيهات وتفسير تغيرات التكلفة وصياغة ملخصات التقارير من أرقام حسابك وحدها—ولا يتخذ أي قرار أو يعدّل ميزانية دون موافقة فريقك. قيد التطوير · الإطلاق في 2027.',
                     'cards' => [
@@ -139,7 +139,7 @@ class PublicCatalog
                 'en' => [
                     'nav' => 'AI',
                     'title' => 'AI for Ad Agencies in Arabic & English | AdsRanger',
-                    'meta' => 'Bilingual AI summaries that explain campaign shifts and draft report notes strictly from your workspace data—never trained on other clients.',
+                    'meta' => 'AI summaries in Arabic and English that explain campaign changes and draft report notes from your own workspace data. In development; launching 2027.',
                     'h1' => 'Bilingual AI grounded in your agency numbers—never on autopilot',
                     'lead' => 'AdsRanger uses AI to summarize alert triggers, explain pacing shifts, and draft report notes in Arabic and English. Nothing changes in any ad account without your team\'s approval. In development · launching in 2027.',
                     'cards' => [
