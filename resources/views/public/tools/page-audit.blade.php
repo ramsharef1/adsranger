@@ -18,6 +18,11 @@ $t = $ar ? [
         'missing_canonical' => 'الرابط المعتمد (canonical) مفقود.', 'image_missing_alt' => 'توجد صور بلا نص بديل (alt).',
         'page_is_noindex' => 'الصفحة تحتوي على وسم noindex يمنع أرشفتها.',
     ],
+    'notes' => 'تحسينات صغيرة (5 نقاط لكل منها):',
+    'n' => [
+        'no_json_ld' => 'لا توجد بيانات منظّمة (JSON-LD) في الصفحة.',
+        'no_question_heading' => 'لا يوجد عنوان فرعي بصيغة سؤال، وقد يساعد في الظهور ضمن الأسئلة الشائعة.',
+    ],
 ] : [
     'url' => 'Page URL', 'kw' => 'Target keyword (optional)', 'run' => 'Audit page', 'running' => 'Auditing…',
     'score' => 'Page audit score', 'ok' => 'No core on-page issues found.', 'serp' => 'Title: :tp px (:tc characters) · Description: :dp px (:dc characters)',
@@ -31,6 +36,11 @@ $t = $ar ? [
         'missing_h1' => 'Missing <h1> heading.', 'multiple_h1' => 'Multiple <h1> headings found.',
         'missing_canonical' => 'Missing rel="canonical" link.', 'image_missing_alt' => 'One or more images are missing alt text.',
         'page_is_noindex' => 'Page has a noindex meta tag.',
+    ],
+    'notes' => 'Small improvements (5 points each):',
+    'n' => [
+        'no_json_ld' => 'No structured data (JSON-LD) on the page.',
+        'no_question_heading' => 'No subheading phrased as a question, which can help the page show for common questions.',
     ],
 ];
 @endphp
@@ -94,6 +104,10 @@ $t = $ar ? [
         (d.issues || []).forEach(function (code) {
           out.appendChild(bidi(el('div', 'pa-issue'), T.m[code] || code));
         });
+        if (d.notes && d.notes.length) {
+          out.appendChild(el('p', 'muted', T.notes));
+          d.notes.forEach(function (code) { out.appendChild(bidi(el('div', 'muted'), T.n[code] || code)); });
+        }
         out.hidden = false;
       })
       .catch(function () { err.textContent = T.failed; err.hidden = false; })

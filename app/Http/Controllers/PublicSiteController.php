@@ -409,8 +409,6 @@ class PublicSiteController extends Controller
             '/search' => 'public/product/show',
             '/ai' => 'public/product/show',
             '/glossary' => 'public/glossary/index',
-            '/blog' => 'public/blog/index',
-            '/guides' => 'public/guides/index',
             '/solutions/agencies' => 'public/solution-role',
             '/solutions/freelancers' => 'public/solution-role',
             '/for-clients' => 'public/solution-role',
@@ -419,7 +417,8 @@ class PublicSiteController extends Controller
             '/privacy' => 'legal/page',
             '/terms' => 'legal/page',
             '/data-deletion' => 'legal/page',
-        ] + (config('seo_tools.public') ? (['/tools' => 'public/tools/index'] + collect(PublicSite::publicTools())->mapWithKeys(fn (string $t) => ['/tools/'.$t => 'public/tools/'.$t])->all()) : []);
+        ] + (PublicSite::articlesPublic() ? ['/blog' => 'public/blog/index', '/guides' => 'public/guides/index'] : [])
+          + (config('seo_tools.public') ? (['/tools' => 'public/tools/index'] + collect(PublicSite::publicTools())->mapWithKeys(fn (string $t) => ['/tools/'.$t => 'public/tools/'.$t])->all()) : []);
     }
 
     /** R-13: /sitemap.xml is a sitemap index; children are added as sections ship (features, guides, blog, …). */
@@ -528,26 +527,42 @@ class PublicSiteController extends Controller
 
     public function blogIndex(string $lang = 'ar'): Response
     {
-        return response()->view('public.blog.index', ['lang' => $lang === 'en' ? 'en' : 'ar']);
+        return $this->article('public.blog.index', ['lang' => $lang === 'en' ? 'en' : 'ar']);
     }
 
     public function blogShow(string $lang = 'ar', string $slug = ''): Response
     {
         abort_unless(isset(PublicCatalog::posts()[$slug]), 404);
 
-        return response()->view('public.blog.show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'slug' => $slug]);
+        return $this->article('public.blog.show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'slug' => $slug]);
     }
 
     public function guidesIndex(string $lang = 'ar'): Response
     {
-        return response()->view('public.guides.index', ['lang' => $lang === 'en' ? 'en' : 'ar']);
+        return $this->article('public.guides.index', ['lang' => $lang === 'en' ? 'en' : 'ar']);
     }
 
     public function guidesShow(string $lang = 'ar', string $slug = ''): Response
     {
         abort_unless(isset(PublicCatalog::guides()[$slug]), 404);
 
-        return response()->view('public.guides.show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'slug' => $slug]);
+        return $this->article('public.guides.show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'slug' => $slug]);
+    }
+
+    /**
+     * GB-01 / GB-02 (a): guide and blog pages answer, but send noindex until Growth's rewrite is published.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    private function article(string $view, array $data): Response
+    {
+        $public = PublicSite::articlesPublic();
+        $response = response()->view($view, $data + ['noindex' => ! $public]);
+        if (! $public) {
+            $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+        }
+
+        return $response;
     }
 
     public function solutionOrRolePage(string $lang = 'ar', string $pageKey = 'roadmap'): Response

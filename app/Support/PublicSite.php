@@ -87,6 +87,24 @@ class PublicSite
      *
      * @return list<array{label: string, path?: string, items?: list<string>}>
      */
+    /** GB-01 / GB-02 (a): the guide and blog pages are listed and linked only once Growth's rewrite is published. */
+    public static function articlesPublic(): bool
+    {
+        return (bool) config('seo_tools.articles_public');
+    }
+
+    /** True for /guides, /blog and their articles. */
+    public static function isArticlePath(string $path): bool
+    {
+        return (bool) preg_match('#^/(guides|blog)(/|$)#', $path);
+    }
+
+    /** False for an article path while the articles are held, so no public page links to them. */
+    public static function linkable(string $path): bool
+    {
+        return self::articlesPublic() || ! self::isArticlePath($path);
+    }
+
     /** Tools that are published: SEO_TOOLS_PUBLIC on and not held back (D-249). @return list<string> slugs */
     public static function publicTools(): array
     {

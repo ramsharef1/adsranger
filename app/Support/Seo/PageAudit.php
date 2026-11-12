@@ -131,6 +131,15 @@ class PageAudit
             $issues[] = 'page_is_noindex';
         }
 
+        // UX-253: the two small checks still cost points, so the result names them as notes instead of hiding them.
+        $notes = [];
+        if (! $hasJsonLd) {
+            $notes[] = 'no_json_ld';
+        }
+        if (! $hasQuestionHeading) {
+            $notes[] = 'no_question_heading';
+        }
+
         $weights = [
             'ar_lang' => 15,
             'rtl_dir' => 15,
@@ -171,6 +180,7 @@ class PageAudit
             'score' => $score,
             'checks' => $checks,
             'issues' => $issues,
+            'notes' => $notes,
             'serp' => self::serpWidths($title, $desc),
         ];
     }

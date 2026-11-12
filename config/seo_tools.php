@@ -8,6 +8,11 @@
 return [
     'public' => (bool) env('SEO_TOOLS_PUBLIC', false),
 
+    // GB-01 / GB-02 (a), Rami 2026-11-13: the /guides and /blog articles are thin E2 stubs. While this is false they answer
+    // with noindex, stay out of the sitemap, /llms.txt and the hubs' cards, and no page links to them. Growth rewrites
+    // them (GB-10 / GB-14); Rami switches this on when they are ready.
+    'articles_public' => (bool) env('SITE_ARTICLES_PUBLIC', false),
+
     // Each tool's view is resources/views/public/tools/<slug>.blade.php. URLs per Content's map (ADSR-042 §13) where set;
     // the three ad tools (D-90) wait for Content's OK on their slugs.
     'tools' => [

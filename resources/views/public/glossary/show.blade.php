@@ -36,7 +36,9 @@
     </section>
     <p>
         <a href="{{ $u('/glossary') }}">{{ $ar ? '← كل مصطلحات القاموس' : '← All glossary terms' }}</a>
+        @if (\App\Support\PublicSite::linkable($item['related_path']))
         · <a href="{{ $u($item['related_path']) }}">{{ $ar ? 'الأداة أو الصفحة المرتبطة →' : 'Related tool or page →' }}</a>
+        @endif
     </p>
 </div>
 @endsection

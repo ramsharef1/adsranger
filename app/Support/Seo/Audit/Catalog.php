@@ -40,7 +40,7 @@ class Catalog
                 'لا تحمل الصفحة lang="ar"، فلا تعرف محركات البحث وقارئات الشاشة أنها عربية.', 'The page has no lang="ar", so search engines and screen readers don\'t know it is Arabic.',
                 'أضف lang="ar" (أو lang="ar-SA" مثلًا) إلى وسم <html>.', 'Add lang="ar" (or a regional code such as lang="ar-SA") to the <html> tag.'],
             'AR-FONT-01' => [self::WARNING, 'arabic', 'لا يوجد خط عربي من الويب', 'No Arabic web font',
-                'الصفحة عربية ولا تحمّل خطًا عربيًا، فتُعرض بخط النظام الذي يختلف بين الأجهزة.', 'The page is Arabic but loads no Arabic web font, so it renders in the system font, which differs between devices.',
+                'تحمّل الصفحة خطوطًا من الويب لكن لا يدعم أيٌّ منها العربية، فيُعرض النص العربي بخط النظام الذي يختلف بين الأجهزة.', 'The page loads web fonts but none covers Arabic, so Arabic text falls back to a system font that differs between devices.',
                 'حمّل خطًا عربيًا (مثل IBM Plex Sans Arabic أو Tajawal) مع font-display: swap.', 'Load an Arabic web font (for example IBM Plex Sans Arabic or Tajawal) with font-display: swap.'],
             'AR-FONT-02' => [self::INFO, 'arabic', 'الخط بلا font-display', 'Font without font-display',
                 'الخط المحمّل بلا font-display، فقد يظهر نص فارغ حتى يكتمل تحميل الخط.', 'The loaded font has no font-display, so text may stay invisible until the font loads.',

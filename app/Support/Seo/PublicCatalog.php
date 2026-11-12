@@ -457,9 +457,9 @@ class PublicCatalog
             'performance-max' => [
                 'term_ar' => 'حملات الأداء الأقصى (Performance Max)',
                 'term_en' => 'Performance Max',
-                'def_ar' => 'نوع حملات في إعلانات جوجل يوزع الميزانية تلقائيًا عبر البحث ويوتيوب والشبكة الإعلانية وخرائط جوجل بناءً على هدف التحويل.',
+                'def_ar' => 'نوع حملات في Google Ads يوزّع الميزانية تلقائيًا على البحث والشبكة الإعلانية ومنصة YouTube وخرائط Google بناءً على هدف التحويل.',
                 'def_en' => 'A goal-based Google Ads campaign type that serves across Search, YouTube, Display, Discover, Gmail, and Maps from one budget.',
-                'formula_ar' => 'عائد الحملة = إجمالي قيمة التحويلات عبر كل قنوات جوجل ÷ إنفاق الحملة',
+                'formula_ar' => 'عائد الحملة = إجمالي قيمة التحويلات عبر كل قنوات Google ÷ إنفاق الحملة',
                 'formula_en' => 'Campaign Return = Total Conversion Value Across Google Inventory / Spend',
                 'example_ar' => 'تزويد الحملة بنصوص عربية وإنجليزية وصور واضحة وميزانية يومية 50 USD يساعدها على اختبار القنوات الأعلى تحويلًا.',
                 'example_en' => 'Supplying bilingual asset groups and a steady 50 USD daily budget helps the campaign optimize across placements.',
@@ -803,14 +803,14 @@ class PublicCatalog
     {
         return [
             'meta-ads-mena' => [
-                'title_ar' => 'دليل إعلانات Meta (فيسبوك وإنستغرام) في الخليج والمنطقة | AdsRanger',
+                'title_ar' => 'دليل إعلانات Meta في الخليج والمنطقة (Facebook، Instagram) | AdsRanger',
                 'title_en' => 'Meta Ads (Facebook & Instagram) Guide for MENA Agencies | AdsRanger',
                 'meta_ar' => 'دليل شامل لوكالات الإعلان لإدارة حملات Meta في أسواق الخليج والمنطقة: هيكلة الحسابات، صياغة الإعلانات العربية، وحملات الرسائل والعملاء المحتملين.',
                 'meta_en' => 'Comprehensive agency guide to managing Meta Ads across Gulf and MENA markets: account structure, Arabic copy, messaging ads, and lead forms.',
-                'summary_ar' => 'إرشادات عملية لوكالات التسويق لإدارة حملات فيسبوك وإنستغرام في أسواق الخليج والمنطقة، من كتابة النصوص العربية إلى مراقبة التشبع الإعلاني.',
+                'summary_ar' => 'إرشادات عملية لوكالات التسويق لإدارة حملات Meta على Facebook ومنصة Instagram في أسواق الخليج والمنطقة، من كتابة النصوص العربية إلى مراقبة التشبع الإعلاني.',
                 'summary_en' => 'Actionable framework for agencies running Facebook and Instagram campaigns in MENA—covering Arabic copy, lead quality, and creative fatigue.',
                 'sections_ar' => [
-                    ['h' => '1. هيكلة الحملات حسب هدف العمل الفعلي', 'p' => 'افصل بوضوح بين حملات المبيعات المباشرة، وحملات رسائل واتساب، وحملات نماذج العملاء المحتملين حتى تظل تكلفة النتيجة قابلة للمقارنة في تقارير العميل.'],
+                    ['h' => '1. هيكلة الحملات حسب هدف العمل الفعلي', 'p' => 'افصل بوضوح بين حملات المبيعات المباشرة، وحملات الرسائل عبر WhatsApp، وحملات نماذج العملاء المحتملين حتى تظل تكلفة النتيجة قابلة للمقارنة في تقارير العميل.'],
                     ['h' => '2. صياغة النصوص الإعلانية العربية ومراعاة اللهجات', 'p' => 'اختر بين العربية الفصحى الواضحة أو اللهجة المحلية المناسبة للسوق المستهدف، وتأكد من عدم انعكاس الأرقام أو الأسماء اللاتينية في العناوين.'],
                     ['h' => '3. مراقبة التكرار (Frequency) وتشبع الجمهور', 'p' => 'في الأسواق المحدودة جغرافيًا يرتفع معدل تكرار ظهور الإعلان بسرعة؛ راقب ارتفاع تكلفة النتيجة بالتوازي مع التكرار لتجديد التصاميم في الوقت المناسب.'],
                 ],
@@ -823,11 +823,11 @@ class PublicCatalog
                 'related_links' => ['/integrations', '/studio', '/tools/roas-calculator'],
             ],
             'google-ads-for-agencies' => [
-                'title_ar' => 'دليل إدارة إعلانات جوجل للوكالات في المنطقة | AdsRanger',
+                'title_ar' => 'دليل إدارة إعلانات Google للوكالات في المنطقة | AdsRanger',
                 'title_en' => 'Google Ads Guide for MENA Marketing Agencies | AdsRanger',
-                'meta_ar' => 'كيف تدير وكالات التسويق حملات بحث جوجل وPerformance Max بالعربية والإنجليزية: أنواع المطابقة، الكلمات السلبية، وجاهزية صفحات الهبوط.',
+                'meta_ar' => 'كيف تدير وكالات التسويق حملات البحث في Google وحملات Performance Max بالعربية والإنجليزية: أنواع المطابقة، الكلمات السلبية، وجاهزية صفحات الهبوط.',
                 'meta_en' => 'How MENA agencies structure Arabic and English Google Search and Performance Max campaigns: match types, negatives, and landing page readiness.',
-                'summary_ar' => 'منهجية عملية لإدارة حملات بحث جوجل وPerformance Max للعملاء باللغتين العربية والإنجليزية، مع تغطية اختلافات الهمزات والكلمات السلبية.',
+                'summary_ar' => 'منهجية عملية لإدارة حملات البحث في Google وحملات Performance Max للعملاء باللغتين العربية والإنجليزية، مع تغطية اختلافات الهمزات والكلمات السلبية.',
                 'summary_en' => 'Practical blueprint for running bilingual Google Search and Performance Max accounts—covering Arabic spelling variants, negative lists, and landing page checks.',
                 'sections_ar' => [
                     ['h' => '1. تغطية صيغ الكتابة العربية في مجموعات الإعلانات', 'p' => 'استخدم مولد الكلمات المفتاحية العربية لرصد صيغ الهمزات والتاء المربوطة ومرادفات اللهجات التي يكتبها الباحثون فعليًا في محرك البحث.'],
@@ -843,11 +843,11 @@ class PublicCatalog
                 'related_links' => ['/integrations/google-ads', '/tools/arabic-keyword-generator', '/tools/page-audit'],
             ],
             'snapchat-tiktok-ads-gulf' => [
-                'title_ar' => 'دليل إعلانات سناب شات وتيك توك في السعودية والخليج | AdsRanger',
+                'title_ar' => 'دليل إعلانات Snapchat ومنصة TikTok في السعودية والخليج | AdsRanger',
                 'title_en' => 'Snapchat & TikTok Ads Guide for Gulf Campaigns | AdsRanger',
-                'meta_ar' => 'إرشادات لوكالات الإعلان لإدارة حملات الفيديو العمودي على سناب شات وتيك توك في أسواق الخليج: المقاسات، الرسائل التسويقية، ومتابعة الميزانيات.',
+                'meta_ar' => 'إرشادات لوكالات الإعلان لإدارة حملات الفيديو العمودي على Snapchat ومنصة TikTok في أسواق الخليج: المقاسات، الرسائل التسويقية، ومتابعة الميزانيات.',
                 'meta_en' => 'Agency guide to running vertical video campaigns on Snapchat and TikTok in Gulf markets: creative specs, hooks, and budget pacing.',
-                'summary_ar' => 'كيف تخطط وتدير حملات الفيديو العمودي على منصتي سناب شات وتيك توك لعملاء التجارة الإلكترونية والخدمات في أسواق الخليج.',
+                'summary_ar' => 'كيف تخطط وتدير حملات الفيديو العمودي على منصة Snapchat ومنصة TikTok لعملاء التجارة الإلكترونية والخدمات في أسواق الخليج.',
                 'summary_en' => 'How agencies plan, test, and pace vertical video campaigns across Snapchat and TikTok for Gulf e-commerce and service brands.',
                 'sections_ar' => [
                     ['h' => '1. تصميم الفيديو العمودي الكامل منذ الثواني الأولى', 'p' => 'اعتمد مقاس 9:16 الكامل مع نص عربي واضح في المنطقة الآمنة بعيدًا عن أزرار التفاعل، واذكر العرض الأساسي خلال أول ثانيتين.'],

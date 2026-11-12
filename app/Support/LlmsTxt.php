@@ -71,7 +71,7 @@ class LlmsTxt
             '## Guides and planning',
             '- [Ramadan 2027 advertising guide]('.$u('/ramadan-2027').'): A phase-by-phase Ramadan plan for agencies: prep dates, budget pacing, creative and reporting.',
             '- [MENA ad calendar 2027]('.$u('/mena-calendar').'): Key 2027 advertising dates across the region, with when to start planning and a source for each date.',
-            '- [Guides]('.$u('/guides').'): Guides for agencies on ad platforms, client reporting and budget pacing.',
+            ...(PublicSite::articlesPublic() ? ['- [Guides]('.$u('/guides').'): Guides for agencies on ad platforms, client reporting and budget pacing.'] : []),
             '- [Glossary]('.$u('/glossary').'): Ad and SEO terms with formulas and examples from the region.',
             '',
             '## Product (in development)',
