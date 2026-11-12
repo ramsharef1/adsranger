@@ -8,7 +8,7 @@
 <li><strong>Data from connected ad platforms:</strong> when you connect an account through the platform's own sign-in (OAuth), we receive an access token and, within the permissions you approve: ad account and business IDs and names, campaigns, ad sets, ads, creatives, budgets, audiences metadata, performance metrics, conversions and, if you turn on the leads features, lead form submissions.</li>
 <li><strong>Data from connected organic accounts:</strong> pages and profiles you connect, their posts, comments, messages and insights, and the content you schedule through AdsRanger.</li>
 <li><strong>Technical data:</strong> IP address, browser type, pages used and error logs, kept for security and to keep the service running.</li>
-<li><strong>Cookies:</strong> we use only the cookies needed to keep you signed in and protect forms. We do not use advertising or cross-site tracking cookies.</li>
+<li><strong>Cookies:</strong> we use the cookies needed to keep you signed in, remember your language and protect forms. On the public website, and only if you click "Accept analytics", we also use Google Analytics to count visits and see which pages are used; it runs with Google's advertising features off. If you choose "Essential only", Google Analytics is not loaded. You can change your choice any time in <a href="#" data-cookie-settings>cookie settings</a>. We do not use advertising or cross-site tracking cookies.</li>
 </ul>
 
 <h2>2. How we use data</h2>

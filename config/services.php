@@ -2,6 +2,11 @@
 
 return [
 
+    // GA4 on the public site (D-255 follow-up, Rami 2026-11-12). Loaded only after the visitor accepts analytics cookies.
+    'ga4' => [
+        'measurement_id' => preg_match('/^G-[A-Z0-9]{4,20}$/', (string) env('GA4_MEASUREMENT_ID', '')) ? env('GA4_MEASUREMENT_ID') : null,
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services

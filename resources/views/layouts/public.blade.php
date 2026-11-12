@@ -160,6 +160,7 @@ h3{font-size:18px;margin:0 0 6px}
 .stk .btn{width:100%}
 @media (max-width:767px){.stk.on{display:block}}
 /* cookie notice */
+.ck-btns{display:flex;gap:8px;flex-wrap:wrap}.ck .ck-alt{background:transparent;border:1px solid currentColor;color:inherit}
 .ck{position:fixed;inset-inline:0;bottom:0;z-index:50;background:var(--surface);border-top:1px solid var(--line);font-size:14px}
 .ck .wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:10px}
 .ck p{margin:0;flex:1;min-width:220px}
@@ -290,10 +291,16 @@ input[type=text],input[type=email],input[type=number],select,textarea{width:100%
 @if ($sticky)
 <div class="stk" id="ar-sticky"><a class="btn" href="{{ $u('/waitlist') }}?type=agency" data-cta="waitlist" data-pos="sticky">{{ $waitlistLabel }}</a></div>
 @endif
+@php($gaId = config('services.ga4.measurement_id'))
 <div class="ck" id="ar-cookie-banner" role="region" aria-label="{{ $ar ? 'إشعار ملفات تعريف الارتباط' : 'Cookie notice' }}" hidden>
     <div class="wrap">
+@if ($gaId)
+        <p><span class="ck-long">{!! $ar ? 'نستخدم ملفات تعريف الارتباط الأساسية لتشغيل الموقع، وبموافقتك نستخدم <bdi dir="ltr">Google Analytics</bdi> لمعرفة كيف يُستخدم الموقع، دون أي ميزات إعلانية. راجع <a href="/privacy">سياسة الخصوصية</a>.' : 'We use essential cookies to run the site and, with your OK, Google Analytics to see how the site is used, with no ad features. See our <a href="/en/privacy">privacy policy</a>.' !!}</span><span class="ck-short">{!! $ar ? 'ملفات أساسية، و<bdi dir="ltr">Google Analytics</bdi> بموافقتك فقط. <a href="/privacy">الخصوصية</a>' : 'Essential cookies, Google Analytics only with your OK. <a href="/en/privacy">Privacy</a>' !!}</span></p>
+        <div class="ck-btns"><button type="button" class="btn" id="ar-cookie-accept" data-consent="analytics">{{ $ar ? 'قبول التحليلات' : 'Accept analytics' }}</button><button type="button" class="btn ck-alt" data-consent="essential">{{ $ar ? 'الأساسية فقط' : 'Essential only' }}</button></div>
+@else
         <p><span class="ck-long">{!! $ar ? 'نستخدم ملفات تعريف الارتباط الأساسية فقط لتشغيل الجلسات وحفظ اللغة والأمان، دون أي أدوات تتبّع إعلانية. راجع <a href="/privacy">سياسة الخصوصية</a>.' : 'We only use essential cookies for sign-in sessions, language and security, with no third-party ad trackers. See our <a href="/en/privacy">privacy policy</a>.' !!}</span><span class="ck-short">{!! $ar ? 'ملفات تعريف ارتباط أساسية فقط، دون تتبّع إعلاني. <a href="/privacy">الخصوصية</a>' : 'Essential cookies only, no ad trackers. <a href="/en/privacy">Privacy</a>' !!}</span></p>
-        <button type="button" class="btn" id="ar-cookie-accept">{{ $ar ? 'حسنًا' : 'Got it' }}</button>
+        <button type="button" class="btn" id="ar-cookie-accept" data-consent="essential">{{ $ar ? 'حسنًا' : 'Got it' }}</button>
+@endif
     </div>
 </div>
 <script>
@@ -312,12 +319,22 @@ input[type=text],input[type=email],input[type=number],select,textarea{width:100%
   document.querySelectorAll('[data-theme-toggle]').forEach(function(b){b.addEventListener('click',function(){var d=!isDark();root.setAttribute('data-theme',d?'dark':'light');try{localStorage.setItem('ar_theme',d?'dark':'light');}catch(e){}sync();});});
   sync();
   var ck=document.getElementById('ar-cookie-banner');
-  if(ck&&document.cookie.indexOf('ar_cookie_ok=1')===-1){ck.hidden=false;document.body.style.paddingBottom=ck.offsetHeight+'px';}
+  // Consent (GA4, 2026-11-12): ar_consent=analytics|essential. GA loads only after "analytics"; no ad features.
+  var GA=@json($gaId);
+  function consent(){var m=document.cookie.match(/(?:^|; )ar_consent=(analytics|essential)/);return m?m[1]:null;}
+  function loadGa(){if(!GA||window.gtag){return;}window.dataLayer=window.dataLayer||[];window.gtag=function(){window.dataLayer.push(arguments);};
+    window.gtag('js',new Date());window.gtag('config',GA,{allow_google_signals:false,allow_ad_personalization_signals:false});
+    var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA);document.head.appendChild(s);}
+  if(consent()==='analytics'){loadGa();}
+  function showCk(){if(ck){ck.hidden=false;document.body.style.paddingBottom=ck.offsetHeight+'px';}}
+  if(ck&&!consent()){showCk();}
+  document.querySelectorAll('[data-cookie-settings]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();showCk();});});
   var ok=document.getElementById('ar-cookie-accept');
   var stk=document.getElementById('ar-sticky'),cb=document.querySelector('.cb,.hp-close'),hero=document.querySelector('.ph,.hp-hero');
   function stkSync(){if(!stk){return;}var cookieShown=ck&&!ck.hidden,past=hero?hero.getBoundingClientRect().bottom<0:true,atEnd=cb?cb.getBoundingClientRect().top<window.innerHeight:false;var on=!cookieShown&&past&&!atEnd;stk.classList.toggle('on',on);document.body.style.paddingBottom=cookieShown?ck.offsetHeight+'px':(on||past?'64px':'');}
   if(stk&&window.matchMedia('(max-width:767px)').matches){window.addEventListener('scroll',stkSync,{passive:true});stkSync();}
-  if(ok){ok.addEventListener('click',function(){document.cookie='ar_cookie_ok=1; Max-Age=15552000; Path=/; SameSite=Lax';ck.hidden=true;document.body.style.paddingBottom='';stkSync();});}
+  document.querySelectorAll('#ar-cookie-banner [data-consent]').forEach(function(b){b.addEventListener('click',function(){var v=b.getAttribute('data-consent');
+    document.cookie='ar_consent='+v+'; Max-Age=15552000; Path=/; SameSite=Lax; Secure';ck.hidden=true;document.body.style.paddingBottom='';stkSync();if(v==='analytics'){loadGa();}});});
   document.addEventListener('click',function(e){var a=e.target.closest('[data-cta]');if(a&&window.gtag){window.gtag('event','cta_click',{cta:a.getAttribute('data-cta'),position:a.getAttribute('data-pos')});}});
 })();
 </script>
