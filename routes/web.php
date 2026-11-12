@@ -6,6 +6,7 @@ use App\Http\Controllers\ClientReportController;
 use App\Http\Controllers\ConnectController;
 use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\MagicLoginController;
+use App\Http\Controllers\PublicAttributionCollectorController;
 use App\Http\Controllers\PublicSiteController;
 use App\Http\Controllers\ReportUnsubscribeController;
 use App\Http\Controllers\StudioBriefController;
@@ -163,6 +164,16 @@ Route::post('/onboard/{token}', [ClientOnboardingController::class, 'submit'])
     ->middleware('throttle:20,1')->where('token', '[A-Za-z0-9]{32,64}')->name('client.onboard.submit');
 Route::get('/api/v1/export/{token}', [ClientOnboardingController::class, 'exportFeed'])
     ->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{32,64}')->name('api.export.feed');
+
+// Wave B.2 (#195 & #202): First-party CAPI collector relay & post-purchase HDYHAU micro-survey (404 while intelligence_hub is off)
+Route::get('/collect/{token}', [PublicAttributionCollectorController::class, 'status'])
+    ->middleware('throttle:120,1')->where('token', '[A-Za-z0-9]{32,64}')->name('public.collect.status');
+Route::post('/collect/{token}', [PublicAttributionCollectorController::class, 'collect'])
+    ->middleware('throttle:120,1')->where('token', '[A-Za-z0-9]{32,64}')->name('public.collect.ingest');
+Route::get('/survey/{token}', [PublicAttributionCollectorController::class, 'showSurvey'])
+    ->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{32,64}')->name('public.survey.show');
+Route::post('/survey/{token}', [PublicAttributionCollectorController::class, 'submitSurvey'])
+    ->middleware('throttle:30,1')->where('token', '[A-Za-z0-9]{32,64}')->name('public.survey.submit');
 
 // Wave 21 public growth pages (E2 `7c3df2e`) held back 2026-11-07 (D-168): the partner directory (view kept as
 // public/partners-held; /partners is now the P-25 design-partner page, D-219), case studies and
