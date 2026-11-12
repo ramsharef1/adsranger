@@ -98,7 +98,9 @@ class SeoAuditA1Test extends TestCase
         $this->assertSame(3, $audit->critical_count); // AR-RTL-01 + AR-LANG-01 on /services, STATUS-01 on /missing
         $this->assertSame(SiteAuditor::score(['critical' => $audit->critical_count, 'warning' => $audit->warning_count, 'info' => $audit->info_count], 4), $audit->score);
         $this->assertGreaterThan(0, $audit->score);
-        $this->assertLessThan(100, $audit->score);
+        $this->assertLessThanOrEqual(79, $audit->score, 'UX-247: any error caps the score in the amber band');
+        $this->assertSame(79, SiteAuditor::score(['critical' => 1, 'warning' => 0, 'info' => 0], 200));
+        $this->assertSame(100, SiteAuditor::score(['critical' => 0, 'warning' => 0, 'info' => 50], 10));
     }
 
     public function test_robots_disallow_all_blocks_the_audit(): void

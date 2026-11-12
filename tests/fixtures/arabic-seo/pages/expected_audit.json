@@ -57,8 +57,7 @@
     ],
     "page-24.html": [
         "HREF-04",
-        "HREF-05",
-        "IDX-03"
+        "HREF-05"
     ],
     "page-25.html": [
         "HREF-02"
@@ -79,5 +78,28 @@
         "IDX-01",
         "META-01",
         "SCHEMA-01"
+    ],
+    "page-29.html": [
+        "AR-FONT-01",
+        "AR-FONT-02",
+        "AR-ONPAGE-01",
+        "AR-ONPAGE-02",
+        "AR-TITLE-02",
+        "H1-02"
+    ],
+    "page-30.html": [
+        "AR-TITLE-03",
+        "META-04",
+        "URL-03"
+    ],
+    "page-31.html": [
+        "META-03",
+        "META-04"
+    ],
+    "page-32.html": [
+        "META-03"
+    ],
+    "page-33.html": [
+        "IDX-03"
     ]
 }

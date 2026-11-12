@@ -32,11 +32,12 @@ class SeoAuditCommand extends Command
             $url = preg_match('/<link[^>]*hreflang=["\']'.$lang.'(?:[-_][A-Za-z]+)?["\'][^>]*href=["\']([^"\']+)["\']/i', $html, $m)
                 || preg_match('/<link[^>]*rel=["\']canonical["\'][^>]*href=["\']([^"\']+)["\']/i', $html, $m) ? $m[1] : 'https://example.com/ar/'.pathinfo($name, PATHINFO_FILENAME);
             $parsed = PageParser::parse($html, $url);
-            $pages[$url] = ['parsed' => $parsed, 'status' => 200, 'name' => $name];
+            $keyword = preg_match('/<meta[^>]*name=["\']x-audit-keyword["\'][^>]*content=["\']([^"\']+)["\']/i', $html, $km) ? $km[1] : null;
+            $pages[$url] = ['parsed' => $parsed, 'status' => 200, 'name' => $name, 'keyword' => $keyword];
         }
         $siteIssues = Rules::site(array_map(fn (array $p) => ['parsed' => $p['parsed'], 'status' => 200], $pages));
         foreach ($pages as $url => $p) {
-            $codes = array_values(array_unique(array_map(fn (array $i) => $i[0], array_merge(Rules::page($p['parsed'], $url, 200), $siteIssues[$url] ?? []))));
+            $codes = array_values(array_unique(array_map(fn (array $i) => $i[0], array_merge(Rules::page($p['parsed'], $url, 200, $p['keyword']), $siteIssues[$url] ?? []))));
             sort($codes);
             $actual[$p['name']] = $codes;
         }
@@ -68,6 +69,13 @@ class SeoAuditCommand extends Command
                     $falseCrit++;
                     $missing[] = "$name: unexpected $code";
                 }
+            }
+        }
+        // UX-249: every rule that the fixtures can exercise is expected at least once (crawl-status rules are covered by SeoAuditA1Test).
+        $expectedAll = array_unique(array_merge(...array_values($expected ?: [[]])));
+        foreach (array_keys(Catalog::rules()) as $code) {
+            if (! in_array($code, ['STATUS-01', 'LINK-01', 'LINK-02', 'HREF-06'], true) && ! in_array($code, $expectedAll, true)) {
+                $missing[] = "no fixture expects $code";
             }
         }
         foreach ($missing as $m) {

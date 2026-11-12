@@ -16,6 +16,7 @@ class PageAuditTest extends TestCase
     {
         $html = (string) file_get_contents(base_path('tests/fixtures/arabic-seo/pages/page-01.html'));
         $res = PageAudit::auditHtml($html);
+        $this->assertTrue(PageAudit::auditHtml('<html lang="ar" dir="rtl"><head><title>ت</title></head><body><img src="/l.svg" alt=""></body></html>')['checks']['images_have_alt'], 'UX-244: alt="" is decorative, not missing');
         $this->assertArrayHasKey('serp', $res); // the live tool reads it (cl81: every real audit 500'd without it)
         $this->assertSame(100, $res['score']);
         $this->assertTrue($res['checks']['ar_lang']);

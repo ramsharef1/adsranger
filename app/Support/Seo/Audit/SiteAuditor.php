@@ -11,7 +11,7 @@ use Throwable;
 
 /**
  * Runs one SeoAudit end to end (A1): robots → crawl → page rules → site rules → persist → score.
- * Score (Rami 13:41, G-4): max(0, 100 − (10 × errors + 3 × warnings) ÷ pages crawled), rounded; not a ranking claim.
+ * Score (Rami 13:41, G-4): max(0, 100 − (10 × errors + 3 × warnings) ÷ pages crawled), rounded, capped at 79 while any error exists (UX-247); not a ranking claim.
  */
 class SiteAuditor
 {
@@ -125,7 +125,10 @@ class SiteAuditor
         $w = config('seo_audit.score_weights', ['critical' => 10, 'warning' => 3, 'info' => 0]);
         $penalty = ($w['critical'] * $counts['critical'] + $w['warning'] * $counts['warning'] + $w['info'] * $counts['info']) / $pages;
 
-        return (int) max(0, min(100, round(100 - $penalty)));
+        $score = (int) max(0, min(100, round(100 - $penalty)));
+
+        // UX-247: one error on a big site must not read as teal; any error caps the score in the amber band.
+        return $counts['critical'] > 0 ? min($score, 79) : $score;
     }
 
     private function finish(SeoAudit $audit, string $status, ?string $error = null): SeoAudit

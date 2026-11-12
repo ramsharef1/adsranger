@@ -113,7 +113,8 @@ class Rules
         }
         if ($p['canonical'] === '') {
             $issues[] = ['IDX-02', ''];
-        } elseif (PageParser::normalise($p['canonical']) !== PageParser::normalise($url) && ! self::sameButSlash($p['canonical'], $url)) {
+        } elseif (PageParser::normalise($p['canonical']) !== PageParser::normalise($url) && ! self::sameButSlash($p['canonical'], $url)
+            && ! in_array('HREF-04', array_column($issues, 0), true)) { // UX-248: one cause, one issue
             $issues[] = ['IDX-03', $p['canonical']];
         }
 

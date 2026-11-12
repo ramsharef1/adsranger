@@ -53,7 +53,7 @@
                 <label><input type="checkbox" wire:model="consent" style="margin-top:5px"> <span>{{ __('I confirm the agency has the client\'s permission to audit and track this site.') }}</span></label>
                 @error('newSiteUrl')<div class="sa-err">{{ $message }}</div>@enderror
                 <div><button type="button" class="sa-btn" wire:click="addSite">{{ __('Add site') }}</button></div>
-                <p class="sa-muted">{{ __('Your plan: :sites site(s) and :pages pages a month. Used this month: :used.', ['sites' => $limits['sites'], 'pages' => number_format($limits['pages']), 'used' => number_format($pagesUsed)]) }}</p>
+                <p class="sa-muted">{{ __('Your plan allows :sites and :pages a month. Used this month: :used.', ['sites' => trans_choice('{1} one site|{2} two sites|[3,10] :n sites|[11,*] :n sites', $limits['sites'], ['n' => $limits['sites']]), 'pages' => trans_choice('{1} one page|{2} two pages|[3,10] :n pages|[11,*] :n pages', $limits['pages'], ['n' => number_format($limits['pages'])]), 'used' => number_format($pagesUsed)]) }}</p>
             </div>
         @elseif ($sites->isEmpty())
             <p class="sa-muted">{{ __('Add the client\'s site to start auditing it.') }} {{ __('Only the workspace owner or an admin can add sites and run audits.') }}</p>
@@ -78,14 +78,14 @@
                         <button type="button" class="sa-btn ghost" wire:click="stopAudit">{{ __('Stop the audit') }}</button>
                     @else
                         <input type="text" wire:model="keyword" placeholder="{{ __('Target keyword (optional)') }}" aria-label="{{ __('Target keyword (optional)') }}" style="min-height:44px;border-radius:8px;border:1px solid rgba(148,163,184,.5);padding:8px 12px;background:transparent;min-width:220px">
-                        <button type="button" class="sa-btn" wire:click="runAudit" wire:confirm="{{ __('Run the audit now? It opens up to :n pages of this site and counts them against this month\'s limit.', ['n' => min((int) config('seo_audit.max_pages_per_run'), max(0, $limits['pages'] - $pagesUsed))]) }}" @disabled($pagesUsed >= $limits['pages'])>{{ __('Audit now') }}</button>
+                        <button type="button" class="sa-btn" wire:click="runAudit" wire:confirm="{{ __('Run the audit now? It opens up to :pages of this site and counts them against this month\'s limit.', ['pages' => trans_choice('{1} one page|{2} two pages|[3,10] :n pages|[11,*] :n pages', min((int) config('seo_audit.max_pages_per_run'), max(0, $limits['pages'] - $pagesUsed)), ['n' => min((int) config('seo_audit.max_pages_per_run'), max(0, $limits['pages'] - $pagesUsed))])]) }}" @disabled($pagesUsed >= $limits['pages'])>{{ __('Audit now') }}</button>
                     @endif
                 @endif
                 @if ($audit && $audit->status === 'done')
                     <button type="button" class="sa-btn ghost" wire:click="downloadCsv">{{ __('Export CSV') }}</button>
                 @endif
             </div>
-            <p class="sa-muted" style="margin-top:8px">{{ __('Uses up to :n pages of this month\'s limit (remaining :left).', ['n' => (int) config('seo_audit.max_pages_per_run'), 'left' => number_format(max(0, $limits['pages'] - $pagesUsed))]) }}</p>
+            <p class="sa-muted" style="margin-top:8px">{{ __('Uses up to :pages of this month\'s limit (remaining :left).', ['pages' => trans_choice('{1} one page|{2} two pages|[3,10] :n pages|[11,*] :n pages', (int) config('seo_audit.max_pages_per_run'), ['n' => (int) config('seo_audit.max_pages_per_run')]), 'left' => trans_choice('{1} one page|{2} two pages|[3,10] :n pages|[11,*] :n pages', max(0, $limits['pages'] - $pagesUsed), ['n' => number_format(max(0, $limits['pages'] - $pagesUsed))])]) }}</p>
 
             @if ($pagesUsed >= $limits['pages'])
                 <p class="sa-muted" style="margin-top:8px;color:#b45309">{{ __('Audits are paused: you have reached this month\'s page limit.') }} {{ __('It renews on :date.', ['date' => now()->addMonthNoOverflow()->startOfMonth()->translatedFormat('j F')]) }}</p>
@@ -97,7 +97,7 @@
                         <p class="sa-muted" style="margin-top:12px" aria-live="polite">{{ __('The audit is queued.') }}</p>
                         @break
                     @case('running')
-                        <p class="sa-muted" style="margin-top:12px" aria-live="polite">{{ __('Auditing: :done of :total pages.', ['done' => $audit->pages_done, 'total' => $audit->pages_planned]) }}</p>
+                        <p class="sa-muted" style="margin-top:12px" aria-live="polite">{{ __('Auditing: :done of :total.', ['done' => $audit->pages_done, 'total' => trans_choice('{1} one page|{2} two pages|[3,10] :n pages|[11,*] :n pages', $audit->pages_planned, ['n' => $audit->pages_planned])]) }}</p>
                         <div style="height:8px;border-radius:4px;background:rgba(148,163,184,.25);margin-top:6px;max-width:420px"><div style="height:8px;border-radius:4px;background:#0f766e;width:{{ $audit->pages_planned > 0 ? min(100, (int) round($audit->pages_done / $audit->pages_planned * 100)) : 0 }}%"></div></div>
                         @break
                     @case('blocked')
@@ -115,7 +115,7 @@
                     @case('done')
                         @php $band = $audit->score >= 80 ? '' : ($audit->score >= 50 ? 'mid' : 'low'); @endphp
                         <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-top:14px">
-                            <div class="sa-ring {{ $band }}" role="img" aria-label="{{ __('Site health score') }} {{ $audit->score }}" title="{{ __('100 minus (:c × errors + :w × warnings) per page audited. Not a Google ranking.', ['c' => $weights['critical'], 'w' => $weights['warning']]) }}">{{ $audit->score }}</div>
+                            <div class="sa-ring {{ $band }}" role="img" aria-label="{{ __('Site health score') }} {{ $audit->score }}" title="{{ __('Site health score: 100 minus the average deduction per page audited (:c points per error, :w per warning). Not a Google ranking.', ['c' => $weights['critical'], 'w' => $weights['warning']]) }}">{{ $audit->score }}</div>
                             <div class="sa-grid" style="flex:1 1 320px">
                                 <div class="sa-card"><strong>{{ $audit->critical_count }}</strong><span>{{ __('Errors') }}</span></div>
                                 <div class="sa-card"><strong>{{ $audit->warning_count }}</strong><span>{{ __('Warnings') }}</span></div>
@@ -123,9 +123,10 @@
                                 <div class="sa-card"><strong>{{ $audit->pages_done }}</strong><span>{{ __('Pages audited') }}</span></div>
                             </div>
                         </div>
-                        <p class="sa-muted" style="margin-top:8px">{{ __('Site health score: 100 minus (:c × errors + :w × warnings) per page audited. Not a Google ranking.', ['c' => $weights['critical'], 'w' => $weights['warning']]) }} · {{ $fmtDate($audit->finished_at) }}</p>
+                        <p class="sa-muted" style="margin-top:8px">{{ __('Site health score: 100 minus the average deduction per page audited (:c points per error, :w per warning). Not a Google ranking.', ['c' => $weights['critical'], 'w' => $weights['warning']]) }}@if ($audit->critical_count > 0) · {{ __('An error needs fixing.') }}@endif · {{ $fmtDate($audit->finished_at) }}</p>
                         <div class="sa-cats">
                             @foreach (\App\Support\Seo\Audit\Catalog::CATEGORIES as $key => [$catAr, $catEn])
+                                @continue($key === 'speed') {{-- UX-250: no speed rule until A2 --}}
                                 <span>{!! $bd($ar ? $catAr : $catEn) !!}: {{ $categories[$key] }}</span>
                             @endforeach
                         </div>
@@ -148,7 +149,7 @@
                                             <li><bdi dir="ltr"><a href="{{ $pg['url'] }}" target="_blank" rel="noopener">{{ $pg['url'] }}</a></bdi>@if ($pg['detail']) · <bdi dir="ltr">{{ $pg['detail'] }}</bdi>@endif</li>
                                         @endforeach
                                         @if ($g['count'] > count($g['pages']))
-                                            <li class="sa-muted">{{ __('… and :n more (in the CSV export).', ['n' => $g['count'] - count($g['pages'])]) }}</li>
+                                            <li class="sa-muted">{{ __('… and :n more in the CSV file.', ['n' => $g['count'] - count($g['pages'])]) }}</li>
                                         @endif
                                     </ul>
                                 </details>

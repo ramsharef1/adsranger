@@ -119,7 +119,7 @@ class SeoAuditPage extends Page
             'consent' => ['accepted'],
         ]);
         if ($v->fails()) {
-            $this->addError('newSiteUrl', $v->errors()->has('consent') ? __('Confirm the client\'s permission before the first audit.') : __('Enter the site address, starting with https://'));
+            $this->addError('newSiteUrl', $v->errors()->has('consent') ? __('Confirm the client\'s permission before the first audit.') : __('Enter the full site address, such as https://example.sa'));
 
             return;
         }
@@ -127,7 +127,7 @@ class SeoAuditPage extends Page
         $host = strtolower((string) parse_url($url, PHP_URL_HOST));
         $count = SeoSite::where('agency_id', $client->agency_id)->count();
         if ($count >= $this->planLimits()['sites']) {
-            $this->addError('newSiteUrl', __('Your plan allows :n site(s). Remove one or move to a bigger plan.', ['n' => $this->planLimits()['sites']]));
+            $this->addError('newSiteUrl', trans_choice('{1} Your plan allows one site.|[2,*] Your plan allows :n sites.', $this->planLimits()['sites'], ['n' => $this->planLimits()['sites']]).' '.__('Remove one or move to a bigger plan.'));
 
             return;
         }

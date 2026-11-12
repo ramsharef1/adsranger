@@ -83,7 +83,8 @@ class PageAudit
         $imgs = $imgMatches[0] ?? [];
         $imagesHaveAlt = true;
         foreach ($imgs as $imgTag) {
-            if (! preg_match('/\balt=["\']([^"\']+)["\']/i', $imgTag, $am) || trim($am[1]) === '') {
+            // UX-244: alt="" marks a decorative image (correct per WCAG); only a missing alt attribute counts.
+            if (! preg_match('/\balt\s*=/i', $imgTag)) {
                 $imagesHaveAlt = false;
                 break;
             }
