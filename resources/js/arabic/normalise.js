@@ -10,6 +10,12 @@ export function createNormaliser(rules) {
     const tashkeelTest = new RegExp(`[${tashkeel}]`, 'u');
     const digitSets = ['eastern', 'persian'].map((set) => Array.from(rules.digits[set]));
     let cityIndex = null;
+    let lexicon = null;
+    const getLexicon = () => {
+        if (lexicon === null) { lexicon = new Set((rules.arabizi_lexicon ?? []).map((w) => key(w))); }
+
+        return lexicon;
+    };
 
     const unique = (list) => Array.from(new Set(list));
     const hasPhrase = (text, phrase) => phrase !== '' && ` ${text} `.includes(` ${phrase} `);
@@ -53,10 +59,13 @@ export function createNormaliser(rules) {
                 next.sort((x, y) => x[1] - y[1]);
                 const seen = new Set();
                 scored = [];
-                for (const n of next) { if (!seen.has(n[0]) && scored.length < max) { seen.add(n[0]); scored.push(n); } }
+                for (const n of next) { if (!seen.has(n[0]) && scored.length < max * 4) { seen.add(n[0]); scored.push(n); } }
                 i += len;
             }
-            const forms = scored.map((x) => x[0]);
+            const lex = getLexicon();
+            const rank = (x) => (lex.has(key(x[0])) ? [0, -Array.from(x[0]).length, x[1]] : [1, 0, x[1]]);
+            scored.sort((x, y) => { const a = rank(x); const b = rank(y); return (a[0] - b[0]) || (a[1] - b[1]) || (a[2] - b[2]); });
+            const forms = scored.slice(0, max).map((x) => x[0]);
             const next = [];
             results.forEach((r, ri) => { forms.forEach((f, fi) => { next.push([r === '' ? f : `${r} ${f}`, ri + fi]); }); });
             next.sort((x, y) => x[1] - y[1]);
@@ -162,8 +171,15 @@ export function createNormaliser(rules) {
         return unique(tags).sort((x, y) => (x < y ? -1 : x > y ? 1 : 0));
     }
 
+    function neverMerge(a, b) {
+        const wa = a.trim().split(/\s+/u).filter(Boolean);
+        const wb = b.trim().split(/\s+/u).filter(Boolean);
+
+        return (rules.never_merge ?? []).some(([x, y]) => wa.some((w, i) => wb[i] !== undefined && ((w === x && wb[i] === y) || (w === y && wb[i] === x))));
+    }
+
     function sameKeyword(a, b, country = null) {
-        if (key(a) !== key(b)) { return false; }
+        if (key(a) !== key(b) || neverMerge(a, b)) { return false; }
         const ta = placeTags(a, country);
         const tb = placeTags(b, country);
 

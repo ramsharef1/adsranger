@@ -35,9 +35,14 @@ Route::middleware(PublicTrailingSlash::class)->group(function () {
         Route::get('/tools/'.$tool, [PublicSiteController::class, 'seoTool'])->defaults('lang', 'ar')->defaults('tool', $tool);
         Route::get('/en/tools/'.$tool, [PublicSiteController::class, 'seoTool'])->defaults('lang', 'en')->defaults('tool', $tool);
     }
+    // Growth O-339 (12 Nov): renamed slugs keep their old URLs as 301s.
+    foreach (['capi-pixel-checker' => 'ad-pixel-checker', 'ksa-ad-compliance-checker' => 'gulf-ad-disclosure-checklist'] as $old => $new) {
+        Route::permanentRedirect('/tools/'.$old, '/tools/'.$new);
+        Route::permanentRedirect('/en/tools/'.$old, '/en/tools/'.$new);
+    }
     Route::post('/tools/hreflang-checker/run', [PublicSiteController::class, 'hreflangRun'])->middleware('throttle:30,1');
     Route::post('/tools/page-audit/run', [PublicSiteController::class, 'pageAuditRun'])->middleware('throttle:30,1');
-    Route::post('/tools/capi-pixel-checker/run', [PublicSiteController::class, 'capiPixelRun'])->middleware('throttle:30,1');
+    Route::post('/tools/ad-pixel-checker/run', [PublicSiteController::class, 'capiPixelRun'])->middleware('throttle:30,1');
     Route::post('/tools/llms-txt-generator/check', [PublicSiteController::class, 'llmsTxtCheck'])->middleware('throttle:30,1');
     Route::post('/tools/robots-sitemap-checker/run', [PublicSiteController::class, 'robotsSitemapRun'])->middleware('throttle:30,1');
     Route::post('/tools/audit-report-request', [PublicSiteController::class, 'requestAuditEmail'])->defaults('lang', 'ar')->middleware('throttle:10,1');

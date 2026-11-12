@@ -96,7 +96,7 @@ function run(e) {
     ].filter(([, list]) => list.length > 0);
     const out = $('kg-out'); out.innerHTML = '';
     groups.forEach(([name, list]) => {
-        const h = document.createElement('h3'); h.textContent = name; out.appendChild(h);
+        const h = document.createElement('h2'); h.textContent = name; out.appendChild(h);
         const ul = document.createElement('ul'); ul.className = 'tl-list';
         list.forEach((s) => { const li = document.createElement('li'); li.textContent = s; li.dir = /[؀-ۿ]/.test(s) ? 'rtl' : 'ltr'; ul.appendChild(li); });
         out.appendChild(ul);

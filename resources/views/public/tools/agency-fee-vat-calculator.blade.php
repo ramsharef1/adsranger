@@ -1,6 +1,6 @@
 @php
 extract(\App\Support\ToolPage::head($lang ?? 'ar', '/tools/agency-fee-vat-calculator',
-    ['حاسبة أتعاب الوكالة وضريبة القيمة المضافة في الدول العربية | AdsRanger', 'Agency Retainer, % of Spend & MENA VAT Calculator | AdsRanger'],
+    ['حاسبة أتعاب الوكالة والضريبة | AdsRanger', 'Agency Fee & MENA VAT Calculator | AdsRanger'],
     ['قارن بين الأتعاب الشهرية الثابتة ونسبة إدارة الإنفاق الإعلاني واحسب صافي هامش الوكالة وضريبة القيمة المضافة للسعودية والأردن والإمارات ومصر.',
         'Compare fixed agency retainer vs % of ad spend, media float vs net agency margin, and MENA VAT (KSA 15%, Jordan 16%, UAE 5%, Egypt 14%).']));
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
@@ -11,7 +11,7 @@ $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
 @endpush
 @section('hero')
 <h1>{{ $ar ? 'حاسبة أتعاب الوكالة وضريبة القيمة المضافة' : 'Agency Fee, Margin & MENA VAT Calculator' }}</h1>
-<p class="muted" style="font-size:17px">{{ $ar ? 'احسب أتعاب إدارة الحملات وصافي هامش الوكالة والفاتورة الضريبية (السعودية 15%، الأردن 16%، الإمارات 5%، مصر 14%).' : 'Model retainer vs % of spend, client card vs agency media float, net agency margin, and MENA VAT.' }}</p>
+<p class="muted" style="font-size:17px">{{ $ar ? 'احسب أتعاب إدارة الحملات وصافي هامش الوكالة والفاتورة الضريبية (السعودية 15%، الأردن 16% ضريبة مبيعات، الإمارات 5%، مصر 14%؛ نسب للتخطيط فقط).' : 'Model retainer vs % of spend, client card vs agency media float, net agency margin, and MENA VAT.' }}</p>
 @endsection
 @section('content')
 <section class="tl">

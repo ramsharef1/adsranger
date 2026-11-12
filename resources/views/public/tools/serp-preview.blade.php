@@ -5,7 +5,7 @@ $ar = ($lang ?? 'ar') === 'ar';
 $lang = $ar ? 'ar' : 'en';
 $arPath = '/tools/serp-preview';
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
-$title = $ar ? 'معاينة نتائج جوجل للعناوين العربية | AdsRanger' : 'Google SERP Preview for Arabic Titles | AdsRanger';
+$title = $ar ? 'معاينة نتائج البحث للعناوين العربية | AdsRanger' : 'Google SERP Preview for Arabic Titles | AdsRanger';
 $meta = $ar
     ? 'شاهد كيف قد يظهر عنوان صفحتك ووصفها في نتائج البحث على الجوال والكمبيوتر، بالعربية أو الإنجليزية، مع تنبيه عند القطع. مجانًا ودون تسجيل، ولا نحفظ شيئًا.'
     : 'See how your title and description may look in search results on mobile and desktop, with a warning when they get cut. Free, no sign-up, nothing stored.';

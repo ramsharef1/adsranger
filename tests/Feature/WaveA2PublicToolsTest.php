@@ -14,7 +14,7 @@ use Tests\TestCase;
 class WaveA2PublicToolsTest extends TestCase
 {
     private const WAVE_A2_SLUGS = [
-        'capi-pixel-checker',
+        'ad-pixel-checker',
         'cod-poas-calculator',
         'whatsapp-link-generator',
         'ad-mockup-preview',
@@ -22,7 +22,7 @@ class WaveA2PublicToolsTest extends TestCase
         'schema-generator',
         'ab-significance-calculator',
         'safe-zone-checker',
-        'ksa-ad-compliance-checker',
+        'gulf-ad-disclosure-checklist',
         'cpm-cpc-cpa-calculator',
         'agency-fee-vat-calculator',
         'robots-sitemap-checker',
@@ -60,14 +60,14 @@ class WaveA2PublicToolsTest extends TestCase
 
         // Sitemap hides tools when SEO_TOOLS_PUBLIC=false, and includes all 12 AR+EN pairs when SEO_TOOLS_PUBLIC=true
         $hiddenXml = $this->get('/sitemaps/pages.xml')->assertOk()->getContent();
-        $this->assertStringNotContainsString('/tools/capi-pixel-checker', $hiddenXml);
+        $this->assertStringNotContainsString('/tools/ad-pixel-checker', $hiddenXml);
 
         // D-249: with the tools public, the held-back ones still stay out of the sitemap and hub and keep noindex.
-        config(['seo_tools.public' => true, 'seo_tools.held' => ['capi-pixel-checker']]);
+        config(['seo_tools.public' => true, 'seo_tools.held' => ['ad-pixel-checker']]);
         $heldXml = $this->get('/sitemaps/pages.xml')->assertOk()->getContent();
-        $this->assertStringNotContainsString('/tools/capi-pixel-checker', $heldXml);
-        $this->assertStringNotContainsString('/tools/capi-pixel-checker', $this->get('/tools')->getContent());
-        $this->get('/tools/capi-pixel-checker')->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+        $this->assertStringNotContainsString('/tools/ad-pixel-checker', $heldXml);
+        $this->assertStringNotContainsString('/tools/ad-pixel-checker', $this->get('/tools')->getContent());
+        $this->get('/tools/ad-pixel-checker')->assertHeader('X-Robots-Tag', 'noindex, nofollow');
 
         config(['seo_tools.held' => []]);
         $publicXml = $this->get('/sitemaps/pages.xml')->assertOk()->getContent();
@@ -90,7 +90,7 @@ class WaveA2PublicToolsTest extends TestCase
         // Private / loopback / metadata addresses are refused by SafeFetcher
         SafeFetcher::$resolver = fn () => null;
 
-        $r1 = $this->postJson('/tools/capi-pixel-checker/run', ['url' => 'http://169.254.169.254/latest/meta-data/']);
+        $r1 = $this->postJson('/tools/ad-pixel-checker/run', ['url' => 'http://169.254.169.254/latest/meta-data/']);
         $r1->assertOk()->assertJson(['ok' => false, 'error' => 'blocked']);
 
         $r2 = $this->postJson('/tools/llms-txt-generator/check', ['url' => 'http://127.0.0.1/']);
@@ -99,11 +99,11 @@ class WaveA2PublicToolsTest extends TestCase
         $r3 = $this->postJson('/tools/robots-sitemap-checker/run', ['url' => 'http://10.0.0.5/']);
         $r3->assertOk()->assertJson(['ok' => false, 'error' => 'blocked']);
 
-        // 5 runs/day visitor limit: 4 more runs on capi-pixel-checker succeed (total 5), 6th returns 429
+        // 5 runs/day visitor limit: 4 more runs on ad-pixel-checker succeed (total 5), 6th returns 429
         for ($i = 2; $i <= 5; $i++) {
-            $this->postJson('/tools/capi-pixel-checker/run', ['url' => 'https://private.example/'])->assertOk();
+            $this->postJson('/tools/ad-pixel-checker/run', ['url' => 'https://private.example/'])->assertOk();
         }
-        $this->postJson('/tools/capi-pixel-checker/run', ['url' => 'https://private.example/'])
+        $this->postJson('/tools/ad-pixel-checker/run', ['url' => 'https://private.example/'])
             ->assertStatus(429)
             ->assertJson(['error' => 'limit']);
     }
@@ -175,7 +175,7 @@ HTML;
 
     public function test_disclosure_checklist_never_gives_a_pass_verdict(): void
     {
-        $html = $this->get('/en/tools/ksa-ad-compliance-checker')->assertOk()->getContent();
+        $html = $this->get('/en/tools/gulf-ad-disclosure-checklist')->assertOk()->getContent();
         $this->assertStringNotContainsString("'Pass'", $html);
         $this->assertStringContainsString('not a legal check', $html);
     }
@@ -191,5 +191,11 @@ HTML;
 
         config(['seo_tools.public' => false]);
         $this->assertSame(['/tools/ramadan-budget-calculator', '/ramadan-2027', '/mena-calendar'], PublicSite::toolsMenu());
+    }
+
+    public function test_renamed_tools_redirect_permanently(): void
+    {
+        $this->get('/tools/capi-pixel-checker')->assertStatus(301)->assertRedirect('/tools/ad-pixel-checker');
+        $this->get('/en/tools/ksa-ad-compliance-checker')->assertStatus(301)->assertRedirect('/en/tools/gulf-ad-disclosure-checklist');
     }
 }

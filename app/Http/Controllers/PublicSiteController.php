@@ -309,7 +309,7 @@ class PublicSiteController extends Controller
         if ($resp = $this->enforceUrlToolLimit($request, 'capi-pixel')) {
             return $resp;
         }
-        ToolRateLimiter::recordToolUse('capi-pixel-checker-run');
+        ToolRateLimiter::recordToolUse('ad-pixel-checker-run');
 
         $fetched = SafeFetcher::fetch($data['url']);
         if (! ($fetched['ok'] ?? false) || ($fetched['status'] ?? 0) !== 200) {
@@ -449,7 +449,7 @@ class PublicSiteController extends Controller
     public function requestAuditEmail(Request $request, string $lang = 'ar')
     {
         $lang = $lang === 'en' ? 'en' : 'ar';
-        $tool = in_array($request->input('tool'), ['page-audit', 'hreflang-checker', 'capi-pixel-checker', 'robots-sitemap-checker'], true) ? $request->input('tool') : 'page-audit';
+        $tool = in_array($request->input('tool'), ['page-audit', 'hreflang-checker', 'ad-pixel-checker', 'robots-sitemap-checker'], true) ? $request->input('tool') : 'page-audit';
         $target = ($lang === 'en' ? '/en/tools/' : '/tools/').$tool;
         if (filled($request->input('website'))) {
             return redirect($target)->with('tool_report_saved', true);

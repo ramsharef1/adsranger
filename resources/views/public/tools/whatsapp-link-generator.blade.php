@@ -30,13 +30,13 @@ $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
     </form>
 
     <div class="tl-out" aria-live="polite">
-        <h3>{{ $ar ? 'رابط واتساب المباشر' : 'Direct wa.me link' }}</h3>
+        <h2>{{ $ar ? 'رابط واتساب المباشر' : 'Direct wa.me link' }}</h2>
         <code class="tl-code" id="wa-out" dir="ltr"></code>
         <div class="tl-actions">
             <button type="button" class="btn" id="wa-copy">{{ $ar ? 'نسخ الرابط' : 'Copy link' }}</button>
             <button type="button" class="btn" id="wa-dl">{{ $ar ? 'تنزيل رمز SVG' : 'Download SVG QR' }}</button>
         </div>
-        <h3 style="margin-top:18px">{{ $ar ? 'معاينة رمز الاستجابة السريعة (SVG)' : 'QR code preview (SVG)' }}</h3>
+        <h2 style="margin-top:18px">{{ $ar ? 'معاينة رمز الاستجابة السريعة (SVG)' : 'QR code preview (SVG)' }}</h2>
         <div id="wa-qr" style="width:188px;height:188px;padding:10px;background:#fff;border:1px solid var(--line);border-radius:10px;display:grid;place-items:center"></div>
         <p class="muted" style="margin-top:12px">{{ $privacy }}</p>
     </div>

@@ -1,7 +1,7 @@
 @php
 extract(\App\Support\ToolPage::head($lang ?? 'ar', '/tools/llms-txt-generator',
-    ['منشئ ملف llms.txt وفاحص زواحف الذكاء الاصطناعي | AdsRanger', 'llms.txt Generator & AI Crawler robots.txt Checker | AdsRanger'],
-    ['أنشئ ملف llms.txt القياسي لموقعك العربي أو الإنجليزي وافحص صلاحيات GPTBot وClaudeBot وPerplexityBot في ملف robots.txt.',
+    ['منشئ ملف llms.txt وفاحص زواحف الذكاء الاصطناعي | AdsRanger', 'llms.txt Generator & AI Crawler Checker | AdsRanger'],
+    ['أنشئ ملف llms.txt بالصيغة المقترحة لموقعك العربي أو الإنجليزي وافحص صلاحيات GPTBot، ClaudeBot، PerplexityBot في ملف robots.txt.',
         'Generate standard llms.txt markdown files and audit your domain\'s robots.txt rules for GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, and Google-Extended.']));
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
 @endphp
@@ -35,7 +35,7 @@ Security | https://adsranger.com/security | Data handling and OAuth scopes</text
     </form>
 
     <div class="tl-out" aria-live="polite">
-        <h3><bdi dir="ltr">llms.txt</bdi></h3>
+        <h2><bdi dir="ltr">llms.txt</bdi></h2>
         <pre class="tl-code" id="lm-out" dir="ltr" style="white-space:pre-wrap"></pre>
         <div class="tl-actions">
             <button type="button" class="btn" id="lm-copy">{{ $ar ? 'نسخ الملف' : 'Copy markdown' }}</button>

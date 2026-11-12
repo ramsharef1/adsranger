@@ -1,6 +1,6 @@
 @php
 extract(\App\Support\ToolPage::head($lang ?? 'ar', '/tools/safe-zone-checker',
-    ['فاحص المناطق الآمنة لإعلانات الفيديو العمودية (9:16) | AdsRanger', '9:16 Reels, TikTok & Snapchat Safe-Zone Checker | AdsRanger'],
+    ['فاحص المناطق الآمنة لفيديو 9:16 | AdsRanger', '9:16 Reels, TikTok & Snapchat Safe-Zone Checker | AdsRanger'],
     ['اختبر تصميم إعلانك العمودي 9:16 داخل المتصفح لتتأكد أن أزرار Reels وTikTok وSnapchat لا تغطي النصوص والترجمة العربية.',
         'Drag and drop a 9:16 frame in your browser to overlay Instagram Reels, TikTok, and Snapchat UI danger zones with zero server uploads.']));
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);

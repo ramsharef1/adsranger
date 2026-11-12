@@ -2,6 +2,8 @@
 
 namespace App\Support\Seo;
 
+use Illuminate\Support\HtmlString;
+
 /**
  * Package C (E1-034 / D-241): "How it works" text blocks and FAQPage Q&A for the 9 free SEO & ad tools.
  * Follows R-21 (AdsRanger is feminine in Arabic), UX-226 (<bdi dir="ltr">AdsRanger</bdi>), and D-229 honesty rules.
@@ -20,7 +22,7 @@ class ToolCopy
                     'how_steps' => [
                         'أدخل عنوان الصفحة والوصف التعريفي والرابط الذي تود معاينته.',
                         'بدّل بين عرض الجوال والكمبيوتر واتجاه الصفحة (عربي أو إنجليزي) لمحاكاة العرض الفعلي.',
-                        'راجع عداد البكسلات والتنبيهات الفورية لتفادي قطع العنوان أو انعكاس ترتيب الكلمات اللاتينية.',
+                        'راجع عداد البكسلات والتنبيهات لتفادي قطع العنوان أو انعكاس ترتيب الكلمات اللاتينية.',
                     ],
                     'faq_title' => 'أسئلة شائعة حول معاينة نتائج البحث',
                     'faqs' => [
@@ -53,7 +55,7 @@ class ToolCopy
                     'faq_title' => 'أسئلة شائعة حول فاحص الطول',
                     'faqs' => [
                         ['q' => 'كم صفحة يمكنني فحصها في المرة الواحدة؟', 'a' => 'يمكنك فحص حتى 50 عنوانًا ووصفًا دفعة واحدة داخل المتصفح دون تسجيل.'],
-                        ['q' => 'ما الحد الموصى به لطول العنوان العربي؟', 'a' => 'يُفضّل ألا يتجاوز العنوان 580 بكسل (نحو 55 إلى 65 حرفًا عربيًا) حتى لا يُقطع في نتائج الجوال والكمبيوتر.'],
+                        ['q' => 'ما الحد الموصى به لطول العنوان العربي؟', 'a' => 'يُفضّل ألا يتجاوز العنوان 580 بكسل حتى لا يُقطع في نتائج الجوال والكمبيوتر؛ ويختلف عدد الأحرف حسب عرضها، لذلك نقيس بالبكسل.'],
                     ],
                 ],
                 'en' => [
@@ -81,7 +83,7 @@ class ToolCopy
                     'faq_title' => 'أسئلة شائعة حول مولد الكلمات العربية',
                     'faqs' => [
                         ['q' => 'هل تعرض الأداة أحجام البحث الشهرية؟', 'a' => 'تعرض الأداة صيغ الكتابة العربية والأسئلة واللهجات لتوسيع قائمتك مجانًا، ولا تعرض أحجام بحث تقديرية غير موثقة.'],
-                        ['q' => 'لماذا تهم صيغ الهمزة والتاء المربوطة في السيو العربي؟', 'a' => 'يكتب المستخدمون العرب الكلمة الواحدة بعدة طرق (مثل اعلانات وإعلانات، أو شركة وشركه)، وتغطيتها تزيد فرص ظهور صفحتك وإعلاناتك.'],
+                        ['q' => 'لماذا تهم صيغ الهمزة والتاء المربوطة في السيو العربي؟', 'a' => 'يكتب المستخدمون العرب الكلمة الواحدة بعدة طرق (مثل اعلانات وإعلانات، أو شركة وشركه)، وتغطيتها قد تساعد صفحتك وإعلاناتك على الظهور لمن يكتبها بشكل مختلف.'],
                     ],
                 ],
                 'en' => [
@@ -109,7 +111,7 @@ class ToolCopy
                     'faq_title' => 'أسئلة شائعة حول محوّل العربيزي',
                     'faqs' => [
                         ['q' => 'ما المقصود بالعربيزي في محركات البحث؟', 'a' => 'العربيزي هو كتابة الكلمات العربية بحروف لاتينية وأرقام (مثل 3 لحرف العين و7 لحرف الحاء)، ويستخدمه جزء من الباحثين في المنطقة.'],
-                        ['q' => 'هل يتم إرسال النصوص إلى خوادم خارجية؟', 'a' => 'لا، يعمل المحوّل محليًا باستخدام طبقة تطبيع النصوص العربية الخاصة بـ AdsRanger دون حفظ أي مدخلات.'],
+                        ['q' => 'هل يتم إرسال النصوص إلى خوادم خارجية؟', 'a' => 'لا، يعمل المحوّل محليًا باستخدام طبقة تطبيع النصوص العربية في AdsRanger دون حفظ أي مدخلات.'],
                     ],
                 ],
                 'en' => [
@@ -159,7 +161,7 @@ class ToolCopy
                     'how_title' => 'كيف تعمل حاسبة وتيرة الإنفاق الإعلاني',
                     'how_steps' => [
                         'أدخل الميزانية الشهرية المعتمدة، وما أُنفق حتى اليوم، وعدد الأيام المنقضية من الشهر.',
-                        'تحسب الأداة نسبة وتيرة الإنفاق، والتوقع المتوقع لنهاية الشهر، والإنفاق اليومي المقترح للأيام المتبقية.',
+                        'تحسب الأداة نسبة وتيرة الإنفاق، والإنفاق المتوقع حتى نهاية الشهر، والإنفاق اليومي المقترح للأيام المتبقية.',
                         'استخدم الإنفاق اليومي المقترح لضبط ميزانيات الحملات وتفادي نفاد الميزانية مبكرًا أو نقص الصرف.',
                     ],
                     'faq_title' => 'أسئلة شائعة حول وتيرة الإنفاق',
@@ -187,7 +189,7 @@ class ToolCopy
                     'how_title' => 'كيف يعمل منشئ روابط التتبّع (UTM)',
                     'how_steps' => [
                         'أدخل رابط صفحة الهبوط الأساسي واختر المنصة الإعلانية أو اكتب معاملات التتبع يدويًا.',
-                        'تولّد الأداة الرابط الكامل مع معاملات utm_source وutm_medium وutm_campaign بشكل قياسي.',
+                        'تولّد الأداة الرابط الكامل مع معاملات utm_source، utm_medium، utm_campaign بشكل قياسي.',
                         'انسخ الرابط النهائي واستخدمه في إعلاناتك لتظهر المصادر بدقة في تقارير التحليلات.',
                     ],
                     'faq_title' => 'أسئلة شائعة حول روابط UTM',
@@ -228,7 +230,7 @@ class ToolCopy
                     'how_title' => 'How the hreflang checker works',
                     'how_steps' => [
                         'Enter the full URL of a bilingual or multi-regional page.',
-                        'Our SSRF-safe fetcher inspects status codes, language-region tags, self-references, x-default, canonical alignment, and Arabic dir="rtl" attributes.',
+                        'The checker fetches the public page only and inspects status codes, language-region tags, self-references, x-default, canonical alignment, and Arabic dir="rtl" attributes.',
                         'Verify that every alternate page links back reciprocally so search engines honour your language versions.',
                     ],
                     'faq_title' => 'Frequently asked questions',
@@ -243,13 +245,13 @@ class ToolCopy
                     'how_title' => 'كيف يعمل فاحص السيو العربي للصفحة',
                     'how_steps' => [
                         'أدخل رابط الصفحة والكلمة المفتاحية العربية المستهدفة (اختياريًا).',
-                        'يفحص المحرك 14 قاعدة مخصصة للسيو العربي تشمل عرض العنوان والوصف بالبكسل، وسم lang="ar" وdir="rtl"، وتطابق الكلمة المفتاحية بعد تطبيع الهمزات، والبيانات المنظمة (JSON-LD).',
+                        'يفحص المحرك 14 قاعدة مخصصة للسيو العربي تشمل عرض العنوان والوصف بالبكسل، وسمَي lang="ar"، dir="rtl"، وتطابق الكلمة المفتاحية بعد تطبيع الهمزات، والبيانات المنظمة (JSON-LD).',
                         'احصل على درجة جاهزية الصفحة من 100 مع قائمة واضحة بالمشكلات التي تحتاج إلى معالجة.',
                     ],
                     'faq_title' => 'أسئلة شائعة حول فحص السيو العربي للصفحة',
                     'faqs' => [
-                        ['q' => 'كيف يطابق الفاحص الكلمات المفتاحية العربية؟', 'a' => 'يستخدم الفاحص طبقة التطبيع العربية الخاصة بـ AdsRanger لمطابقة الكلمة حتى لو اختلفت أشكال الهمزات (أ/إ/آ/ا) أو التاء المربوطة والهاء في عنوان الصفحة ونصها.'],
-                        ['q' => 'كم صفحة يمكنني فحصها مجانًا؟', 'a' => 'يمكنك إجراء حتى 5 فحوصات حية يوميًا مجانًا ودون تسجيل، أو طلب إرسال ملخص الفحص إلى بريدك عند تفعيل خدمة الرسائل.'],
+                        ['q' => 'كيف يطابق الفاحص الكلمات المفتاحية العربية؟', 'a' => 'يستخدم الفاحص طبقة التطبيع العربية في AdsRanger لمطابقة الكلمة حتى لو اختلفت أشكال الهمزات (أ/إ/آ/ا) أو التاء المربوطة والهاء في عنوان الصفحة ونصها.'],
+                        ['q' => 'كم صفحة يمكنني فحصها مجانًا؟', 'a' => 'يمكنك إجراء حتى 5 فحوصات حية يوميًا مجانًا ودون تسجيل.'],
                     ],
                 ],
                 'en' => [
@@ -261,12 +263,12 @@ class ToolCopy
                     ],
                     'faq_title' => 'Frequently asked questions',
                     'faqs' => [
-                        ['q' => 'How does the audit match Arabic keywords across spelling variants?', 'a' => 'It uses AdsRanger\'s Arabic normalization layer so hamza, alef, and ta-marbuta variations match accurately without false negatives.'],
+                        ['q' => 'How does the audit match Arabic keywords across spelling variants?', 'a' => 'It uses AdsRanger\'s Arabic normalization layer so hamza, alef, and ta-marbuta variations match the same keyword.'],
                         ['q' => 'How many live page audits can I run per day?', 'a' => 'Visitors can run up to 5 live page audits per day for free without signing up.'],
                     ],
                 ],
             ],
-            'capi-pixel-checker' => [
+            'ad-pixel-checker' => [
                 'ar' => [
                     'how_title' => 'كيف يعمل فاحص البكسل ووسوم التتبع',
                     'how_steps' => [
@@ -305,7 +307,7 @@ class ToolCopy
                     'faq_title' => 'أسئلة شائعة حول ربحية الدفع عند الاستلام',
                     'faqs' => [
                         ['q' => 'لماذا يبدو العائد الإعلاني مرتفعًا بينما يخسر المتجر؟', 'a' => 'لأن العائد الإعلاني التقليدي يحسب الطلبات المرسلة قبل خصم الطلبات المرتجعة وتكلفة شحنها ذهابًا وإيابًا.'],
-                        ['q' => 'ما الفرق بين ROAS وPOAS؟', 'a' => 'يقيس ROAS إجمالي الإيرادات مقابل الإنفاق الإعلاني، بينما يقيس POAS هامش الربح الفعلي بعد خصم البضاعة والشحن والعمولات مقسومًا على الإنفاق الإعلاني.'],
+                        ['q' => 'ما الفرق بين العائد على الإنفاق (ROAS) والعائد على الربح (POAS)؟', 'a' => 'يقيس ROAS إجمالي الإيرادات مقابل الإنفاق الإعلاني، بينما يقيس POAS هامش الربح الفعلي بعد خصم البضاعة والشحن والعمولات مقسومًا على الإنفاق الإعلاني.'],
                     ],
                 ],
                 'en' => [
@@ -354,14 +356,14 @@ class ToolCopy
                 'ar' => [
                     'how_title' => 'كيف تعمل أداة معاينة الإعلانات الحية',
                     'how_steps' => [
-                        'اختر اتجاه الإعلان (عربي من اليمين لليصار أو إنجليزي) وأدخل اسم العلامة والنص والعنوان.',
-                        'بدّل بين مواضع العرض: منشور ميتا، ريلز وتيك توك العمودي، قصص سناب شات، وإعلان بحث جوجل.',
+                        'اختر اتجاه الإعلان (عربي من اليمين إلى اليسار أو إنجليزي) وأدخل اسم العلامة والنص والعنوان.',
+                        'بدّل بين مواضع العرض: منشور Meta، والفيديو العمودي في Reels، TikTok، وقصص Snapchat، وإعلان البحث في Google.',
                         'انتبه لتنبيهات تجاوز الطول الموصى به قبل إرسال المسودة للعميل أو النشر.',
                     ],
                     'faq_title' => 'أسئلة شائعة حول معاينة الإعلانات',
                     'faqs' => [
                         ['q' => 'متى يُقطع النص الأساسي في إعلانات الخلاصة؟', 'a' => 'غالبًا يظهر أول 125 حرفًا تقريبًا قبل زر عرض المزيد على شاشات الجوال.'],
-                        ['q' => 'ما الحد الآمن لعناوين إعلانات بحث جوجل المتجاوبة؟', 'a' => 'الحد الأقصى لكل عنوان هو 30 حرفًا، وللوصف 90 حرفًا.'],
+                        ['q' => 'ما حدود الأحرف في إعلانات البحث المتجاوبة على Google؟', 'a' => 'الحد الأقصى لكل عنوان هو 30 حرفًا، وللوصف 90 حرفًا.'],
                     ],
                 ],
                 'en' => [
@@ -382,13 +384,13 @@ class ToolCopy
                 'ar' => [
                     'how_title' => 'كيف يعمل منشئ ملف llms.txt وفاحص زواحف الذكاء',
                     'how_steps' => [
-                        'أدخل اسم موقعك ووصفه الموجز وأهم الروابط المرجعية لبناء ملف llms.txt القياسي.',
+                        'أدخل اسم موقعك ووصفه الموجز وأهم الروابط المرجعية لبناء ملف llms.txt بالصيغة المقترحة.',
                         'انسخ الملف أو نزّله لرفعه في جذر موقعك على المسار /llms.txt.',
-                        'استخدم تبويب فحص الموقع للتحقق من قواعد GPTBot وClaudeBot وPerplexityBot في ملف robots.txt.',
+                        'استخدم تبويب فحص الموقع للتحقق من قواعد GPTBot، ClaudeBot، PerplexityBot في ملف robots.txt.',
                     ],
                     'faq_title' => 'أسئلة شائعة حول ملف llms.txt',
                     'faqs' => [
-                        ['q' => 'ما فائدة ملف llms.txt؟', 'a' => 'يقدّم ملخصًا منظمًا بصيغة ماركداون لمساعدة أنظمة الإجابة الذكية في فهم صفحاتك الأساسية ووثائقك الرسمية بدقة.'],
+                        ['q' => 'ما فائدة ملف llms.txt؟', 'a' => 'يقدّم ملخصًا منظمًا بصيغة ماركداون قد يساعد أنظمة الإجابة الذكية على فهم صفحاتك الأساسية، ولا تلتزم كل الأنظمة بقراءته.'],
                         ['q' => 'هل يغني ملف llms.txt عن ملف robots.txt؟', 'a' => 'لا؛ يتحكم robots.txt في السماح أو المنع للزواحف، بينما يوجّه llms.txt الأنظمة المسموح لها إلى أهم محتواك.'],
                     ],
                 ],
@@ -401,7 +403,7 @@ class ToolCopy
                     ],
                     'faq_title' => 'Frequently asked questions',
                     'faqs' => [
-                        ['q' => 'What does llms.txt do?', 'a' => 'It provides a concise markdown directory of your canonical pages so AI search and answer engines read accurate source material.'],
+                        ['q' => 'What does llms.txt do?', 'a' => 'It provides a concise markdown directory of your canonical pages which may help AI search and answer tools find your key pages. Not every tool reads it.'],
                         ['q' => 'Does llms.txt replace robots.txt?', 'a' => 'No. Crawler access permissions are controlled in robots.txt, while llms.txt curates key resources for permitted agents.'],
                     ],
                 ],
@@ -411,7 +413,7 @@ class ToolCopy
                     'how_title' => 'كيف يعمل مولد البيانات المنظمة JSON-LD',
                     'how_steps' => [
                         'اختر نوع الكيان المطلوب: منظمة، نشاط تجاري محلي، أسئلة شائعة، منتج، أو تطبيق برمجي.',
-                        'أدخل الحقول بالعربية أو الإنجليزية لمشاهدة كود JSON-LD يتحدث فورًا.',
+                        'أدخل الحقول بالعربية أو الإنجليزية لترى كود JSON-LD يتحدّث أثناء الكتابة.',
                         'تحقق من سلامة الصياغة البرمجية وانسخ الوسم الجاهز لوضعه داخل رأس الصفحة.',
                     ],
                     'faq_title' => 'أسئلة شائعة حول البيانات المنظمة',
@@ -467,13 +469,13 @@ class ToolCopy
                     'how_title' => 'كيف يعمل فاحص المناطق الآمنة للفيديو العمودي',
                     'how_steps' => [
                         'اسحب صورة تصميم إعلانك العمودي (9:16) أو لقطة من الفيديو إلى مساحة المعاينة.',
-                        'بدّل بين طبقات واجهة إنستغرام ريلز وتيك توك وسناب شات لمعرفة أماكن الأزرار والوصف.',
+                        'بدّل بين طبقات واجهة Instagram Reels، TikTok، Snapchat لمعرفة أماكن الأزرار والوصف.',
                         'تأكّد أن الشعار والترجمة العربية وزر الدعوة لاتخاذ إجراء تقع داخل المنطقة الخضراء الآمنة.',
                     ],
                     'faq_title' => 'أسئلة شائعة حول المناطق الآمنة للإعلانات',
                     'faqs' => [
-                        ['q' => 'هل تُرفع صوري أو تصاميمي إلى خوادم AdsRanger؟', 'a' => 'لا إطلاقًا؛ تُقرأ الصورة محليًا داخل متصفحك فقط ولا يغادر ملفك جهازك.'],
-                        ['q' => 'كم تبلغ الهوامش الآمنة التقريبية لفيديو 1080×1920؟', 'a' => 'يُنصح بترك نحو 250 بكسل من الأعلى، و380 إلى 420 بكسل من الأسفل، و120 بكسل من الجانب الذي تظهر فيه أيقونات التفاعل.'],
+                        ['q' => 'هل تُرفع صوري أو تصاميمي إلى خوادم AdsRanger؟', 'a' => 'لا. تُقرأ الصورة داخل متصفحك فقط، ولا يغادر ملفك جهازك.'],
+                        ['q' => 'كم تبلغ الهوامش الآمنة التقريبية لفيديو 1080×1920؟', 'a' => 'يُنصح بترك نحو 250 بكسل من الأعلى، ونحو 400 بكسل من الأسفل، و120 بكسل من الجانب الذي تظهر فيه أيقونات التفاعل. وهذه هوامش تقريبية تختلف بين التطبيقات وتحديثاتها.'],
                     ],
                 ],
                 'en' => [
@@ -485,18 +487,18 @@ class ToolCopy
                     ],
                     'faq_title' => 'Frequently asked questions',
                     'faqs' => [
-                        ['q' => 'Are my creative files uploaded to any server?', 'a' => 'Never. File rendering runs 100% locally in your browser via FileReader/URL.createObjectURL with zero server uploads.'],
-                        ['q' => 'What safe margins work across Reels, TikTok, and Snap?', 'a' => 'On a 1080x1920 frame, keeping critical text at least 250px from the top, 400px from the bottom, and 120px from side icon rails avoids UI overlap.'],
+                        ['q' => 'Are my creative files uploaded to any server?', 'a' => 'No. The file is read in your browser and never leaves your device.'],
+                        ['q' => 'What safe margins work across Reels, TikTok, and Snap?', 'a' => 'On a 1080x1920 frame, keeping critical text about 250 px from the top, 400 px from the bottom and 120 px from the side icon rail usually avoids the platform buttons. These are approximate and change between apps and updates.'],
                     ],
                 ],
             ],
-            'ksa-ad-compliance-checker' => [
+            'gulf-ad-disclosure-checklist' => [
                 'ar' => [
-                    'how_title' => 'كيف يعمل قائمة إفصاحات الإعلانات في السعودية والإمارات',
+                    'how_title' => 'كيف تعمل قائمة إفصاحات الإعلانات في السعودية والإمارات',
                     'how_steps' => [
                         'اختر القطاع الإعلاني (عقارات، صحة وتجميل، غذاء ومكملات، تقسيط وتمويل، أو مؤثرين).',
                         'ألصق نص الإعلان لفحص وجود عبارات الإفصاح وأرقام التراخيص المطلوبة ومراجعة قائمة التحقق.',
-                        'صحّح النواقص قبل إطلاق الحملة لتقليل احتمالية رفض الإعلان أو المخالفات التنظيمية.',
+                        'صحّح النواقص قبل إطلاق الحملة لتقليل احتمال رفض الإعلان. القائمة تذكير، وليست حكمًا بالمطابقة.',
                     ],
                     'faq_title' => 'أسئلة شائعة حول ضوابط الإعلانات الخليجية',
                     'faqs' => [
@@ -523,7 +525,7 @@ class ToolCopy
                     'how_title' => 'كيف تعمل حاسبة مؤشرات الإعلانات الشاملة',
                     'how_steps' => [
                         'أدخل الإنفاق الإعلاني وعدد مرات الظهور والنقرات والتحويلات.',
-                        'تحسب الأداة فورًا تكلفة الألف ظهور (CPM) ونسبة النقر (CTR) وتكلفة النقرة (CPC) ومعدل التحويل (CVR) وتكلفة الاكتساب (CPA).',
+                        'تحسب الأداة تكلفة الألف ظهور (CPM) ونسبة النقر (CTR) وتكلفة النقرة (CPC) ومعدل التحويل (CVR) وتكلفة الاكتساب (CPA).',
                         'عدّل أي رقم لمحاكاة أثر رفع نسبة النقر أو تحسين معدل تحويل صفحة الهبوط على تكلفة العميل.',
                     ],
                     'faq_title' => 'أسئلة شائعة حول معادلات الأداء الإعلاني',
@@ -536,7 +538,7 @@ class ToolCopy
                     'how_title' => 'How the full-funnel CPM, CPC & CPA calculator works',
                     'how_steps' => [
                         'Enter your budget/spend, impressions, clicks, and conversions.',
-                        'Instantly see calculated CPM, CTR %, CPC, CVR %, and CPA side by side.',
+                        'See CPM, CTR %, CPC, CVR % and CPA side by side.',
                         'Adjust CTR or landing-page CVR to model how funnel improvements lower your CPA.',
                     ],
                     'faq_title' => 'Frequently asked questions',
@@ -550,7 +552,7 @@ class ToolCopy
                 'ar' => [
                     'how_title' => 'كيف تعمل حاسبة أتعاب الوكالة وضريبة القيمة المضافة',
                     'how_steps' => [
-                        'اختر الدولة ونسبة ضريبة القيمة المضافة (السعودية 15%، الأردن 16%، الإمارات 5%، مصر 14%، أو مخصص).',
+                        'اختر الدولة ونسبة ضريبة القيمة المضافة (السعودية 15%، الأردن 16% ضريبة المبيعات العامة، الإمارات 5%، مصر 14%، أو مخصص). نسب افتراضية للتخطيط، فتحقّق من النسبة الحالية لدى الجهة الضريبية.',
                         'أدخل ميزانية الإعلانات الشهرية وقارن بين الأتعاب الشهرية الثابتة ونسبة الإدارة من الإنفاق.',
                         'راجع إجمالي فاتورة العميل شاملة الضريبة وصافي هامش ربح الوكالة بعد تكلفة الفريق.',
                     ],
@@ -604,7 +606,39 @@ class ToolCopy
             ],
         ];
 
-        return $map[$tool][$ar ? 'ar' : 'en'] ?? $map['serp-preview'][$ar ? 'ar' : 'en'];
+        $copy = $map[$tool][$ar ? 'ar' : 'en'] ?? $map['serp-preview'][$ar ? 'ar' : 'en'];
+
+        // Copy Bank (UX-235): no «و» joined to a Latin word in Arabic copy; the space keeps both words readable.
+        return $ar ? self::mapStrings($copy, fn (string $t): string => (string) preg_replace('/(^|\s)و(?=[A-Za-z])/u', '$1و ', $t)) : $copy;
+    }
+
+    /** @param  array<mixed>  $data */
+    private static function mapStrings(array $data, \Closure $fn): array
+    {
+        foreach ($data as $k => $v) {
+            $data[$k] = is_array($v) ? self::mapStrings($v, $fn) : (is_string($v) ? $fn($v) : $v);
+        }
+
+        return $data;
+    }
+
+    /** Escaped copy for the page; in Arabic every Latin run (AdsRanger, GA4, utm_source, lang="ar") gets <bdi dir="ltr"> (UX-235 / 236). */
+    public static function html(string $text, bool $ar): HtmlString
+    {
+        if (! $ar) {
+            return new HtmlString(e($text));
+        }
+        $out = preg_replace_callback('/[A-Za-z0-9][A-Za-z0-9._:\/="#%×+\-]*(?:[ ][A-Za-z0-9][A-Za-z0-9._:\/="#%×+\-]*)*|[^A-Za-z0-9]+/u',
+            function (array $m): string {
+                if (! preg_match('/[A-Za-z]/', $m[0])) {
+                    return e($m[0]);
+                }
+                $core = rtrim($m[0], '.:');
+
+                return '<bdi dir="ltr">'.e($core).'</bdi>'.e(substr($m[0], strlen($core)));
+            }, $text);
+
+        return new HtmlString((string) $out);
     }
 
     /**

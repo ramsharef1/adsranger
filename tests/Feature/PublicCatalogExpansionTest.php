@@ -23,7 +23,7 @@ class PublicCatalogExpansionTest extends TestCase
 
         $this->get('/tools/page-audit')
             ->assertOk()
-            ->assertSee('id="tool-email-capture"', false)
+            ->assertDontSee('id="tool-email-capture"', false) // T-01: no reminder form while there is no mail provider (D-251)
             ->assertSee('"@type":"FAQPage"', false);
 
         $this->post('/tools/audit-report-request', [

@@ -25,7 +25,7 @@ $t = $ar ? ['in' => 'النص بالعربيزي', 'hint' => 'الأرقام: 2 
         <div class="tl-actions"><button type="button" class="btn btn-ghost" id="az-copy">{{ $t['copy'] }}</button></div>
     </form>
     <div class="tl-out" aria-live="polite">
-        <h3>{{ $t['out'] }}</h3>
+        <h2>{{ $t['out'] }}</h2>
         <ul class="tl-list" id="az-out" dir="rtl"></ul>
         <p class="muted" style="margin-top:12px">{{ $t['note'] }}</p>
         <p class="muted">{{ $privacy }}</p>

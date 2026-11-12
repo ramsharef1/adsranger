@@ -159,8 +159,10 @@ h3{font-size:18px;margin:0 0 6px}
 .stk{position:fixed;inset-inline:0;bottom:0;z-index:45;background:var(--bg);border-top:1px solid var(--line);padding:8px 16px;display:none}
 .stk .btn{width:100%}
 @media (max-width:767px){.stk.on{display:block}}
+input[type=file]{width:100%;min-height:48px;padding:10px 12px;border-radius:10px;border:1px dashed var(--field);background:var(--bg);color:var(--ink);font:inherit}
+input[type=file]::file-selector-button{min-height:36px;margin-inline-end:10px;padding:6px 12px;border-radius:8px;border:1px solid var(--field);background:var(--card);color:var(--ink);font:inherit;cursor:pointer}
 /* cookie notice */
-.ck-btns{display:flex;gap:8px;flex-wrap:wrap}.ck .ck-alt{background:transparent;border:1px solid currentColor;color:inherit}
+.ck-btns{display:flex;gap:8px;flex-wrap:nowrap}@media (max-width:480px){.ck.ck-ga .wrap{flex-wrap:wrap;row-gap:4px}.ck.ck-ga p{flex:1 1 100%;margin:0}.ck.ck-ga .ck-btns{flex:1 1 100%}.ck.ck-ga .ck-btns .btn{flex:1}}.ck-btns .btn{min-height:44px;padding:8px 14px;white-space:nowrap}.ck p a{display:inline-block;padding:12px 4px;margin:-12px 0}.ck .ck-alt{background:transparent;border:1px solid currentColor;color:inherit}
 .ck{position:fixed;inset-inline:0;bottom:0;z-index:50;background:var(--surface);border-top:1px solid var(--line);font-size:14px}
 .ck .wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:10px}
 .ck p{margin:0;flex:1;min-width:220px}
@@ -168,7 +170,7 @@ h3{font-size:18px;margin:0 0 6px}
 @media (max-width:480px){.ck{font-size:13px;line-height:1.5}.ck .wrap{flex-wrap:nowrap;gap:8px;padding-block:6px}.ck p{min-width:0}.ck-long{display:none}.ck-short{display:inline}.ck .btn{flex:none;min-height:44px;padding:6px 14px}}
 /* forms */
 label,.lbl{display:block;font-weight:600;margin:16px 0 6px}
-input[type=text],input[type=email],input[type=number],select,textarea{width:100%;min-height:48px;padding:10px 12px;border-radius:10px;border:1px solid var(--field);background:var(--bg);color:var(--ink);font:inherit}
+input[type=text],input[type=email],input[type=number],input[type=url],input[type=tel],input[type=search],select,textarea{width:100%;min-height:48px;padding:10px 12px;border-radius:10px;border:1px solid var(--field);background:var(--bg);color:var(--ink);font:inherit}
 .check{display:flex;align-items:center;gap:10px;min-height:44px;margin:0;font-weight:400;cursor:pointer}
 .check input{width:20px;height:20px;flex:none;accent-color:var(--acc)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
@@ -292,10 +294,10 @@ input[type=text],input[type=email],input[type=number],select,textarea{width:100%
 <div class="stk" id="ar-sticky"><a class="btn" href="{{ $u('/waitlist') }}?type=agency" data-cta="waitlist" data-pos="sticky">{{ $waitlistLabel }}</a></div>
 @endif
 @php($gaId = config('services.ga4.measurement_id'))
-<div class="ck" id="ar-cookie-banner" role="region" aria-label="{{ $ar ? 'إشعار ملفات تعريف الارتباط' : 'Cookie notice' }}" hidden>
+<div class="ck{{ $gaId ? ' ck-ga' : '' }}" id="ar-cookie-banner" role="region" aria-label="{{ $ar ? 'إشعار ملفات تعريف الارتباط' : 'Cookie notice' }}" hidden>
     <div class="wrap">
 @if ($gaId)
-        <p><span class="ck-long">{!! $ar ? 'نستخدم ملفات تعريف الارتباط الأساسية لتشغيل الموقع، وبموافقتك نستخدم <bdi dir="ltr">Google Analytics</bdi> لمعرفة كيف يُستخدم الموقع، دون أي ميزات إعلانية. راجع <a href="/privacy">سياسة الخصوصية</a>.' : 'We use essential cookies to run the site and, with your OK, Google Analytics to see how the site is used, with no ad features. See our <a href="/en/privacy">privacy policy</a>.' !!}</span><span class="ck-short">{!! $ar ? 'ملفات أساسية، و<bdi dir="ltr">Google Analytics</bdi> بموافقتك فقط. <a href="/privacy">الخصوصية</a>' : 'Essential cookies, Google Analytics only with your OK. <a href="/en/privacy">Privacy</a>' !!}</span></p>
+        <p><span class="ck-long">{!! $ar ? 'نستخدم ملفات أساسية فقط، ولا نشغّل <bdi dir="ltr">Google Analytics</bdi> إلا بموافقتك، ودون أي ميزات إعلانية. <a href="/privacy">سياسة الخصوصية</a>' : 'We use essential cookies only, and run Google Analytics only with your OK, with no ad features. <a href="/en/privacy">Privacy policy</a>' !!}</span><span class="ck-short">{!! $ar ? 'ملفات أساسية، والتحليلات بموافقتك فقط. <a href="/privacy">الخصوصية</a>' : 'Essential cookies; analytics only if you agree. <a href="/en/privacy">Privacy</a>' !!}</span></p>
         <div class="ck-btns"><button type="button" class="btn" id="ar-cookie-accept" data-consent="analytics">{{ $ar ? 'قبول التحليلات' : 'Accept analytics' }}</button><button type="button" class="btn ck-alt" data-consent="essential">{{ $ar ? 'الأساسية فقط' : 'Essential only' }}</button></div>
 @else
         <p><span class="ck-long">{!! $ar ? 'نستخدم ملفات تعريف الارتباط الأساسية فقط لتشغيل الجلسات وحفظ اللغة والأمان، دون أي أدوات تتبّع إعلانية. راجع <a href="/privacy">سياسة الخصوصية</a>.' : 'We only use essential cookies for sign-in sessions, language and security, with no third-party ad trackers. See our <a href="/en/privacy">privacy policy</a>.' !!}</span><span class="ck-short">{!! $ar ? 'ملفات تعريف ارتباط أساسية فقط، دون تتبّع إعلاني. <a href="/privacy">الخصوصية</a>' : 'Essential cookies only, no ad trackers. <a href="/en/privacy">Privacy</a>' !!}</span></p>

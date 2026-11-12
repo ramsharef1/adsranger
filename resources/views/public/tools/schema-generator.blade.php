@@ -1,6 +1,6 @@
 @php
 extract(\App\Support\ToolPage::head($lang ?? 'ar', '/tools/schema-generator',
-    ['مولد البيانات المنظمة JSON-LD بالعربية والإنجليزية | AdsRanger', 'Bilingual JSON-LD Schema Generator & Validator | AdsRanger'],
+    ['مولد البيانات المنظمة JSON-LD | AdsRanger', 'Bilingual JSON-LD Schema Generator & Validator | AdsRanger'],
     ['أنشئ وتحقّق من كود البيانات المنظمة JSON-LD لأنواع Organization وLocalBusiness وFAQPage وProduct وSoftwareApplication.',
         'Generate and validate Arabic & English JSON-LD structured data for Organization, LocalBusiness, FAQPage, Product, and SoftwareApplication.']));
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
@@ -39,7 +39,7 @@ $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
     </form>
 
     <div class="tl-out" aria-live="polite">
-        <h3><bdi dir="ltr">JSON-LD</bdi></h3>
+        <h2><bdi dir="ltr">JSON-LD</bdi></h2>
         <textarea id="sc-json" rows="11" dir="ltr" style="font-family:monospace;font-size:13px"></textarea>
         <p id="sc-status" style="font-size:13.5px;font-weight:600;margin:8px 0 0;color:var(--acc)"></p>
         <div class="tl-actions">

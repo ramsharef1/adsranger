@@ -1,6 +1,6 @@
 @php
 extract(\App\Support\ToolPage::head($lang ?? 'ar', '/tools/ab-significance-calculator',
-    ['حاسبة الدلالة الإحصائية لاختبارات A/B وحجم العينة | AdsRanger', 'A/B Test Significance, Bayesian Win Rate & Sample Size Calculator | AdsRanger'],
+    ['حاسبة دلالة اختبارات A/B | AdsRanger', 'A/B Test Significance & Sample Size Calculator | AdsRanger'],
     ['احسب الدلالة الإحصائية (Z-test وp-value) واحتمال الفوز البايزي والحد الأدنى لحجم العينة لاختبارات الإعلانات وصفحات الهبوط.',
         'Calculate Frequentist Z-score, p-value, Bayesian win probability, and minimum sample size for ad and landing-page split tests.']));
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
@@ -16,7 +16,7 @@ $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
 @section('content')
 <section class="tl">
     <form class="card" onsubmit="return false" novalidate>
-        <h3 style="margin-top:0">{{ $ar ? 'النسخة الأصلية (A) والنسخة المختبرة (B)' : 'Control (A) vs Variant (B)' }}</h3>
+        <h2 style="margin-top:0">{{ $ar ? 'النسخة الأصلية (A) والنسخة المختبرة (B)' : 'Control (A) vs Variant (B)' }}</h2>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
             <div>
                 <label for="ab-va">{{ $ar ? 'زوار / نقرات (A)' : 'Visitors / clicks (A)' }}</label>
@@ -43,7 +43,7 @@ $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
         </select>
 
         <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
-        <h3 style="margin:0">{{ $ar ? 'تقدير الحد الأدنى لحجم العينة' : 'Minimum sample-size planner' }}</h3>
+        <h2 style="margin:0">{{ $ar ? 'تقدير الحد الأدنى لحجم العينة' : 'Minimum sample-size planner' }}</h2>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
             <div>
                 <label for="ab-base">{{ $ar ? 'معدل التحويل الأساسي (%)' : 'Baseline CVR (%)' }}</label>
@@ -62,7 +62,7 @@ $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
             <li><span>{{ $ar ? 'معدل تحويل (A)' : 'Control CVR (A)' }}</span><strong id="ab-ra" dir="ltr"></strong></li>
             <li><span>{{ $ar ? 'معدل تحويل (B)' : 'Variant CVR (B)' }}</span><strong id="ab-rb" dir="ltr"></strong></li>
             <li><span>{{ $ar ? 'التحسن النسبي (Lift)' : 'Relative lift' }}</span><strong id="ab-lift" dir="ltr"></strong></li>
-            <li><span><bdi dir="ltr">Z-score / p-value</bdi></span><strong id="ab-zp" dir="ltr"></strong></li>
+            <li><span>{!! $ar ? 'قيمة <bdi dir="ltr">Z</bdi> وقيمة <bdi dir="ltr">p</bdi>' : 'Z-score / p-value' !!}</span><strong id="ab-zp" dir="ltr"></strong></li>
             <li><span>{{ $ar ? 'احتمال فوز (B) البايزي' : 'Bayesian P(B beats A)' }}</span><strong id="ab-bayes" dir="ltr"></strong></li>
             <li><span>{{ $ar ? 'حجم العينة المطلوب لكل نسخة (قوة 80%)' : 'Min sample per variant (80% power)' }}</span><strong id="ab-n" dir="ltr"></strong></li>
         </ul>

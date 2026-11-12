@@ -92,6 +92,22 @@ class Normaliser
     }
 
     /** @return list<string> Arabic candidates for an Arabizi text; ambiguous digits fan out (8 → ق / غ). */
+    /** @var array<string, true>|null */
+    private static ?array $lexicon = null;
+
+    /** @return array<string, true> keys of the Arabizi lexicon (common ad-search words, Content's keyword set). */
+    private static function lexiconKeys(): array
+    {
+        if (self::$lexicon === null) {
+            self::$lexicon = [];
+            foreach (self::rules()['arabizi_lexicon'] ?? [] as $word) {
+                self::$lexicon[self::key($word)] = true;
+            }
+        }
+
+        return self::$lexicon;
+    }
+
     public static function arabiziToArabic(string $text): array
     {
         $r = self::rules();
@@ -113,14 +129,19 @@ class Normaliser
                 $seen = [];
                 $scored = [];
                 foreach ($next as $n) {
-                    if (! isset($seen[$n[0]]) && count($scored) < $max) {
+                    if (! isset($seen[$n[0]]) && count($scored) < $max * 4) {
                         $seen[$n[0]] = true;
                         $scored[] = $n;
                     }
                 }
                 $i += $len;
             }
-            $wordForms = array_column($scored, 0);
+            // UX-231: forms that are known words (arabizi_lexicon) rank first; then by spelling cost. Stable sort keeps ties.
+            $lex = self::lexiconKeys();
+            // Among known words, the one that keeps more of the typed letters wins (3yadat → عيادات, not عيادة).
+            $rank = fn (array $x): array => isset($lex[self::key($x[0])]) ? [0, -mb_strlen($x[0]), $x[1]] : [1, 0, $x[1]];
+            usort($scored, fn ($x, $y) => $rank($x) <=> $rank($y));
+            $wordForms = array_slice(array_column($scored, 0), 0, $max);
             // Combine word by word, best-ranked combinations first (sum of each word's rank), so the cap keeps the
             // likeliest forms of every word rather than every form of the first word.
             $next = [];
@@ -231,9 +252,25 @@ class Normaliser
         return null;
     }
 
+    /** A listed pair (rules never_merge) appears at the same word position: different words that key() would merge. */
+    private static function neverMerge(string $a, string $b): bool
+    {
+        $wa = preg_split('/\s+/u', trim($a), -1, PREG_SPLIT_NO_EMPTY);
+        $wb = preg_split('/\s+/u', trim($b), -1, PREG_SPLIT_NO_EMPTY);
+        foreach (self::rules()['never_merge'] ?? [] as [$x, $y]) {
+            foreach ($wa as $i => $w) {
+                if (isset($wb[$i]) && (($w === $x && $wb[$i] === $y) || ($w === $y && $wb[$i] === $x))) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public static function sameKeyword(string $a, string $b, ?string $country = null): bool
     {
-        if (self::key($a) !== self::key($b)) {
+        if (self::key($a) !== self::key($b) || self::neverMerge($a, $b)) {
             return false;
         }
         $ta = self::placeTags($a, $country);

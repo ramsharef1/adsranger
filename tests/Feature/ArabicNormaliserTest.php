@@ -75,7 +75,10 @@ class ArabicNormaliserTest extends TestCase
 
         $this->assertSame(1.0, Normaliser::tashkeelRatio('اَلْعَرَبِيَّةُ لُغَةٌ'));
         $this->assertSame(0.5, Normaliser::tashkeelRatio('إعلاناتٌ ممولة'));
-        $this->assertSame('2026-11-08', Normaliser::rules()['checked_on']);
+        $this->assertSame('2026-11-12', Normaliser::rules()['checked_on']);
+        $this->assertSame('عيادات اسنان قهوة', Normaliser::arabiziToArabic('3yadat asnan 8ahwa')[0], 'UX-231: known words first');
+        $this->assertFalse(Normaliser::sameKeyword('على', 'علي'));
+        $this->assertContains('gulf', Normaliser::dialectTags('شلون احجز موعد'));
     }
 
     public function test_php_and_js_give_identical_results(): void

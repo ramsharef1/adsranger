@@ -30,7 +30,7 @@ $t = $ar ? ['link' => 'الرابط', 'copy' => 'انسخ الرابط', 'copied
         @endforeach
     </form>
     <div class="tl-out" aria-live="polite">
-        <h3>{{ $t['link'] }}</h3>
+        <h2>{{ $t['link'] }}</h2>
         <code class="tl-code" id="ut-out" dir="ltr"></code>
         <div class="tl-actions"><button type="button" class="btn" id="ut-copy">{{ $t['copy'] }}</button></div>
         <ul id="ut-msgs" style="margin:12px 0 0;padding-inline-start:20px"></ul>

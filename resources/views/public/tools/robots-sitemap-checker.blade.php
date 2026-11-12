@@ -1,6 +1,6 @@
 @php
 extract(\App\Support\ToolPage::head($lang ?? 'ar', '/tools/robots-sitemap-checker',
-    ['فاحص ملف robots.txt وخريطة الموقع XML والرابط المعتمد | AdsRanger', 'Robots.txt, XML Sitemap & Canonical Checker | AdsRanger'],
+    ['فاحص robots.txt وخريطة الموقع | AdsRanger', 'Robots.txt, XML Sitemap & Canonical Checker | AdsRanger'],
     ['افحص ملف robots.txt وخرائط الموقع المعلنة ووسم الرابط المعتمد (canonical) لاكتشاف تعارضات الحظر وأخطاء الأرشفة.',
         'Inspect robots.txt directives, declared XML sitemaps, and page canonical tags to catch Disallow conflicts and HTTP errors.']));
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);

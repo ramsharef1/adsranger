@@ -1,6 +1,6 @@
 @php
 extract(\App\Support\ToolPage::head($lang ?? 'ar', '/tools/cod-poas-calculator',
-    ['حاسبة أرباح الدفع عند الاستلام والتقسيط (COD & POAS) | AdsRanger', 'MENA COD & BNPL Profit / POAS Calculator | AdsRanger'],
+    ['حاسبة أرباح الدفع عند الاستلام (POAS) | AdsRanger', 'MENA COD & BNPL Profit / POAS Calculator | AdsRanger'],
     ['احسب نقطة التعادل الحقيقية وصافي الربح وعائد POAS لمتاجر الدفع عند الاستلام وخدمات التقسيط في الخليج والأردن ومصر.',
         'Calculate Break-Even ROAS, Real Net Profit, and POAS for MENA e-commerce factoring COD delivery rates, return shipping, and Tabby/Tamara fees.']));
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);

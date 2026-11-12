@@ -1,5 +1,5 @@
 @php
-extract(\App\Support\ToolPage::head($lang ?? 'ar', '/tools/ksa-ad-compliance-checker',
+extract(\App\Support\ToolPage::head($lang ?? 'ar', '/tools/gulf-ad-disclosure-checklist',
     ['قائمة إفصاحات الإعلانات في السعودية والإمارات | AdsRanger', 'KSA & UAE Ad Disclosure Checklist | AdsRanger'],
     ['قائمة فحص إرشادية ومسح لنص الإعلان لمراجعة متطلبات ترخيص فال العقاري والغذاء والدواء ووزارة الصحة ووسم معلن وإفصاحات التقسيط.',
         'Reminder checklist and word search for Saudi REGA/Fal, SFDA, MOH disclaimers, UAE Media Council permit tags, and BNPL disclosures.']));
@@ -34,13 +34,13 @@ $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
     </form>
 
     <div class="tl-out" aria-live="polite">
-        <h3>{{ $ar ? 'نتيجة فحص النص وقائمة التحقق' : 'Copy scan & required disclosures' }}</h3>
+        <h2>{{ $ar ? 'نتيجة فحص النص وقائمة التحقق' : 'Copy scan & required disclosures' }}</h2>
         <ul class="tl-kv" id="kc-list"></ul>
         <p class="muted" style="margin-top:14px">{{ $privacy }}</p>
     </div>
 </section>
 <p style="margin-top:20px"><a class="btn" href="{{ $u('/waitlist') }}?type=agency">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a></p>
-@include('public.tools.partials.tool-guide-faq', ['toolSlug' => 'ksa-ad-compliance-checker', 'ar' => $ar])
+@include('public.tools.partials.tool-guide-faq', ['toolSlug' => 'gulf-ad-disclosure-checklist', 'ar' => $ar])
 @endsection
 @push('scripts')
 <script>

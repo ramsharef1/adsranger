@@ -1,24 +1,25 @@
 @php
     $tc = \App\Support\Seo\ToolCopy::for($toolSlug ?? 'serp-preview', $ar ?? true);
     $faqJson = \App\Support\Seo\ToolCopy::faqSchema($toolSlug ?? 'serp-preview', $ar ?? true);
-    $showEmailCapture = in_array($toolSlug ?? '', ['page-audit', 'hreflang-checker'], true);
+    // T-01 / UX-230 / UX-233: no reminder form while there is no mail provider (D-251). The endpoint stays for later.
+    $showEmailCapture = false;
 @endphp
 <section class="card" style="margin-top:28px;padding:22px">
-    <h2 style="font-size:20px;margin-top:0">{{ $tc['how_title'] }}</h2>
+    <h2 style="font-size:20px;margin-top:0">{{ \App\Support\Seo\ToolCopy::html($tc['how_title'], $ar ?? true) }}</h2>
     <ol style="margin:12px 0 0;padding-inline-start:20px;line-height:1.75">
         @foreach ($tc['how_steps'] as $step)
-            <li style="margin-bottom:6px">{{ $step }}</li>
+            <li style="margin-bottom:6px">{{ \App\Support\Seo\ToolCopy::html($step, $ar ?? true) }}</li>
         @endforeach
     </ol>
 </section>
 
 <section class="card" style="margin-top:18px;padding:22px">
-    <h2 style="font-size:20px;margin-top:0">{{ $tc['faq_title'] }}</h2>
+    <h2 style="font-size:20px;margin-top:0">{{ \App\Support\Seo\ToolCopy::html($tc['faq_title'], $ar ?? true) }}</h2>
     <div style="display:grid;gap:14px;margin-top:12px">
         @foreach ($tc['faqs'] as $f)
             <div>
-                <h3 style="font-size:16px;margin:0 0 4px">{{ $f['q'] }}</h3>
-                <p class="muted" style="margin:0;line-height:1.65">{{ $f['a'] }}</p>
+                <h3 style="font-size:16px;margin:0 0 4px">{{ \App\Support\Seo\ToolCopy::html($f['q'], $ar ?? true) }}</h3>
+                <p class="muted" style="margin:0;line-height:1.65">{{ \App\Support\Seo\ToolCopy::html($f['a'], $ar ?? true) }}</p>
             </div>
         @endforeach
     </div>

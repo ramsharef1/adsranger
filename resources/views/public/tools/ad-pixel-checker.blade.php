@@ -1,7 +1,7 @@
 @php
-extract(\App\Support\ToolPage::head($lang ?? 'ar', '/tools/capi-pixel-checker',
-    ['فاحص البكسل ووسوم التتبع الإعلانية | AdsRanger', 'Ad Pixel & Tag Checker (Meta, GTM, GA4, Salla/Zid) | AdsRanger'],
-    ['افحص أي صفحة عامة لرصد وسوم Meta Pixel وGTM وGA4 وTikTok وSnap وروابط سلة وزد مع تنبيهات dataLayer وnoscript. مجانًا ودون تسجيل.',
+extract(\App\Support\ToolPage::head($lang ?? 'ar', '/tools/ad-pixel-checker',
+    ['فاحص البكسل ووسوم التتبع الإعلانية | AdsRanger', 'Ad Pixel & Tag Checker (Meta, GTM, GA4) | AdsRanger'],
+    ['افحص أي صفحة عامة لرصد وسوم Meta Pixel، GTM، GA4، TikTok، Snap وروابط سلة وزد مع تنبيهات dataLayer، noscript. مجانًا ودون تسجيل.',
         'Inspect any public URL to detect Meta Pixel, GTM, GA4, Google Ads, TikTok, Snap, LinkedIn, and Salla/Zid hooks. Free, no sign-up.']));
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
 $t = $ar ? [
@@ -44,7 +44,7 @@ $t = $ar ? [
     </div>
 </section>
 <p style="margin-top:20px"><a class="btn" href="{{ $u('/waitlist') }}?type=agency">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a></p>
-@include('public.tools.partials.tool-guide-faq', ['toolSlug' => 'capi-pixel-checker', 'ar' => $ar])
+@include('public.tools.partials.tool-guide-faq', ['toolSlug' => 'ad-pixel-checker', 'ar' => $ar])
 @endsection
 @push('scripts')
 <script>
@@ -56,7 +56,7 @@ $t = $ar ? [
     var u = $('cp-url').value.trim(), err = $('cp-err'), out = $('cp-out');
     if(!/^https?:\/\/\S+\.\S+/i.test(u)){ err.textContent = T.bad_url; err.hidden = false; return; }
     err.hidden = true; $('cp-btn').disabled = true; $('cp-btn').textContent = T.running;
-    fetch(@json(url('/tools/capi-pixel-checker/run')), {
+    fetch(@json(url('/tools/ad-pixel-checker/run')), {
       method: 'POST',
       headers: {'Content-Type':'application/json','Accept':'application/json','X-CSRF-TOKEN':@json(csrf_token())},
       body: JSON.stringify({url: u})

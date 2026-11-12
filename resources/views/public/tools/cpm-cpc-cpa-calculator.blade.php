@@ -1,6 +1,6 @@
 @php
 extract(\App\Support\ToolPage::head($lang ?? 'ar', '/tools/cpm-cpc-cpa-calculator',
-    ['حاسبة مؤشرات الإعلانات الشاملة (CPM, CPC, CTR, CPA) | AdsRanger', 'Full-Funnel CPM, CPC, CTR, CVR & CPA Calculator | AdsRanger'],
+    ['حاسبة تكلفة الألف ظهور والنقرة والتحويل | AdsRanger', 'Full-Funnel CPM, CPC, CTR, CVR & CPA Calculator | AdsRanger'],
     ['احسب وحوّل فورًا بين الميزانية ومرات الظهور وتكلفة الألف ظهور (CPM) ونسبة النقر (CTR) وتكلفة النقرة (CPC) وتكلفة الاكتساب (CPA).',
         'Instant full-funnel media math converter across Budget, Impressions, CPM, CTR, Clicks, CPC, CVR, Conversions, and CPA.']));
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
@@ -12,7 +12,7 @@ $curs = ['USD', 'SAR', 'AED', 'JOD', 'KWD', 'QAR', 'EGP'];
 @endpush
 @section('hero')
 <h1>{!! $ar ? 'حاسبة مؤشرات الإعلانات الشاملة (<bdi dir="ltr">CPM · CPC · CPA</bdi>)' : 'Full-Funnel CPM, CPC & CPA Calculator' !!}</h1>
-<p class="muted" style="font-size:17px">{{ $ar ? 'أدخل أرقام الحملة الأساسية لتحسب كل مؤشرات القمع الإعلاني من الظهور حتى تكلفة العميل.' : 'Convert instantly across spend, impressions, CPM, CTR, clicks, CPC, CVR, conversions, and CPA.' }}</p>
+<p class="muted" style="font-size:17px">{{ $ar ? 'أدخل أرقام الحملة الأساسية لتحسب كل مؤشرات القمع الإعلاني من الظهور حتى تكلفة العميل.' : 'Convert between spend, impressions, CPM, CTR, clicks, CPC, CVR, conversions, and CPA.' }}</p>
 @endsection
 @section('content')
 <section class="tl">
@@ -35,11 +35,11 @@ $curs = ['USD', 'SAR', 'AED', 'JOD', 'KWD', 'QAR', 'EGP'];
 
     <div class="tl-out" aria-live="polite">
         <ul class="tl-kv">
-            <li><span><bdi dir="ltr">CPM</bdi> ({{ $ar ? 'تكلفة الألف ظهور' : 'Cost per 1,000 impressions' }})</span><strong id="mm-cpm" dir="ltr"></strong></li>
-            <li><span><bdi dir="ltr">CTR</bdi> ({{ $ar ? 'نسبة النقر إلى الظهور' : 'Click-through rate' }})</span><strong id="mm-ctr" dir="ltr"></strong></li>
-            <li><span><bdi dir="ltr">CPC</bdi> ({{ $ar ? 'تكلفة النقرة' : 'Cost per click' }})</span><strong id="mm-cpc" dir="ltr"></strong></li>
-            <li><span><bdi dir="ltr">CVR</bdi> ({{ $ar ? 'معدل تحويل النقرات' : 'Conversion rate' }})</span><strong id="mm-cvr" dir="ltr"></strong></li>
-            <li><span><bdi dir="ltr">CPA / CPL</bdi> ({{ $ar ? 'تكلفة الاكتساب / التحويل' : 'Cost per acquisition' }})</span><strong id="mm-cpa" dir="ltr"></strong></li>
+            <li><span>{!! $ar ? 'تكلفة الألف ظهور (<bdi dir="ltr">CPM</bdi>)' : 'CPM (Cost per 1,000 impressions)' !!}</span><strong id="mm-cpm" dir="ltr"></strong></li>
+            <li><span>{!! $ar ? 'نسبة النقر إلى الظهور (<bdi dir="ltr">CTR</bdi>)' : 'CTR (Click-through rate)' !!}</span><strong id="mm-ctr" dir="ltr"></strong></li>
+            <li><span>{!! $ar ? 'تكلفة النقرة (<bdi dir="ltr">CPC</bdi>)' : 'CPC (Cost per click)' !!}</span><strong id="mm-cpc" dir="ltr"></strong></li>
+            <li><span>{!! $ar ? 'معدل تحويل النقرات (<bdi dir="ltr">CVR</bdi>)' : 'CVR (Conversion rate)' !!}</span><strong id="mm-cvr" dir="ltr"></strong></li>
+            <li><span>{!! $ar ? 'تكلفة الاكتساب / التحويل (<bdi dir="ltr">CPA / CPL</bdi>)' : 'CPA / CPL (Cost per acquisition)' !!}</span><strong id="mm-cpa" dir="ltr"></strong></li>
         </ul>
         <p class="muted" style="margin-top:14px">{{ $privacy }}</p>
     </div>
