@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Clients\Pages;
 use App\Filament\Pages\ExportData;
 use App\Filament\Pages\MeetingPrepPage;
 use App\Filament\Resources\Clients\ClientResource;
+use App\Models\Ad;
 use App\Models\AdSet;
 use App\Models\Alert;
 use App\Models\AuditLog;
@@ -18,11 +19,13 @@ use App\Models\CodWeek;
 use App\Models\DailyMetric;
 use App\Models\LeadDeskLink;
 use App\Models\ReportSchedule;
+use App\Support\Arabic\Phrases;
 use App\Support\ClientFreeze;
 use App\Support\ClientSetupCopy;
 use App\Support\ClientSummaryText;
 use App\Support\CodOutcomes;
 use App\Support\DataGaps;
+use App\Support\DialectResults;
 use App\Support\Fx;
 use App\Support\HealthScore;
 use App\Support\LeadDesk;
@@ -71,6 +74,14 @@ class ViewClient extends ViewRecord
     public function getTitle(): string
     {
         return $this->record->name;
+    }
+
+    /** PS-22 (R5): the agency tags an ad's dialect; empty clears it (back to the guess from the name). */
+    public function setAdDialect(int $adId, string $dialect): void
+    {
+        abort_unless(TeamRoles::canManageData(auth()->user(), $this->record->agency), 403);
+        $ad = Ad::whereIn('ad_account_id', $this->record->adAccounts()->pluck('id'))->findOrFail($adId);
+        $ad->forceFill(['dialect' => in_array($dialect, Phrases::DIALECTS, true) ? $dialect : null])->save();
     }
 
     protected function getHeaderActions(): array
@@ -514,6 +525,7 @@ class ViewClient extends ViewRecord
             'alerts' => Alert::where('client_id', $c->id)->where('status', 'open')->latest()->limit(5)->get(),
             'series' => DataGaps::series($c, $from, $to),
             'marketDates' => MarketDates::forClient($c, $from, $to), // PS-21 / XS-20 (R5)
+            'dialects' => DialectResults::summary($c, $from, $to), // PS-22 (R5)
             'approvals' => ClientApproval::where('client_id', $c->id)->where('status', '!=', 'withdrawn')->latest()->limit(8)->get(), // XS-06
             'leads' => Modules::on('lead_desk', null, $c->agency) ? LeadDesk::summary($c, $from, $to) : null, // XS-13 / XS-23
             'season' => SeasonReview::latest($c), // FS-22 (R4)

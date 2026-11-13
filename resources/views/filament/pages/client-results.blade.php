@@ -274,6 +274,33 @@
         </x-filament::section>
     @endif
 
+    {{-- PS-22 (R5): cost per result by dialect; ads are tagged here (or guessed from their names). --}}
+    @if (! empty($dialects['ads']))
+        @php $dl = \App\Support\Arabic\Phrases::dialectLabels() + ['untagged' => __('Not tagged')]; $canTag = \App\Support\TeamRoles::canManageData(auth()->user(), $client->agency); @endphp
+        <x-filament::section data-dialect-results collapsible :collapsed="$dialects['tagged'] === 0">
+            <x-slot name="heading">{{ __('Results by dialect') }}</x-slot>
+            <x-slot name="description">{{ __('Tag each ad with its dialect to compare. Untagged ads use a guess from the ad name when it has dialect words.') }}</x-slot>
+            <div style="overflow-x:auto"><table style="width:100%;font-size:13.5px;border-collapse:collapse">
+                <thead><tr><th style="text-align:start;padding:6px">{{ __('Dialect') }}</th><th style="text-align:end;padding:6px">{{ __('Ads') }}</th>@unless ($client->hide_spend)<th style="text-align:end;padding:6px">{{ __('Spend') }}</th>@endunless<th style="text-align:end;padding:6px">{{ __('Results') }}</th>@unless ($client->hide_spend)<th style="text-align:end;padding:6px">{{ __('Cost per result') }}</th>@endunless</tr></thead>
+                <tbody>@foreach ($dialects['rows'] as $r)<tr style="border-top:1px solid rgba(148,163,184,.2)"><td style="padding:6px">{{ $dl[$r['dialect']] ?? $r['dialect'] }}</td><td style="padding:6px;text-align:end">{{ $r['ads'] }}</td>@unless ($client->hide_spend)<td style="padding:6px;text-align:end">{{ R::money($r['spend'], $cur) }}</td>@endunless<td style="padding:6px;text-align:end">{{ number_format($r['results']) }}</td>@unless ($client->hide_spend)<td style="padding:6px;text-align:end">{{ $r['cpr'] !== null ? R::money($r['cpr'], $cur) : '–' }}</td>@endunless</tr>@endforeach</tbody>
+            </table></div>
+            @if ($canTag)
+                <details style="margin-top:10px"><summary style="cursor:pointer;min-height:44px;display:flex;align-items:center;font-size:13px">{{ __('Tag ads (top 15 by spend)') }}</summary>
+                    <ul style="margin:0;padding:0;list-style:none;display:grid;gap:6px">
+                        @foreach ($dialects['ads'] as $ad)
+                            <li style="display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:13px">
+                                <span dir="auto" style="overflow-wrap:anywhere">{{ $ad['name'] }}@if ($ad['guess'])<span style="{{ $muted }}"> · {{ __('guess: :d', ['d' => $dl[$ad['guess']]]) }}</span>@endif</span>
+                                <select aria-label="{{ __('Dialect of :ad', ['ad' => $ad['name']]) }}" wire:change="setAdDialect({{ $ad['id'] }}, $event.target.value)" style="min-height:44px;padding:4px 8px;border-radius:8px;border:1px solid rgba(148,163,184,.35);background:transparent;font-size:13px">
+                                    <option value="">{{ __('Not tagged') }}</option>@foreach (\App\Support\Arabic\Phrases::dialectLabels() as $k => $v)<option value="{{ $k }}" @selected($ad['dialect'] === $k)>{{ $v }}</option>@endforeach
+                                </select>
+                            </li>
+                        @endforeach
+                    </ul>
+                </details>
+            @endif
+        </x-filament::section>
+    @endif
+
     {{-- XS-06 (R4): what the client was asked to approve, and who answered --}}
     @if ($approvals->isNotEmpty())
         <x-filament::section data-client-approvals>

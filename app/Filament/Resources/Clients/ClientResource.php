@@ -8,12 +8,14 @@ use App\Filament\Resources\Clients\Pages\EditClient;
 use App\Filament\Resources\Clients\Pages\ListClients;
 use App\Filament\Resources\Clients\Pages\ViewClient;
 use App\Models\AdAccount;
+use App\Models\Agency;
 use App\Models\Client;
 use App\Models\DailyMetric;
 use App\Support\Arabic\Phrases;
 use App\Support\CallResults;
 use App\Support\ClientSetupScore;
 use App\Support\HealthScore;
+use App\Support\PanelSearch;
 use App\Support\TeamRoles;
 use BackedEnum;
 use Filament\Actions\EditAction;
@@ -23,6 +25,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\GlobalSearch\GlobalSearchResult;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -30,6 +33,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use UnitEnum;
 
 class ClientResource extends Resource
@@ -49,6 +53,27 @@ class ClientResource extends Resource
     protected static ?int $navigationSort = 12;
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    /** PS-23 / XS-46 / FS-52 (R5): Arabic-aware search for clients and their campaigns («الريّان» = "al rayyan"). */
+    public static function getGlobalSearchResults(string $search): Collection
+    {
+        $agency = Filament::getTenant();
+        if (! $agency instanceof Agency) {
+            return collect();
+        }
+        $hits = PanelSearch::find($agency, auth()->user(), $search);
+        $out = collect();
+        foreach ($hits['clients'] as $c) {
+            $out->push(new GlobalSearchResult(title: $c->name, url: static::getUrl('view', ['record' => $c->id]),
+                details: [__('Client') => $c->status === 'paused' ? __('Paused') : __('Active')]));
+        }
+        foreach ($hits['campaigns'] as $h) {
+            $out->push(new GlobalSearchResult(title: (string) $h['campaign']->name, url: static::getUrl('view', ['record' => $h['client']->id]),
+                details: [__('Campaign') => $h['client']->name]));
+        }
+
+        return $out;
+    }
 
     public static function canManage(): bool
     {

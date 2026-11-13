@@ -105,6 +105,7 @@ class AppPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.shell-head'))
             ->renderHook(PanelsRenderHook::TOPBAR_LOGO_AFTER, fn () => view('panels.shell-areas'))
             ->renderHook(PanelsRenderHook::BODY_END, fn () => view('panels.shell-bottom'))
+            ->renderHook(PanelsRenderHook::BODY_END, fn () => view('panels.keyboard')) // PS-25 (R5)
             ->renderHook(PanelsRenderHook::GLOBAL_SEARCH_AFTER, fn () => view('panels.shell-client-switcher'))
             ->renderHook(PanelsRenderHook::SIMPLE_PAGE_END, fn () => view('panels.lang-switch'))
             // D-61 trial banner (days left / trial ended), under the top bar.

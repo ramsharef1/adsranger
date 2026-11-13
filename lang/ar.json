@@ -2730,5 +2730,11 @@
     "Clean spelling": "كتابة نظيفة",
     "Call to action swapped": "دعوة مستبدلة",
     "From the main market": "حسب السوق الرئيسي",
-    "Used for phrases, ad line variants and AI drafts for this client.": "تُستخدم في العبارات والصيغ البديلة ومسودات الذكاء الاصطناعي لهذا العميل."
+    "Used for phrases, ad line variants and AI drafts for this client.": "تُستخدم في العبارات والصيغ البديلة ومسودات الذكاء الاصطناعي لهذا العميل.",
+    "Not tagged": "بلا وسم",
+    "Results by dialect": "النتائج حسب اللهجة",
+    "Tag each ad with its dialect to compare. Untagged ads use a guess from the ad name when it has dialect words.": "ضع وسم اللهجة على كل إعلان للمقارنة. الإعلانات بلا وسم تُقدَّر لهجتها من اسم الإعلان إن احتوى كلمات لهجة.",
+    "Tag ads (top 15 by spend)": "وسم الإعلانات (أعلى 15 إنفاقًا)",
+    "guess: :d": "تقدير: :d",
+    "Dialect of :ad": "لهجة :ad"
 }
