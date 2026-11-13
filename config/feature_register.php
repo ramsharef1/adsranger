@@ -48,13 +48,12 @@ use App\Support\Reach\Serve;
 use App\Support\Reach\Wallet;
 use App\Support\RestoreTest;
 use App\Support\Seo\AiCrawlerChecker;
+use App\Support\Seo\Audit\PageSpeed;
+use App\Support\Seo\Audit\SiteAuditor;
 use App\Support\Seo\PageAudit;
 use App\Support\Seo\PublicCatalog;
 use App\Support\Seo\SiteAuditRunner;
 use App\Support\Seo\ToolGuard;
-use App\Support\Site\CopyLint;
-use App\Support\WebPush;
-
 /*
  * A-12 (FR-029) register-to-code guard. Every row marked Done or Live in ADSR-060 / ADSR-920 is listed here with the
  * code it lives in and the test that proves it. RegisterToCodeTest fails if a listed class, view or test is missing,
@@ -62,6 +61,9 @@ use App\Support\WebPush;
  *
  * 'code' entries: a class name, "view:<name>", "route:<uri>" or "config:<file>". 'tests': files under tests/.
  */
+use App\Support\Site\CopyLint;
+use App\Support\WebPush;
+
 return [
     '#173' => ['title' => 'Day-1 account audit', 'code' => [AccountAudit::class, AccountAuditPage::class], 'tests' => ['Feature/AccountAuditTest.php']],
     'FR-042' => ['title' => 'Onboarding (steps 1–3 required)', 'code' => [OnboardingPage::class], 'tests' => ['Feature/OnboardingTest.php']],
@@ -97,4 +99,5 @@ return [
     'FR-REACH-R1' => ['title' => 'AdsRanger Reach R-1: schema, offer + coupon importer (AR/EN CSV), S2S postback receiver, 3-tier coupon attribution, dual estimate wallet, /admin Reach board (module reach, off; D-262 estimates)', 'code' => [OfferImporter::class, Postbacks::class, Attribution::class, Wallet::class, ReachControlBoard::class, 'route:reach/v1/postback/{token}'], 'tests' => ['Feature/ReachR1Test.php']],
     'FR-REACH-R2' => ['title' => 'AdsRanger Reach R-2: stateless /reach/v1/serve + offerwall + AI feed (geo, OS, URL keywords, payday / meal-time boost, UCB1, cached), < 5 KB web tag (no CLS, 0x0 guard, auto-skim), incent firewall, family-safe + 20-domain blocklist, human vs AI-agent counters, 4-tab /reach/portal, /reach landing (noindex, 404 while off)', 'code' => [Serve::class, ReachServeController::class, ReachPortalController::class, 'view:reach.portal', 'view:reach.landing', 'route:reach/v1/serve', 'route:reach/v1/ai-feed'], 'tests' => ['Feature/ReachR2Test.php']],
     'FR-REACH-R3' => ['title' => 'AdsRanger Reach R-3: free AI Bot Traffic & Unmonetized Revenue Checker (/tools/ai-crawler-revenue-checker): robots.txt per AI crawler, llms.txt + Offer markup, SafeFetcher + ToolAbuseGuard, noindex and out of sitemap / menus / hub / share cards (seo_tools.module_gated, module reach)', 'code' => [AiCrawlerChecker::class, ReachToolController::class, 'view:public.tools.ai-crawler-revenue-checker', 'config:seo_tools', 'route:tools/ai-crawler-revenue-checker/run'], 'tests' => ['Feature/ReachR3Test.php']],
+    'FR-089-A2' => ['title' => 'Site audit A2 speed lab (E2-062): static asset checks SPEED-01..04 (render-blocking script / CSS, first image without dimensions, inline payload) + optional PageSpeed Insights v5 mobile (score, LCP, INP field-only, CLS, TTFB); speed chip only when speed_checked_at exists (UX-250); module seo_audit, off', 'code' => [PageSpeed::class, SiteAuditor::class, 'view:filament.pages.seo-audit'], 'tests' => ['Feature/SeoAuditA2SpeedTest.php']],
 ];

@@ -11,7 +11,7 @@ use App\Support\Seo\SafeFetcher;
  * @phpstan-type Parsed array{lang: string, dir: string, title: string, description: string, h1s: list<string>, canonical: string,
  *   hreflang: list<array{lang: string, href: string}>, links: list<string>, images_no_alt: int, images_no_alt_src: list<string>, noindex: bool, fonts: list<string>,
  *   font_display: bool, arabic_font: bool, json_ld: list<string>, json_ld_invalid: int, text: string, word_count: int, arabic_ratio: float,
- *   title_px: int}
+ *   title_px: int, speed: array{blocking_scripts: int, blocking_scripts_src: list<string>, blocking_css: int, hero_img_no_dims: ?string, inline_bytes: int}}
  */
 class PageParser
 {
@@ -119,7 +119,73 @@ class PageParser
             'fonts' => $fonts, 'font_display' => $fontDisplay, 'arabic_font' => $arabicFont, 'json_ld' => $jsonLd, 'json_ld_invalid' => $invalid,
             'text' => mb_substr($text, 0, 4000), 'word_count' => $wordCount, 'arabic_ratio' => round($ratio, 3),
             'title_px' => (int) PageAudit::serpWidths($title, $description)['title_px'],
+            'speed' => self::speed($html, $head, $pageUrl),
         ];
+    }
+
+    /**
+     * A2 static asset facts (E2-062): read from the HTML only, no timing. A render-blocking script is a <script src> in <head>
+     * without defer, async or type="module"; a render-blocking stylesheet is a <link rel="stylesheet"> in <head> whose media
+     * applies on load (none, all, screen). The hero image is the first <img> in <body>; inline bytes count inline scripts,
+     * styles and data: URIs.
+     *
+     * @return array{blocking_scripts: int, blocking_scripts_src: list<string>, blocking_css: int, hero_img_no_dims: ?string, inline_bytes: int}
+     */
+    public static function speed(string $html, string $head, string $pageUrl): array
+    {
+        $blockingScripts = [];
+        preg_match_all('/<script\b([^>]*)>/i', $head, $sm);
+        foreach ($sm[1] as $attrs) {
+            if (! preg_match('/\bsrc\s*=\s*["\']?([^"\'\s>]+)/i', $attrs, $src)) {
+                continue;
+            }
+            if (preg_match('/\b(defer|async)\b/i', $attrs) || preg_match('/\btype\s*=\s*["\']?module/i', $attrs)) {
+                continue;
+            }
+            $blockingScripts[] = mb_substr(self::absolute($pageUrl, html_entity_decode($src[1])), 0, 120);
+        }
+
+        $blockingCss = 0;
+        preg_match_all('/<link\b[^>]*>/i', $head, $lm);
+        foreach ($lm[0] as $tag) {
+            if (! preg_match('/\brel\s*=\s*["\']?stylesheet/i', $tag)) {
+                continue;
+            }
+            $media = preg_match('/\bmedia\s*=\s*["\']([^"\']*)["\']/i', $tag, $mm) ? strtolower(trim($mm[1])) : '';
+            if ($media === '' || $media === 'all' || $media === 'screen') {
+                $blockingCss++;
+            }
+        }
+
+        $body = preg_match('/<body\b.*?<\/body>/is', $html, $bm) ? $bm[0] : '';
+        $hero = null;
+        if (preg_match('/<img\b[^>]*>/i', $body, $im)) {
+            $tag = $im[0];
+            $sized = preg_match('/\bwidth\s*=/i', $tag) && preg_match('/\bheight\s*=/i', $tag);
+            $styled = preg_match('/\bstyle\s*=\s*["\'][^"\']*(aspect-ratio|height\s*:)/i', $tag);
+            if (! $sized && ! $styled) {
+                $hero = preg_match('/\bsrc\s*=\s*["\']([^"\']+)["\']/i', $tag, $hs) && ! str_starts_with(trim($hs[1]), 'data:')
+                    ? mb_substr(self::absolute($pageUrl, trim(html_entity_decode($hs[1]))), 0, 120) : 'img';
+            }
+        }
+
+        $inline = 0;
+        preg_match_all('/<script\b([^>]*)>(.*?)<\/script>/is', $html, $is);
+        foreach ($is[1] as $i => $attrs) {
+            if (! preg_match('/\bsrc\s*=/i', $attrs) && ! preg_match('/application\/(ld\+)?json/i', $attrs)) {
+                $inline += strlen($is[2][$i]);
+            }
+        }
+        preg_match_all('/<style\b[^>]*>(.*?)<\/style>/is', $html, $st);
+        foreach ($st[1] as $css) {
+            $inline += strlen($css);
+        }
+        preg_match_all('/data:[a-z]+\/[a-z0-9.+-]+;base64,[A-Za-z0-9+\/=]+/i', $html, $du);
+        foreach ($du[0] as $uri) {
+            $inline += strlen($uri);
+        }
+
+        return ['blocking_scripts' => count($blockingScripts), 'blocking_scripts_src' => array_slice($blockingScripts, 0, 5), 'blocking_css' => $blockingCss, 'hero_img_no_dims' => $hero, 'inline_bytes' => $inline];
     }
 
     public static function text(string $fragment): string

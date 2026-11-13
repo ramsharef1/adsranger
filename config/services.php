@@ -41,6 +41,11 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI', rtrim((string) env('APP_URL', 'http://localhost'), '/').'/app/oauth/google/callback'),
     ],
 
+    // E2-062 site audit A2: optional Google PageSpeed Insights v5 key (same key as the landing-page check). Empty = static asset checks only.
+    'pagespeed' => [
+        'key' => env('PAGESPEED_API_KEY'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

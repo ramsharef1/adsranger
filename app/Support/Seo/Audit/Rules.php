@@ -136,6 +136,24 @@ class Rules
             }
         }
 
+        // A2 speed (E2-062): static asset checks from the HTML only; never a timing claim.
+        $speed = $p['speed'] ?? null;
+        if (is_array($speed)) {
+            $cfg = config('seo_audit.speed', []);
+            if ($speed['blocking_scripts'] > (int) ($cfg['blocking_scripts_max'] ?? 0)) {
+                $issues[] = ['SPEED-01', mb_substr($speed['blocking_scripts'].' script: '.implode(' · ', $speed['blocking_scripts_src']), 0, 480)];
+            }
+            if ($speed['blocking_css'] > (int) ($cfg['blocking_css_max'] ?? 2)) {
+                $issues[] = ['SPEED-02', $speed['blocking_css'].' CSS'];
+            }
+            if ($speed['hero_img_no_dims'] !== null) {
+                $issues[] = ['SPEED-03', $speed['hero_img_no_dims']];
+            }
+            if ($speed['inline_bytes'] > (int) ($cfg['inline_bytes_max'] ?? 100_000)) {
+                $issues[] = ['SPEED-04', number_format($speed['inline_bytes'] / 1024, 0).' KB'];
+            }
+        }
+
         return $issues;
     }
 

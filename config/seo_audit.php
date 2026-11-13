@@ -19,4 +19,12 @@ return [
 
     // Health score (Rami 13:41, G-4): 100 minus weighted issues per crawled page. Shown with its formula and date; not a ranking claim.
     'score_weights' => ['critical' => 10, 'warning' => 3, 'info' => 0],
+
+    // A2 speed lab (E2-062): static HTML asset checks run on every page; Core Web Vitals come only from PageSpeed Insights (services.pagespeed.key).
+    'speed' => [
+        'blocking_scripts_max' => 0,      // SPEED-01 when a <head> script has no defer / async / type=module
+        'blocking_css_max' => 2,          // SPEED-02 when more render-blocking stylesheets than this sit in <head>
+        'inline_bytes_max' => 100_000,    // SPEED-04 inline <script> + <style> + data: URIs over this many bytes
+        'psi_timeout_s' => 60,
+    ],
 ];

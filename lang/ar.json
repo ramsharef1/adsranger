@@ -2761,5 +2761,13 @@
     "Expected": "متوقع",
     "Confirmed": "مؤكد",
     "AdsRanger Reach (publishers)": "AdsRanger Reach (للناشرين)",
-    "Publisher offers, coupon attribution, conversion postbacks and estimate wallets. No money moves before launch.": "عروض للناشرين، ونسب أكواد الخصم، وإشعارات التحويل، ومحافظ تقديرية. لا تتحرك أي أموال قبل الإطلاق."
+    "Publisher offers, coupon attribution, conversion postbacks and estimate wallets. No money moves before launch.": "عروض للناشرين، ونسب أكواد الخصم، وإشعارات التحويل، ومحافظ تقديرية. لا تتحرك أي أموال قبل الإطلاق.",
+    "Page speed": "سرعة الصفحة",
+    "Mobile score (PageSpeed)": "نتيجة الهاتف (PageSpeed)",
+    "Render-blocking files on the first page": "ملفات توقف عرض الصفحة الأولى",
+    "Measured by Google PageSpeed Insights on mobile for the site address.": "قاسها Google PageSpeed Insights على الهاتف لعنوان الموقع.",
+    "INP needs real-visitor data, which Google doesn't have for this page yet.": "يحتاج INP إلى بيانات زوار حقيقيين، ولا يملكها Google لهذه الصفحة بعد.",
+    "Read from the page code only. Load times (LCP, INP, CLS) need a PageSpeed Insights key, so we show none.": "قرأناها من شيفرة الصفحة فقط. أزمنة التحميل (LCP، INP، CLS) تحتاج مفتاح PageSpeed Insights، لذا لا نعرض أيًّا منها.",
+    ":n s": ":n ث",
+    ":n ms": ":n م.ث"
 }
