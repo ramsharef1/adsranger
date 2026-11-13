@@ -5,6 +5,8 @@ namespace App\Support;
 use App\Filament\Pages;
 use App\Filament\Resources;
 use App\Models\Agency;
+use App\Models\Alert;
+use App\Models\Client;
 use Filament\Facades\Filament;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
@@ -180,19 +182,48 @@ class Shell
         return array_filter(array_replace(array_fill_keys(self::AREAS, null), $links));
     }
 
-    /** @return array{date: string, hijri: string, next: ?array{label: string, days: int}} the season ribbon line */
+    /**
+     * PX-03: the season ribbon: today in both calendars, the next 2 seasons, and one status sentence from open alerts
+     * (D-88 levels) for the clients this person sees.
+     *
+     * @return array{date: string, hijri: string, next: list<array{label: string, days: int}>, clients: int, calm: int, critical: int, warning: int}
+     */
     public static function ribbon(Agency $agency): array
     {
         $tz = $agency->timezone ?: 'UTC';
         $today = now($tz)->toDateString();
         $ar = app()->getLocale() === 'ar';
-        $next = collect(MenaCalendar::events($today, now($tz)->addDays(60)->toDateString()))
-            ->filter(fn ($e) => $e['start'] > $today)->sortBy('start')->first();
+        $next = collect(MenaCalendar::events($today, now($tz)->addDays(90)->toDateString()))
+            ->filter(fn ($e) => $e['start'] > $today)->sortBy('start')->unique('key')->take(2)
+            ->map(fn ($e) => ['label' => $ar ? $e['ar'] : $e['label'], 'days' => (int) now($tz)->startOfDay()->diffInDays($e['start'])])->values()->all();
+
+        $ids = Client::visibleTo(auth()->user(), $agency)->where('status', 'active')->pluck('id');
+        $open = Alert::where('agency_id', $agency->id)->where('status', 'open')->whereIn('client_id', $ids)
+            ->selectRaw('severity, count(*) as n, count(distinct client_id) as c')->groupBy('severity')->get()->keyBy('severity');
+        $withAlerts = Alert::where('agency_id', $agency->id)->where('status', 'open')->whereIn('client_id', $ids)->whereIn('severity', ['high', 'medium'])->distinct()->count('client_id');
 
         return [
             'date' => now($tz)->locale(app()->getLocale())->translatedFormat($ar ? 'l j F Y' : 'l j M Y'),
             'hijri' => MenaCalendar::hijriLabel($today, $ar ? 'ar' : 'en'),
-            'next' => $next ? ['label' => $ar ? $next['ar'] : $next['label'], 'days' => (int) now($tz)->startOfDay()->diffInDays($next['start'])] : null,
+            'next' => $next,
+            'clients' => $ids->count(), 'calm' => $ids->count() - $withAlerts,
+            'critical' => (int) ($open['high']->n ?? 0), 'warning' => (int) ($open['medium']->n ?? 0),
         ];
+    }
+
+    /** PX-05: the clients for the header switcher, each with its worst open alert level (critical · warning · ok). */
+    public static function clientsWithStatus(Agency $agency): array
+    {
+        $clients = Client::visibleTo(auth()->user(), $agency)->where('status', 'active')->orderBy('name')->get(['id', 'name']);
+        $worst = Alert::where('agency_id', $agency->id)->where('status', 'open')->whereIn('client_id', $clients->pluck('id'))
+            ->selectRaw("client_id, max(case when severity = 'high' then 2 when severity = 'medium' then 1 else 0 end) as w")->groupBy('client_id')->pluck('w', 'client_id');
+
+        return $clients->map(fn (Client $c) => ['id' => $c->id, 'name' => $c->name, 'level' => [2 => 'critical', 1 => 'warning'][(int) ($worst[$c->id] ?? 0)] ?? 'ok'])->all();
+    }
+
+    /** PX-04: comfortable (44 px rows, default) or compact (desktop only). */
+    public static function density(): string
+    {
+        return (auth()->user()?->ui_prefs['density'] ?? 'comfortable') === 'compact' ? 'compact' : 'comfortable';
     }
 }

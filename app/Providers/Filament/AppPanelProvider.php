@@ -10,6 +10,9 @@ use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Auth\Register;
 use App\Filament\Pages\Auth\RequestPasswordReset;
 use App\Filament\Pages\Auth\ResetPassword;
+use App\Filament\Pages\MyDevices;
+use App\Filament\Pages\MyNotifications;
+use App\Filament\Pages\PlanUsage;
 use App\Filament\Pages\Tenancy\EditAgencyProfile;
 use App\Filament\Pages\Tenancy\RegisterAgency;
 use App\Filament\Pages\WhatsNewPage;
@@ -24,6 +27,7 @@ use App\Http\Middleware\SetPanelLocale;
 use App\Http\Middleware\TrialLifecycleGate;
 use App\Models\Agency;
 use App\Support\PanelColors;
+use App\Support\Shell;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\FontProviders\GoogleFontProvider;
@@ -101,6 +105,7 @@ class AppPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.shell-head'))
             ->renderHook(PanelsRenderHook::TOPBAR_LOGO_AFTER, fn () => view('panels.shell-areas'))
             ->renderHook(PanelsRenderHook::BODY_END, fn () => view('panels.shell-bottom'))
+            ->renderHook(PanelsRenderHook::GLOBAL_SEARCH_AFTER, fn () => view('panels.shell-client-switcher'))
             ->renderHook(PanelsRenderHook::SIMPLE_PAGE_END, fn () => view('panels.lang-switch'))
             // D-61 trial banner (days left / trial ended), under the top bar.
             // EH-17 (D-293): the /admin announcement line, above the other banners.
@@ -123,6 +128,31 @@ class AppPanelProvider extends PanelProvider
                 'primary' => PanelColors::primary(),
             ])
             ->userMenuItems([
+                // PX-07 (D-302): with the new shell, the account menu also holds plan + usage, notifications, devices and density.
+                Action::make('shell-plan')
+                    ->label(fn (): string => __('Plan & usage'))
+                    ->icon('heroicon-o-credit-card')
+                    ->url(fn (): string => PlanUsage::getUrl())
+                    ->visible(fn (): bool => Shell::on()),
+                Action::make('shell-notifications')
+                    ->label(fn (): string => __('My notifications'))
+                    ->icon('heroicon-o-bell')
+                    ->url(fn (): string => MyNotifications::getUrl())
+                    ->visible(fn (): bool => Shell::on()),
+                Action::make('shell-devices')
+                    ->label(fn (): string => __('My devices'))
+                    ->icon('heroicon-o-device-phone-mobile')
+                    ->url(fn (): string => MyDevices::getUrl())
+                    ->visible(fn (): bool => Shell::on()),
+                Action::make('shell-density')
+                    ->label(fn (): string => Shell::density() === 'compact' ? __('Comfortable rows') : __('Compact rows'))
+                    ->icon('heroicon-o-bars-3')
+                    ->action(function (): void {
+                        $u = auth()->user();
+                        $u->forceFill(['ui_prefs' => array_merge((array) $u->ui_prefs, ['density' => Shell::density() === 'compact' ? 'comfortable' : 'compact'])])->save();
+                        redirect(request()->header('Referer') ?: Filament::getUrl());
+                    })
+                    ->visible(fn (): bool => Shell::on()),
                 Action::make('whats-new')
                     ->label(fn (): string => __("What's new"))
                     ->icon('heroicon-o-sparkles')

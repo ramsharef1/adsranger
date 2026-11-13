@@ -30,6 +30,17 @@ html:not(.dark) .fi-section{border-radius:var(--ar-radius-card);border:1px solid
 .dark .ar-areas a[aria-current]{background:rgba(20,184,166,.18);color:#5EEAD4}
 .ar-ribbon{background:var(--ar-ribbon);color:var(--ar-ribbon-text);display:flex;flex-wrap:wrap;align-items:center;gap:4px 24px;padding:4px 24px;font-size:13px}
 .ar-ribbon a{color:var(--ar-ribbon-link);font-weight:600}
+.ar-ribbon-status{margin-inline-start:auto;font-weight:600}
+.ar-switch{position:relative}
+.ar-switch-btn{min-height:var(--ar-touch);display:inline-flex;align-items:center;gap:6px;padding:0 14px;border:1px solid var(--ar-control);border-radius:var(--ar-radius-control);background:var(--ar-surface);color:var(--ar-text);font:inherit;cursor:pointer;max-width:220px}
+.ar-switch-btn bdi{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dark .ar-switch-btn{background:transparent;color:#E2E8F0;border-color:rgba(148,163,184,.35)}
+.ar-switch-list{position:absolute;inset-inline-end:0;top:calc(100% + 6px);z-index:40;min-width:240px;max-height:60vh;overflow:auto;margin:0;padding:6px;list-style:none;background:var(--ar-surface);border:1px solid var(--ar-border);border-radius:var(--ar-radius-card);box-shadow:0 8px 24px rgba(15,31,30,.12)}
+.dark .ar-switch-list{background:#0B1020;border-color:rgba(148,163,184,.25)}
+.ar-switch-list a{min-height:var(--ar-touch);display:flex;align-items:center;gap:10px;padding:0 10px;border-radius:var(--ar-radius-control);color:inherit;text-decoration:none}
+.ar-switch-list a:hover,.ar-switch-list a[aria-current]{background:var(--ar-accent-soft);color:var(--ar-accent-strong)}
+.ar-dot{width:8px;height:8px;border-radius:999px;display:inline-block;flex:none}
+[x-cloak]{display:none!important}
 .ar-bottom{display:none}
 @media (max-width:900px){
   .ar-areas{display:none}
@@ -42,5 +53,13 @@ html:not(.dark) .fi-section{border-radius:var(--ar-radius-card);border:1px solid
   .ar-bottom .ar-count{position:absolute;top:6px;inset-inline-start:calc(50% + 6px);background:var(--ar-critical-bg);color:var(--ar-critical);border-radius:var(--ar-radius-pill);padding:0 6px;font-size:11px;font-weight:700}
   .fi-body{padding-bottom:64px}
 }
+@if (\App\Support\Shell::density() === 'compact')
+/* PX-04: compact rows on desktop only; phones keep 44 px targets. */
+@media (min-width:901px){
+  .fi-sidebar-item-btn{min-height:34px}
+  .fi-ta-cell,.fi-ta-header-cell{padding-top:4px!important;padding-bottom:4px!important}
+  .fi-section-content{padding:12px!important}
+}
+@endif
 </style>
 @endif

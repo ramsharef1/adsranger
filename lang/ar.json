@@ -2464,5 +2464,11 @@
     ":season in :n day|:season in :n days": "{0} :season اليوم|{1} :season بعد يوم واحد|{2} :season بعد يومين|[3,10] :season بعد :n أيام|[11,*] :season بعد :n يومًا",
     "Alerts, :n open|Alerts, :n open": "{0} التنبيهات، لا شيء مفتوح|{1} التنبيهات، واحد مفتوح|{2} التنبيهات، اثنان مفتوحان|[3,10] التنبيهات، :n مفتوحة|[11,*] التنبيهات، :n مفتوحًا",
     "New panel layout": "تصميم اللوحة الجديد",
-    "Areas in the header, a shorter side menu per area, the season line and a bottom bar on phones.": "أقسام في الشريط العلوي، وقائمة جانبية أقصر لكل قسم، وسطر المواسم، وشريط سفلي على الهاتف."
+    "Areas in the header, a shorter side menu per area, the season line and a bottom bar on phones.": "أقسام في الشريط العلوي، وقائمة جانبية أقصر لكل قسم، وسطر المواسم، وشريط سفلي على الهاتف.",
+    ":calm of :total clients without open Critical or Warning alerts": ":calm من :total عملاء بلا تنبيهات حرجة أو تحذيرات مفتوحة",
+    "Critical :c · Warning :w": "حرج :c · تحذير :w",
+    "No open alerts": "لا تنبيهات مفتوحة",
+    "Comfortable rows": "صفوف مريحة",
+    "Compact rows": "صفوف مضغوطة",
+    "My devices": "أجهزتي"
 }

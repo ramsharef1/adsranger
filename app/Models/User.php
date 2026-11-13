@@ -44,6 +44,7 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
             'signup_payload' => 'array',
             'push_weekend_off' => 'boolean',
             'push_override_spend' => 'boolean',
+            'ui_prefs' => 'array',
         ];
     }
 

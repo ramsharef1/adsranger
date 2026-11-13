@@ -40,6 +40,7 @@
             @endif
         </span>
 
+        @unless (\App\Support\Shell::on())
         <label style="{{ $chip }}{{ $current ? ';border-color:#0F766E' : '' }}" data-context-client>
             <x-filament::icon icon="heroicon-o-user-circle" style="width:16px;height:16px;opacity:.7" />
             <span>{{ __('Client') }}:</span>
@@ -52,6 +53,7 @@
                 @endforeach
             </select>
         </label>
+        @endunless
 
         <span style="{{ $chip }}{{ $fresh['stale'] && ! $fresh['none'] ? ';'.$amber : '' }}" data-context-freshness
               @if ($fresh['oldest']) title="{{ __('Oldest account: :account', ['account' => $fresh['oldest']]) }}" @endif>
