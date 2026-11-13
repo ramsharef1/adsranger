@@ -11,4 +11,4 @@ CHANGELOG.md export-ignore
 .styleci.yml export-ignore
 
 # BX-01: published datasets must reach the server byte for byte (CRLF + BOM for Excel).
-public/data/* binary
+resources/datasets/* binary

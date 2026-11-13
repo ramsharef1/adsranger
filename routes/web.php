@@ -105,6 +105,7 @@ Route::middleware(PublicTrailingSlash::class)->group(function () {
 
     Route::get('/llms.txt', [PublicSiteController::class, 'llmsTxt']);
     Route::get('/data', [PublicSiteController::class, 'data'])->defaults('lang', 'ar');
+    Route::get('/data/{file}', [PublicSiteController::class, 'dataFile'])->where('file', '[A-Za-z0-9-]+\.(csv|json|md|txt)');
     Route::get('/en/data', [PublicSiteController::class, 'data'])->defaults('lang', 'en');
     Route::get('/accessibility', [PublicSiteController::class, 'accessibility'])->defaults('lang', 'ar');
     Route::get('/en/accessibility', [PublicSiteController::class, 'accessibility'])->defaults('lang', 'en');

@@ -14,20 +14,25 @@ class OpenDataBx01Test extends TestCase
             ->assertSee('MENA ad calendar 2027')->assertSee('/data/mena-ad-calendar-2027.csv', false)->assertSee('/data/mena-ad-calendar-2027.json', false)
             ->assertSee('"@type":"Dataset"', false)->assertSee('"license":"https://creativecommons.org/licenses/by/4.0/"', false)->assertSee('"contentUrl":"https://adsranger.com/data/mena-ad-calendar-2027.csv"', false)
             ->assertSee('id="cite"', false)->assertSee('Cite this page')->assertSee('Licence: CC BY 4.0.');
+        $this->assertStringStartsWith('text/csv', $this->get('/data/mena-ad-calendar-2027.csv')->headers->get('Content-Type'));
+        $this->get('/data/secrets.txt')->assertNotFound();
+        $this->assertDirectoryDoesNotExist(public_path('data'), 'a public/data folder makes the web server redirect /data');
         $this->get('/data')->assertOk()->assertSee('تقويم المواسم الإعلانية 2027')->assertSee('استشهد بهذه الصفحة')->assertSee('hreflang="en"', false);
         foreach (config('datasets.mena-ad-calendar-2027.files') as [, $path]) {
-            $this->assertFileExists(public_path(ltrim($path, '/')), $path);
+            $this->assertFileExists(resource_path('datasets/'.basename($path)), $path);
+            $r = $this->get($path)->assertOk();
+            $this->assertSame(md5_file(resource_path('datasets/'.basename($path))), md5($r->streamedContent()), "$path is served byte for byte");
         }
         $this->assertStringContainsString('/data', $this->get('/sitemap.xml')->getContent().$this->get('/sitemaps/pages.xml')->getContent());
     }
 
-    /** The published files must match the calendar the site shows: a config change needs a new release in public/data. */
+    /** The published files must match the calendar the site shows: a config change needs a new release in resources/datasets. */
     public function test_published_calendar_matches_the_site_config(): void
     {
-        $json = json_decode(file_get_contents(public_path('data/mena-ad-calendar-2027.json')), true);
+        $json = json_decode(file_get_contents(resource_path('datasets/mena-ad-calendar-2027.json')), true);
         $this->assertSame(config('datasets.mena-ad-calendar-2027.rows'), count($json['rows']));
         $this->assertSame('CC BY 4.0', $json['license']);
-        $csvRows = count(file(public_path('data/mena-ad-calendar-2027.csv'), FILE_SKIP_EMPTY_LINES)) - 1;
+        $csvRows = count(file(resource_path('datasets/mena-ad-calendar-2027.csv'), FILE_SKIP_EMPTY_LINES)) - 1;
         $this->assertSame(count($json['rows']), $csvRows, 'CSV and JSON carry the same rows');
 
         $config = collect(config('mena_calendar_2027.rows'))->filter(fn ($r) => $r['date'] !== null);
@@ -39,7 +44,7 @@ class OpenDataBx01Test extends TestCase
         }
         foreach ($config as $c) {
             $this->assertArrayHasKey($c['event_en'], $published, "{$c['id']} is on the site but not in the published files");
-            $this->assertSame($c['date'], $published[$c['event_en']], "{$c['id']} date changed: publish a new release in public/data + config/datasets.php");
+            $this->assertSame($c['date'], $published[$c['event_en']], "{$c['id']} date changed: publish a new release in resources/datasets + config/datasets.php");
         }
         $this->assertCount($config->count(), $published, 'no published row that the site no longer shows');
     }

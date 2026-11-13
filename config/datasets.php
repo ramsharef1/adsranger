@@ -2,7 +2,7 @@
 
 /*
  * BX-01 (B-43 / B-44): open datasets hosted on adsranger.com/data, so links and citations come to our own domain. The
- * files in public/data are the exact published release (GitHub is a mirror). DatasetsTest fails if the source config
+ * files in resources/datasets (served by PublicSiteController::dataFile) are the exact published release (GitHub is a mirror). DatasetsTest fails if the source config
  * changes without a new release here.
  */
 return [

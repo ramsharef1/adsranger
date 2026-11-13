@@ -130,6 +130,25 @@ class PublicSiteController extends Controller
         return view('public.data', ['lang' => $lang === 'en' ? 'en' : 'ar']);
     }
 
+    /**
+     * /data/{file}: a published dataset file, byte for byte from resources/datasets (not public/, so /data stays a page).
+     * Only files listed in config/datasets.php are served, with their own content type.
+     */
+    public function dataFile(string $file)
+    {
+        foreach (config('datasets', []) as $d) {
+            foreach ($d['files'] as [, $path, $type]) {
+                if ($path === '/data/'.$file) {
+                    return response()->file(resource_path('datasets/'.$file), [
+                        'Content-Type' => $type.(str_starts_with($type, 'text/') || $type === 'application/json' ? '; charset=utf-8' : ''),
+                        'Cache-Control' => 'public, max-age=3600', 'Access-Control-Allow-Origin' => '*',
+                    ]);
+                }
+            }
+        }
+        abort(404);
+    }
+
     /** /accessibility (R2-46, D-263; copy Growth Site_Adds_R2-46-48). */
     public function accessibility(string $lang = 'ar')
     {
