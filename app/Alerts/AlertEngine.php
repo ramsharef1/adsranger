@@ -105,6 +105,9 @@ class AlertEngine
         if ($rules['landing_page']['enabled'] ?? false) {
             static::landingPage($a, $rules['landing_page'], $found);
         }
+        if ($rules['upload_stale']['enabled'] ?? false) {
+            static::uploadStale($a, $rules['upload_stale'], $found);
+        }
 
         return static::store($a, $found);
     }
@@ -221,6 +224,24 @@ class AlertEngine
                 'detail' => $lp->url.' — '.($offsite ? 'redirects to another site: '.mb_substr((string) $lp->final_url, 0, 200) : ($lp->error ?: 'HTTP '.$lp->status_code)).'.'
                     .($lp->down_since ? ' Down since '.$lp->down_since->format('Y-m-d H:i').' UTC.' : '').' Ads sent '.$lp->clicks_30d.' clicks here in 30 days.',
                 'payload' => ['status' => $lp->status_code, 'down_since' => $lp->down_since?->toIso8601String(), 'offsite' => $offsite]]);
+        }
+    }
+
+    /** PS-08: clients fed by uploads only (no account synced in 3 days) whose newest import is older than the threshold. */
+    protected static function uploadStale(Agency $a, array $r, array &$found): void
+    {
+        $days = max(1, (int) $r['t']['days']);
+        $live = AdAccount::where('agency_id', $a->id)->whereNotNull('client_id')->where('last_synced_at', '>=', now()->subDays(3))->pluck('client_id')->all();
+        $last = DailyMetric::query()->where('agency_id', $a->id)->where('source', 'import')->whereNotNull('client_id')
+            ->selectRaw('client_id, max(created_at) as at')->groupBy('client_id')->pluck('at', 'client_id');
+        foreach (Client::where('agency_id', $a->id)->where('status', 'active')->whereIn('id', $last->keys())->whereNotIn('id', $live)->get() as $c) {
+            $age = (int) floor(Carbon::parse($last[$c->id])->diffInHours(now()) / 24);
+            if ($age >= $days) {
+                static::add($found, 'upload_stale', $r, ['client_id' => $c->id, 'entity_type' => 'client', 'entity_id' => $c->id, 'entity_name' => $c->name,
+                    'title' => 'No fresh data: '.$c->name,
+                    'detail' => "Last upload $age days ago. Export the latest report from the ad platform and import it.",
+                    'payload' => ['days' => $age, 'last_upload' => Carbon::parse($last[$c->id])->toIso8601String()]]);
+            }
         }
     }
 

@@ -22,6 +22,9 @@ return [
         // 11 Pro rules (#23)
         'pacing' => ['label' => 'Budget pacing', 'severity' => 'warning',
             'help' => 'From this day of the month: the month-end spend forecast is more than this % above or below the monthly budget.', 'thresholds' => ['pct' => 20, 'from_day' => 7]],
+        // PS-08 (D-296): a client fed by uploads only, with no fresh upload for this many days (Desk + a phone reminder every 7 days).
+        'upload_stale' => ['label' => 'No fresh upload', 'severity' => 'warning',
+            'help' => 'A client with no live connection has had no new imported data for at least this many days.', 'thresholds' => ['days' => 7]],
         'landing_page' => ['label' => 'Broken landing page', 'severity' => 'critical',
             'help' => 'A landing page used by ads returns an error (checked every night) and had at least this many ad clicks in 30 days.', 'thresholds' => ['min_clicks' => 1]],
         'search_term_waste' => ['label' => 'Wasted search terms', 'severity' => 'warning',

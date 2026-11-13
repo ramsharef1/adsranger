@@ -39,6 +39,7 @@ class AlertText
         '/^Cost per result (\d+)% above target: (?<n1>.+)$/s' => 'تكلفة النتيجة أعلى من المستهدف بنسبة $1%: ~1',
         '/^Cost per click up (\d+)%: (?<n1>.+)$/s' => 'ارتفاع تكلفة النقرة $1%: ~1',
         '/^Active campaign with 0 impressions: (?<n1>.+)$/s' => 'حملة نشطة دون أي ظهور: ~1',
+        '/^No fresh data: (?<n1>.+)$/s' => 'لا بيانات حديثة: ~1',
     ];
 
     private const DETAILS = [
@@ -54,6 +55,7 @@ class AlertText
         '/^Spent ([\d,.]+) of a ([\d,.]+) daily budget \((\d+%)\) on (\S+)\.$/' => 'أُنفق $1 من ميزانية يومية قدرها $2 ($3) في $4.',
         '/^Campaign ends .+ \((\S+)\)\.$/s' => 'تنتهي الحملة في $1.',
         '/^Ad set ends .+ \((\S+)\)\.$/s' => 'تنتهي المجموعة الإعلانية في $1.',
+        '/^Last upload (\d+) days ago\. Export the latest report from the ad platform and import it\.$/' => 'آخر رفع للبيانات قبل {days:$1}. صدّر أحدث تقرير من منصة الإعلانات واستورده.',
         '/^The connection needs attention: (?<n1>.+)$/s' => 'يحتاج الربط إلى مراجعة: ~1',
         '/^The access token expired on (\S+)\. Reconnect\.$/' => 'انتهت صلاحية رمز الوصول في $1. أعد الربط.',
         '/^Sync failed (\d+) times in a row: (?<n1>.+)$/s' => 'فشلت المزامنة {times:$1} متتالية: ~1',

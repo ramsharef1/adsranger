@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\DataImports\Pages;
 
+use App\Filament\Pages\ImportReviewPage;
 use App\Filament\Resources\DataImports\DataImportResource;
 use App\Models\Client;
 use App\Models\DataImport;
+use App\Support\Import\ImportReview;
 use App\Support\Import\ImportSheet;
 use App\Support\MetricsImporter;
 use App\Support\TeamRoles;
@@ -17,6 +19,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Utilities\Get;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\HtmlString;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -66,8 +69,12 @@ class ListDataImports extends ListRecords
 
                             return;
                         }
+                        Cache::forget('import-review:'.$agency->id);
+                        $pending = count(ImportReview::pending($agency));
                         Notification::make()->title(__('Import saved'))->success()
-                            ->body(static::resultLine($import))->send();
+                            ->body(static::resultLine($import).($pending ? ' · '.__('Campaigns to sort: :n', ['n' => $pending]) : ''))
+                            ->actions($pending ? [Action::make('sort')->label(__('Sort imported campaigns'))->url(ImportReviewPage::getUrl())->button()] : [])
+                            ->persistent($pending > 0)->send();
                     } catch (\Throwable $e) {
                         Notification::make()->title(__('Import failed'))->body($e->getMessage())->danger()->persistent()->send();
                     }

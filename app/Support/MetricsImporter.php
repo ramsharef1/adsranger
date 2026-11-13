@@ -7,6 +7,7 @@ use App\Models\AuditLog;
 use App\Models\DailyMetric;
 use App\Models\DataImport;
 use App\Models\User;
+use App\Support\Import\GoalGuess;
 use App\Support\Import\ImportSheet;
 use App\Support\Import\NetworkGuess;
 use Carbon\Carbon;
@@ -238,6 +239,8 @@ class MetricsImporter
                 $callsVal = static::num($get($r, 'calls'));
                 $convVal = static::num($get($r, 'conversions'));
                 $rawType = strtolower(trim((string) $get($r, 'result_type')));
+                // PS-03: Meta's result indicator (actions:lead, offsite_conversion.fb_pixel_purchase…) becomes our result type.
+                $rawType = $rawType === '' ? '' : (GoalGuess::fromIndicator($rawType) ?? 'conversion');
                 $inferredType = $rawType ?: ($purchasesVal > 0 ? 'purchase' : ($leadsVal > 0 ? 'lead' : ($messagesVal > 0 ? 'message' : ($callsVal > 0 ? 'call' : 'conversion'))));
                 $norm = ResultResolver::normalizeRow([
                     'result_type' => $inferredType,

@@ -30,6 +30,7 @@ return [
         'ops-live-site' => 'ops-live-site',
         'usage-ledger' => 'usage-ledger',
         'reindex-gate' => 'reindex-gate',
+        'upload-reminders' => 'upload-reminders',
     ],
 
     // EG-01: how long ops rows are kept (days). Customer data is never pruned here (D-164 / D-166: purge stays manual).

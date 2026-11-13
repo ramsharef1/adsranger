@@ -2292,5 +2292,21 @@
     "an unknown network (choose one above)": "منصة غير معروفة (اخترها في الأعلى)",
     ":n rows with a date": "صفوف فيها تاريخ: :n",
     "Matched columns": "الأعمدة المطابَقة",
-    "Too many rows (max :n per import).": "عدد الصفوف كبير (الحد :n في كل استيراد)."
+    "Too many rows (max :n per import).": "عدد الصفوف كبير (الحد :n في كل استيراد).",
+    "Saved: :c campaigns, :r rows": "حُفظ: الحملات :c، الصفوف :r",
+    "Suggestions come from the campaign names (Arabic or Latin). Check each row, change what is wrong, then save. Nothing changes before you save.": "الاقتراحات مأخوذة من أسماء الحملات (بالعربية أو اللاتينية). راجع كل صف وصحّح الخطأ ثم احفظ. لا يتغير شيء قبل الحفظ.",
+    "Every imported campaign has a client and a goal.": "كل حملة مستوردة لها عميل وهدف.",
+    "Not assigned": "غير مُسندة",
+    "Suggested from the name": "اقتراح من الاسم",
+    "No fresh data: :client": "لا بيانات حديثة: :client",
+    "Last upload :n days ago. Export the latest report and import it.": "آخر رفع قبل :n يوم. صدّر أحدث تقرير واستورده.",
+    "Copy setup to other clients": "انسخ الإعداد إلى عملاء آخرين",
+    "What to copy": "ما الذي يُنسخ",
+    "Targets (cost per result, results, ROAS)": "الأهداف (تكلفة النتيجة، عدد النتائج، العائد على الإنفاق الإعلاني)",
+    "Report schedule (recipients are not copied)": "جدول التقارير (دون نسخ المستلمين)",
+    "Setup copied to :n clients": "نُسخ الإعداد إلى عملاء عددهم :n",
+    "Campaigns to sort: :n": "حملات تحتاج فرزًا: :n",
+    "Sort imported campaigns": "فرز الحملات المستوردة",
+    "No fresh upload": "لا رفع حديث للبيانات",
+    "A client with no live connection has had no new imported data for at least this many days.": "عميل بلا ربط مباشر لم تُستورد له بيانات جديدة منذ هذا العدد من الأيام على الأقل."
 }

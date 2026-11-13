@@ -88,6 +88,6 @@ return [
             'what' => ['en' => '12 months per client: plan vs actual vs forecast.', 'ar' => '12 شهرًا لكل عميل: الخطة مقابل الفعلي مقابل التوقع.']],
     ],
 
-    // Alert rules that need `alert_rules_pro` (#23: 7 rules on Starter, the rest on Pro).
+    // Alert rules that need `alert_rules_pro` (#23: 7 rules on Starter, the rest on Pro; the PS-08 upload reminder is on every plan, D-296).
     'pro_alert_rules' => ['pacing', 'landing_page', 'search_term_waste', 'account_health', 'ctr_drop', 'roas_drop', 'spend_spike', 'high_frequency', 'zero_impressions', 'lead_cost_spike', 'high_cpc'],
 ];

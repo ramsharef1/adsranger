@@ -8,8 +8,10 @@ use App\Models\AdSet;
 use App\Models\Alert;
 use App\Models\AuditLog;
 use App\Models\Campaign;
+use App\Models\Client;
 use App\Models\ClientLink;
 use App\Models\ReportSchedule;
+use App\Support\ClientSetupCopy;
 use App\Support\HealthScore;
 use App\Support\MetricsQuery;
 use App\Support\Modules;
@@ -23,6 +25,7 @@ use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
@@ -53,6 +56,19 @@ class ViewClient extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            // PS-13: copy this client's targets and report schedule to other clients (recipients stay per client).
+            Action::make('copySetup')->label(__('Copy setup to other clients'))->icon('heroicon-o-document-duplicate')->color('gray')
+                ->visible(fn () => TeamRoles::canManageData(auth()->user(), $this->record->agency))
+                ->schema([
+                    Select::make('to')->label(__('Clients'))->multiple()->required()
+                        ->options(fn () => Client::where('agency_id', $this->record->agency_id)->whereKeyNot($this->record->id)->where('status', '!=', 'archived')->orderBy('name')->pluck('name', 'id')),
+                    CheckboxList::make('parts')->label(__('What to copy'))->required()->default(['targets'])
+                        ->options(['targets' => __('Targets (cost per result, results, ROAS)'), 'schedule' => __('Report schedule (recipients are not copied)')]),
+                ])
+                ->action(function (array $data) {
+                    $n = ClientSetupCopy::copy($this->record, array_map('intval', $data['to']), $data['parts']);
+                    Notification::make()->title(__('Setup copied to :n clients', ['n' => $n]))->success()->send();
+                }),
             // #56 signed client links: owners, admins and managers create and revoke; everyone in the workspace can see them.
             Action::make('clientLinks')
                 ->label(__('Client links'))

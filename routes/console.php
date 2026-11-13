@@ -18,6 +18,7 @@ use App\Support\Ops\NetworkDeadlines;
 use App\Support\Ops\Prune;
 use App\Support\PlatformHealth;
 use App\Support\Site\ReindexGate;
+use App\Support\UploadReminders;
 use Illuminate\Support\Facades\Schedule;
 
 // proc_open is disabled on this server, so every task runs in-process (job / call), never ->command().
@@ -50,3 +51,5 @@ Schedule::call(fn () => JobRuns::track('ops-live-site', fn () => LiveSiteCheck::
 Schedule::call(fn () => JobRuns::track('usage-ledger', fn () => UsageLedger::snapshot()))->monthlyOn(1, '04:10')->name('usage-ledger')->withoutOverlapping();
 // CS-20 (D-290): nightly re-index gate check of the held guides, posts and glossary terms (02:40 UTC, after the live-site check).
 Schedule::call(fn () => JobRuns::track('reindex-gate', fn () => ReindexGate::run()))->dailyAt('02:40')->name('reindex-gate')->withoutOverlapping();
+// PS-08 (D-296): phone reminder for clients fed by uploads, at 7 / 14 / 21… days without fresh data (06:45 Amman = 03:45 UTC).
+Schedule::call(fn () => JobRuns::track('upload-reminders', fn () => UploadReminders::run()))->dailyAt('03:45')->name('upload-reminders')->withoutOverlapping();
