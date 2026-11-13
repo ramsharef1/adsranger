@@ -1805,5 +1805,14 @@
     "{1} 1 ad-account sync failed in the last hour.|[2,*] :n ad-account syncs failed in the last hour.": "{1} فشلت مزامنة حساب إعلاني واحد خلال آخر ساعة.|[2,10] فشلت مزامنة :n حسابات إعلانية خلال آخر ساعة.|[11,*] فشلت مزامنة :n حسابًا إعلانيًا خلال آخر ساعة.",
     ":path answered :status instead of 200.": "أعادت :path الرمز :status بدل 200.",
     "nothing": "لا شيء",
-    "AdsRanger server needs a look": "خادم AdsRanger يحتاج إلى مراجعة"
+    "AdsRanger server needs a look": "خادم AdsRanger يحتاج إلى مراجعة",
+    "No restore test has run yet.": "لم يُجرَ أي اختبار استعادة بعد.",
+    "The last restore test failed: :msg": "فشل آخر اختبار استعادة: :msg",
+    "The last restore test is more than :days days old.": "مضى على آخر اختبار استعادة أكثر من :days يومًا.",
+    "Restore test": "اختبار الاستعادة",
+    "Once a month the newest nightly backup is restored into a temporary database, checked and deleted. The backups are on this server only until the off-server copy (R2) is set up.": "مرة كل شهر تُستعاد أحدث نسخة احتياطية ليلية إلى قاعدة بيانات مؤقتة، ثم تُفحص وتُحذف. النسخ الاحتياطية على هذا الخادم فقط إلى أن تُجهَّز النسخة الخارجية (R2).",
+    "Passed": "نجح",
+    "Table": "الجدول",
+    "Rows in the backup": "الصفوف في النسخة الاحتياطية",
+    "Rows live now": "الصفوف الحية الآن"
 }

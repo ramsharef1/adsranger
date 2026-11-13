@@ -94,6 +94,11 @@ class PlatformHealth
             }
         }
 
+        // 6. A-5: the monthly restore test passed and is recent.
+        if (config('health.restore_test', true) && ($restore = RestoreTest::problem()) !== null) {
+            $problems[] = ['kind' => 'restore', 'text' => $restore];
+        }
+
         PlatformSetting::put(self::LAST_KEY, ['at' => now()->toIso8601String(), 'problems' => $problems]);
 
         $sent = [];

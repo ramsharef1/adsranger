@@ -17,7 +17,7 @@ class PlatformHealthA3Test extends TestCase
 
     public function test_new_errors_and_failed_jobs_are_reported_once(): void
     {
-        config(['health.check_urls' => false, 'push.enabled' => false]);
+        config(['health.check_urls' => false, 'health.restore_test' => false, 'push.enabled' => false]);
         $log = storage_path('logs/laravel.log');
         $backup = is_file($log) ? File::get($log) : null;
         File::put($log, "[2026-11-12 10:00:00] production.ERROR: old problem\n");

@@ -6,6 +6,7 @@ use App\Filament\Concerns\TranslatesPageLabels;
 use App\Models\PlatformSetting;
 use App\Support\LiveVerification;
 use App\Support\PlatformHealth;
+use App\Support\RestoreTest;
 use BackedEnum;
 use Filament\Pages\Page;
 use UnitEnum;
@@ -38,6 +39,6 @@ class LiveVerificationBoard extends Page
     {
         $rows = LiveVerification::board();
 
-        return ['health' => (array) PlatformSetting::get(PlatformHealth::LAST_KEY, []), 'rows' => $rows, 'verified' => count(array_filter($rows, fn ($r) => $r['level'] === 'verified')), 'days' => LiveVerification::VERIFIED_DAYS];
+        return ['restore' => RestoreTest::last(), 'health' => (array) PlatformSetting::get(PlatformHealth::LAST_KEY, []), 'rows' => $rows, 'verified' => count(array_filter($rows, fn ($r) => $r['level'] === 'verified')), 'days' => LiveVerification::VERIFIED_DAYS];
     }
 }

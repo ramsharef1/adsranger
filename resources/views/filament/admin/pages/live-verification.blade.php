@@ -26,6 +26,25 @@
         @endif
     </x-filament::section>
 
+    {{-- A-5 --}}
+    <x-filament::section style="margin-top:16px">
+        <x-slot name="heading">{{ __('Restore test') }}</x-slot>
+        <x-slot name="description">{{ __('Once a month the newest nightly backup is restored into a temporary database, checked and deleted. The backups are on this server only until the off-server copy (R2) is set up.') }}</x-slot>
+        @if (! $restore)
+            <p style="margin:0;font-size:14px">{{ __('No restore test has run yet.') }}</p>
+        @else
+            <p style="margin:0 0 8px;font-size:14px;font-weight:600">{{ $restore['ok'] ? __('Passed') : __('Failed') }} · <bdi dir="ltr">{{ \Illuminate\Support\Carbon::parse($restore['at'])->timezone('Asia/Amman')->format('Y-m-d H:i') }}</bdi> · <bdi dir="ltr">{{ $restore['backup'] }}</bdi></p>
+            @unless ($restore['ok'])<p role="alert" style="margin:0 0 8px;font-size:14px">{{ $restore['message'] }}</p>@endunless
+            @if (! empty($restore['tables']))
+                <table style="border-collapse:collapse;font-size:14px">
+                    <caption class="sr-only">{{ __('Restore test') }}</caption>
+                    <thead><tr><th scope="col" style="padding:4px 10px;text-align:start">{{ __('Table') }}</th><th scope="col" style="padding:4px 10px;text-align:start">{{ __('Rows in the backup') }}</th><th scope="col" style="padding:4px 10px;text-align:start">{{ __('Rows live now') }}</th></tr></thead>
+                    <tbody>@foreach ($restore['tables'] as $t)<tr><td style="padding:4px 10px" dir="ltr">{{ $t['table'] }}</td><td style="padding:4px 10px" dir="ltr">{{ $t['restored'] }}</td><td style="padding:4px 10px" dir="ltr">{{ $t['live'] }}</td></tr>@endforeach</tbody>
+                </table>
+            @endif
+        @endif
+    </x-filament::section>
+
     <x-filament::section>
         <x-slot name="heading">{{ __(':n of :total networks verified', ['n' => $verified, 'total' => count($rows)]) }}</x-slot>
         <x-slot name="description">{{ __('Verified means a real (not demo) account synced and brought rows back in the last :days days. Everything on this page comes from the system; nothing is typed by hand.', ['days' => $days]) }}</x-slot>
