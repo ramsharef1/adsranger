@@ -9,6 +9,23 @@
     ];
 @endphp
 <x-filament-panels::page>
+    {{-- A-3 --}}
+    <x-filament::section>
+        <x-slot name="heading">{{ __('Server health') }}</x-slot>
+        @if (empty($health['at']))
+            <p style="margin:0;font-size:14px">{{ __('No health check has run yet. It runs every 10 minutes.') }}</p>
+        @else
+            <p style="margin:0 0 6px;font-size:14px">{{ __('Last check') }}: <bdi dir="ltr">{{ \Illuminate\Support\Carbon::parse($health['at'])->timezone('Asia/Amman')->format('Y-m-d H:i') }}</bdi></p>
+            @if (empty($health['problems']))
+                <p style="margin:0;font-size:14px;font-weight:600">{{ __('No problems found.') }}</p>
+            @else
+                <ul role="list" style="margin:0;padding-inline-start:18px;font-size:14px">
+                    @foreach ($health['problems'] as $p)<li>{{ $p['text'] }}</li>@endforeach
+                </ul>
+            @endif
+        @endif
+    </x-filament::section>
+
     <x-filament::section>
         <x-slot name="heading">{{ __(':n of :total networks verified', ['n' => $verified, 'total' => count($rows)]) }}</x-slot>
         <x-slot name="description">{{ __('Verified means a real (not demo) account synced and brought rows back in the last :days days. Everything on this page comes from the system; nothing is typed by hand.', ['days' => $days]) }}</x-slot>

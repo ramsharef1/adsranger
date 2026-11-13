@@ -1794,5 +1794,16 @@
     "off": "متوقفة",
     "Works": "تعمل",
     "Failed": "فشل",
-    "Saved, cannot be fully tested": "محفوظة ولا يمكن اختبارها كاملًا"
+    "Saved, cannot be fully tested": "محفوظة ولا يمكن اختبارها كاملًا",
+    "Server health": "صحة الخادم",
+    "No health check has run yet. It runs every 10 minutes.": "لم يُجرَ أي فحص بعد. يعمل الفحص كل 10 دقائق.",
+    "Last check": "آخر فحص",
+    "No problems found.": "لا توجد مشكلات.",
+    "{1} 1 new error in the server log: :first|[2,*] :n new errors in the server log. First: :first": "{1} خطأ جديد في سجل الخادم: :first|[2,10] :n أخطاء جديدة في سجل الخادم. أولها: :first|[11,*] :n خطأً جديدًا في سجل الخادم. أولها: :first",
+    "{1} 1 queued job failed in the last 15 minutes.|[2,*] :n queued jobs failed in the last 15 minutes.": "{1} فشلت مهمة واحدة في الطابور خلال آخر 15 دقيقة.|[2,10] فشلت :n مهام في الطابور خلال آخر 15 دقيقة.|[11,*] فشلت :n مهمة في الطابور خلال آخر 15 دقيقة.",
+    "The queue has a job waiting for more than 15 minutes. The worker may be down.": "في الطابور مهمة تنتظر منذ أكثر من 15 دقيقة، وقد يكون العامل متوقفًا.",
+    "{1} 1 ad-account sync failed in the last hour.|[2,*] :n ad-account syncs failed in the last hour.": "{1} فشلت مزامنة حساب إعلاني واحد خلال آخر ساعة.|[2,10] فشلت مزامنة :n حسابات إعلانية خلال آخر ساعة.|[11,*] فشلت مزامنة :n حسابًا إعلانيًا خلال آخر ساعة.",
+    ":path answered :status instead of 200.": "أعادت :path الرمز :status بدل 200.",
+    "nothing": "لا شيء",
+    "AdsRanger server needs a look": "خادم AdsRanger يحتاج إلى مراجعة"
 }
