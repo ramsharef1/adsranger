@@ -8,6 +8,7 @@ use App\Models\Agency;
 use App\Models\Alert;
 use App\Support\CriticalPush;
 use App\Support\Ops\Lanes;
+use App\Support\RamadanHours;
 use App\Support\Trial;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -43,7 +44,8 @@ class RunAlerts implements ShouldQueue
                 AlertEngine::run($a, $local->copy()->subDay()->toDateString());
                 $a->forceFill(['alerts_run_on' => $today])->saveQuietly();
             }
-            if ($local->hour >= 8 && optional($a->digest_sent_on)->toDateString() !== $today) {
+            // PS-19 (D-307): in Ramadan the digest waits until after iftar (21:00 by default).
+            if ($local->format('H:i') >= RamadanHours::digestFrom($a, $local) && optional($a->digest_sent_on)->toDateString() !== $today) {
                 $a->forceFill(['digest_sent_on' => $today])->saveQuietly();
                 if (! $a->adAccounts()->where('is_active', true)->exists()) {
                     return; // UX-191: no digest while no ad account is connected and tracked

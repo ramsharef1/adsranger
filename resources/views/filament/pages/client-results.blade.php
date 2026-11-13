@@ -98,6 +98,9 @@
                     <div><div style="{{ $muted }}">{{ __(':result so far → forecast', ['result' => R::label($pace['main_type'], app()->getLocale()) ?: __('Results')]) }}</div><strong>{{ number_format($pace['results']) }} → {{ number_format($pace['forecast_results']) }}</strong>@if ($pace['target_results'])<span style="{{ $muted }}"> · {{ __('target :n', ['n' => number_format($pace['target_results'])]) }}</span>@endif</div>
                     <div><div style="{{ $muted }}">{{ __('Forecast cost / result') }}</div><strong>{{ R::money($pace['forecast_cpr'], $cur) }}</strong></div>
                 @endif
+                @if (! empty($pace['weekday_curve']))
+                    <div data-weekday-curve style="{{ $muted }};grid-column:1/-1">{{ __('Expected spend follows this client\'s own weekday pattern from the last 8 weeks.') }}</div>
+                @endif
             </div>
             <div style="{{ $muted }};margin-top:8px">{{ __('Forecast = spent so far + last :days days\' daily average × :left days left.', ['days' => config('planning.pacing.run_rate_days'), 'left' => $pace['days_left']]) }}
                 <a href="{{ \App\Filament\Pages\BudgetPlanner::getUrl(['client' => $client->id]) }}" style="color:#14B8A6">{{ __('Budget plan') }}</a> ·

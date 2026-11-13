@@ -36,9 +36,23 @@ class Pacing
         $rateResults = $recent['main_results'] / $n;
         $left = $daysIn - $full; // today included
 
-        $forecastSpend = $spent + $rateSpend * $left;
-        $forecastResults = $results + $rateResults * $left;
-        $expected = $budget ? $budget * $full / $daysIn : null;
+        // PS-20 (R5): the client's own weekday pattern (Fri / Sat dips differ by country); flat when history is too short.
+        $curve = static::weekdayCurve($c, $today);
+        $w = fn (Carbon $d) => $curve[$d->isoWeekday()] ?? 1.0;
+        $weightAll = $weightDone = $weightLeft = $weightRecent = 0.0;
+        for ($d = $start->copy(); $d->month === $start->month; $d->addDay()) {
+            $weightAll += $w($d);
+            $d->lt($today) ? $weightDone += $w($d) : $weightLeft += $w($d);
+        }
+        for ($d = $today->copy()->subDays($n); $d->lt($today); $d->addDay()) {
+            $weightRecent += $w($d);
+        }
+        $perWeight = $weightRecent > 0 ? $recent['spend'] / $weightRecent : $rateSpend;
+        $perWeightResults = $weightRecent > 0 ? $recent['main_results'] / $weightRecent : $rateResults;
+
+        $forecastSpend = $spent + $perWeight * $weightLeft;
+        $forecastResults = $results + $perWeightResults * $weightLeft;
+        $expected = $budget ? $budget * $weightDone / $weightAll : null;
         $pace = $expected ? $spent / $expected * 100 : null;
         $tol = (float) $cfg['tolerance'];
 
@@ -62,7 +76,43 @@ class Pacing
             'forecast_vs_budget' => $budget ? $forecastSpend / $budget * 100 : null,
             'forecast_vs_target' => $target ? $forecastResults / $target * 100 : null,
             'daily_needed' => $budget && $left > 0 ? max(0, ($budget - $spent) / $left) : null,
+            'weekday_curve' => $curve !== null,
         ];
+    }
+
+    /**
+     * PS-20: each ISO weekday's share of spend over the last 8 full weeks, scaled so the average day is 1.0. Null when
+     * there are fewer than 28 days with spend or the pattern is flat (every day within 10 %), so pacing stays linear.
+     *
+     * @return array<int, float>|null
+     */
+    public static function weekdayCurve(Client $c, Carbon $today): ?array
+    {
+        $daily = MetricsQuery::daily($c, $today->copy()->subDays(56)->toDateString(), $today->copy()->subDay()->toDateString());
+        $sum = array_fill(1, 7, 0.0);
+        $cnt = array_fill(1, 7, 0);
+        foreach ($daily as $date => $t) {
+            if ((float) $t['spend'] <= 0) {
+                continue;
+            }
+            $wd = Carbon::parse($date)->isoWeekday();
+            $sum[$wd] += (float) $t['spend'];
+            $cnt[$wd]++;
+        }
+        if (array_sum($cnt) < 28 || min($cnt) < 3) {
+            return null;
+        }
+        $avg = [];
+        foreach ($sum as $wd => $s) {
+            $avg[$wd] = $s / $cnt[$wd];
+        }
+        $mean = array_sum($avg) / 7;
+        if ($mean <= 0) {
+            return null;
+        }
+        $curve = array_map(fn ($v) => round($v / $mean, 3), $avg);
+
+        return max($curve) - min($curve) < 0.1 ? null : $curve;
     }
 
     public static function label(string $status): array

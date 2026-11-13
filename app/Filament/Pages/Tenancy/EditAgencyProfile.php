@@ -6,8 +6,10 @@ use App\Models\AuditLog;
 use App\Support\AgencyLogo;
 use App\Support\CustomDomainManager;
 use App\Support\Modules;
+use App\Support\RamadanHours;
 use Closure;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\TextEntry;
@@ -64,6 +66,13 @@ class EditAgencyProfile extends EditTenantProfile
             Toggle::make('report_powered_by')->label(__('Show "Powered by AdsRanger" on client reports'))
                 ->helperText(__('A small line at the bottom of client report links and PDFs. Switch it off to show only your agency.'))
                 ->default(true)->formatStateUsing(fn ($state): bool => $state === null || (bool) $state),
+            // PS-19 (R5, D-307): on by default; null counts as on.
+            Section::make(__('Ramadan hours'))->description(__('During Ramadan the daily summary comes after iftar, and push quiet hours move to 03:00–12:00 for members who kept the default. It switches on and off by itself from the Ramadan dates.'))
+                ->columns(2)->schema([
+                    Toggle::make('ramadan_hours')->label(__('Use Ramadan hours'))->default(true)->formatStateUsing(fn ($state): bool => $state === null || (bool) $state),
+                    Select::make('ramadan_digest_at')->label(__('Daily summary time in Ramadan'))->options(RamadanHours::digestTimes())->default(RamadanHours::DEFAULT_DIGEST)
+                        ->formatStateUsing(fn ($state): string => $state ?: RamadanHours::DEFAULT_DIGEST),
+                ]),
             Toggle::make('require_two_factor')->label(__('Require two-step verification for all members'))
                 ->helperText(__('Members who haven\'t set it up are asked to add an authenticator app before they can open this workspace. This includes you.')),
         ]);

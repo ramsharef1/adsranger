@@ -2682,5 +2682,10 @@
     "Client approvals": "موافقات العميل",
     "Waiting for the client": "بانتظار العميل",
     "Approved by :name": "وافق :name",
-    ":name asked for changes": "طلب :name تعديلات"
+    ":name asked for changes": "طلب :name تعديلات",
+    "Expected spend follows this client's own weekday pattern from the last 8 weeks.": "الإنفاق المتوقع يتبع نمط أيام الأسبوع لهذا العميل خلال آخر 8 أسابيع.",
+    "Ramadan hours": "ساعات رمضان",
+    "During Ramadan the daily summary comes after iftar, and push quiet hours move to 03:00–12:00 for members who kept the default. It switches on and off by itself from the Ramadan dates.": "في رمضان يصل الملخص اليومي بعد الإفطار، وتنتقل ساعات الهدوء للإشعارات إلى 03:00–12:00 للأعضاء الذين لم يغيّروها. يعمل ويتوقف وحده حسب مواعيد رمضان.",
+    "Use Ramadan hours": "استخدم ساعات رمضان",
+    "Daily summary time in Ramadan": "وقت الملخص اليومي في رمضان"
 }

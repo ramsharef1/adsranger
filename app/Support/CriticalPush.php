@@ -148,6 +148,10 @@ class CriticalPush
         }
         $start = (string) ($u->push_quiet_start ?: '23:00');
         $end = (string) ($u->push_quiet_end ?: '07:00');
+        // PS-19 (D-307): in Ramadan the default quiet hours follow the late nights (03:00–12:00); own choices stay.
+        if ($start === '23:00' && $end === '07:00' && RamadanHours::active($a, $now)) {
+            [$start, $end] = RamadanHours::QUIET;
+        }
         if ($start === $end) {
             return false;
         }
