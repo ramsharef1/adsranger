@@ -28,6 +28,9 @@ class UploadReminders
                 continue;
             }
             foreach ($alerts as $al) {
+                if ($al->client && $al->client->status !== 'active') { // XS-10: a paused client gets no reminders.
+                    continue;
+                }
                 $days = (int) ($al->payload['days'] ?? 0);
                 $step = intdiv($days, 7);
                 if ($step < 1 || ! Cache::add("upload-reminder:{$al->id}:$step", 1, now()->addDays(8))) {

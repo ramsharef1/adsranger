@@ -53,7 +53,7 @@ class NightShift
             return $fail(__('No key for this provider. Add one in My API keys.'));
         }
 
-        $ids = Client::where('agency_id', $agency->id)->whereIn('id', (array) $shift->client_ids)->limit((int) config('ai_workspace.night_shift.max_clients', 25))->pluck('id')->all();
+        $ids = Client::where('agency_id', $agency->id)->where('status', 'active')->whereIn('id', (array) $shift->client_ids)->limit((int) config('ai_workspace.night_shift.max_clients', 25))->pluck('id')->all();
 
         return static::work($run, $key, $ids);
     }

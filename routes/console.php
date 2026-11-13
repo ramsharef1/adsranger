@@ -9,6 +9,7 @@ use App\Jobs\RunTrialLifecycle;
 use App\Jobs\SnapshotHealth;
 use App\Jobs\VerifyOwnLinks;
 use App\Support\Business\UsageLedger;
+use App\Support\ClientFreeze;
 use App\Support\Fx;
 use App\Support\Ops\Heartbeat;
 use App\Support\Ops\JobRuns;
@@ -53,3 +54,5 @@ Schedule::call(fn () => JobRuns::track('usage-ledger', fn () => UsageLedger::sna
 Schedule::call(fn () => JobRuns::track('reindex-gate', fn () => ReindexGate::run()))->dailyAt('02:40')->name('reindex-gate')->withoutOverlapping();
 // PS-08 (D-296): phone reminder for clients fed by uploads, at 7 / 14 / 21… days without fresh data (06:45 Amman = 03:45 UTC).
 Schedule::call(fn () => JobRuns::track('upload-reminders', fn () => UploadReminders::run()))->dailyAt('03:45')->name('upload-reminders')->withoutOverlapping();
+// XS-10 (R4, D-303): paused clients whose resume date has come are switched back on.
+Schedule::call(fn () => JobRuns::track('client-resume', fn () => ClientFreeze::resumeDue()))->dailyAt('03:20')->name('client-resume')->withoutOverlapping();

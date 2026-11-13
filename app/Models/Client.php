@@ -18,7 +18,7 @@ class Client extends Model
     protected function casts(): array
     {
         return ['hide_spend' => 'boolean', 'monthly_budget' => 'float', 'target_cpr' => 'float', 'target_roas' => 'float', 'target_results' => 'integer',
-            'health_score' => 'integer', 'health_parts' => 'array', 'health_at' => 'datetime', 'ai_scope' => 'array', 'brain_checked_at' => 'datetime'];
+            'health_score' => 'integer', 'health_parts' => 'array', 'health_at' => 'datetime', 'ai_scope' => 'array', 'brain_checked_at' => 'datetime', 'paused_until' => 'date', 'paused_at' => 'datetime'];
     }
 
     public function agency(): BelongsTo
@@ -62,6 +62,12 @@ class Client extends Model
         $targetUser = ($preview && ! empty($preview['user'])) ? $preview['user'] : $user;
 
         return $q->where(fn ($w) => $w->whereDoesntHave('users')->orWhereHas('users', fn ($u) => $u->where('users.id', $targetUser->id)));
+    }
+
+    /** XS-02 (R4): calls, WhatsApp chats and meetings logged with this client. */
+    public function contacts(): HasMany
+    {
+        return $this->hasMany(ClientContact::class);
     }
 
     protected static function booted(): void

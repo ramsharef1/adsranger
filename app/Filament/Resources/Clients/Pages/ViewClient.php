@@ -9,8 +9,10 @@ use App\Models\Alert;
 use App\Models\AuditLog;
 use App\Models\Campaign;
 use App\Models\Client;
+use App\Models\ClientContact;
 use App\Models\ClientLink;
 use App\Models\ReportSchedule;
+use App\Support\ClientFreeze;
 use App\Support\ClientSetupCopy;
 use App\Support\HealthScore;
 use App\Support\MetricsQuery;
@@ -26,8 +28,10 @@ use Carbon\CarbonInterface;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
@@ -56,6 +60,41 @@ class ViewClient extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            // XS-02 (R4, D-303): log a call, WhatsApp chat or meeting, with an optional next contact date.
+            Action::make('logContact')->label(__('Log contact'))->icon('heroicon-o-chat-bubble-left-right')->color('gray')
+                ->visible(fn () => TeamRoles::canManageData(auth()->user(), $this->record->agency))
+                ->schema([
+                    Select::make('kind')->label(__('Type'))->options(ClientContact::kindLabels())->default('call')->required(),
+                    DatePicker::make('happened_on')->label(__('Date'))->default(now($this->record->agency?->timezone ?: 'UTC')->toDateString())->required()->native(false),
+                    Textarea::make('note')->label(__('Note'))->rows(3)->maxLength(2000),
+                    DatePicker::make('next_on')->label(__('Next contact (optional)'))->native(false)->afterOrEqual('happened_on'),
+                ])
+                ->action(function (array $data): void {
+                    ClientContact::create(['agency_id' => $this->record->agency_id, 'client_id' => $this->record->id, 'user_id' => auth()->id(),
+                        'kind' => $data['kind'], 'happened_on' => $data['happened_on'], 'note' => trim(strip_tags((string) ($data['note'] ?? ''))) ?: null, 'next_on' => $data['next_on'] ?? null]);
+                    // A new contact closes any follow-up that was due before it.
+                    ClientContact::where('client_id', $this->record->id)->whereNull('next_done_at')->whereNotNull('next_on')->where('next_on', '<=', $data['happened_on'])
+                        ->update(['next_done_at' => now()]);
+                    Notification::make()->title(__('Contact logged.'))->success()->send();
+                }),
+            // XS-10 (R4, D-303): pause a client (alerts, scheduled reports, night shift stop; data kept), one click to resume.
+            Action::make('pauseClient')->label(__('Pause client'))->icon('heroicon-o-pause-circle')->color('gray')
+                ->visible(fn () => $this->record->status === 'active' && TeamRoles::canManageData(auth()->user(), $this->record->agency))
+                ->modalDescription(__('Alerts, scheduled reports and the night shift stop for this client. Data keeps syncing and nothing is deleted.'))
+                ->schema([
+                    Select::make('reason')->label(__('Reason'))->options(ClientFreeze::reasonLabels())->default('holiday')->required(),
+                    DatePicker::make('until')->label(__('Resume on (optional)'))->native(false)->minDate(now()->addDay()->toDateString()),
+                ])
+                ->action(function (array $data): void {
+                    ClientFreeze::pause($this->record, $data['reason'], $data['until'] ?? null, auth()->user());
+                    Notification::make()->title(__('Client paused.'))->success()->send();
+                }),
+            Action::make('resumeClient')->label(__('Resume client'))->icon('heroicon-o-play-circle')
+                ->visible(fn () => $this->record->status === 'paused' && TeamRoles::canManageData(auth()->user(), $this->record->agency))
+                ->action(function (): void {
+                    ClientFreeze::resume($this->record, auth()->user());
+                    Notification::make()->title(__('Client resumed.'))->success()->send();
+                }),
             // PS-13: copy this client's targets and report schedule to other clients (recipients stay per client).
             Action::make('copySetup')->label(__('Copy setup to other clients'))->icon('heroicon-o-document-duplicate')->color('gray')
                 ->visible(fn () => TeamRoles::canManageData(auth()->user(), $this->record->agency))
@@ -316,6 +355,7 @@ class ViewClient extends ViewRecord
             ],
             'top' => MetricsQuery::topAds($c, $from, $to),
             'alerts' => Alert::where('client_id', $c->id)->where('status', 'open')->latest()->limit(5)->get(),
+            'contacts' => ClientContact::with('user')->where('client_id', $c->id)->orderByDesc('happened_on')->orderByDesc('id')->limit(10)->get(),
             'synced' => MetricsQuery::lastSynced($c),
             'accounts' => $c->adAccounts()->with('network')->get(),
         ];

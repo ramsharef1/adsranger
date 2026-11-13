@@ -6,6 +6,21 @@
 @endphp
 <x-filament-panels::page>
     @include('filament.partials.onboarding-checklist')
+    @if ($followUps->isNotEmpty())
+        {{-- XS-02 (R4, D-303): contacts due today or earlier. --}}
+        <x-filament::section :heading="__('Follow-ups due')" data-follow-ups>
+            <div style="display:grid;gap:6px">
+                @foreach ($followUps as $f)
+                    <div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:14px;border-bottom:1px solid rgba(148,163,184,.2);padding-bottom:6px" wire:key="fu-{{ $f->id }}">
+                        <span><a href="{{ \App\Filament\Resources\Clients\ClientResource::getUrl('view', ['record' => $f->client_id]) }}" style="color:#0F766E;text-decoration:underline"><bdi>{{ $f->client?->name }}</bdi></a>
+                            · {{ \App\Models\ClientContact::kindLabels()[$f->kind] ?? '' }} · <bdi>{{ $f->next_on->locale(app()->getLocale())->translatedFormat('j M') }}</bdi>
+                            @if ($f->note)<span style="opacity:.75"> · {{ \Illuminate\Support\Str::limit($f->note, 80) }}</span>@endif</span>
+                        <x-filament::button size="xs" color="gray" wire:click="followUpDone({{ $f->id }})">{{ __('Done') }}</x-filament::button>
+                    </div>
+                @endforeach
+            </div>
+        </x-filament::section>
+    @endif
     @if ($brainsToCheck->isNotEmpty())
         {{-- WS-34 (D-301): monthly check of each client brain by a person. --}}
         <x-filament::section :heading="__('Client brains to check')" data-brains-to-check>

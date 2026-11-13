@@ -152,6 +152,32 @@
         </x-filament::section>
     @endif
 
+    {{-- XS-10 (R4): paused client --}}
+    @if ($client->status === 'paused')
+        <div role="status" data-client-paused style="border:1px solid rgba(180,83,9,.4);background:rgba(245,158,11,.10);border-radius:12px;padding:10px 14px;font-size:14px">
+            <strong>{{ __('Paused') }}</strong> · {{ \App\Support\ClientFreeze::reasonLabels()[$client->paused_reason] ?? __('Other') }}
+            @if ($client->paused_until) · {{ __('Resumes on :date', ['date' => $client->paused_until->locale(app()->getLocale())->translatedFormat('j M Y')]) }}@endif
+            <div style="{{ $muted }}">{{ __('Alerts, scheduled reports and the night shift are stopped. Data keeps syncing.') }}</div>
+        </div>
+    @endif
+
+    {{-- XS-02 (R4): contact log --}}
+    <x-filament::section data-contacts>
+        <x-slot name="heading">{{ __('Contact log') }}</x-slot>
+        @if ($contacts->isEmpty())
+            <p style="{{ $muted }};margin:0">{{ __('No calls, chats or meetings logged yet. Use "Log contact" above.') }}</p>
+        @else
+            @foreach ($contacts as $ct)
+                <div style="padding:6px 0;border-top:1px solid rgba(148,163,184,.2);font-size:14px">
+                    <strong>{{ \App\Models\ClientContact::kindLabels()[$ct->kind] ?? $ct->kind }}</strong>
+                    · <bdi>{{ $ct->happened_on->locale(app()->getLocale())->translatedFormat('j M Y') }}</bdi>@if ($ct->user) · <bdi>{{ $ct->user->name }}</bdi>@endif
+                    @if ($ct->note)<div dir="auto" style="white-space:pre-line">{{ $ct->note }}</div>@endif
+                    @if ($ct->next_on)<div style="{{ $muted }}">{{ __('Next contact: :date', ['date' => $ct->next_on->locale(app()->getLocale())->translatedFormat('j M Y')]) }}@if ($ct->next_done_at) · {{ __('done') }}@endif</div>@endif
+                </div>
+            @endforeach
+        @endif
+    </x-filament::section>
+
     @if ($alerts->isNotEmpty())
         <x-filament::section>
             <x-slot name="heading">{{ __('Open alerts') }}</x-slot>

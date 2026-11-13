@@ -9,6 +9,7 @@ use App\Models\AdAccount;
 use App\Models\AiBrainItem;
 use App\Models\Alert;
 use App\Models\Client;
+use App\Models\ClientContact;
 use App\Support\CurrentClient;
 use App\Support\MetricsQuery;
 use App\Support\Modules;
@@ -106,10 +107,23 @@ class DailyDesk extends Page
                 ->take(5)->values()
             : collect();
 
+        // XS-02 (R4, D-303): follow-ups whose date has come, for the clients this person sees.
+        $followUps = ClientContact::with('client')->where('agency_id', $a->id)->whereIn('client_id', $clients->pluck('id'))
+            ->whereNull('next_done_at')->whereNotNull('next_on')->where('next_on', '<=', now($tz)->toDateString())->orderBy('next_on')->limit(8)->get();
+
         return [
+            'followUps' => $followUps,
             'from' => $from, 'rows' => $rows, 'synced' => $synced ? Carbon::parse($synced) : null,
             'tz' => $tz, 'night' => $night, 'clientNames' => $clients->pluck('name', 'id'), 'brainsToCheck' => $toCheck,
         ];
+    }
+
+    /** XS-02: a follow-up was done (or isn't needed any more). */
+    public function followUpDone(int $id): void
+    {
+        $a = Filament::getTenant();
+        $ids = Client::visibleTo(auth()->user(), $a)->pluck('id');
+        ClientContact::where('agency_id', $a->id)->whereIn('client_id', $ids)->whereKey($id)->update(['next_done_at' => now()]);
     }
 
     /** FS-08: the member says whether a night-shift item helped; kept in the item, counted per level on the night shift page. */
