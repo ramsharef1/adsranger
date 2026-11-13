@@ -45,8 +45,8 @@
                     </label>
                 @endforeach
                 <button type="submit" class="btn">{{ __('Submit answer') }}</button>
-                {{-- UX-257 (Product's proposal; Business may replace the wording). No AdsRanger branding: the client collects it. --}}
-                <p class="sub" style="margin:14px 0 0;font-size:12.5px">{!! __(':client collects this answer to learn how you found them. We don\'t ask for your name or number.', ['client' => '<bdi>'.e($client->name).'</bdi>']) !!}</p>
+                {{-- UX-257 (Business 05:27 wording). No AdsRanger branding: the client collects it. Add a privacy-policy link once clients can store one. --}}
+                <p class="sub" style="margin:14px 0 0;font-size:12.5px">{!! __(':client collects your answer, with your order number, to learn how you found them and improve its ads. We don\'t ask for your name, phone or email.', ['client' => '<bdi>'.e($client->name).'</bdi>']) !!}</p>
             </form>
         @endif
     </main>

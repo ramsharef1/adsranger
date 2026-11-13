@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Support\Seo\PageAudit;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 /** cl87 (Rami's ADSR-920 picks, Batch 0): GB-01 articles + glossary terms listed (switch can hold them), UX-253 page-audit notes. */
@@ -49,5 +50,17 @@ class SiteBatch0Cl87Test extends TestCase
         $this->assertSame(90, $r['score']);
         $this->assertSame([], $r['issues']);
         $this->assertSame(['no_json_ld', 'no_question_heading'], $r['notes']);
+    }
+
+    /** UX-265: the public tool's reply carried no `notes`, so the page said "no core issues" at 90 with nothing listed. */
+    public function test_page_audit_reply_includes_the_notes(): void
+    {
+        Http::fake(['*' => Http::response(
+            '<html lang="ar" dir="rtl"><head><title>عنوان</title><meta name="description" content="وصف">'
+            .'<link rel="canonical" href="https://a.example/"></head><body><h1>عنوان</h1></body></html>', 200, ['Content-Type' => 'text/html'])]);
+
+        $this->postJson('/tools/page-audit/run', ['url' => 'https://example.com/'])
+            ->assertOk()->assertJsonPath('ok', true)->assertJsonPath('score', 90)
+            ->assertJsonPath('notes', ['no_json_ld', 'no_question_heading']);
     }
 }

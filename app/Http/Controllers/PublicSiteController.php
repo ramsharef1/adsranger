@@ -316,6 +316,7 @@ class PublicSiteController extends Controller
             'score' => $audit['score'],
             'checks' => $audit['checks'],
             'issues' => $audit['issues'],
+            'notes' => $audit['notes'],
             'serp' => $audit['serp'],
         ]);
     }

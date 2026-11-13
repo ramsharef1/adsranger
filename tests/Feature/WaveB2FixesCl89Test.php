@@ -90,7 +90,7 @@ class WaveB2FixesCl89Test extends TestCase
 
         $this->get('/survey/'.$survey->survey_token.'?lang=en')->assertOk()
             ->assertSee('value="other"', false)
-            ->assertSee('Jeddah Shop</bdi> collects this answer', false)
+            ->assertSee('Jeddah Shop</bdi> collects your answer, with your order number', false)
             ->assertSee('Your answer helps us know where to advertise.')
             ->assertDontSee('AdsRanger');
     }
