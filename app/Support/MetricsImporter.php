@@ -7,6 +7,8 @@ use App\Models\AuditLog;
 use App\Models\DailyMetric;
 use App\Models\DataImport;
 use App\Models\User;
+use App\Support\Import\ImportSheet;
+use App\Support\Import\NetworkGuess;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -17,15 +19,15 @@ use RuntimeException;
 class MetricsImporter
 {
     public const SYNONYMS = [
-        'date' => ['date', 'day', 'reporting starts', 'reporting date', 'start date', 'التاريخ', 'اليوم', 'تاريخ البدء'],
+        'date' => ['date', 'day', 'by day', 'reporting starts', 'reporting date', 'start date', 'start time', 'التاريخ', 'اليوم', 'تاريخ البدء', 'بدء إعداد التقارير', 'بداية إعداد التقارير'],
         'campaign_name' => ['campaign', 'campaign name', 'اسم الحملة', 'الحملة'],
         'campaign_id' => ['campaign id', 'معرف الحملة'],
-        'spend' => ['spend', 'cost', 'amount spent', 'amount', 'budget spent', 'الإنفاق', 'المبلغ المنفق', 'التكلفة'],
-        'impressions' => ['impressions', 'impr', 'impr.', 'views', 'مرات الظهور', 'الظهور'],
+        'spend' => ['spend', 'cost', 'amount spent', 'amount', 'budget spent', 'total cost', 'الإنفاق', 'المبلغ المنفق', 'المبلغ الذي تم إنفاقه', 'التكلفة'],
+        'impressions' => ['impressions', 'impr', 'impr.', 'paid impressions', 'views', 'مرات الظهور', 'الظهور'],
         'reach' => ['reach', 'unique users', 'الوصول'],
         'clicks' => ['clicks', 'all clicks', 'النقرات'],
-        'link_clicks' => ['link clicks', 'inline link clicks', 'outbound clicks', 'نقرات الرابط'],
-        'conversions' => ['conversions', 'results', 'installs', 'actions', 'النتائج', 'التحويلات'],
+        'link_clicks' => ['link clicks', 'inline link clicks', 'outbound clicks', 'clicks (destination)', 'swipe ups', 'نقرات الرابط', 'نقرات على الرابط'],
+        'conversions' => ['conversions', 'results', 'conv.', 'installs', 'actions', 'النتائج', 'التحويلات'],
         'leads' => ['leads', 'lead', 'العملاء المحتملون'],
         'purchases' => ['purchases', 'purchase', 'orders', 'المشتريات', 'الطلبات'],
         'messages' => ['messages', 'conversations', 'المحادثات', 'الرسائل'],
@@ -33,8 +35,8 @@ class MetricsImporter
         'landing_views' => ['landing page views', 'landing views', 'مشاهدات الصفحة'],
         'add_to_cart' => ['add to cart', 'adds to cart', 'الإضافة إلى السلة'],
         'checkouts' => ['checkouts', 'checkouts initiated', 'initiate checkout', 'بدء الدفع'],
-        'revenue' => ['revenue', 'conversion value', 'purchase value', 'purchases conversion value', 'sales', 'الإيرادات', 'قيمة التحويل'],
-        'result_type' => ['result type', 'optimization goal', 'objective', 'نوع النتيجة', 'الهدف'],
+        'revenue' => ['revenue', 'conversion value', 'conv. value', 'purchase value', 'purchases conversion value', 'sales', 'الإيرادات', 'قيمة التحويل', 'قيمة تحويل المشتريات'],
+        'result_type' => ['result type', 'result indicator', 'optimization goal', 'objective', 'نوع النتيجة', 'مؤشر النتائج', 'الهدف'],
         'currency' => ['currency', 'العملة'],
     ];
 
@@ -62,7 +64,7 @@ class MetricsImporter
 
     protected static function norm(string $h): string
     {
-        $h = preg_replace('/^\xEF\xBB\xBF/', '', $h);
+        $h = (string) TextClean::invisible(preg_replace('/^\xEF\xBB\xBF/', '', $h));
         $h = mb_strtolower(trim($h));
         $h = preg_replace('/\s*\((usd|jod|sar|aed|eur|gbp|[a-z]{3})\)\s*$/u', '', $h);
 
@@ -98,8 +100,7 @@ class MetricsImporter
 
     protected static function num($v): float
     {
-        $v = trim((string) $v);
-        $v = strtr($v, ['٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4', '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9', '٫' => '.', '٬' => ',']);
+        $v = (string) TextClean::western(trim((string) $v)); // PS-24
         $v = preg_replace('/[^0-9.,\-]/', '', $v);
         if (substr_count($v, ',') && ! substr_count($v, '.')) {
             $v = substr_count($v, ',') === 1 && strlen(substr(strrchr($v, ','), 1)) <= 2 ? str_replace(',', '.', $v) : str_replace(',', '', $v);
@@ -110,7 +111,7 @@ class MetricsImporter
 
     protected static function date($v): ?string
     {
-        $v = trim((string) $v);
+        $v = (string) TextClean::western(TextClean::invisible(trim((string) $v)));
         if ($v === '') {
             return null;
         }
@@ -130,37 +131,104 @@ class MetricsImporter
         }
     }
 
-    public static function import(Agency $agency, User $user, string $network, string $csv, string $filename, string $source = 'file', ?int $clientId = null): DataImport
+    /** PS-01: the header is the first of the top rows that names a date and a spend column (exports often start with a title). */
+    public static function headerRow(array $rows): ?int
     {
-        $csv = str_replace(["\r\n", "\r"], "\n", $csv);
-        $lines = array_values(array_filter(explode("\n", $csv), fn ($l) => trim($l) !== ''));
-        if (count($lines) < 2) {
-            throw new RuntimeException('The file has no data rows.');
-        }
-        $delim = substr_count($lines[0], ';') > substr_count($lines[0], ',') ? ';' : (substr_count($lines[0], "\t") > substr_count($lines[0], ',') ? "\t" : ',');
-        $headers = str_getcsv($lines[0], $delim, "\"", "");
-        $map = static::map($headers);
-        foreach (['date', 'spend'] as $req) {
-            if (! isset($map[$req])) {
-                throw new RuntimeException('Could not find a "'.$req.'" column. Columns found: '.Str::limit(implode(', ', $headers), 200));
+        foreach (array_slice($rows, 0, 10, true) as $i => $row) {
+            $map = static::map($row);
+            if (isset($map['date'], $map['spend'])) {
+                return $i;
             }
         }
-        if (count($lines) - 1 > self::MAX_ROWS) {
-            throw new RuntimeException('Too many rows (max '.self::MAX_ROWS.' per import).');
+
+        return null;
+    }
+
+    /**
+     * PS-01: what an import would do, before saving: the network it looks like, the matched columns and the first rows.
+     *
+     * @param  list<list<string>>  $rows
+     * @return array{network: ?string, header: ?int, mapping: array<string, string>, missing: list<string>, sample: list<array<string, mixed>>, rows: int}
+     */
+    public static function preview(array $rows, int $limit = 5): array
+    {
+        $h = static::headerRow($rows);
+        if ($h === null) {
+            $first = $rows[0] ?? [];
+            $map = static::map($first);
+
+            return ['network' => null, 'header' => null, 'mapping' => collect($map)->map(fn ($i) => (string) $first[$i])->all(),
+                'missing' => array_values(array_diff(['date', 'spend'], array_keys($map))), 'sample' => [], 'rows' => 0];
+        }
+        $headers = $rows[$h];
+        $map = static::map($headers);
+        $sample = [];
+        $count = 0;
+        foreach (array_slice($rows, $h + 1) as $r) {
+            $d = static::date($r[$map['date']] ?? null);
+            if (! $d) {
+                continue;
+            }
+            $count++;
+            if (count($sample) < $limit) {
+                $sample[] = ['date' => $d, 'campaign' => isset($map['campaign_name']) ? TextClean::invisible($r[$map['campaign_name']] ?? '') : null,
+                    'spend' => static::num($r[$map['spend']] ?? 0), 'results' => isset($map['conversions']) ? static::num($r[$map['conversions']] ?? 0) : null];
+            }
         }
 
-        return DB::transaction(function () use ($agency, $user, $network, $lines, $delim, $map, $headers, $filename, $source, $clientId) {
+        return ['network' => NetworkGuess::guess(array_map([static::class, 'norm'], $headers)), 'header' => $h,
+            'mapping' => collect($map)->map(fn ($i) => (string) $headers[$i])->all(), 'missing' => [], 'sample' => $sample, 'rows' => $count];
+    }
+
+    public static function import(Agency $agency, User $user, string $network, string $csv, string $filename, string $source = 'file', ?int $clientId = null): DataImport
+    {
+        return static::importRows($agency, $user, $network, ImportSheet::fromCsv($csv, self::MAX_ROWS + 11), $filename, $source, $clientId);
+    }
+
+    /**
+     * Saves the rows. PS-07: a row already imported for the same network, client, campaign and day is skipped when nothing
+     * changed and updated when a number changed, so next month's export can be dropped in whole. PS-26: invisible marks are
+     * stripped from campaign names and counted.
+     *
+     * @param  list<list<string>>  $rows
+     */
+    public static function importRows(Agency $agency, User $user, ?string $network, array $rows, string $filename, string $source = 'file', ?int $clientId = null): DataImport
+    {
+        $h = static::headerRow($rows);
+        if ($h === null) {
+            $map = static::map($rows[0] ?? []);
+            foreach (['date', 'spend'] as $req) {
+                if (! isset($map[$req])) {
+                    throw new RuntimeException('Could not find a "'.$req.'" column. Columns found: '.Str::limit(implode(', ', $rows[0] ?? []), 200));
+                }
+            }
+        }
+        $headers = $rows[$h];
+        $map = static::map($headers);
+        $data = array_slice($rows, $h + 1);
+        if ($data === []) {
+            throw new RuntimeException('The file has no data rows.');
+        }
+        if (count($data) > self::MAX_ROWS) {
+            throw new RuntimeException('Too many rows (max '.self::MAX_ROWS.' per import).');
+        }
+        $network = $network ?: (NetworkGuess::guess(array_map([static::class, 'norm'], $headers)) ?? 'other');
+
+        return DB::transaction(function () use ($agency, $user, $network, $data, $map, $headers, $filename, $source, $clientId) {
             $import = DataImport::create(['agency_id' => $agency->id, 'client_id' => $clientId, 'user_id' => $user->id, 'network' => $network, 'source' => $source,
                 'filename' => Str::limit($filename, 190), 'mapping' => collect($map)->map(fn ($i) => $headers[$i])->all()]);
             $get = fn ($row, $f) => isset($map[$f]) ? ($row[$map[$f]] ?? null) : null;
-            $batch = [];
-            $count = 0;
+            $parsed = [];
+            $cleaned = 0;
             $now = now();
-            foreach (array_slice($lines, 1) as $line) {
-                $r = str_getcsv($line, $delim, "\"", "");
+            foreach ($data as $r) {
                 $d = static::date($get($r, 'date'));
                 if (! $d) {
                     continue; // skip totals / blank rows
+                }
+                $rawName = (string) $get($r, 'campaign_name');
+                if (TextClean::hasInvisible($rawName)) {
+                    $cleaned++;
                 }
                 $clicksVal = (int) static::num($get($r, 'clicks'));
                 $linkClicksVal = (int) static::num($get($r, 'link_clicks')) ?: $clicksVal;
@@ -188,11 +256,11 @@ class MetricsImporter
                     'checkouts' => static::num($get($r, 'checkouts')),
                     'revenue' => static::num($get($r, 'revenue')),
                 ]);
-                $batch[] = [
+                $parsed[] = [
                     'agency_id' => $agency->id, 'client_id' => $clientId, 'level' => 'campaign', 'result_type' => $norm['result_type'], 'roas_eligible' => $norm['roas_eligible'],
                     'data_import_id' => $import->id, 'network' => $network, 'date' => $d,
-                    'campaign_id' => Str::limit((string) $get($r, 'campaign_id'), 190, '') ?: null,
-                    'campaign_name' => Str::limit((string) $get($r, 'campaign_name'), 250, '') ?: null,
+                    'campaign_id' => Str::limit((string) TextClean::invisible((string) $get($r, 'campaign_id')), 190, '') ?: null,
+                    'campaign_name' => Str::limit((string) TextClean::invisible($rawName), 250, '') ?: null,
                     'spend' => $norm['spend'], 'impressions' => $norm['impressions'], 'reach' => $norm['reach'],
                     'clicks' => $norm['clicks'], 'link_clicks' => $norm['link_clicks'], 'conversions' => $norm['results'], 'results' => $norm['results'],
                     'leads' => $norm['leads'], 'purchases' => $norm['purchases'], 'messages' => $norm['messages'], 'calls' => $norm['calls'],
@@ -201,7 +269,37 @@ class MetricsImporter
                     'currency' => Str::upper(Str::limit((string) ($get($r, 'currency') ?: $agency->currency), 8, '')),
                     'source' => 'import', 'created_at' => $now, 'updated_at' => $now,
                 ];
-                $count++;
+            }
+            if ($parsed === []) {
+                throw new RuntimeException('No rows had a readable date.');
+            }
+
+            // PS-07: rows already imported for the same days.
+            $key = fn ($row) => implode('|', [$row['client_id'] ?? '', $row['campaign_id'] ?: mb_strtolower((string) $row['campaign_name']), substr((string) $row['date'], 0, 10)]);
+            $dates = array_unique(array_column($parsed, 'date'));
+            $existing = DailyMetric::query()->where('agency_id', $agency->id)->where('network', $network)->where('source', 'import')
+                ->where('client_id', $clientId)->whereIn('date', $dates)->get()->keyBy(fn ($m) => $key($m->getAttributes()));
+            $fields = ['spend', 'impressions', 'reach', 'clicks', 'link_clicks', 'results', 'leads', 'purchases', 'messages', 'calls', 'landing_views', 'add_to_cart', 'checkouts', 'revenue'];
+            $added = $updated = $skipped = 0;
+            $batch = [];
+            $seen = [];
+            foreach ($parsed as $row) {
+                $k = $key($row);
+                $old = $existing[$k] ?? null;
+                if ($old && ! isset($seen[$k])) {
+                    $seen[$k] = true;
+                    $same = collect($fields)->every(fn ($f) => abs((float) $old->$f - (float) $row[$f]) < 0.0001);
+                    if ($same) {
+                        $skipped++;
+                    } else {
+                        $old->forceFill(collect($row)->only([...$fields, 'conversions', 'result_type', 'roas_eligible', 'data_import_id', 'currency'])->all())->save();
+                        $updated++;
+                    }
+
+                    continue;
+                }
+                $batch[] = $row;
+                $added++;
                 if (count($batch) >= 500) {
                     DailyMetric::insert($batch);
                     $batch = [];
@@ -210,11 +308,8 @@ class MetricsImporter
             if ($batch) {
                 DailyMetric::insert($batch);
             }
-            if ($count === 0) {
-                throw new RuntimeException('No rows had a readable date.');
-            }
-            $import->update(['rows' => $count]);
-            AuditLog::record('data.imported', $agency, ['import_id' => $import->id, 'network' => $network, 'rows' => $count]);
+            $import->update(['rows' => $added, 'rows_updated' => $updated, 'rows_skipped' => $skipped, 'names_cleaned' => $cleaned]);
+            AuditLog::record('data.imported', $agency, ['import_id' => $import->id, 'network' => $network, 'rows' => $added, 'updated' => $updated, 'skipped' => $skipped]);
 
             return $import;
         });

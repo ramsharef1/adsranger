@@ -13,7 +13,8 @@
         "laravel/passport": "^13.10",
         "laravel/socialite": "^5.31",
         "laravel/tinker": "^3.0",
-        "mpdf/mpdf": "^8.2"
+        "mpdf/mpdf": "^8.2",
+        "openspout/openspout": "^4.28"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

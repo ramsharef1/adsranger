@@ -2275,5 +2275,22 @@
     "Hold again": "احجبها مجددًا",
     "Release": "أطلقها",
     "Not checked yet. Press \"Check all now\".": "لم تُفحص بعد. اضغط «افحص الكل الآن».",
-    "Re-index gate": "بوابة إعادة الفهرسة"
+    "Re-index gate": "بوابة إعادة الفهرسة",
+    "Detect from the file": "اكتشفها من الملف",
+    "Leave empty: Meta, Google, TikTok and Snapchat exports are recognised by their columns, in English or Arabic.": "اتركها فارغة: نتعرّف على ملفات التصدير من منصات Meta، Google، TikTok، Snapchat من أسماء أعمدتها، بالعربية أو الإنجليزية.",
+    "CSV or Excel file": "ملف CSV أو Excel",
+    "Export from the network as CSV or .xlsx (up to 10 MB, 50,000 rows).": "صدّر التقرير من المنصة بصيغة CSV أو ‎.xlsx (حتى 10 ميغابايت، 50,000 صف).",
+    "Preview": "معاينة",
+    "Import saved": "حُفظ الاستيراد",
+    "New rows: :n": "صفوف جديدة: :n",
+    "Updated since the last upload: :n": "صفوف تغيّرت منذ آخر رفع: :n",
+    "Already there, skipped: :n": "صفوف موجودة سابقًا تُركت: :n",
+    "Names cleaned of hidden marks: :n": "أسماء نُظّفت من علامات مخفية: :n",
+    "Network: :name": "المنصة: :name",
+    "No date and spend columns were found in the first rows.": "لم نجد عمودي التاريخ والإنفاق في الصفوف الأولى.",
+    "Looks like": "يبدو أنه من",
+    "an unknown network (choose one above)": "منصة غير معروفة (اخترها في الأعلى)",
+    ":n rows with a date": "صفوف فيها تاريخ: :n",
+    "Matched columns": "الأعمدة المطابَقة",
+    "Too many rows (max :n per import).": "عدد الصفوف كبير (الحد :n في كل استيراد)."
 }
