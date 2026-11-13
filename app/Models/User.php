@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\ViewAs;
 use Database\Factories\UserFactory;
 use Filament\Auth\MultiFactor\App\Concerns\InteractsWithAppAuthentication;
 use Filament\Auth\MultiFactor\App\Concerns\InteractsWithAppAuthenticationRecovery;
@@ -16,9 +17,12 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use Laravel\Passport\Contracts\OAuthenticatable;
+use Laravel\Passport\HasApiTokens;
 
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token', 'google_id'])]
@@ -27,10 +31,10 @@ use Illuminate\Support\Collection;
  * #74: two-step verification with an authenticator app + recovery codes (Filament app authentication; secret and
  * codes are stored encrypted and hidden), and `google_id` once the user has signed in with Google.
  */
-class User extends Authenticatable implements FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery, HasTenants, MustVerifyEmail
+class User extends Authenticatable implements FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery, HasTenants, MustVerifyEmail, OAuthenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, InteractsWithAppAuthentication, InteractsWithAppAuthenticationRecovery, Notifiable;
+    use HasApiTokens, HasFactory, InteractsWithAppAuthentication, InteractsWithAppAuthenticationRecovery, Notifiable;
 
     protected function casts(): array
     {
@@ -44,7 +48,7 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
     }
 
     /** #175 this user's phones / browsers subscribed to Critical push. */
-    public function pushSubscriptions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function pushSubscriptions(): HasMany
     {
         return $this->hasMany(PushSubscription::class);
     }
@@ -93,6 +97,6 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
 
     public function roleIn(Agency $agency): ?string
     {
-        return \App\Support\ViewAs::effectiveRole($this, $agency);
+        return ViewAs::effectiveRole($this, $agency);
     }
 }

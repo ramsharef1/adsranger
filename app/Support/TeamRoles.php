@@ -24,6 +24,11 @@ class TeamRoles
         return $user && $agency && in_array($user->roleIn($agency), ['owner', 'admin'], true);
     }
 
+    public static function isOwner(?User $user, ?Agency $agency): bool
+    {
+        return $user && $agency && $user->roleIn($agency) === 'owner';
+    }
+
     /** Owners, admins and account managers can connect networks and import data. */
     public static function canManageData(?User $user, ?Agency $agency): bool
     {

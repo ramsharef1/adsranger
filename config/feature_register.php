@@ -8,13 +8,16 @@ use App\Filament\Admin\Pages\LiveVerificationBoard;
 use App\Filament\Admin\Pages\PlatformSettings;
 use App\Filament\Admin\Pages\ToolGuardBoard;
 use App\Filament\Pages\AccountAuditPage;
+use App\Filament\Pages\AiConnectionsPage;
 use App\Filament\Pages\ClientBrainPage;
 use App\Filament\Pages\MyDevices;
 use App\Filament\Pages\OnboardingPage;
 use App\Filament\Pages\SeoAuditPage;
 use App\Filament\Pages\WhatsNewPage;
 use App\Filament\Pages\WorkspaceActivity;
+use App\Http\Middleware\AiConnectorGuard;
 use App\Http\Middleware\ToolAbuseGuard;
+use App\Mcp\Servers\AdsRangerServer;
 use App\Models\CostLine;
 use App\Models\LaunchCheck;
 use App\Support\AiWorkspace\Brain;
@@ -68,4 +71,5 @@ return [
     'O-394' => ['title' => 'Copy rewrites 1–26 + glossary title template, no email promises (D-266)', 'code' => [PublicCatalog::class, CopyLint::class], 'tests' => ['Feature/PublicCopyLintTest.php']],
     'A-2' => ['title' => 'Recorded API replies as contract tests (Meta, Google Ads, TikTok, Reddit) + no-fake-success guard on 16 connectors; WR-06, WR-07', 'code' => [ConnectorRegistry::class, RedditConnector::class], 'tests' => ['Feature/ConnectorContractsA2Test.php']],
     'AIW-M1a' => ['title' => 'AI Workspace M1 core: quality gate (Q1, Q2, Q3, Q5, Q9), rule clean-up, output contracts, client brain + screen (module ai_workspace, off)', 'code' => [QualityGate::class, Brain::class, ClientBrainPage::class], 'tests' => ['Feature/AiWorkspaceM1CoreTest.php']],
+    'AIW-M1b' => ['title' => 'AI Workspace M1: AdsRanger connector at mcp.adsranger.com (OAuth 2.1 + DCR, consent with ownership tick, 8 tools, 3 playbooks, guard, Connections screen)', 'code' => [AdsRangerServer::class, AiConnectorGuard::class, AiConnectionsPage::class], 'tests' => ['Feature/AiConnectorM1bTest.php']],
 ];

@@ -20,11 +20,13 @@ return Application::configure(basePath: dirname(__DIR__))
         // Website W2 (2026-11-08): baseline security headers on every response.
         $middleware->append(SecurityHeaders::class);
         $middleware->validateCsrfTokens(except: ['collect/*']);
+        // AI Workspace connect (OAuth): a signed-out person is sent to the app login, then back to the consent screen.
+        $middleware->redirectGuestsTo(fn () => route('filament.app.auth.login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // UX-9: the reference shown on 5xx pages is in every logged error, so support can find it.
         $exceptions->context(fn () => ['ref' => app(ErrorRef::class)->id()]);
         $exceptions->shouldRenderJsonWhen(
-            fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
+            fn (Request $request) => $request->is('api/*') || $request->expectsJson() || $request->getHost() === config('ai_workspace.mcp_host'),
         );
     })->create();
