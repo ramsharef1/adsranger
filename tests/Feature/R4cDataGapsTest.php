@@ -7,6 +7,7 @@ use App\Models\AdAccount;
 use App\Models\AdNetwork;
 use App\Models\Agency;
 use App\Models\Client;
+use App\Models\ClientLink;
 use App\Models\Connection;
 use App\Models\DailyMetric;
 use App\Models\User;
@@ -51,5 +52,17 @@ class R4cDataGapsTest extends TestCase
         Filament::setCurrentPanel(Filament::getPanel('app'));
         Filament::setTenant($agency);
         Livewire::test(ViewClient::class, ['record' => $client->id])->call('setPeriod', '14d')->assertSee('Daily spend')->assertSee('Sync failed')->assertSee('No data for 2 days');
+
+        // The client sees the same gaps on the report link and in the monthly PDF data, never days before data started.
+        $link = ClientLink::issue($client);
+        auth()->logout();
+        $html = $this->get('/r/'.$link->token.'?lang=en&p=7d')->assertOk()->assertSee('Days with no data')->getContent();
+        $this->assertStringContainsString($d(5).' → '.$d(4), $html);
+        $this->assertStringContainsString('the data sync failed', $html);
+        $this->assertStringContainsString('nothing came back from the platform', $html);
+        $this->assertStringNotContainsString('read-only', $html);
+        $gaps = DataGaps::forReport($client, $d(10), $d(0));
+        $this->assertNotContains('not_connected', array_column($gaps, 'reason'));
+        $this->assertSame([], DataGaps::forReport(Client::create(['agency_id' => $agency->id, 'name' => 'Empty', 'currency' => 'SAR', 'status' => 'active']), $d(10), $d(1)), 'no data at all: no gap line');
     }
 }

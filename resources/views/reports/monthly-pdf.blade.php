@@ -115,6 +115,12 @@
     @endif
 @endif
 
+@if (! empty($gaps))
+    <div class="muted" data-report-gaps style="margin-top:10px;line-height:1.8">{{ __('report.gaps_intro') }}
+        @foreach ($gaps as $g)<bdi dir="ltr">{{ $g['from'] === $g['to'] ? $g['from'] : $g['from'].' → '.$g['to'] }}</bdi> ({{ __('report.gap_'.$g['reason']) }})@if (! $loop->last){{ $lang === 'ar' ? '،' : ',' }} @endif @endforeach
+    </div>
+@endif
+
 {{-- XS-03 / FS-20 (R4): the agency's own lines, edited before sending. --}}
 @if (! empty($notes?->done))
     <h2>{{ __('report.what_we_did') }}</h2>

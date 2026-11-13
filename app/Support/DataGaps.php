@@ -81,4 +81,24 @@ class DataGaps
 
         return ['days' => $days, 'gaps' => $gaps];
     }
+
+    /**
+     * Gap runs for client-facing reports (/r and the monthly PDF): only days after data started (sync failed or nothing
+     * came back), never future days, at most 6 runs. Empty when the client has no data in the period at all.
+     *
+     * @return list<array{from: string, to: string, days: int, reason: string}>
+     */
+    public static function forReport(Client $c, string $from, string $to): array
+    {
+        $to = min($to, now($c->agency?->timezone ?: 'UTC')->subDay()->toDateString());
+        if ($to < $from) {
+            return [];
+        }
+        $s = static::series($c, $from, $to);
+        if (collect($s['days'])->whereNull('gap')->isEmpty()) {
+            return [];
+        }
+
+        return array_slice(array_values(array_filter($s['gaps'], fn ($g) => $g['reason'] !== 'not_connected')), 0, 6);
+    }
 }

@@ -139,6 +139,12 @@
         </div>
     @endif
 
+    @if (! empty($gaps))
+        <div class="muted" data-report-gaps style="margin-top:10px;line-height:1.8">{{ __('report.gaps_intro') }}
+            @foreach ($gaps as $g)<bdi dir="ltr">{{ $g['from'] === $g['to'] ? $g['from'] : $g['from'].' → '.$g['to'] }}</bdi> ({{ __('report.gap_'.$g['reason']) }})@if (! $loop->last){{ $lang === 'ar' ? '،' : ',' }} @endif @endforeach
+        </div>
+    @endif
+
     <p><a class="pill" href="{{ url('/r/'.$link->token.'/ads').'?'.http_build_query(['p' => $period, 'lang' => $lang]) }}">{{ __('report.see_ads') }}</a></p>
 
     @if ($pdfMonths)

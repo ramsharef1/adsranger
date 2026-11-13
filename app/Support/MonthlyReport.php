@@ -51,6 +51,7 @@ class MonthlyReport
             'campaigns' => array_slice(MetricsQuery::breakdown($client, $from, $to, 'campaign'), 0, 15),
             'hideSpend' => (bool) $client->hide_spend,
             'notes' => MonthNotes::get($client, $month), // XS-03 / FS-20 (R4)
+            'gaps' => DataGaps::forReport($client, $from, $to), // FS-24 / XS-44
             'generated' => now($client->agency->timezone ?: 'UTC')->locale($lang)->translatedFormat('j F Y'),
         ];
     }

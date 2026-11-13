@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\ClientApproval;
 use App\Models\ClientLink;
 use App\Support\DataExport;
+use App\Support\DataGaps;
 use App\Support\MetricsQuery;
 use App\Support\MonthlyReport;
 use App\Support\Pacing;
@@ -46,6 +47,7 @@ class ClientReportController extends Controller
             'pace' => $client->monthly_budget ? Pacing::month($client) : null,
             'campaigns' => array_slice(MetricsQuery::breakdown($client, $from, $to, 'campaign'), 0, 10),
             'synced' => MetricsQuery::lastSynced($client),
+            'gaps' => DataGaps::forReport($client, $from, $to), // FS-24 / XS-44: days without data, never shown as zero
             'hideSpend' => (bool) $client->hide_spend,
             'pdfMonths' => PlanGate::allows($client->agency, 'monthly_pdf') ? MonthlyReport::months(3, $lang, $tz) : [],
             // XS-06 (R4): what the agency asked this client to approve
