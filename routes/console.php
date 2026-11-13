@@ -7,13 +7,15 @@ use App\Jobs\RunAlerts;
 use App\Jobs\RunTrialLifecycle;
 use App\Jobs\SnapshotHealth;
 use App\Support\Fx;
+use App\Support\PlatformHealth;
 use Illuminate\Support\Facades\Schedule;
 
 // proc_open is disabled on this server, so every task runs in-process (job / call), never ->command().
 Schedule::job(new DailySync)->dailyAt('02:30')->name('daily-sync')->withoutOverlapping();
 Schedule::job(new RunAlerts)->everyFifteenMinutes()->name('alerts')->withoutOverlapping();
-// A-3 (R2-69): server log, failed jobs, queue, syncs, uptime → push to super admins.
-Schedule::command('platform:health')->everyTenMinutes()->name('platform-health')->withoutOverlapping();
+// A-3 (R2-69): server log, failed jobs, queue, syncs, uptime → push to super admins. Runs in-process: the server's PHP has
+// proc_open disabled, so Schedule::command() (which starts a child process) fails there; use job / call only.
+Schedule::call(fn () => PlatformHealth::check())->everyTenMinutes()->name('platform-health')->withoutOverlapping();
 Schedule::job(new SnapshotHealth)->dailyAt('04:00')->name('health-snapshot')->withoutOverlapping();
 Schedule::job(new CheckLandingPages)->dailyAt('05:10')->name('landing-pages')->withoutOverlapping();
 Schedule::call(fn () => Fx::pull())->dailyAt('01:15')->name('fx-pull')->withoutOverlapping();
