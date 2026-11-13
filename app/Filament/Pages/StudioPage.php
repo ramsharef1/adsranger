@@ -9,6 +9,7 @@ use App\Models\BrandKit;
 use App\Models\Client;
 use App\Models\CreativeAsset;
 use App\Models\CreativeBrief;
+use App\Models\CreativeFatigueAlert;
 use App\Support\Arabic\Phrases;
 use App\Support\StudioCopyGenerator;
 use App\Support\TeamRoles;
@@ -92,7 +93,15 @@ class StudioPage extends Page
         $agency = Filament::getTenant();
         $clients = Client::visibleTo(auth()->user(), $agency)->where('status', 'active')->orderBy('name')->get();
         $this->clientId = $clients->first()?->id;
+        // E2-066: "Draft a replacement" from the creative fatigue board opens the brief for that client and ad.
+        $fatigue = request()->integer('fatigue') ? CreativeFatigueAlert::where('agency_id', $agency?->getKey())->find(request()->integer('fatigue')) : null;
+        if ($fatigue && $clients->contains('id', $fatigue->client_id)) {
+            $this->clientId = $fatigue->client_id;
+        }
         $this->loadClientKit();
+        if ($fatigue && $this->clientId === $fatigue->client_id) {
+            $this->briefTitle = mb_substr(__('Replacement for :ad', ['ad' => $fatigue->ad_name ?: $fatigue->ad_ref]), 0, 160);
+        }
     }
 
     public function updatedClientId(): void

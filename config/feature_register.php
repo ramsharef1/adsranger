@@ -13,6 +13,7 @@ use App\Filament\Pages\AeoCitationRadarPage;
 use App\Filament\Pages\AiConnectionsPage;
 use App\Filament\Pages\AiKeysPage;
 use App\Filament\Pages\ClientBrainPage;
+use App\Filament\Pages\CreativeFatigueBoardPage;
 use App\Filament\Pages\FreeLiteView;
 use App\Filament\Pages\MyDevices;
 use App\Filament\Pages\NightShiftPage;
@@ -53,7 +54,6 @@ use App\Support\Reach\Wallet;
 use App\Support\RestoreTest;
 use App\Support\Seo\AeoCitationRadar;
 use App\Support\Seo\AiCrawlerChecker;
-use App\Support\Seo\Audit\PageSpeed;
 /*
  * A-12 (FR-029) register-to-code guard. Every row marked Done or Live in ADSR-060 / ADSR-920 is listed here with the
  * code it lives in and the test that proves it. RegisterToCodeTest fails if a listed class, view or test is missing,
@@ -61,12 +61,14 @@ use App\Support\Seo\Audit\PageSpeed;
  *
  * 'code' entries: a class name, "view:<name>", "route:<uri>" or "config:<file>". 'tests': files under tests/.
  */
+use App\Support\Seo\Audit\PageSpeed;
 use App\Support\Seo\Audit\SiteAuditor;
 use App\Support\Seo\PageAudit;
 use App\Support\Seo\PublicCatalog;
 use App\Support\Seo\SiteAuditRunner;
 use App\Support\Seo\ToolGuard;
 use App\Support\Site\CopyLint;
+use App\Support\Studio\CreativeFatigueDetector;
 use App\Support\WebPush;
 
 return [
@@ -108,4 +110,5 @@ return [
     'FR-STORE-SYNC' => ['title' => 'Salla / Zid / Shopify signed store webhooks (E2-063): /webhooks/stores/{token} (CSRF-exempt, hash_equals HMAC-SHA256, replay window + unique event_uid), finished orders → per-SKU snapshots + observed COD rates on client_unit_economics (#193), returned COD orders, stock updates → #197 bleed guard; store connections in the profit hub (managers only); module intelligence_hub, off', 'code' => [StoreWebhooks::class, StoreWebhookController::class, 'route:webhooks/stores/{token}', 'config:store_sync'], 'tests' => ['Feature/MenaStoreWebhooksTest.php']],
     'FR-REACH-R4' => ['title' => 'AdsRanger Reach R-4 (E2-064): network Sub-ID + postback presets (arabclicks / linkaraby aff_sub, admitad subid, impact subId1, direct_client subid) with per-endpoint overrides on /admin › Reach, and a deterministic WordPress plugin .zip + Cloudflare Worker snippet in /reach/portal › Placements (async tag.js, /llms.txt promo codes, schema.org Offer JSON-LD on pages that show offers); module reach, off', 'code' => [PublisherKit::class, Postbacks::class, ReachControlBoard::class, ReachPortalController::class, 'route:reach/portal/wordpress-plugin.zip'], 'tests' => ['Feature/ReachR4Test.php']],
     'FR-AEO-RADAR' => ['title' => 'AEO / GEO brand citation & AI readiness radar (E2-065): deterministic readiness out of 100 from SafeFetcher checks (robots.txt per AI crawler, /llms.txt, Organization / FAQPage / Product JSON-LD, AR / EN entity parity) + optional probes on the workspace\'s own AI key under its monthly cap (#159); no citation rate without probes; module seo_audit, off', 'code' => [AeoCitationRadar::class, AeoCitationRadarPage::class, 'view:filament.pages.aeo-citation-radar'], 'tests' => ['Feature/AeoGeoCitationRadarTest.php']],
+    'FR-CREATIVE-FATIGUE' => ['title' => 'Creative fatigue & peak-season decay guard (E2-066): ad-level frequency saturation + click-through / ThruPlay rate drop vs the ad\'s own 3-week baseline, tighter limits during Ramadan\'s last ten nights, Eid and White Friday (MenaCalendar), open / resolved alerts, board with visibleTo + hide_spend and a draft-replacement link into Creative Studio; module studio, off', 'code' => [CreativeFatigueDetector::class, CreativeFatigueBoardPage::class, 'view:filament.pages.creative-fatigue-board', 'config:creative_fatigue'], 'tests' => ['Feature/CreativeFatigueGuardTest.php']],
 ];
