@@ -19,7 +19,7 @@ class AiBrainItem extends Model
 
     protected function casts(): array
     {
-        return ['output' => 'array', 'checks' => 'array', 'cleanup' => 'array', 'blocking' => 'boolean'];
+        return ['output' => 'array', 'checks' => 'array', 'cleanup' => 'array', 'meta' => 'array', 'blocking' => 'boolean'];
     }
 
     public function client(): BelongsTo

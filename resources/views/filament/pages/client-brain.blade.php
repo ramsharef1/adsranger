@@ -71,6 +71,49 @@
         </details>
     @endif
 
+    @if ($client && $canRun)
+        <section style="{{ $card }}" aria-label="{{ __('AI box') }}">
+            <h3 style="font-size:15px;font-weight:700;margin:0">{{ __('AI box') }}</h3>
+            @if ($keys->isEmpty())
+                <p style="margin:0;font-size:14px">{{ __('Add your own API key to run AI here.') }} <a href="{{ \App\Filament\Pages\AiKeysPage::getUrl() }}" style="color:#0F766E;text-decoration:underline">{{ __('My API keys') }}</a></p>
+            @else
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px">
+                    <div><label for="bx-pb" style="{{ $label }}">{{ __('Playbook') }}</label>
+                        <select id="bx-pb" wire:model.live="boxPlaybook" style="{{ $field }}">@foreach (\App\Support\AiWorkspace\Playbooks::all() as $k => $p)<option value="{{ $k }}">{{ app()->getLocale() === 'ar' ? $p['title_ar'] : $p['title_en'] }}</option>@endforeach</select></div>
+                    <div><label for="bx-key" style="{{ $label }}">{{ __('Key') }}</label>
+                        <select id="bx-key" wire:model.live="boxKey" style="{{ $field }}">@foreach ($keys as $kk)<option value="{{ $kk->provider }}">{{ \App\Models\AiKey::PROVIDERS[$kk->provider] }} · {{ \App\Support\AiWorkspace\OwnKey::modelLabel($kk->provider, $kk->model) }}</option>@endforeach</select></div>
+                    @if ($boxPlaybook === 'dialect_ad_copy')
+                        <div><label for="bx-d" style="{{ $label }}">{{ __('Dialect') }}</label>
+                            <select id="bx-d" wire:model.live="boxDialect" style="{{ $field }}">@foreach (['gulf' => __('Gulf'), 'levantine' => __('Levantine'), 'egyptian' => __('Egyptian'), 'maghrebi' => __('Maghrebi')] as $k => $v)<option value="{{ $k }}">{{ $v }}</option>@endforeach</select></div>
+                        <div><label for="bx-p" style="{{ $label }}">{{ __('Platform') }}</label>
+                            <select id="bx-p" wire:model.live="boxPlatform" style="{{ $field }}">@foreach (['meta' => 'Meta', 'google_ads' => 'Google Ads', 'tiktok' => 'TikTok', 'snapchat' => 'Snapchat'] as $k => $v)<option value="{{ $k }}">{{ $v }}</option>@endforeach</select></div>
+                    @endif
+                </div>
+                <div><label for="bx-n" style="{{ $label }}">{{ __('Anything to add (goal, offer, period)') }}</label>
+                    <textarea id="bx-n" wire:model.blur="boxNotes" rows="2" maxlength="1000" style="{{ $field }};min-height:64px" dir="auto"></textarea></div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;font-size:12.5px">
+                    <span style="border:1px solid rgba(148,163,184,.35);border-radius:999px;padding:4px 10px">✓ <bdi>{{ $client->name }}</bdi></span>
+                    <span style="border:1px solid rgba(148,163,184,.35);border-radius:999px;padding:4px 10px">{{ __('Last 7 days vs the 7 before') }}</span>
+                    <span style="border:1px solid rgba(148,163,184,.35);border-radius:999px;padding:4px 10px">{{ __('Checked by AdsRanger before it is saved') }}</span>
+                </div>
+                @if ($key)
+                    <div style="{{ $muted }}">
+                        @if ($estimate !== null){!! __('Estimated cost on your key: about :usd (estimate).', ['usd' => $ltr('≤ '.number_format($estimate, 3).' USD')]) !!} · @endif
+                        {!! __('This month: :spent of :cap', ['spent' => $ltr(number_format($key->spentThisMonth(), 2).' USD'), 'cap' => $ltr(number_format((float) $key->monthly_cap_usd, 2).' USD')]) !!}
+                    </div>
+                @endif
+                @if ($boxError)
+                    <div role="alert" style="border:1px solid rgba(185,28,28,.4);border-radius:10px;padding:10px;font-size:13.5px">
+                        {{ $boxError }}
+                        @if ($boxBilling) <a href="{{ $boxBilling }}" target="_blank" rel="noopener noreferrer" style="color:#0F766E;text-decoration:underline">{{ __('Open your provider\'s billing page') }}</a>@endif
+                    </div>
+                @endif
+                <div><x-filament::button wire:click="runBox" wire:loading.attr="disabled" style="min-height:44px">
+                    <span wire:loading.remove wire:target="runBox">{{ __('Run') }}</span><span wire:loading wire:target="runBox">{{ __('Running…') }}</span></x-filament::button></div>
+            @endif
+        </section>
+    @endif
+
     @if (! $client)
         <p style="{{ $muted }}">{{ __('Add a client first.') }}</p>
     @elseif ($items->isEmpty())

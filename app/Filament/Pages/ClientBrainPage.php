@@ -5,9 +5,13 @@ namespace App\Filament\Pages;
 use App\Filament\Concerns\HeldBackModule;
 use App\Filament\Concerns\TranslatesPageLabels;
 use App\Models\AiBrainItem;
+use App\Models\AiKey;
 use App\Models\AuditLog;
 use App\Models\Client;
+use App\Support\AiWorkspace\AiBox;
 use App\Support\AiWorkspace\ContextPack;
+use App\Support\AiWorkspace\OwnKey;
+use App\Support\AiWorkspace\Playbooks;
 use App\Support\CurrentClient;
 use App\Support\TeamRoles;
 use BackedEnum;
@@ -52,6 +56,21 @@ class ClientBrainPage extends Page
     /** @var list<int> */
     public array $original = [];
 
+    // AI box (M1 item 8): runs a playbook on the workspace's own key.
+    public string $boxKey = '';
+
+    public string $boxPlaybook = 'weekly_summary';
+
+    public string $boxNotes = '';
+
+    public string $boxDialect = 'gulf';
+
+    public string $boxPlatform = 'meta';
+
+    public ?string $boxError = null;
+
+    public ?string $boxBilling = null;
+
     public function mount(): void
     {
         $this->clientId = CurrentClient::id() ?: $this->clients()->first()?->id;
@@ -70,6 +89,29 @@ class ClientBrainPage extends Page
     public function toggleOriginal(int $id): void
     {
         $this->original = in_array($id, $this->original, true) ? array_values(array_diff($this->original, [$id])) : [...$this->original, $id];
+    }
+
+    public function runBox(): void
+    {
+        $client = $this->client();
+        abort_unless($client && TeamRoles::canManageData(auth()->user(), Filament::getTenant()), 403);
+        $this->boxError = $this->boxBilling = null;
+        $key = AiKey::where('agency_id', $client->agency_id)->where('provider', $this->boxKey)->first();
+        if (! $key) {
+            $this->boxError = __('Add your own API key to run AI here.');
+
+            return;
+        }
+        $r = AiBox::run($client, $key, $this->boxPlaybook, $this->boxNotes, auth()->user(), $this->boxDialect, $this->boxPlatform);
+        if (! $r['ok']) {
+            $this->boxError = $r['error'];
+            $this->boxBilling = ($r['billing'] ?? false) ? config("ai_workspace.own_key_billing.{$key->provider}") : null;
+
+            return;
+        }
+        $this->boxNotes = '';
+        $this->type = '';
+        Notification::make()->title(__('Saved to the client brain · cost on your key about :usd USD (estimate).', ['usd' => number_format($r['cost'], 4)]))->success()->send();
     }
 
     public function remove(int $id): void
@@ -92,7 +134,17 @@ class ClientBrainPage extends Page
                 ->latest()->limit(100)->get()
             : collect();
 
+        $keys = $client ? AiKey::where('agency_id', $client->agency_id)->orderBy('provider')->get() : collect();
+        if ($keys->isNotEmpty() && ! $keys->contains('provider', $this->boxKey)) {
+            $this->boxKey = $keys->first()->provider;
+        }
+        $key = $keys->firstWhere('provider', $this->boxKey);
+        $estimate = ($client && $key && isset(Playbooks::all()[$this->boxPlaybook]))
+            ? OwnKey::estimate($key, json_encode(Playbooks::envelope($client, $this->boxPlaybook, $this->boxNotes, $this->boxDialect, $this->boxPlatform), JSON_UNESCAPED_UNICODE))
+            : null;
+
         return ['clients' => $this->clients(), 'client' => $client, 'items' => $items, 'pack' => $client ? ContextPack::for($client) : null,
-            'canManage' => TeamRoles::canManageTeam(auth()->user(), Filament::getTenant())];
+            'canManage' => TeamRoles::canManageTeam(auth()->user(), Filament::getTenant()),
+            'canRun' => TeamRoles::canManageData(auth()->user(), Filament::getTenant()), 'keys' => $keys, 'key' => $key, 'estimate' => $estimate];
     }
 }

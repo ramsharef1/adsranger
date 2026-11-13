@@ -68,6 +68,7 @@ class Brain
             'url' => $type === 'chat_link' ? static::safeUrl($data['url'] ?? null) : null,
             'ai_provider' => $data['ai'] ?? null, 'playbook' => $data['playbook'] ?? null, 'playbook_version' => $data['playbook_version'] ?? null,
             'state' => $state, 'score' => $gate['score'], 'band' => $gate['band'], 'blocking' => $gate['blocking'], 'checks' => $gate['checks'],
+            'meta' => isset($data['meta']) && is_array($data['meta']) ? $data['meta'] : null,
             'cleanup' => ['hidden' => $clean['hidden'], 'generic' => $clean['generic'], 'actions' => $clean['actions'], 'no_fix' => $clean['no_fix'],
                 'fixed' => $gate['fixed'], 'suggested' => $gate['suggested']],
         ]);

@@ -4,6 +4,7 @@ use App\Jobs\CheckLandingPages;
 use App\Jobs\DailySync;
 use App\Jobs\QueueScheduledReports;
 use App\Jobs\RunAlerts;
+use App\Jobs\RunNightShift;
 use App\Jobs\RunTrialLifecycle;
 use App\Jobs\SnapshotHealth;
 use App\Support\Fx;
@@ -23,3 +24,5 @@ Schedule::call(fn () => Fx::pull())->dailyAt('01:15')->name('fx-pull')->withoutO
 Schedule::job(new QueueScheduledReports)->dailyAt(config('reports.send_at_utc', '05:20'))->name('scheduled-reports')->withoutOverlapping();
 // D-61 trial lifecycle (self-signup agencies only): ending / ended / deletion mails, read-only → closed → archived.
 Schedule::job(new RunTrialLifecycle)->dailyAt(config('trial.run_at_utc', '03:10'))->name('trial-lifecycle')->withoutOverlapping();
+// AI Workspace night shift v0 (M1): each workspace at its own hour, once a day; does nothing while no workspace has it on.
+Schedule::job(new RunNightShift)->hourlyAt(5)->name('ai-night-shift')->withoutOverlapping();
