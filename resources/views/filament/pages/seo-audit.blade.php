@@ -31,6 +31,7 @@
 .sa-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
 .sa-tabs button{min-height:44px;padding:6px 14px;border-radius:999px;border:1px solid rgba(148,163,184,.4);background:transparent;cursor:pointer}
 .sa-tabs button.on{background:#0f766e;color:#fff;border-color:#0f766e}
+.sa-speed{margin-top:16px;padding:14px;border-radius:12px;border:1px solid rgba(148,163,184,.25)}
 </style>
 
 @if (! $client)
@@ -126,10 +127,35 @@
                         <p class="sa-muted" style="margin-top:8px">{{ __('Site health score: 100 minus the average deduction per page audited (:c points per critical finding, :w per warning). Not a Google ranking.', ['c' => $weights['critical'], 'w' => $weights['warning']]) }}@if ($audit->critical_count > 0) · {{ __('A critical finding needs fixing.') }}@endif · {{ $fmtDate($audit->finished_at) }}</p>
                         <div class="sa-cats">
                             @foreach (\App\Support\Seo\Audit\Catalog::CATEGORIES as $key => [$catAr, $catEn])
-                                @continue($key === 'speed') {{-- UX-250: no speed rule until A2 --}}
+                                @continue($key === 'speed' && ! $audit->hasSpeedData()) {{-- UX-250: the speed chip shows only once A2 measured this audit --}}
                                 <span>{!! $bd($ar ? $catAr : $catEn) !!}: {{ $categories[$key] }}</span>
                             @endforeach
                         </div>
+
+                        @if ($audit->hasSpeedData())
+                            {{-- E2-062 A2 speed lab: PageSpeed Insights numbers only when Google answered; static counts otherwise. --}}
+                            <section class="sa-speed" aria-label="{{ __('Page speed') }}">
+                                <h3 style="font-size:15px;margin:0">{{ __('Page speed') }} · <bdi dir="ltr">{{ \Illuminate\Support\Str::limit($audit->site?->host ?? '', 60) }}</bdi></h3>
+                                <div class="sa-grid" style="margin-top:10px">
+                                    @if ($audit->speed_source === 'psi')
+                                        @if ($audit->psi_mobile_score !== null)<div class="sa-card"><strong>{{ $audit->psi_mobile_score }}</strong><span>{{ __('Mobile score (PageSpeed)') }}</span></div>@endif
+                                        @if ($audit->lcp_ms !== null)<div class="sa-card"><strong>{{ __(':n s', ['n' => number_format($audit->lcp_ms / 1000, 1)]) }}</strong><span><bdi dir="ltr">LCP</bdi></span></div>@endif
+                                        <div class="sa-card"><strong>{{ $audit->inp_ms !== null ? __(':n ms', ['n' => number_format($audit->inp_ms)]) : '—' }}</strong><span><bdi dir="ltr">INP</bdi></span></div>
+                                        @if ($audit->cls_score !== null)<div class="sa-card"><strong>{{ number_format($audit->cls_score, 2) }}</strong><span><bdi dir="ltr">CLS</bdi></span></div>@endif
+                                        @if ($audit->ttfb_ms !== null)<div class="sa-card"><strong>{{ __(':n ms', ['n' => number_format($audit->ttfb_ms)]) }}</strong><span><bdi dir="ltr">TTFB</bdi></span></div>@endif
+                                    @endif
+                                    <div class="sa-card"><strong>{{ $audit->render_blocking_count ?? '—' }}</strong><span>{{ __('Render-blocking files on the first page') }}</span></div>
+                                </div>
+                                <p class="sa-muted" style="margin-top:8px">
+                                    @if ($audit->speed_source === 'psi')
+                                        {!! $bd(__('Measured by Google PageSpeed Insights on mobile for the site address.')) !!}@if ($audit->inp_ms === null) {!! $bd(__('INP needs real-visitor data, which Google doesn\'t have for this page yet.')) !!}@endif
+                                    @else
+                                        {!! $bd(__('Read from the page code only. Load times (LCP, INP, CLS) need a PageSpeed Insights key, so we show none.')) !!}
+                                    @endif
+                                    · {{ $fmtDate($audit->speed_checked_at) }}
+                                </p>
+                            </section>
+                        @endif
 
                         @if ($groups === [])
                             <p class="sa-muted" style="margin-top:14px">{{ __('No issues found in this audit.') }}</p>

@@ -135,6 +135,19 @@ class Catalog
             'SCHEMA-03' => [self::INFO, 'schema', 'تاريخ غير معياري في البيانات المنظّمة', 'Non-standard date in structured data',
                 'حقل تاريخ في JSON-LD ليس بصيغة ISO 8601 (مثل تاريخ هجري أو نص عربي).', 'A date field in the JSON-LD is not ISO 8601 (for example a Hijri or Arabic-text date).',
                 'اكتب التواريخ بصيغة YYYY-MM-DD في البيانات المنظّمة واعرض الهجري في النص.', 'Write dates as YYYY-MM-DD in structured data and show the Hijri date in the text.'],
+            // A2 speed lab (E2-062): read from the HTML, so they name the cause, not a measured time.
+            'SPEED-01' => [self::WARNING, 'speed', 'سكربت يوقف عرض الصفحة', 'Render-blocking script',
+                'سكربت خارجي في <head> بلا defer أو async، فيتوقف المتصفح عن رسم الصفحة حتى يحمّله وينفّذه.', 'An external script in <head> has no defer or async, so the browser stops drawing the page until it loads and runs it.',
+                'أضف defer (أو async للسكربتات المستقلة) أو انقل السكربت إلى نهاية <body>.', 'Add defer (or async for independent scripts) or move the script to the end of <body>.'],
+            'SPEED-02' => [self::INFO, 'speed', 'ملفات تنسيق كثيرة توقف العرض', 'Many render-blocking stylesheets',
+                'أكثر من ملفَّي تنسيق في <head> تُحمَّل قبل أول رسم للصفحة.', 'More than two stylesheets in <head> load before the first paint.',
+                'ادمج ملفات التنسيق، وضع التنسيق الحرج داخل الصفحة، وحمّل الباقي لاحقًا.', 'Merge stylesheets, inline the critical CSS and load the rest later.'],
+            'SPEED-03' => [self::INFO, 'speed', 'الصورة الأولى بلا أبعاد', 'First image without dimensions',
+                'أول صورة في الصفحة بلا width و height، فتقفز المحتويات عند تحميلها (CLS).', 'The first image on the page has no width and height, so content jumps when it loads (CLS).',
+                'أضف width و height (أو aspect-ratio في التنسيق) إلى الصورة.', 'Add width and height (or a CSS aspect-ratio) to the image.'],
+            'SPEED-04' => [self::INFO, 'speed', 'محتوى مضمَّن ثقيل', 'Heavy inline payload',
+                'سكربتات وتنسيقات وصور مضمّنة (data:) داخل الصفحة تتجاوز 100 كيلوبايت، فتبطئ أول تحميل ولا تُخزَّن.', 'Inline scripts, styles and data: images inside the page exceed 100 KB, which slows the first load and can\'t be cached.',
+                'انقل السكربتات والتنسيقات الكبيرة إلى ملفات خارجية، والصور إلى ملفات صور.', 'Move large scripts and styles to external files, and images to image files.'],
         ];
     }
 

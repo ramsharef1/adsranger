@@ -71,6 +71,7 @@ class SiteAuditor
 
             $siteIssues = Rules::site(array_map(fn (array $p) => ['parsed' => $p['parsed'], 'status' => $p['status']], $pages), $linkStatus);
             $counts = ['critical' => 0, 'warning' => 0, 'info' => 0];
+            $rows = [];
             foreach ($pages as $url => $page) {
                 $p = $page['parsed'];
                 $row = SeoAuditPage::create([
@@ -87,7 +88,12 @@ class SiteAuditor
                     'word_count' => $p['word_count'],
                     'noindex' => $p['noindex'],
                     'response_ms' => $page['ms'],
+                    // A2 (E2-062): static asset facts, measured from the HTML we fetched.
+                    'render_blocking_count' => $p['speed']['blocking_scripts'] + $p['speed']['blocking_css'],
+                    'speed_source' => 'static',
+                    'speed_checked_at' => now(),
                 ]);
+                $rows[$url] = $row;
                 $issues = array_merge(Rules::page($p, $url, $page['status'], $keyword), $siteIssues[$url] ?? []);
                 $seenCodes = [];
                 foreach ($issues as [$code, $detail]) {
@@ -106,7 +112,7 @@ class SiteAuditor
                 'info_count' => $counts['info'],
                 'score' => self::score($counts, count($pages)),
                 'pages_done' => count($pages),
-            ])->save();
+            ] + $this->speed($rows, $pages))->save();
 
             return $this->finish($audit, 'done');
         } catch (Throwable $e) {
@@ -114,6 +120,32 @@ class SiteAuditor
 
             return $this->finish($audit, 'failed', mb_substr($e->getMessage(), 0, 120));
         }
+    }
+
+    /**
+     * A2 speed summary for the audit: static counts from the first crawled page (the site's address); PageSpeed Insights
+     * mobile numbers on top when a key is set and Google answered. Nothing is stored for a metric Google didn't return.
+     *
+     * @param  array<string, SeoAuditPage>  $rows
+     * @param  array<string, array{parsed: array, status: ?int, ms: int, error: ?string}>  $pages
+     * @return array<string, mixed>
+     */
+    private function speed(array $rows, array $pages): array
+    {
+        $rootUrl = array_key_first($pages);
+        $root = $rows[$rootUrl] ?? null;
+        if ($root === null) {
+            return [];
+        }
+        $out = ['render_blocking_count' => $root->render_blocking_count, 'speed_source' => 'static', 'speed_checked_at' => now()];
+        $psi = PageSpeed::run($rootUrl);
+        if ($psi !== null) {
+            $root->forceFill($psi + ['speed_source' => 'psi', 'speed_checked_at' => now()])->save();
+            $out = $psi + $out;
+            $out['speed_source'] = 'psi';
+        }
+
+        return $out;
     }
 
     /** @param  array{critical: int, warning: int, info: int}  $counts */

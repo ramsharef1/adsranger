@@ -13,7 +13,7 @@ class SeoAuditPage extends Model
 
     protected function casts(): array
     {
-        return ['hreflang' => 'array', 'noindex' => 'boolean'];
+        return ['hreflang' => 'array', 'noindex' => 'boolean', 'speed_checked_at' => 'datetime', 'cls_score' => 'float'];
     }
 
     public function audit(): BelongsTo

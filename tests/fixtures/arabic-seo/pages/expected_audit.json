@@ -1,6 +1,7 @@
 {
     "page-01.html": [
-        "AR-TITLE-01"
+        "AR-TITLE-01",
+        "SPEED-03"
     ],
     "page-02.html": [
         "AR-LANG-01",
@@ -10,21 +11,37 @@
         "IDX-02",
         "IMG-01",
         "META-02",
-        "SCHEMA-01"
+        "SCHEMA-01",
+        "SPEED-03"
     ],
-    "page-03.html": [],
-    "page-04.html": [],
-    "page-05.html": [],
-    "page-06.html": [],
-    "page-07.html": [],
+    "page-03.html": [
+        "SPEED-03"
+    ],
+    "page-04.html": [
+        "SPEED-03"
+    ],
+    "page-05.html": [
+        "SPEED-03"
+    ],
+    "page-06.html": [
+        "SPEED-03"
+    ],
+    "page-07.html": [
+        "SPEED-03"
+    ],
     "page-08.html": [
         "AR-TITLE-01",
         "SCHEMA-01"
     ],
-    "page-09.html": [],
-    "page-10.html": [],
+    "page-09.html": [
+        "SPEED-03"
+    ],
+    "page-10.html": [
+        "SPEED-03"
+    ],
     "page-11.html": [
-        "HREF-01"
+        "HREF-01",
+        "SPEED-03"
     ],
     "page-12.html": [
         "SCHEMA-01"
@@ -39,21 +56,35 @@
     ],
     "page-15.html": [
         "AR-TITLE-01",
-        "HREF-01"
+        "HREF-01",
+        "SPEED-03"
     ],
-    "page-16.html": [],
-    "page-17.html": [],
-    "page-18.html": [],
-    "page-19.html": [],
-    "page-20.html": [],
+    "page-16.html": [
+        "SPEED-03"
+    ],
+    "page-17.html": [
+        "SPEED-03"
+    ],
+    "page-18.html": [
+        "SPEED-03"
+    ],
+    "page-19.html": [
+        "SPEED-03"
+    ],
+    "page-20.html": [
+        "SPEED-03"
+    ],
     "page-21.html": [
-        "HREF-01"
+        "HREF-01",
+        "SPEED-03"
     ],
     "page-22.html": [
+        "SPEED-03",
         "URL-01"
     ],
     "page-23.html": [
-        "HREF-01"
+        "HREF-01",
+        "SPEED-03"
     ],
     "page-24.html": [
         "HREF-04",
@@ -70,6 +101,7 @@
         "IMG-01",
         "SCHEMA-02",
         "SCHEMA-03",
+        "SPEED-03",
         "URL-01",
         "URL-02"
     ],
@@ -101,5 +133,17 @@
     ],
     "page-33.html": [
         "IDX-03"
+    ],
+    "page-34.html": [
+        "SPEED-01"
+    ],
+    "page-35.html": [
+        "SPEED-02"
+    ],
+    "page-36.html": [
+        "SPEED-03"
+    ],
+    "page-37.html": [
+        "SPEED-04"
     ]
 }

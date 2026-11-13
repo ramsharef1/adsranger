@@ -15,7 +15,7 @@ class SeoAudit extends Model
 
     protected function casts(): array
     {
-        return ['started_at' => 'datetime', 'finished_at' => 'datetime'];
+        return ['started_at' => 'datetime', 'finished_at' => 'datetime', 'speed_checked_at' => 'datetime', 'cls_score' => 'float'];
     }
 
     public function site(): BelongsTo
@@ -31,6 +31,12 @@ class SeoAudit extends Model
     public function issues(): HasMany
     {
         return $this->hasMany(SeoIssue::class);
+    }
+
+    /** UX-250: the speed chip and panel show only once A2 measured something real for this audit. */
+    public function hasSpeedData(): bool
+    {
+        return $this->speed_checked_at !== null;
     }
 
     public function isOpen(): bool
