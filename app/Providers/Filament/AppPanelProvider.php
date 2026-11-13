@@ -97,9 +97,14 @@ class AppPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.head'))
             // #175: PWA manifest + service worker for phone alerts.
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.pwa'))
+            // PX-01 / PX-02 (D-302): new shell, only when the panel_shell module is on for this workspace.
+            ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.shell-head'))
+            ->renderHook(PanelsRenderHook::TOPBAR_LOGO_AFTER, fn () => view('panels.shell-areas'))
+            ->renderHook(PanelsRenderHook::BODY_END, fn () => view('panels.shell-bottom'))
             ->renderHook(PanelsRenderHook::SIMPLE_PAGE_END, fn () => view('panels.lang-switch'))
             // D-61 trial banner (days left / trial ended), under the top bar.
             // EH-17 (D-293): the /admin announcement line, above the other banners.
+            ->renderHook(PanelsRenderHook::TOPBAR_AFTER, fn () => view('panels.shell-ribbon'))
             ->renderHook(PanelsRenderHook::TOPBAR_AFTER, fn () => view('panels.announcement'))
             ->renderHook(PanelsRenderHook::TOPBAR_AFTER, fn () => view('panels.sample-data'))
             ->renderHook(PanelsRenderHook::TOPBAR_AFTER, fn () => view('panels.context-bar'))

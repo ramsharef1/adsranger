@@ -9,8 +9,10 @@ use App\Support\ErrorRef;
 use App\Support\Mail\EmailSuppressionGuard;
 use App\Support\Ops\JobRuns;
 use App\Support\ReadOnlyGuard;
+use App\Support\ShellNavigationManager;
 use App\Support\Signup;
 use Filament\Auth\Notifications\VerifyEmail as FilamentVerifyEmail;
+use Filament\Navigation\NavigationManager;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Mail\Events\MessageSending;
@@ -31,6 +33,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(ErrorRef::class);
         // #158: our AR/EN "confirm your email" mail replaces Filament's wherever Filament sends one.
         $this->app->bind(FilamentVerifyEmail::class, VerifyEmail::class);
+        // PX-01 (D-302): the new shell filters the sidebar by area; off = Filament's own navigation, unchanged.
+        $this->app->scoped(NavigationManager::class, fn () => new ShellNavigationManager);
     }
 
     /**

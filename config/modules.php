@@ -25,6 +25,8 @@ return [
         'seo_audit' => (bool) env('MODULE_SEO_AUDIT', false),
         // AI Workspace M1 (D-270, spec v2 §6): off until Product's EX check (M1 screens §12) + Rami's go.
         'ai_workspace' => (bool) env('MODULE_AI_WORKSPACE', false),
+        // PX-01 / PX-02 new panel shell (D-302): areas in the header, area sidebar, season ribbon, phone bottom bar.
+        'panel_shell' => (bool) env('MODULE_PANEL_SHELL', false),
     ],
 
     'preview_agencies' => array_values(array_filter(array_map('trim', explode(',', (string) env('MODULES_PREVIEW_AGENCIES', ''))))),

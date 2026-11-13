@@ -69,6 +69,11 @@ class Modules
                 'description' => __('Your own AI with your clients\' data: client brain, quality checks, and the AdsRanger connector.'),
                 'beta_requestable' => false,
             ],
+            'panel_shell' => [
+                'label' => __('New panel layout'),
+                'description' => __('Areas in the header, a shorter side menu per area, the season line and a bottom bar on phones.'),
+                'beta_requestable' => false,
+            ],
             'custom_domains' => [
                 'label' => __('Custom report domain'),
                 'description' => __('Client report links on the agency\'s own domain.'),
