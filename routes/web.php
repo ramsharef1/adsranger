@@ -11,6 +11,7 @@ use App\Http\Controllers\PublicSiteController;
 use App\Http\Controllers\ReportUnsubscribeController;
 use App\Http\Controllers\StudioBriefController;
 use App\Http\Middleware\PublicTrailingSlash;
+use App\Http\Middleware\ToolAbuseGuard;
 use App\Support\Seo\PublicCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -41,11 +42,11 @@ Route::middleware(PublicTrailingSlash::class)->group(function () {
         Route::permanentRedirect('/tools/'.$old, '/tools/'.$new);
         Route::permanentRedirect('/en/tools/'.$old, '/en/tools/'.$new);
     }
-    Route::post('/tools/hreflang-checker/run', [PublicSiteController::class, 'hreflangRun'])->middleware('throttle:30,1');
-    Route::post('/tools/page-audit/run', [PublicSiteController::class, 'pageAuditRun'])->middleware('throttle:30,1');
-    Route::post('/tools/ad-pixel-checker/run', [PublicSiteController::class, 'capiPixelRun'])->middleware('throttle:30,1');
-    Route::post('/tools/llms-txt-generator/check', [PublicSiteController::class, 'llmsTxtCheck'])->middleware('throttle:30,1');
-    Route::post('/tools/robots-sitemap-checker/run', [PublicSiteController::class, 'robotsSitemapRun'])->middleware('throttle:30,1');
+    Route::post('/tools/hreflang-checker/run', [PublicSiteController::class, 'hreflangRun'])->middleware(['throttle:30,1', ToolAbuseGuard::class]);
+    Route::post('/tools/page-audit/run', [PublicSiteController::class, 'pageAuditRun'])->middleware(['throttle:30,1', ToolAbuseGuard::class]);
+    Route::post('/tools/ad-pixel-checker/run', [PublicSiteController::class, 'capiPixelRun'])->middleware(['throttle:30,1', ToolAbuseGuard::class]);
+    Route::post('/tools/llms-txt-generator/check', [PublicSiteController::class, 'llmsTxtCheck'])->middleware(['throttle:30,1', ToolAbuseGuard::class]);
+    Route::post('/tools/robots-sitemap-checker/run', [PublicSiteController::class, 'robotsSitemapRun'])->middleware(['throttle:30,1', ToolAbuseGuard::class]);
     Route::post('/tools/audit-report-request', [PublicSiteController::class, 'requestAuditEmail'])->defaults('lang', 'ar')->middleware('throttle:10,1');
     Route::post('/en/tools/audit-report-request', [PublicSiteController::class, 'requestAuditEmail'])->defaults('lang', 'en')->middleware('throttle:10,1');
 
