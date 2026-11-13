@@ -1,6 +1,6 @@
 @php
     $field = 'min-height:44px;padding:6px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.35);background:transparent;font-size:13px';
-    $dot = ['season' => '#0F766E', 'campaign_end' => '#B54708', 'report' => '#1849A9', 'follow_up' => '#53389E', 'licence' => '#B42318', 'resume' => '#067647'];
+    $dot = ['season' => '#0F766E', 'payday' => '#047857', 'school' => '#7A5AF8', 'campaign_end' => '#B54708', 'report' => '#1849A9', 'follow_up' => '#53389E', 'licence' => '#B42318', 'resume' => '#067647'];
 @endphp
 <x-filament-panels::page>
     <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:end">

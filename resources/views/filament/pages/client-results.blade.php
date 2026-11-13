@@ -354,6 +354,9 @@
         $maxDay = max(1, collect($sd)->max('spend') ?? 0);
         $gapColor = ['not_connected' => 'rgba(148,163,184,.35)', 'sync_failed' => 'rgba(180,35,24,.35)', 'no_data' => 'rgba(181,71,8,.30)'];
         $gapLabels = \App\Support\DataGaps::reasonLabels();
+        // PS-21 / XS-20 (R5): the agency's own payday and school / exam dates for this client's country, as "usually".
+        $paydays = collect($marketDates)->where('kind', 'payday')->keyBy('date');
+        $periods = collect($marketDates)->where('kind', '!=', 'payday')->values();
     @endphp
     <x-filament::section data-daily-chart>
         <x-slot name="heading">{{ __('Daily spend') }}</x-slot>
@@ -366,6 +369,20 @@
                 @endif
             @endforeach
         </div>
+        @if ($paydays->isNotEmpty())
+            <div aria-hidden="true" style="display:flex;gap:2px;margin-top:2px">
+                @foreach ($sd as $day => $v)
+                    <div @if ($paydays->has($day)) data-payday title="{{ $day }} · {{ $paydays[$day]['label'] }}" @endif style="flex:1 0 6px;min-width:6px;height:6px;border-radius:999px;background:{{ $paydays->has($day) ? '#0F766E' : 'transparent' }}"></div>
+                @endforeach
+            </div>
+        @endif
+        @if ($paydays->isNotEmpty() || $periods->isNotEmpty())
+            <div style="{{ $muted }};margin-top:6px" data-market-markers>
+                @if ($paydays->isNotEmpty())<span><span style="display:inline-block;width:6px;height:6px;border-radius:999px;background:#0F766E;vertical-align:middle" aria-hidden="true"></span> {{ __('Payday (usually)') }}: @foreach ($paydays as $d => $p)<bdi dir="ltr">{{ $d }}</bdi>@if (! $loop->last), @endif @endforeach</span>@endif
+                @foreach ($periods as $p)<span> · {{ $p['label'] }} <bdi dir="ltr">{{ $p['date'] }} → {{ $p['end'] }}</bdi></span>@endforeach
+                · <a href="{{ \App\Filament\Pages\MarketDatesPage::getUrl() }}" style="text-decoration:underline">{{ __('Edit dates') }}</a>
+            </div>
+        @endif
         @if ($series['gaps'])
             <ul style="margin:8px 0 0;padding-inline-start:18px;font-size:13px" data-gap-list>
                 @foreach ($series['gaps'] as $g)

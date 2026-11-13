@@ -26,6 +26,7 @@ use App\Support\DataGaps;
 use App\Support\Fx;
 use App\Support\HealthScore;
 use App\Support\LeadDesk;
+use App\Support\MarketDates;
 use App\Support\MetricsQuery;
 use App\Support\Modules;
 use App\Support\MonthlyReport;
@@ -512,6 +513,7 @@ class ViewClient extends ViewRecord
             'top' => MetricsQuery::topAds($c, $from, $to),
             'alerts' => Alert::where('client_id', $c->id)->where('status', 'open')->latest()->limit(5)->get(),
             'series' => DataGaps::series($c, $from, $to),
+            'marketDates' => MarketDates::forClient($c, $from, $to), // PS-21 / XS-20 (R5)
             'approvals' => ClientApproval::where('client_id', $c->id)->where('status', '!=', 'withdrawn')->latest()->limit(8)->get(), // XS-06
             'leads' => Modules::on('lead_desk', null, $c->agency) ? LeadDesk::summary($c, $from, $to) : null, // XS-13 / XS-23
             'season' => SeasonReview::latest($c), // FS-22 (R4)

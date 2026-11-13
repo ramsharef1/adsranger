@@ -18,12 +18,12 @@ use Carbon\CarbonPeriod;
  */
 class ClientCalendar
 {
-    public const KINDS = ['season', 'campaign_end', 'report', 'follow_up', 'licence', 'resume'];
+    public const KINDS = ['season', 'payday', 'school', 'campaign_end', 'report', 'follow_up', 'licence', 'resume'];
 
     /** @return array<string, string> */
     public static function kindLabels(): array
     {
-        return ['season' => __('Season'), 'campaign_end' => __('Campaign ends'), 'report' => __('Report goes out'), 'follow_up' => __('Follow-up'),
+        return ['season' => __('Season'), 'payday' => __('Payday (usually)'), 'school' => __('School or exams'), 'campaign_end' => __('Campaign ends'), 'report' => __('Report goes out'), 'follow_up' => __('Follow-up'),
             'licence' => __('Licence expires'), 'resume' => __('Client resumes')];
     }
 
@@ -42,6 +42,13 @@ class ClientCalendar
             if ($e['start'] >= $from) {
                 $add($e['start'], 'season', $ar ? $e['ar'] : $e['label'], null);
             }
+        }
+        // PS-21 / XS-20 (R5): the agency's own payday and school / exam dates for the countries of these clients.
+        $countries = $clients->map(fn (Client $c) => MarketDates::countryOf($c->setRelation('agency', $a)))->filter()->unique()->values()->all() ?: array_filter([$a->country]);
+        $many = count($countries) > 1;
+        foreach (MarketDates::between($a, $countries, $from, $to) as $m) {
+            $title = $m['label'].($many ? ' · '.$m['country'] : '').($m['end'] !== $m['date'] ? ' → '.$m['end'] : '');
+            $add(max($m['date'], $from), $m['kind'] === 'payday' ? 'payday' : 'school', $title, null);
         }
         if ($ids->isEmpty()) {
             return static::sorted($out);
