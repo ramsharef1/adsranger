@@ -7,6 +7,7 @@ use App\Jobs\RunAlerts;
 use App\Jobs\RunNightShift;
 use App\Jobs\RunTrialLifecycle;
 use App\Jobs\SnapshotHealth;
+use App\Jobs\VerifyOwnLinks;
 use App\Support\Fx;
 use App\Support\PlatformHealth;
 use Illuminate\Support\Facades\Schedule;
@@ -26,3 +27,5 @@ Schedule::job(new QueueScheduledReports)->dailyAt(config('reports.send_at_utc', 
 Schedule::job(new RunTrialLifecycle)->dailyAt(config('trial.run_at_utc', '03:10'))->name('trial-lifecycle')->withoutOverlapping();
 // AI Workspace night shift v0 (M1): each workspace at its own hour, once a day; does nothing while no workspace has it on.
 Schedule::job(new RunNightShift)->hourlyAt(5)->name('ai-night-shift')->withoutOverlapping();
+// BX-07: recheck every known link to us once a month (1st, 06:20 UTC).
+Schedule::job(new VerifyOwnLinks)->monthlyOn(1, '06:20')->name('links-verify')->withoutOverlapping();

@@ -38,9 +38,10 @@ Route::middleware(PublicTrailingSlash::class)->group(function () {
         Route::get('/en/tools/'.$tool, [PublicSiteController::class, 'seoTool'])->defaults('lang', 'en')->defaults('tool', $tool);
     }
     // Growth O-339 (12 Nov): renamed slugs keep their old URLs as 301s.
-    foreach (['capi-pixel-checker' => 'ad-pixel-checker', 'ksa-ad-compliance-checker' => 'gulf-ad-disclosure-checklist'] as $old => $new) {
-        Route::permanentRedirect('/tools/'.$old, '/tools/'.$new);
-        Route::permanentRedirect('/en/tools/'.$old, '/en/tools/'.$new);
+    // BX-09: the list lives in config/redirects.php so the reclamation board and its test check every rename.
+    foreach (config('redirects.renames') as $old => $new) {
+        Route::permanentRedirect($old, $new);
+        Route::permanentRedirect('/en'.$old, '/en'.$new);
     }
     Route::post('/tools/hreflang-checker/run', [PublicSiteController::class, 'hreflangRun'])->middleware(['throttle:30,1', ToolAbuseGuard::class]);
     Route::post('/tools/page-audit/run', [PublicSiteController::class, 'pageAuditRun'])->middleware(['throttle:30,1', ToolAbuseGuard::class]);
