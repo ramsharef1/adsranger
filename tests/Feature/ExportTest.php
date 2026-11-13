@@ -9,6 +9,7 @@ use App\Models\ClientLink;
 use App\Models\User;
 use App\Support\DataExport;
 use App\Support\DemoData;
+use App\Support\TwoPerson;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -193,9 +194,17 @@ class ExportTest extends TestCase
 
     public function test_workspace_zip_is_for_the_owner(): void
     {
-        $this->actingAs($this->member('admin'))->get($this->url('workspace'))->assertForbidden();
+        $admin = $this->member('admin');
+        $this->actingAs($admin)->get($this->url('workspace'))->assertForbidden();
 
-        $r = $this->actingAs($this->member('owner'))->get($this->url('workspace'));
+        // DS-35 (D-305): owner + admin in the workspace, so the full download needs the admin's approval first.
+        $owner = $this->member('owner');
+        $this->actingAs($owner)->get($this->url('workspace'))->assertForbidden();
+        $req = TwoPerson::request($this->agency, 'export_workspace', null, null, $owner);
+        $this->assertSame('admin', $admin->roleIn($this->agency));
+        $this->assertTrue(TwoPerson::decide($req->fresh(), $admin, true));
+
+        $r = $this->actingAs($owner)->get($this->url('workspace'));
         $r->assertOk();
         $path = $r->getFile()->getPathname();
         $zip = new \ZipArchive;
@@ -207,6 +216,7 @@ class ExportTest extends TestCase
         $this->assertStringNotContainsString('password', strtolower($zip->getFromName('members.csv')));
         $zip->close();
         $this->assertDatabaseHas('audit_logs', ['action' => 'export.csv', 'subject_type' => Agency::class]);
+        $this->actingAs($owner)->get($this->url('workspace'))->assertForbidden(); // an approval is used once
     }
 
     public function test_formulas_are_neutralised(): void

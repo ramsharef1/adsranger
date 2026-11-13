@@ -8,12 +8,15 @@ use App\Jobs\SyncAdAccount;
 use App\Models\AdAccount;
 use App\Models\AiBrainItem;
 use App\Models\Alert;
+use App\Models\ApprovalRequest;
 use App\Models\Client;
 use App\Models\ClientContact;
+use App\Models\ClientLicence;
 use App\Support\CurrentClient;
 use App\Support\MetricsQuery;
 use App\Support\Modules;
 use App\Support\Periods;
+use App\Support\TwoPerson;
 use App\Support\WeekList;
 use BackedEnum;
 use Filament\Facades\Filament;
@@ -112,12 +115,27 @@ class DailyDesk extends Page
         $followUps = ClientContact::with('client')->where('agency_id', $a->id)->whereIn('client_id', $clients->pluck('id'))
             ->whereNull('next_done_at')->whereNotNull('next_on')->where('next_on', '<=', now($tz)->toDateString())->orderBy('next_on')->limit(8)->get();
 
+        // XS-24 / NB-36 (D-305): licences that expire within 30 days (or already have), for the clients this person sees.
+        $licences = ClientLicence::with('client')->where('agency_id', $a->id)->whereIn('client_id', $clients->pluck('id'))
+            ->whereNotNull('expires_on')->where('expires_on', '<=', now($tz)->addDays(30)->toDateString())->orderBy('expires_on')->limit(8)->get();
+
         return [
+            'approvals' => TwoPerson::forApprover($a, auth()->user()), // DS-35 (D-305)
+            'licences' => $licences,
             'weekList' => WeekList::for($a, auth()->user()),
             'followUps' => $followUps,
             'from' => $from, 'rows' => $rows, 'synced' => $synced ? Carbon::parse($synced) : null,
             'tz' => $tz, 'night' => $night, 'clientNames' => $clients->pluck('name', 'id'), 'brainsToCheck' => $toCheck,
         ];
+    }
+
+    /** DS-35 (D-305): a second owner or admin approves or declines a risky action. */
+    public function decideApproval(int $id, bool $approve): void
+    {
+        $r = ApprovalRequest::where('agency_id', Filament::getTenant()->id)->findOrFail($id);
+        $ok = TwoPerson::decide($r, auth()->user(), $approve);
+        Notification::make()->title($ok ? ($approve ? __('Approved. They have 48 hours to go ahead.') : __('Declined.')) : __('This request can no longer be decided.'))
+            ->{$ok ? 'success' : 'warning'}()->send();
     }
 
     /** XS-02: a follow-up was done (or isn't needed any more). */

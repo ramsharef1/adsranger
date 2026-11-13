@@ -10,6 +10,7 @@ use App\Models\AuditLog;
 use App\Models\Campaign;
 use App\Models\Client;
 use App\Models\ClientContact;
+use App\Models\ClientLicence;
 use App\Models\ClientLink;
 use App\Models\CodWeek;
 use App\Models\ReportSchedule;
@@ -67,6 +68,21 @@ class ViewClient extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            // XS-24 / NB-36 (D-305): licence type, number and expiry; printed on briefs, Desk reminder 30 days before.
+            Action::make('addLicence')->label(__('Add licence'))->icon('heroicon-o-identification')->color('gray')
+                ->visible(fn () => TeamRoles::canManageData(auth()->user(), $this->record->agency))
+                ->modalDescription(__('For ads that must show a licence or permit number. AdsRanger keeps the number and reminds you before it expires; it does not judge whether an ad is compliant.'))
+                ->schema([
+                    Select::make('kind')->label(__('Type'))->options(ClientLicence::kindLabels())->required()->default('real_estate'),
+                    TextInput::make('number')->label(__('Licence number'))->required()->maxLength(80),
+                    DatePicker::make('expires_on')->label(__('Expires on (optional)'))->native(false),
+                    TextInput::make('note')->label(__('Note'))->maxLength(200),
+                ])
+                ->action(function (array $data): void {
+                    ClientLicence::create(['agency_id' => $this->record->agency_id, 'client_id' => $this->record->id, 'kind' => $data['kind'],
+                        'number' => trim(strip_tags($data['number'])), 'expires_on' => $data['expires_on'] ?? null, 'note' => trim(strip_tags((string) ($data['note'] ?? ''))) ?: null]);
+                    Notification::make()->title(__('Licence saved.'))->success()->send();
+                }),
             // XS-03 / FS-20 (R4): "what we did" and "next month" for the monthly report; drafted from the app, edited by the agency.
             Action::make('monthNotes')->label(__('Month notes for the report'))->icon('heroicon-o-pencil-square')->color('gray')
                 ->visible(fn () => TeamRoles::canManageData(auth()->user(), $this->record->agency))
@@ -378,6 +394,12 @@ class ViewClient extends ViewRecord
         return TeamRoles::canManageData(auth()->user(), $this->record->agency);
     }
 
+    public function removeLicence(int $id): void
+    {
+        abort_unless(TeamRoles::canManageData(auth()->user(), $this->record->agency), 403);
+        ClientLicence::where('client_id', $this->record->id)->whereKey($id)->delete();
+    }
+
     public function revokeLink(int $id): void
     {
         abort_unless($this->canManageLinks(), 403);
@@ -437,6 +459,7 @@ class ViewClient extends ViewRecord
             'series' => DataGaps::series($c, $from, $to),
             'cod' => CodOutcomes::summary($c, now($c->agency?->timezone ?: 'UTC')->subWeeks(8)->toDateString(), now($c->agency?->timezone ?: 'UTC')->toDateString()),
             'codWeeks' => CodWeek::with('campaign')->where('client_id', $c->id)->orderByDesc('week_start')->limit(8)->get(),
+            'licences' => ClientLicence::where('client_id', $c->id)->orderBy('expires_on')->get(),
             'contacts' => ClientContact::with('user')->where('client_id', $c->id)->orderByDesc('happened_on')->orderByDesc('id')->limit(10)->get(),
             'synced' => MetricsQuery::lastSynced($c),
             'accounts' => $c->adAccounts()->with('network')->get(),

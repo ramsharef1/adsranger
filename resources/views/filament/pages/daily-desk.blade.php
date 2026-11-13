@@ -6,6 +6,35 @@
 @endphp
 <x-filament-panels::page>
     @include('filament.partials.onboarding-checklist')
+    @if ($approvals->isNotEmpty())
+        {{-- DS-35 (D-305): risky actions waiting for a second owner or admin. --}}
+        <x-filament::section :heading="__('Waiting for your approval')" data-approvals>
+            <div style="display:grid;gap:8px">
+                @foreach ($approvals as $ap)
+                    <div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:14px;border-bottom:1px solid rgba(148,163,184,.2);padding-bottom:6px" wire:key="ap-{{ $ap->id }}">
+                        <span><strong>{{ \App\Support\TwoPerson::actionLabels()[$ap->action] ?? $ap->action }}</strong>@if ($ap->subject_name) · <bdi>{{ $ap->subject_name }}</bdi>@endif
+                            · {{ __('asked by :name', ['name' => $ap->requester?->name ?? '—']) }} · {{ __('expires :when', ['when' => $ap->expires_at->locale(app()->getLocale())->diffForHumans()]) }}</span>
+                        <span style="display:flex;gap:6px">
+                            <x-filament::button size="xs" color="danger" wire:click="decideApproval({{ $ap->id }}, true)" wire:confirm="{{ __('Approve this? It cannot be undone once they go ahead.') }}">{{ __('Approve') }}</x-filament::button>
+                            <x-filament::button size="xs" color="gray" wire:click="decideApproval({{ $ap->id }}, false)">{{ __('Decline') }}</x-filament::button>
+                        </span>
+                    </div>
+                @endforeach
+            </div>
+        </x-filament::section>
+    @endif
+    @if ($licences->isNotEmpty())
+        {{-- XS-24 / NB-36 (D-305): licences expiring within 30 days. --}}
+        <x-filament::section :heading="__('Licences to renew')" data-licences>
+            <ul style="margin:0;padding-inline-start:18px;display:grid;gap:4px;font-size:14px">
+                @foreach ($licences as $l)
+                    <li><a href="{{ \App\Filament\Resources\Clients\ClientResource::getUrl('view', ['record' => $l->client_id]) }}" style="color:#0F766E;text-decoration:underline"><bdi>{{ $l->client?->name }}</bdi></a>
+                        · {{ \App\Models\ClientLicence::kindLabels()[$l->kind] ?? $l->kind }} <bdi dir="ltr">{{ $l->number }}</bdi>
+                        · {{ $l->expires_on->isPast() ? __('expired on :date', ['date' => $l->expires_on->locale(app()->getLocale())->translatedFormat('j M Y')]) : __('expires on :date', ['date' => $l->expires_on->locale(app()->getLocale())->translatedFormat('j M Y')]) }}</li>
+                @endforeach
+            </ul>
+        </x-filament::section>
+    @endif
     @if ($weekList)
         {{-- XS-01 (R4): the clients that need a touch this week, with one line of reason each. --}}
         <x-filament::section :heading="__('This week\'s clients')" data-week-list>

@@ -49,6 +49,15 @@ textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--
             <strong>{{ $brief->headline }}</strong>
             <span style="background:var(--acc);color:#0b1020;padding:6px 14px;border-radius:8px;font-weight:600;font-size:13px">{{ $brief->cta }}</span>
         </div>
+        {{-- XS-24 / NB-36 (D-305): licence lines the ad must carry. --}}
+        @php
+            $lics = $brief->client ? \App\Models\ClientLicence::where('client_id', $brief->client_id)->get() : collect();
+        @endphp
+        @if ($lics->isNotEmpty())
+            <div style="margin-top:12px;font-size:13px;color:var(--muted)" data-brief-licences>
+                @foreach ($lics as $l)<div>{{ $ar ? 'رقم الترخيص' : 'Licence no.' }}: <bdi dir="ltr">{{ $l->number }}</bdi></div>@endforeach
+            </div>
+        @endif
     </div>
 
     <div class="card">

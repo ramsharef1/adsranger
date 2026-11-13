@@ -181,6 +181,23 @@
         </x-filament::section>
     @endif
 
+    {{-- XS-24 / NB-36 (D-305): licences the ads must show --}}
+    @if ($licences->isNotEmpty())
+        <x-filament::section data-client-licences>
+            <x-slot name="heading">{{ __('Licences') }}</x-slot>
+            @foreach ($licences as $l)
+                <div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:6px 0;border-top:1px solid rgba(148,163,184,.2);font-size:14px">
+                    <span><strong>{{ \App\Models\ClientLicence::kindLabels()[$l->kind] ?? $l->kind }}</strong> · <bdi dir="ltr">{{ $l->number }}</bdi>
+                        @if ($l->expires_on) · <span @if ($l->expires_on->lte(now()->addDays(30))) style="color:#B45309;font-weight:600" @endif>{{ __('expires on :date', ['date' => $l->expires_on->locale(app()->getLocale())->translatedFormat('j M Y')]) }}</span>@endif
+                        @if ($l->note)<span style="{{ $muted }}"> · {{ $l->note }}</span>@endif</span>
+                    @if (\App\Support\TeamRoles::canManageData(auth()->user(), $client->agency))
+                        <x-filament::button size="xs" color="gray" wire:click="removeLicence({{ $l->id }})" wire:confirm="{{ __('Remove this licence?') }}">{{ __('Remove') }}</x-filament::button>
+                    @endif
+                </div>
+            @endforeach
+        </x-filament::section>
+    @endif
+
     {{-- XS-02 (R4): contact log --}}
     <x-filament::section data-contacts>
         <x-slot name="heading">{{ __('Contact log') }}</x-slot>

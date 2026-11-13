@@ -7,6 +7,7 @@ use App\Http\Controllers\ExportController;
 use App\Models\Client;
 use App\Support\Modules;
 use App\Support\TrialLifecycle;
+use App\Support\TwoPerson;
 use BackedEnum;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
@@ -102,9 +103,23 @@ class ExportData extends Page
 
     public function workspaceAction(): Action
     {
-        return Action::make('workspace')->label(__('Download all workspace data'))->icon('heroicon-o-archive-box-arrow-down')->color('gray')
-            ->visible(fn () => ExportController::canDownloadWorkspace(auth()->user(), Filament::getTenant()))
-            ->url(fn () => static::exportUrl('workspace'));
+        $agency = Filament::getTenant();
+        $user = auth()->user();
+        // DS-35 (D-305): with 2+ owners / admins, the full download waits for a second owner or admin.
+        $gate = $agency && $user && TwoPerson::needed($agency) && ! TwoPerson::approved($agency, 'export_workspace', null, $user);
+        $pending = $gate && TwoPerson::pending($agency, 'export_workspace', null, $user);
+
+        $a = Action::make('workspace')->label($gate ? ($pending ? __('Waiting for approval to download all data') : __('Ask to download all workspace data')) : __('Download all workspace data'))
+            ->icon('heroicon-o-archive-box-arrow-down')->color('gray')
+            ->visible(fn () => ExportController::canDownloadWorkspace(auth()->user(), Filament::getTenant()));
+
+        return $gate
+            ? $a->disabled($pending)->requiresConfirmation()->modalDescription(__('Another owner or admin must approve before all workspace data can be downloaded. The request expires in 48 hours.'))
+                ->action(function () use ($agency, $user): void {
+                    TwoPerson::request($agency, 'export_workspace', null, null, $user);
+                    Notification::make()->title(__('Request sent. Another owner or admin can approve it on their Desk.'))->success()->send();
+                })
+            : $a->url(fn () => static::exportUrl('workspace'));
     }
 
     public function deleteWorkspaceAction(): Action

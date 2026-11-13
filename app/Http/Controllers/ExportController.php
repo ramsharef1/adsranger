@@ -8,6 +8,7 @@ use App\Models\Client;
 use App\Support\DataExport;
 use App\Support\DemoData;
 use App\Support\Import\ClientSheet;
+use App\Support\TwoPerson;
 use Carbon\CarbonImmutable;
 use Filament\Facades\Filament;
 use Illuminate\Http\Request;
@@ -164,6 +165,7 @@ class ExportController extends Controller
     {
         $agency = $this->agency();
         abort_unless(static::canDownloadWorkspace($request->user(), $agency), 403);
+        abort_unless(TwoPerson::consume($agency, 'export_workspace', null, $request->user()), 403, __('This needs approval from another owner or admin first.')); // DS-35
         AuditLog::record('export.csv', $agency, ['kind' => 'workspace_zip']);
         $path = DataExport::workspaceZip($agency);
 
