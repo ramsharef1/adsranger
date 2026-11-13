@@ -53,6 +53,7 @@ class Shell
         Pages\InsightsPage::class => 'ads',
         Pages\LandingPagesPage::class => 'ads',
         Pages\UtmBuilderPage::class => 'ads',
+        Pages\LaunchCheckPage::class => 'ads',
         Pages\StudioPage::class => 'ads',
         Pages\AgencyOpsHubPage::class => 'ads',
         Pages\OrganicSocialPage::class => 'ads',
@@ -73,6 +74,7 @@ class Shell
         Pages\ProfitAttributionHubPage::class => 'reports',
         Pages\WebhooksPage::class => 'reports',
         Pages\ClientOnboardingLinksPage::class => 'reports',
+        Pages\IntakeFormPage::class => 'clients',
     ];
 
     public static function on(?Agency $agency = null): bool
