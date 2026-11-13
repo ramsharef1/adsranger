@@ -13,6 +13,7 @@ use App\Support\AiWorkspace\AiScope;
 use App\Support\AiWorkspace\ContextPack;
 use App\Support\AiWorkspace\OwnKey;
 use App\Support\AiWorkspace\Playbooks;
+use App\Support\AiWorkspace\StyleNotes;
 use App\Support\CurrentClient;
 use App\Support\PlanGate;
 use App\Support\TeamRoles;
@@ -143,6 +144,37 @@ class ClientBrainPage extends Page
         $client->forceFill(['ai_scope' => count($parts) === count(AiScope::PARTS) ? null : $parts])->save();
         AuditLog::record('ai_workspace.scope', $client, ['scope' => $parts]);
         Notification::make()->title(__('Saved. Your AI gets only what is ticked for this client.'))->success()->send();
+    }
+
+    public ?int $editingId = null;
+
+    public string $editText = '';
+
+    public function startEdit(int $id): void
+    {
+        $item = AiBrainItem::where('agency_id', Filament::getTenant()->id)->where('client_id', $this->client()?->id)->findOrFail($id);
+        $this->editingId = $item->id;
+        $this->editText = (string) ($item->clean ?? $item->original);
+    }
+
+    /** FS-05 (D-300): save the member's edit; word swaps become style notes for this client. */
+    public function saveEdit(): void
+    {
+        $client = $this->client();
+        abort_unless($client && TeamRoles::canManageData(auth()->user(), Filament::getTenant()), 403);
+        $item = AiBrainItem::where('client_id', $client->id)->findOrFail($this->editingId);
+        $before = (string) ($item->clean ?? $item->original);
+        $after = trim(strip_tags($this->editText));
+        if ($after === '' || $after === $before) {
+            $this->editingId = null;
+
+            return;
+        }
+        $item->forceFill(['clean' => $after, 'meta' => array_merge($item->meta ?? [], ['edited_by' => auth()->id(), 'edited_at' => now()->toIso8601String()])])->save();
+        $n = $item->type === 'rule' ? 0 : StyleNotes::learn($client, $before, $after, auth()->user());
+        $this->editingId = null;
+        Notification::make()->success()->title(__('Saved.'))
+            ->body($n ? __('Style notes learned from your edit: :n. They are in this client\'s rules and can be deleted.', ['n' => $n]) : null)->send();
     }
 
     public function remove(int $id): void

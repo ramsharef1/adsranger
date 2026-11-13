@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /** AI Workspace: an agency's own API key for one provider (#159 vault, spec v1 §2 step 5). The key is never shown again. */
 class AiKey extends Model
@@ -35,5 +36,10 @@ class AiKey extends Model
     {
         $month = now()->format('Y-m');
         $this->forceFill(['spent_usd' => ($this->spent_month === $month ? (float) $this->spent_usd : 0.0) + $usd, 'spent_month' => $month])->save();
+    }
+
+    public function agency(): BelongsTo
+    {
+        return $this->belongsTo(Agency::class);
     }
 }

@@ -174,8 +174,16 @@
                         </p>
                     @elseif ($showOriginal)
                         <pre style="white-space:pre-wrap;font-family:inherit;font-size:13px;margin:0;opacity:.85" dir="auto">{{ $item->original }}</pre>
+                    @elseif ($editingId === $item->id)
+                        <form wire:submit="saveEdit" style="display:grid;gap:6px" data-edit-form>
+                            <textarea wire:model="editText" rows="6" dir="auto" class="fi-input" style="width:100%;font-size:14px;line-height:1.8"></textarea>
+                            <div style="display:flex;gap:8px"><x-filament::button type="submit" size="sm">{{ __('Save edit') }}</x-filament::button>
+                                <x-filament::button size="sm" color="gray" wire:click="$set('editingId', null)">{{ __('Cancel') }}</x-filament::button></div>
+                            <p style="{{ $muted }};font-size:12px;margin:0">{{ __('Word changes you make are kept as style notes for this client, so your AI writes it your way next time.') }}</p>
+                        </form>
                     @else
                         <div style="font-size:14px;line-height:1.8" dir="auto">{!! nl2br(e($item->clean ?? $item->original)) !!}</div>
+                        @if (! empty($item->meta['edited_at']))<div style="{{ $muted }};font-size:12px">{{ __('Edited by your team') }}</div>@endif
                     @endif
 
                     {{-- FS-03: where each number came from. --}}
@@ -206,6 +214,9 @@
                     @endif
 
                     <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        @if ($canRun && in_array($item->type, ['output', 'brief', 'learning'], true) && $editingId !== $item->id)
+                            <x-filament::button color="gray" size="sm" wire:click="startEdit({{ $item->id }})" style="min-height:44px">{{ __('Edit') }}</x-filament::button>
+                        @endif
                         @if ($item->type !== 'chat_link')
                             <x-filament::button color="gray" size="sm" wire:click="toggleOriginal({{ $item->id }})" style="min-height:44px">{{ $showOriginal ? __('Show clean card') : __('Show original reply') }}</x-filament::button>
                         @endif
