@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuditLog;
+use App\Models\ClientApproval;
 use App\Models\ClientLink;
 use App\Support\DataExport;
 use App\Support\MetricsQuery;
@@ -46,7 +48,23 @@ class ClientReportController extends Controller
             'synced' => MetricsQuery::lastSynced($client),
             'hideSpend' => (bool) $client->hide_spend,
             'pdfMonths' => PlanGate::allows($client->agency, 'monthly_pdf') ? MonthlyReport::months(3, $lang, $tz) : [],
+            // XS-06 (R4): what the agency asked this client to approve
+            'approvals' => ClientApproval::where('client_id', $client->id)->whereIn('status', ['pending', 'approved', 'changes'])->latest()->limit(10)->get(),
+            'token' => $token,
         ])->header('X-Robots-Tag', 'noindex, nofollow')->header('Referrer-Policy', 'no-referrer')->header('Cache-Control', 'private, no-store');
+    }
+
+    /** XS-06 (R4): the client approves or asks for changes on the report link, with the name they type. */
+    public function answer(Request $request, string $token, int $approval)
+    {
+        $link = ClientLink::findActive($token);
+        abort_unless($link, 404);
+        $data = $request->validate(['decision' => ['required', 'in:approved,changes'], 'name' => ['required', 'string', 'max:80'], 'note' => ['nullable', 'string', 'max:1000']]);
+        $a = ClientApproval::where('client_id', $link->client_id)->where('status', 'pending')->findOrFail($approval);
+        $a->update(['status' => $data['decision'], 'answered_by' => trim(strip_tags($data['name'])), 'client_note' => trim(strip_tags((string) ($data['note'] ?? ''))) ?: null, 'answered_at' => now()]);
+        AuditLog::record('client.approval_answered', $link->client?->agency, ['approval' => $a->id, 'decision' => $a->status]);
+
+        return redirect('/r/'.$token.'#approvals')->with('approval_saved', true);
     }
 
     /** #100: the client's ad gallery for the chosen period, through the same signed link. Follows hide_spend. */

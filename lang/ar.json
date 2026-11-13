@@ -2673,5 +2673,14 @@
     ":n to fix": "للإصلاح: :n",
     "Client intake form": "نموذج بيانات العميل",
     "Sections": "الأقسام",
-    "Print or save as PDF": "اطبع أو احفظ PDF"
+    "Print or save as PDF": "اطبع أو احفظ PDF",
+    "Ask the client to approve": "اطلب موافقة العميل",
+    "It shows at the top of this client's report link. The client types their name and taps Approve or Ask for changes; you see who answered and when.": "يظهر أعلى رابط تقرير هذا العميل. يكتب العميل اسمه ويختار «أوافق» أو «أطلب تعديلات»، وترى أنت من ردّ ومتى.",
+    "Creative": "تصميم",
+    "Sent to the report link.": "أُرسل إلى رابط التقرير.",
+    "This client has no report link yet. Make one so they can answer.": "لا يوجد رابط تقرير لهذا العميل بعد. أنشئ رابطًا ليتمكّن من الرد.",
+    "Client approvals": "موافقات العميل",
+    "Waiting for the client": "بانتظار العميل",
+    "Approved by :name": "وافق :name",
+    ":name asked for changes": "طلب :name تعديلات"
 }

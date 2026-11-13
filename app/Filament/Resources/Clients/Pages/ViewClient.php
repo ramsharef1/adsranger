@@ -10,6 +10,7 @@ use App\Models\Alert;
 use App\Models\AuditLog;
 use App\Models\Campaign;
 use App\Models\Client;
+use App\Models\ClientApproval;
 use App\Models\ClientContact;
 use App\Models\ClientLicence;
 use App\Models\ClientLink;
@@ -92,6 +93,21 @@ class ViewClient extends ViewRecord
                 ->action(function (array $data): void {
                     LeadDesk::log($this->record, $data['channel'], $data['label'] ?? null, 'app');
                     Notification::make()->title(__('Lead logged.'))->success()->send();
+                }),
+            // XS-06 (R4): ask the client to approve a plan, budget or creative on the report link.
+            Action::make('askApproval')->label(__('Ask the client to approve'))->icon('heroicon-o-hand-thumb-up')->color('gray')
+                ->visible(fn () => TeamRoles::canManageData(auth()->user(), $this->record->agency))
+                ->modalDescription(__('It shows at the top of this client\'s report link. The client types their name and taps Approve or Ask for changes; you see who answered and when.'))
+                ->schema([
+                    Select::make('kind')->label(__('Type'))->options(['plan' => __('Plan'), 'budget' => __('Budget'), 'creative' => __('Creative'), 'other' => __('Other')])->default('plan')->required(),
+                    TextInput::make('title')->label(__('Title'))->required()->maxLength(160),
+                    Textarea::make('details')->label(__('Details'))->rows(4)->maxLength(3000),
+                ])
+                ->action(function (array $data): void {
+                    ClientApproval::create(['agency_id' => $this->record->agency_id, 'client_id' => $this->record->id, 'kind' => $data['kind'],
+                        'title' => trim(strip_tags($data['title'])), 'details' => trim(strip_tags((string) ($data['details'] ?? ''))) ?: null, 'created_by' => auth()->id()]);
+                    $hasLink = ClientLink::where('client_id', $this->record->id)->whereNull('revoked_at')->exists();
+                    Notification::make()->title(__('Sent to the report link.'))->body($hasLink ? null : __('This client has no report link yet. Make one so they can answer.'))->success()->send();
                 }),
             // XS-24 / NB-36 (D-305): licence type, number and expiry; printed on briefs, Desk reminder 30 days before.
             Action::make('addLicence')->label(__('Add licence'))->icon('heroicon-o-identification')->color('gray')
@@ -496,6 +512,7 @@ class ViewClient extends ViewRecord
             'top' => MetricsQuery::topAds($c, $from, $to),
             'alerts' => Alert::where('client_id', $c->id)->where('status', 'open')->latest()->limit(5)->get(),
             'series' => DataGaps::series($c, $from, $to),
+            'approvals' => ClientApproval::where('client_id', $c->id)->where('status', '!=', 'withdrawn')->latest()->limit(8)->get(), // XS-06
             'leads' => Modules::on('lead_desk', null, $c->agency) ? LeadDesk::summary($c, $from, $to) : null, // XS-13 / XS-23
             'season' => SeasonReview::latest($c), // FS-22 (R4)
             // FS-19 (R4): one brand in several markets: each ad-account currency in its own money, plus the client total.

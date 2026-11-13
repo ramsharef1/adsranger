@@ -271,6 +271,27 @@
         </x-filament::section>
     @endif
 
+    {{-- XS-06 (R4): what the client was asked to approve, and who answered --}}
+    @if ($approvals->isNotEmpty())
+        <x-filament::section data-client-approvals>
+            <x-slot name="heading">{{ __('Client approvals') }}</x-slot>
+            <div style="display:grid;gap:8px;font-size:14px">
+                @foreach ($approvals as $ap)
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:baseline">
+                        <strong>{{ $ap->title }}</strong>
+                        <span style="{{ $muted }}">{{ ['plan' => __('Plan'), 'budget' => __('Budget'), 'creative' => __('Creative'), 'other' => __('Other')][$ap->kind] ?? $ap->kind }}</span>
+                        <span>·
+                            @if ($ap->status === 'pending'){{ __('Waiting for the client') }}
+                            @elseif ($ap->status === 'approved'){{ __('Approved by :name', ['name' => $ap->answered_by]) }} <bdi dir="ltr">{{ $ap->answered_at?->format('Y-m-d H:i') }}</bdi>
+                            @else{{ __(':name asked for changes', ['name' => $ap->answered_by]) }} <bdi dir="ltr">{{ $ap->answered_at?->format('Y-m-d H:i') }}</bdi>@endif
+                        </span>
+                        @if ($ap->client_note)<div style="{{ $muted }};flex-basis:100%" dir="auto">“{{ $ap->client_note }}”</div>@endif
+                    </div>
+                @endforeach
+            </div>
+        </x-filament::section>
+    @endif
+
     {{-- XS-13 / XS-23 (D-306): speed-to-lead and WhatsApp results, from the lead page --}}
     @if ($leads)
         <x-filament::section data-lead-summary>

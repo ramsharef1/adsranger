@@ -147,6 +147,7 @@ Route::post('/l/{token}', [LeadDeskController::class, 'store'])->middleware('thr
 Route::post('/l/{token}/{lead}', [LeadDeskController::class, 'update'])->middleware('throttle:60,1')->where(['token' => '[A-Za-z0-9]{40}', 'lead' => '[0-9]+']);
 Route::get('/r/{token}', [ClientReportController::class, 'show'])->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{40}');
 // #57 monthly PDF behind the same link
+Route::post('/r/{token}/approvals/{approval}', [ClientReportController::class, 'answer'])->middleware('throttle:20,1')->where(['token' => '[A-Za-z0-9]{40}', 'approval' => '[0-9]+']);
 Route::get('/r/{token}/ads', [ClientReportController::class, 'ads'])->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{40}');
 Route::get('/r/{token}/pdf', [ClientReportController::class, 'pdf'])->middleware('throttle:10,1')->where('token', '[A-Za-z0-9]{40}');
 

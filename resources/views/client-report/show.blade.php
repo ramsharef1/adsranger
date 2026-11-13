@@ -39,6 +39,33 @@
         <a class="lang" href="{{ $q(['lang' => __('report.switch_lang')]) }}" lang="{{ __('report.switch_lang') }}">{{ __('report.switch') }}</a>
     </header>
 
+    {{-- XS-06 (R4): approvals the agency asked for; agency branding only. --}}
+    @if ($approvals->isNotEmpty())
+        <section id="approvals" class="card" style="display:grid;gap:12px;margin-bottom:14px">
+            <strong>{{ __('report.approvals') }}</strong>
+            @if (session('approval_saved'))<div class="muted" role="status">{{ __('report.approval_saved') }}</div>@endif
+            @foreach ($approvals as $ap)
+                <div style="border-top:1px solid rgba(148,163,184,.25);padding-top:10px;display:grid;gap:6px">
+                    <div><strong>{{ $ap->title }}</strong> <span class="muted">· {{ __('report.approval_kinds.'.$ap->kind) }}</span></div>
+                    @if ($ap->details)<div style="white-space:pre-line" dir="auto">{{ $ap->details }}</div>@endif
+                    @if ($ap->status === 'pending')
+                        <form method="POST" action="/r/{{ $token }}/approvals/{{ $ap->id }}" style="display:grid;gap:8px">
+                            @csrf
+                            <input name="name" required maxlength="80" placeholder="{{ __('report.your_name') }}" style="min-height:44px;padding:0 10px;border-radius:10px;border:1px solid rgba(148,163,184,.4);font:inherit" dir="auto">
+                            <textarea name="note" maxlength="1000" rows="2" placeholder="{{ __('report.note_optional') }}" style="padding:8px 10px;border-radius:10px;border:1px solid rgba(148,163,184,.4);font:inherit" dir="auto"></textarea>
+                            <div style="display:flex;gap:8px;flex-wrap:wrap">
+                                <button name="decision" value="approved" type="submit" style="min-height:44px;padding:0 16px;border-radius:10px;border:0;background:#0F766E;color:#fff;font:inherit;font-weight:600">{{ __('report.approve') }}</button>
+                                <button name="decision" value="changes" type="submit" style="min-height:44px;padding:0 16px;border-radius:10px;border:1px solid rgba(148,163,184,.5);background:transparent;font:inherit">{{ __('report.ask_changes') }}</button>
+                            </div>
+                        </form>
+                    @else
+                        <div class="muted">{{ $ap->status === 'approved' ? __('report.approved_by', ['name' => $ap->answered_by]) : __('report.changes_by', ['name' => $ap->answered_by]) }} · <bdi dir="ltr">{{ $ap->answered_at?->format('Y-m-d') }}</bdi></div>
+                    @endif
+                </div>
+            @endforeach
+        </section>
+    @endif
+
     <nav class="pills" aria-label="{{ __('report.month') }}">
         @foreach ($periods as $p)
             <a class="pill {{ $p === $period ? 'on' : '' }}" href="{{ $q(['p' => $p]) }}" @if ($p === $period) aria-current="page" @endif>{{ __("report.periods.$p") }}</a>
