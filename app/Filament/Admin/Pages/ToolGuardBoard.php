@@ -14,7 +14,7 @@ class ToolGuardBoard extends Page
 {
     use TranslatesPageLabels;
 
-    public const TOOLS = ['page-audit', 'hreflang-checker', 'ad-pixel-checker', 'llms-txt-generator', 'robots-sitemap-checker'];
+    public const TOOLS = ['page-audit', 'hreflang-checker', 'ad-pixel-checker', 'llms-txt-generator', 'robots-sitemap-checker', 'ai-crawler-revenue-checker'];
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-no-symbol';
 
