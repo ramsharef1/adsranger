@@ -89,5 +89,5 @@ $later = ['Apple Ads', 'Amazon Ads', 'Pinterest', 'Reddit', 'Taboola', 'Outbrain
         <p style="margin:0">{{ $a }}</p>
     @endforeach
 </section>
-<p style="margin-top:24px"><a class="btn" href="{{ $u('/waitlist') }}">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a></p>
+<p style="margin-top:24px"><a class="btn" href="{{ $u('/waitlist') }}">{{ $ar ? 'انضم إلى قائمة الإطلاق' : 'Join the launch list' }}</a></p>
 @endsection

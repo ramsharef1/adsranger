@@ -54,7 +54,7 @@ $t = $ar ? [
 
     <div class="tl-out" id="rsc-out" aria-live="polite" hidden></div>
 </section>
-<p style="margin-top:20px"><a class="btn" href="{{ $u('/waitlist') }}?type=agency">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a></p>
+<p style="margin-top:20px"><a class="btn" href="{{ $u('/waitlist') }}?type=agency">{{ $ar ? 'انضم إلى قائمة الإطلاق' : 'Join the launch list' }}</a></p>
 @include('public.tools.partials.tool-guide-faq', ['toolSlug' => 'robots-sitemap-checker', 'ar' => $ar])
 @endsection
 @push('scripts')

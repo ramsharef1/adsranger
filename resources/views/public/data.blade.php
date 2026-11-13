@@ -8,9 +8,9 @@ $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lng);
 $abs = fn (string $p) => \App\Support\PublicUrl::absolute($p, $lng);
 $b = fn (string $t) => '<bdi dir="ltr">'.e($t).'</bdi>';
 $sets = config('datasets', []);
-$title = $ar ? 'بيانات مفتوحة لتسويق المنطقة | AdsRanger' : 'Open data for MENA marketing | AdsRanger';
+$title = $ar ? 'بيانات مفتوحة للإعلانات في المنطقة | AdsRanger' : 'Open MENA Ad Data: 2027 Calendar in CSV, JSON | AdsRanger'; // Growth O-438 fixes 1–2
 $meta = $ar
-    ? 'بيانات مفتوحة مجانية من AdsRanger بترخيص CC BY 4.0: تقويم المواسم الإعلانية 2027 بصيغة CSV أو JSON، مع المصادر وطريقة الاستشهاد.'
+    ? 'بيانات مفتوحة ومجانية بترخيص CC BY 4.0: تقويم المواسم 2027 في المنطقة بصيغة CSV أو JSON، لكل موعد مصدره، مع طريقة الاستشهاد.'
     : 'Free open data from AdsRanger under CC BY 4.0: the MENA ad calendar 2027 as CSV and JSON, with sources and how to cite it.';
 $root = \App\Support\PublicUrl::HOST;
 $schema = [['@type' => 'DataCatalog', 'name' => $ar ? 'بيانات AdsRanger المفتوحة' : 'AdsRanger open data', 'url' => $abs('/data'),
@@ -45,7 +45,7 @@ $schema = [['@type' => 'DataCatalog', 'name' => $ar ? 'بيانات AdsRanger ا
             : 'Version '.$b($d['version']).' · '.$b($d['rows']).' dates · '.$b($d['released']).' · Licence '.$b($d['license']['name']) !!}</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
             @foreach ($d['files'] as [$kind, $path, $type, $label])
-                <a class="btn {{ $kind === 'csv' ? '' : 'btn-ghost' }}" href="{{ $path }}" download style="min-height:44px"><bdi dir="ltr">{{ $label }}</bdi></a>
+                <a class="btn {{ $kind === 'csv' ? '' : 'btn-ghost' }}" href="{{ $path }}" download style="min-height:44px">@if ($ar && $kind === 'csv'){{-- O-438 fix 5 --}}ملف <bdi dir="ltr">CSV</bdi> (<bdi dir="ltr">UTF-8</bdi>، يفتح في <bdi dir="ltr">Excel</bdi>)@else<bdi dir="ltr">{{ $label }}</bdi>@endif</a>
             @endforeach
         </div>
         <ul style="margin:14px 0 0;line-height:1.8">

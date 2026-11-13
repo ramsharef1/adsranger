@@ -257,7 +257,7 @@
             </div>
             <div class="hp-ctas">
                 <a class="btn btn-sec" href="{{ $u('/demo-report') }}" data-cta="sample_report" data-pos="hero">{{ $ar ? 'شاهد تقريرًا تجريبيًا' : 'See a sample report' }}</a>
-                <a class="btn btn-main" href="{{ $u('/waitlist') }}?type=agency" data-cta="waitlist" data-pos="hero">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a>
+                <a class="btn btn-main" href="{{ $u('/waitlist') }}?type=agency" data-cta="waitlist" data-pos="hero">{{ $ar ? 'انضم إلى قائمة الإطلاق' : 'Join the launch list' }}</a>
             </div>
         </div>
     </div>
@@ -421,6 +421,6 @@
 <section class="hp-close" aria-labelledby="h-close">
     <h2 id="h-close">{{ $ar ? 'انضم إلى قائمة الإطلاق' : 'Join the launch list' }}</h2>
     <p>{{ $ar ? 'اترك بريدك واسم وكالتك ودولتك لتنضم إلى قائمة الإطلاق. الإطلاق في 2027.' : 'Leave your email, agency name and country to join the launch list. Launching 2027.' }}</p>
-    <a class="btn" href="{{ $u('/waitlist') }}?type=agency" data-cta="waitlist" data-pos="closing">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a>
+    <a class="btn" href="{{ $u('/waitlist') }}?type=agency" data-cta="waitlist" data-pos="closing">{{ $ar ? 'انضم إلى قائمة الإطلاق' : 'Join the launch list' }}</a>
 </section>
 @endsection

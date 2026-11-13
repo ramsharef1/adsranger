@@ -143,7 +143,7 @@ $schema[] = ['@type' => 'FAQPage', 'mainEntity' => array_map(fn ($q) => ['@type'
     <p>{!! $ar
         ? 'ومخطِّط السيناريوهات داخل <bdi dir="ltr">AdsRanger</bdi>، المبني على سجل كل عميل، قيد التطوير.'
         : 'A scenario planner inside AdsRanger, using each client\'s own history, is in development.' !!}</p>
-    <p><a class="btn" href="{{ $u('/waitlist') }}">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a></p>
+    <p><a class="btn" href="{{ $u('/waitlist') }}">{{ $ar ? 'انضم إلى قائمة الإطلاق' : 'Join the launch list' }}</a></p>
 </section>
 @endsection
 

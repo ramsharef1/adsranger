@@ -26,7 +26,7 @@ class PublicWebsitePhase1Test extends TestCase
 
     public function test_waitlist_pages_render_and_store_entries_in_ar_and_en(): void
     {
-        $this->get('/waitlist')->assertOk()->assertSee('قائمة انتظار')->assertSee('name="consent"', false)->assertSee('name="country"', false);
+        $this->get('/waitlist')->assertOk()->assertSee('قائمة إطلاق')->assertSee('name="consent"', false)->assertSee('name="country"', false);
         $this->get('/en/waitlist')->assertOk()->assertSee('Join the AdsRanger waitlist');
 
         $this->post('/waitlist', [

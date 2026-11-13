@@ -56,6 +56,6 @@ $cards = [
     <p>{{ $ar ? 'ولمعرفة كيف نحمي البيانات، اقرأ صفحة' : 'To see how we protect data, read our' }} <a class="pl" href="{{ $u('/security') }}">{{ $ar ? 'الأمان' : 'security page' }}</a>.</p>
     <p>{!! $ar ? 'فريق <bdi dir="ltr">AdsRanger</bdi> في عمّان، الأردن. نرد بالعربية أو الإنجليزية.' : 'The AdsRanger team, Amman, Jordan. We reply in Arabic or English.' !!}</p>
     <p>{{ $ar ? 'نرد عادةً خلال يومَي عمل، من الأحد إلى الخميس.' : 'We usually reply within 2 working days, Sunday to Thursday.' }}</p>
-    <p>{{ $ar ? 'تريد أن تنضم إلى قائمة الإطلاق؟' : 'Want to join the launch list?' }} <a class="pl" href="{{ $u('/waitlist') }}">{{ $ar ? 'انضم إلى قائمة الانتظار.' : 'Join the waitlist.' }}</a></p>
+    <p>{{ $ar ? 'تريد أن تنضم إلى قائمة الإطلاق؟' : 'Want to join the launch list?' }} <a class="pl" href="{{ $u('/waitlist') }}">{{ $ar ? 'انضم إلى قائمة الإطلاق.' : 'Join the launch list.' }}</a></p>
 </section>
 @endsection

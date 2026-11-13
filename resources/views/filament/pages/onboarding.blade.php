@@ -67,6 +67,11 @@
                             <option value="">—</option>
                             @foreach ($verticals as $key => $verticalName) <option value="{{ $key }}">{{ __($verticalName) }}</option> @endforeach
                         </select></div>
+                    @unless ($inHouse)
+                        {{-- WS-19 (D-297): agencies with many clients go on to the sheet import after this one. --}}
+                        <p style="{{ $hint }};margin:0" data-many-clients>{{ __('Many clients? Add the first one here, then import the rest from a sheet in Clients.') }}
+                            <a href="{{ route('filament.app.clients-template', ['tenant' => $agency->slug]) }}" style="text-decoration:underline">{{ __('Download the template') }}</a></p>
+                    @endunless
 
                 @elseif ($step === 4)
                     <h2 style="font-size:18px;font-weight:700;margin:0">{{ __('onboarding.step4.title') }}</h2>

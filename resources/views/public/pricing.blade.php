@@ -125,7 +125,7 @@ $schema[] = ['@type' => 'FAQPage', 'mainEntity' => array_map(fn ($q) => ['@type'
                     </ul>
                 @endif
             </div>
-            <a class="btn" href="{{ $u('/waitlist') }}">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a>
+            <a class="btn" href="{{ $u('/waitlist') }}">{{ $ar ? 'انضم إلى قائمة الإطلاق' : 'Join the launch list' }}</a>
         </li>
     @endforeach
 </ul>

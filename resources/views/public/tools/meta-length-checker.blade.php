@@ -86,7 +86,7 @@ $t = $ar ? [
     <p class="muted" style="margin-top:12px">{{ $t['note'] }}</p>
     <p class="muted">{{ $t['privacy'] }}</p>
     <p>{{ $t['other'] }} <a href="{{ $u('/tools/serp-preview') }}">{{ $t['other_link'] }}</a>.</p>
-    <p><a class="btn" href="{{ $u('/waitlist') }}?type=agency">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a></p>
+    <p><a class="btn" href="{{ $u('/waitlist') }}?type=agency">{{ $ar ? 'انضم إلى قائمة الإطلاق' : 'Join the launch list' }}</a></p>
 </section>
 @include('public.tools.partials.tool-guide-faq', ['toolSlug' => 'meta-length-checker', 'ar' => $ar])
 @endsection

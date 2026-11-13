@@ -7,7 +7,7 @@ $t = $ar ? [
     'title' => 'قائمة إطلاق AdsRanger في 2027',
     'meta' => 'اترك بريدك واسم وكالتك أو شركتك ودولتك لتنضم إلى قائمة إطلاق AdsRanger، مساحة العمل العربية أولًا لوكالات المنطقة، في 2027.',
     'switch_url' => '/en/waitlist',
-    'h1' => 'انضم إلى قائمة انتظار <bdi dir="ltr">AdsRanger</bdi>',
+    'h1' => 'انضم إلى قائمة إطلاق <bdi dir="ltr">AdsRanger</bdi>', // O-438 fix 7
     'lead' => 'ما زالت <bdi dir="ltr">AdsRanger</bdi> قيد التطوير، والإطلاق في 2027. اترك بياناتك لتنضم إلى قائمة الإطلاق في 2027. لا رسائل مزعجة، ويمكنك مغادرة القائمة في أي وقت.',
     'saved_h' => 'شكرًا، سجّلنا بياناتك',
     'saved_p' => 'حفظنا بياناتك في قائمة الإطلاق.',
@@ -28,7 +28,7 @@ $t = $ar ? [
     'consent' => 'أوافق على تلقي رسائل بريد إلكتروني حول إطلاق <bdi dir="ltr">AdsRanger</bdi>.',
     'policy' => 'سياسة الخصوصية',
     'new_tab' => '(يفتح في علامة تبويب جديدة)',
-    'submit' => 'انضم إلى قائمة الانتظار',
+    'submit' => 'انضم إلى قائمة الإطلاق',
     'privacy_line' => 'نستخدم بريدك واسم شركتك أو وكالتك ودولتك فقط لإبلاغك بإطلاق <bdi dir="ltr">AdsRanger</bdi>. الاسم ونطاق الإنفاق والمنصات التي تديرها وإجابة «من أنت؟» اختيارية، وتساعدنا على دعوة المناسبين أولًا. لا نشارك هذه البيانات مع أي جهة، ويمكنك إلغاء الاشتراك أو طلب حذفها في أي وقت.',
     'privacy_link' => 'اطّلع على سياسة الخصوصية.',
 ] : [
@@ -56,7 +56,7 @@ $t = $ar ? [
     'consent' => 'I agree to receive emails about AdsRanger\'s launch.',
     'policy' => 'Privacy policy',
     'new_tab' => '(opens in a new tab)',
-    'submit' => 'Join the waitlist',
+    'submit' => 'Join the launch list',
     'privacy_line' => 'We use your email, company name and country only to tell you about AdsRanger\'s launch. Name, spend range, the ad platforms you run and "You are…" are optional; they help us invite the right people first. We don\'t share this with anyone, and you can unsubscribe or ask us to delete it at any time.',
     'privacy_link' => 'See our privacy policy.',
 ];

@@ -77,7 +77,7 @@
 </ul>
 <h2>How AdsRanger fits</h2>
 <p>AdsRanger is an ad operations platform for MENA agencies, now in development and launching in 2027. Planning, pacing and cross-network reporting are among the features coming at launch. A Hijri and Ramadan calendar is in development, and a scenario planner will follow.</p>
-<p><a class="btn" href="/en/waitlist">Join the waitlist</a></p>
+<p><a class="btn" href="/en/waitlist">Join the launch list</a></p>
 <h2>FAQ</h2>
 <h3>When does Ramadan 2027 start?</h3>
 <p>Ramadan 1448 is expected to start on Monday 8 February 2027, based on astronomical calculations. The final date depends on the moon sighting in each country.</p>

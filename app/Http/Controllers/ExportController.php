@@ -7,6 +7,7 @@ use App\Models\AuditLog;
 use App\Models\Client;
 use App\Support\DataExport;
 use App\Support\DemoData;
+use App\Support\Import\ClientSheet;
 use Carbon\CarbonImmutable;
 use Filament\Facades\Filament;
 use Illuminate\Http\Request;
@@ -128,6 +129,16 @@ class ExportController extends Controller
             }
             $w->close();
         }, $file, ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Cache-Control' => 'private, no-store', 'X-Robots-Tag' => 'noindex, nofollow']);
+    }
+
+    /** WS-03: the client sheet template (headers in the panel's language, one example row). */
+    public function clientsTemplate()
+    {
+        return $this->csv('adsranger-clients-template.csv', function ($out) {
+            foreach (ClientSheet::template(app()->getLocale() === 'ar') as $row) {
+                fputcsv($out, $row, ',', '"', '');
+            }
+        });
     }
 
     public function clients(Request $request)

@@ -67,6 +67,6 @@ $tools = [
         </div>
     </div>
 
-    <p style="margin-top:24px"><a class="btn" href="{{ $u('/waitlist') }}?type=business">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a></p>
+    <p style="margin-top:24px"><a class="btn" href="{{ $u('/waitlist') }}?type=business">{{ $ar ? 'انضم إلى قائمة الإطلاق' : 'Join the launch list' }}</a></p>
 </section>
 @endsection

@@ -39,7 +39,7 @@ $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
         <p class="muted" style="margin-top:14px">{{ $privacy }}</p>
     </div>
 </section>
-<p style="margin-top:20px"><a class="btn" href="{{ $u('/waitlist') }}?type=agency">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a></p>
+<p style="margin-top:20px"><a class="btn" href="{{ $u('/waitlist') }}?type=agency">{{ $ar ? 'انضم إلى قائمة الإطلاق' : 'Join the launch list' }}</a></p>
 @include('public.tools.partials.tool-guide-faq', ['toolSlug' => 'gulf-ad-disclosure-checklist', 'ar' => $ar])
 @endsection
 @push('scripts')

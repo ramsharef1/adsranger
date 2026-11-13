@@ -32,7 +32,7 @@ $t = $ar ? ['in' => 'النص بالعربيزي', 'hint' => 'الأرقام: 2 
     </div>
 </section>
 <p><a href="{{ $u('/tools/arabic-keyword-generator') }}">{{ $ar ? 'مولد الكلمات المفتاحية العربية' : 'Arabic keyword generator' }}</a></p>
-<p><a class="btn" href="{{ $u('/waitlist') }}?type=agency">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a></p>
+<p><a class="btn" href="{{ $u('/waitlist') }}?type=agency">{{ $ar ? 'انضم إلى قائمة الإطلاق' : 'Join the launch list' }}</a></p>
 @include('public.tools.partials.tool-guide-faq', ['toolSlug' => 'arabizi-converter', 'ar' => $ar])
 @endsection
 @push('scripts')

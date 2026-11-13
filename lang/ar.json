@@ -2317,5 +2317,20 @@
     "Excel (.xlsx)": "ملف Excel",
     "Download": "تنزيل",
     "Sort your imported campaigns": "افرز حملاتك المستوردة",
-    "Preview your first client report": "اطّلع على أول تقرير لعميلك"
+    "Preview your first client report": "اطّلع على أول تقرير لعميلك",
+    "Join the launch list": "انضم إلى قائمة الإطلاق",
+    "Import clients from a sheet": "استورد العملاء من جدول",
+    "One row per client. Arabic or English headers; only the name is required.": "صف لكل عميل. العناوين بالعربية أو الإنجليزية، والاسم وحده مطلوب.",
+    "Download the template": "نزّل القالب",
+    "Clients added: :n": "عملاء أُضيفوا: :n",
+    "Not added, over the plan limit: :n": "لم يُضافوا لتجاوز حد الباقة: :n",
+    "No client name column was found. Use the template headers.": "لم نجد عمود اسم العميل. استخدم عناوين القالب.",
+    "New clients: :n": "عملاء جدد: :n",
+    "Data connected or imported": "بيانات مربوطة أو مستوردة",
+    "Report schedule": "جدول التقارير",
+    "Client report link": "رابط تقرير العميل",
+    "SEO site": "موقع السيو",
+    "Setup": "الإعداد",
+    "Missing: :list": "الناقص: :list",
+    "Many clients? Add the first one here, then import the rest from a sheet in Clients.": "لديك عملاء كثيرون؟ أضف أولهم هنا، ثم استورد البقية من جدول في صفحة العملاء."
 }

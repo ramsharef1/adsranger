@@ -17,7 +17,7 @@ class OpenDataBx01Test extends TestCase
         $this->assertStringStartsWith('text/csv', $this->get('/data/mena-ad-calendar-2027.csv')->headers->get('Content-Type'));
         $this->get('/data/secrets.txt')->assertNotFound();
         $this->assertDirectoryDoesNotExist(public_path('data'), 'a public/data folder makes the web server redirect /data');
-        $this->get('/data')->assertOk()->assertSee('تقويم المواسم الإعلانية 2027')->assertSee('استشهد بهذه الصفحة')->assertSee('hreflang="en"', false);
+        $this->get('/data')->assertOk()->assertSee('تقويم المواسم 2027')->assertSee('استشهد بهذه الصفحة')->assertSee('hreflang="en"', false);
         foreach (config('datasets.mena-ad-calendar-2027.files') as [, $path]) {
             $this->assertFileExists(resource_path('datasets/'.basename($path)), $path);
             $r = $this->get($path)->assertOk();

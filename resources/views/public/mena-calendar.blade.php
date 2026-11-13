@@ -158,7 +158,7 @@ $t = $ar ? [
     @endforeach
 </ul>
 <p style="margin-top:18px">{!! $ar ? 'نزّل هذا التقويم بصيغة <bdi dir="ltr">CSV</bdi> أو <bdi dir="ltr">JSON</bdi> من صفحة <a href="'.e(\App\Support\PublicUrl::path('/data', 'ar')).'">البيانات المفتوحة</a>.' : 'Download this calendar as CSV or JSON from our <a href="'.e(\App\Support\PublicUrl::path('/data', 'en')).'">open data</a> page.' !!}</p>
-@include('public.partials.cite', ['citeTitle' => $ar ? 'تقويم المواسم الإعلانية 2027' : 'MENA ad calendar 2027', 'citeUrl' => \App\Support\PublicUrl::absolute('/mena-calendar', $ar ? 'ar' : 'en'), 'citeLicense' => 'CC BY 4.0'])
+@include('public.partials.cite', ['citeTitle' => $ar ? 'تقويم المواسم 2027' : 'MENA ad calendar 2027', 'citeUrl' => \App\Support\PublicUrl::absolute('/mena-calendar', $ar ? 'ar' : 'en'), 'citeLicense' => 'CC BY 4.0'])
 @endsection
 
 @push('scripts')

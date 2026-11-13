@@ -81,6 +81,7 @@ class AppPanelProvider extends PanelProvider
                 Route::get('export/daily-metrics.csv', [ExportController::class, 'metrics'])->middleware('throttle:20,1')->name('export.metrics');
                 Route::get('export/daily-metrics.xlsx', [ExportController::class, 'metricsXlsx'])->middleware('throttle:20,1')->name('export.metrics.xlsx');
                 Route::get('export/clients.csv', [ExportController::class, 'clients'])->middleware('throttle:20,1')->name('export.clients');
+                Route::get('clients-template.csv', [ExportController::class, 'clientsTemplate'])->middleware('throttle:20,1')->name('clients-template');
                 Route::get('export/ad-accounts.csv', [ExportController::class, 'adAccounts'])->middleware('throttle:20,1')->name('export.accounts');
                 Route::get('export/workspace.zip', [ExportController::class, 'workspace'])->middleware('throttle:3,1')->name('export.workspace');
                 // #175 Critical push: subscribe / unsubscribe this device, send a test.

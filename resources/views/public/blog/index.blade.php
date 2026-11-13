@@ -31,7 +31,7 @@
     <p style="margin:0 0 10px">{{ $ar ? 'نعيد كتابة هذه الأدلة لتكون أكثر تفصيلًا وفائدة. وإلى أن تُنشر، ابدأ من هنا:' : 'We are rewriting these guides to make them more detailed and useful. Until they are published, start here:' }}</p>
     <ul style="margin:0">
         <li><a href="{{ $u('/ramadan-2027') }}">{{ $ar ? 'دليل رمضان 2027' : 'Ramadan 2027 guide' }}</a></li>
-        <li><a href="{{ $u('/mena-calendar') }}">{{ $ar ? 'تقويم المواسم الإعلانية 2027' : 'MENA ad calendar 2027' }}</a></li>
+        <li><a href="{{ $u('/mena-calendar') }}">{{ $ar ? 'تقويم المواسم 2027' : 'MENA ad calendar 2027' }}</a></li>
         <li><a href="{{ $u('/glossary') }}">{{ $ar ? 'قاموس المصطلحات' : 'Glossary' }}</a></li>
     </ul>
 </div>

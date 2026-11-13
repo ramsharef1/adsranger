@@ -49,7 +49,7 @@ class TrialNotice
     {
         $url = config('adsranger.waitlist_url');
         if (filled($url)) {
-            return new HtmlString('<a href="'.e($url).'" style="text-decoration:underline;display:inline-flex;align-items:center;min-height:44px">'.e(__('Join the waitlist', [], $locale)).'</a>');
+            return new HtmlString('<a href="'.e($url).'" style="text-decoration:underline;display:inline-flex;align-items:center;min-height:44px">'.e(__('Join the launch list', [], $locale)).'</a>');
         }
         $email = e(config('adsranger.signup.support_email'));
 
@@ -61,7 +61,7 @@ class TrialNotice
     {
         $url = config('adsranger.waitlist_url');
         if (filled($url)) {
-            return new HtmlString('<a href="'.e($url).'" style="text-decoration:underline">'.e(__('Join the waitlist', [], $locale)).'</a>');
+            return new HtmlString('<a href="'.e($url).'" style="text-decoration:underline">'.e(__('Join the launch list', [], $locale)).'</a>');
         }
         $email = e(config('adsranger.signup.support_email'));
 

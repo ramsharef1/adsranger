@@ -21,7 +21,7 @@
     $closing = $site::hasClosingBand($arPath);
     $sticky = ! in_array($arPath, ['/waitlist', '/partners'], true);
     $crumb = $isHome ? null : $site::name($arPath, $ar);
-    $waitlistLabel = $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist';
+    $waitlistLabel = $ar ? 'انضم إلى قائمة الإطلاق' : 'Join the launch list';
     $schema = $schema ?? [];
 @endphp
 <!doctype html>

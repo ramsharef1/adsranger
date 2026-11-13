@@ -43,7 +43,7 @@ $t = $ar ? [
         <p class="muted" style="margin:0">{{ $privacy }}</p>
     </div>
 </section>
-<p style="margin-top:20px"><a class="btn" href="{{ $u('/waitlist') }}?type=agency">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a></p>
+<p style="margin-top:20px"><a class="btn" href="{{ $u('/waitlist') }}?type=agency">{{ $ar ? 'انضم إلى قائمة الإطلاق' : 'Join the launch list' }}</a></p>
 @include('public.tools.partials.tool-guide-faq', ['toolSlug' => 'ad-pixel-checker', 'ar' => $ar])
 @endsection
 @push('scripts')

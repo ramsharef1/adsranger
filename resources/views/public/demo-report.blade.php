@@ -31,7 +31,7 @@ $t = $ar ? [
         ['فيديو غرف النوم', 'TikTok', 'مشتريات من الموقع', '410', '8.90', '3,649'],
         ['عروض المجالس', 'Snapchat', 'نماذج عملاء محتملين', '325', '7.50', '2,440'],
     ],
-    'cta' => 'انضم إلى قائمة الانتظار',
+    'cta' => 'انضم إلى قائمة الإطلاق',
 ] : [
     'h1' => 'A client report your clients can read',
     'lead' => 'Results by each campaign\'s real goal, in Arabic or English, through a read-only link. In development.',
@@ -54,7 +54,7 @@ $t = $ar ? [
         ['Bedroom video', 'TikTok', 'Website purchases', '410', '8.90', '3,649'],
         ['Majlis offers', 'Snapchat', 'Lead forms', '325', '7.50', '2,440'],
     ],
-    'cta' => 'Join the waitlist',
+    'cta' => 'Join the launch list',
 ];
 @endphp
 @extends('layouts.public')

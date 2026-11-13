@@ -10,6 +10,8 @@ use App\Filament\Resources\Clients\Pages\ViewClient;
 use App\Models\AdAccount;
 use App\Models\Client;
 use App\Models\DailyMetric;
+use App\Support\CallResults;
+use App\Support\ClientSetupScore;
 use App\Support\HealthScore;
 use App\Support\TeamRoles;
 use BackedEnum;
@@ -92,7 +94,7 @@ class ClientResource extends Resource
                 TextInput::make('target_cpr')->label(__('Target cost per result'))->numeric()->minValue(0),
                 TextInput::make('target_results')->label(__('Target results / month'))->numeric()->integer()->minValue(0),
                 TextInput::make('target_roas')->label(__('Target ROAS'))->numeric()->minValue(0)->helperText(__('e.g. 3 = 3× revenue')),
-                Select::make('call_result')->label(__('Count calls as'))->options(fn () => \App\Support\CallResults::options())
+                Select::make('call_result')->label(__('Count calls as'))->options(fn () => CallResults::options())
                     ->default('placed')->selectablePlaceholder(false)->columnSpan(2)
                     ->helperText(__('Meta call ads report calls placed, confirmed and 20 seconds or longer. The one you pick is the result and the cost per result of call campaigns. Other networks report one call count.')),
             ]),
@@ -137,6 +139,11 @@ class ClientResource extends Resource
                     ->color(fn ($state) => HealthScore::band($state === null ? null : (int) $state)[1])
                     ->tooltip(fn ($record) => collect((array) $record->health_parts)->map(fn ($x, $k) => ucfirst($k).': '.$x['points'].'/'.$x['max'].' · '.$x['note'])->implode("\n") ?: __('Scores run nightly.')),
                 TextColumn::make('ad_accounts_count')->counts('adAccounts')->label(__('Accounts')),
+                // EH-30 (D-297): setup score with the missing steps on hover.
+                TextColumn::make('setup_score')->label(__('Setup'))->badge()->toggleable()
+                    ->state(fn (Client $record) => ClientSetupScore::for($record)['score'].'%')
+                    ->color(fn (Client $record) => ClientSetupScore::for($record)['score'] >= 80 ? 'success' : (ClientSetupScore::for($record)['score'] >= 40 ? 'warning' : 'gray'))
+                    ->tooltip(fn (Client $record) => ($m = ClientSetupScore::for($record)['missing']) ? __('Missing: :list', ['list' => implode(app()->getLocale() === 'ar' ? '، ' : ', ', $m)]) : null),
                 TextColumn::make('monthly_budget')->label(__('Budget / month'))->numeric(2)->toggleable(),
                 TextColumn::make('target_cpr')->label(__('Target CPR'))->numeric(2)->toggleable(),
                 TextColumn::make('status')->label(__('Status'))->badge()->formatStateUsing(fn ($state) => __($state))->color(fn ($state) => $state === 'active' ? 'success' : 'gray'),

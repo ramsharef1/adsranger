@@ -67,6 +67,6 @@ $holds = $ar ? [
 
     <p class="muted" style="margin-top:28px">{{ $ar ? 'تأسست في 2026 · عمّان، الأردن' : 'Founded 2026 · Amman, Jordan' }}</p>
     <p><a class="pl" href="{{ $u('/contact') }}">{{ $ar ? 'تواصل معنا' : 'Contact us' }}</a> · <a class="pl" href="{{ $u('/security') }}">{{ $ar ? 'الأمان' : 'Security' }}</a></p>
-    <p><a class="btn" href="{{ $u('/waitlist') }}">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a></p>
+    <p><a class="btn" href="{{ $u('/waitlist') }}">{{ $ar ? 'انضم إلى قائمة الإطلاق' : 'Join the launch list' }}</a></p>
 </section>
 @endsection

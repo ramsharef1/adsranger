@@ -7,7 +7,7 @@
  */
 return [
     'mena-ad-calendar-2027' => [
-        'title_ar' => 'تقويم المواسم الإعلانية 2027',
+        'title_ar' => 'تقويم المواسم 2027',
         'title_en' => 'MENA ad calendar 2027',
         'about_ar' => 'أهم مواعيد الإعلان في الشرق الأوسط وشمال أفريقيا لعام 2027: رمضان والأعياد والأيام الوطنية ومواسم التخفيضات، مع موعد بدء التخطيط ومصدر لكل موعد.',
         'about_en' => 'Key 2027 advertising dates across the Middle East and North Africa: Ramadan, Eid, national days and sale seasons, with when to start planning and a source for every date.',
