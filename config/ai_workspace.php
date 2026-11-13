@@ -10,7 +10,14 @@ return [
     'token_minutes' => 60,          // short-lived access tokens (spec v1 §16.4 #3)
     'refresh_days' => 30,
     'calls_per_minute' => 30,
-    'calls_per_day' => 200,         // ~200 tool calls / day (Free, v2 §3); paid limits come with the plan records
+    'calls_per_day' => 200,         // fallback when a plan has no row below
+    // D-286: tool calls per AI connection per day, by plan (Agency: 10,000, fair use).
+    'calls_per_day_by_tier' => ['free' => 200, 'solo' => 1000, 'starter' => 2000, 'pro' => 5000, 'agency' => 10000],
+    // D-286 / spec v2 §14.9 #1: Free covers one ad account spending up to this a month (USD); over it 2 months running →
+    // upgrade notice, AI tools go view-only 14 days later. Data is never deleted.
+    'free_spend_cap_usd' => 1000,
+    'free_notice_days' => 14,
+    'free_inactive_days' => 30,
     'max_payload_kb' => 64,
     // Abnormal activity → pause that AI connection + alert the owner (v1 §16.4 #6). Counts within the window.
     'anomaly' => ['window_minutes' => 10, 'scope_probes' => 3, 'schema_failures' => 5, 'injections' => 2, 'bursts' => 5],

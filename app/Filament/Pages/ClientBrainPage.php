@@ -13,6 +13,7 @@ use App\Support\AiWorkspace\ContextPack;
 use App\Support\AiWorkspace\OwnKey;
 use App\Support\AiWorkspace\Playbooks;
 use App\Support\CurrentClient;
+use App\Support\PlanGate;
 use App\Support\TeamRoles;
 use BackedEnum;
 use Filament\Facades\Filament;
@@ -95,6 +96,7 @@ class ClientBrainPage extends Page
     {
         $client = $this->client();
         abort_unless($client && TeamRoles::canManageData(auth()->user(), Filament::getTenant()), 403);
+        abort_unless(PlanGate::allows(Filament::getTenant(), 'ai_workspace_full'), 403);
         $this->boxError = $this->boxBilling = null;
         $key = AiKey::where('agency_id', $client->agency_id)->where('provider', $this->boxKey)->first();
         if (! $key) {
@@ -118,6 +120,7 @@ class ClientBrainPage extends Page
     {
         $client = $this->client();
         abort_unless($client && TeamRoles::canManageTeam(auth()->user(), Filament::getTenant()), 403);
+        abort_unless(PlanGate::allows(Filament::getTenant(), 'ai_workspace_full'), 403);
         $item = AiBrainItem::where('client_id', $client->id)->findOrFail($id);
         $item->delete();
         AuditLog::record('ai_workspace.removed', $client, ['item' => $id, 'type' => $item->type]);
@@ -144,7 +147,8 @@ class ClientBrainPage extends Page
             : null;
 
         return ['clients' => $this->clients(), 'client' => $client, 'items' => $items, 'pack' => $client ? ContextPack::for($client) : null,
-            'canManage' => TeamRoles::canManageTeam(auth()->user(), Filament::getTenant()),
+            'full' => $full = PlanGate::allows(Filament::getTenant(), 'ai_workspace_full'),
+            'canManage' => $full && TeamRoles::canManageTeam(auth()->user(), Filament::getTenant()),
             'canRun' => TeamRoles::canManageData(auth()->user(), Filament::getTenant()), 'keys' => $keys, 'key' => $key, 'estimate' => $estimate];
     }
 }

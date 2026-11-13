@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Support\AiWorkspace\Connector;
+use App\Support\AiWorkspace\FreePlan;
 use App\Support\Modules;
 use Closure;
 use Illuminate\Http\Request;
@@ -48,7 +49,7 @@ class AiConnectorGuard
 
         $today = now($connection->agency->timezone ?: 'UTC')->toDateString();
         $calls = $connection->calls_day?->toDateString() === $today ? $connection->calls_today : 0;
-        if ($this->isToolCall($request) && $calls >= (int) config('ai_workspace.calls_per_day', 200)) {
+        if ($this->isToolCall($request) && $calls >= FreePlan::dailyCap($connection->agency)) {
             return $this->refuse(429, 'Daily limit reached for this AI connection. It resets at midnight, workspace time.');
         }
         $connection->forceFill(['last_call_at' => now(), 'calls_day' => $today, 'calls_today' => $calls + ($this->isToolCall($request) ? 1 : 0)])->save();

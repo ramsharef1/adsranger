@@ -8,6 +8,9 @@
     $usd = fn ($v) => $ltr(number_format((float) $v, 2).' USD');
 @endphp
 <x-filament-panels::page>
+    @if (! $full)
+        <div style="border:1px solid rgba(148,163,184,.35);border-radius:12px;padding:14px;font-size:14px">{{ __(':feature comes with :plan.', ['feature' => \App\Support\PlanGate::featureText('ai_workspace_full', 'name'), 'plan' => \App\Support\PlanGate::tierLabel('pro')]) }} {{ \App\Support\PlanGate::featureText('ai_workspace_full', 'what') }}</div>
+    @endif
     <p style="{{ $muted }};font-size:13px;line-height:1.7">{{ __('Your own API key runs the AI box and the night shift. Usage is billed by your provider to your account. AdsRanger stores the key encrypted and never shows it again.') }}</p>
 
     @foreach ($keys as $k)

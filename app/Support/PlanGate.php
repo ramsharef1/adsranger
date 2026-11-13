@@ -80,10 +80,16 @@ class PlanGate
         return (string) (config("plan_features.features.$feature.$field.$locale") ?? config("plan_features.features.$feature.$field.en") ?? $feature);
     }
 
+    /** Paid tiers shown in plan comparisons and upgrade choices. Free (D-286) is left out until sign-up offers it. */
+    public static function offeredTiers(): array
+    {
+        return array_values(array_diff(array_keys(config('plan_features.tiers')), ['free']));
+    }
+
     /** Gated features grouped by the tier that unlocks them, for Settings › Plan (EX-50 point 7). */
     public static function byTier(): array
     {
-        $out = array_fill_keys(array_keys(config('plan_features.tiers')), []);
+        $out = array_fill_keys(static::offeredTiers(), []);
         foreach (config('plan_features.features') as $key => $f) {
             $out[$f['tier']][] = $key;
         }

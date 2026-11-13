@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\AuditLog;
 use App\Models\PushSubscription;
 use App\Models\User;
+use App\Support\AiWorkspace\FreePlan;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -96,6 +97,7 @@ class Devices
     public static function onLogin(User $user, ?string $ua): void
     {
         $fp = static::fingerprint($ua);
+        FreePlan::catchUp($user); // before this sign-in counts as activity
         $previous = AuditLog::where('user_id', $user->getKey())->where('action', 'auth.login');
         $hadAny = (clone $previous)->exists();
         $known = (clone $previous)->where('meta->device', $fp)->where('created_at', '>=', now()->subDays(self::KNOWN_DAYS))->exists();

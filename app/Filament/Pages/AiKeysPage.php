@@ -7,6 +7,7 @@ use App\Filament\Concerns\TranslatesPageLabels;
 use App\Models\AiKey;
 use App\Models\AuditLog;
 use App\Support\AiWorkspace\OwnKey;
+use App\Support\PlanGate;
 use App\Support\TeamRoles;
 use BackedEnum;
 use Filament\Facades\Filament;
@@ -48,9 +49,15 @@ class AiKeysPage extends Page
 
     public $cap = '';
 
+    /** D-286: keys, the AI box and the night shift come with Pro and up. */
+    protected function full(): bool
+    {
+        return PlanGate::allows(Filament::getTenant(), 'ai_workspace_full');
+    }
+
     protected function canManage(): bool
     {
-        return TeamRoles::canManageTeam(auth()->user(), Filament::getTenant());
+        return $this->full() && TeamRoles::canManageTeam(auth()->user(), Filament::getTenant());
     }
 
     public function save(): void
@@ -106,7 +113,7 @@ class AiKeysPage extends Page
 
     protected function getViewData(): array
     {
-        return ['keys' => AiKey::where('agency_id', Filament::getTenant()->getKey())->orderBy('provider')->get(), 'canManage' => $this->canManage(),
+        return ['full' => $this->full(), 'keys' => AiKey::where('agency_id', Filament::getTenant()->getKey())->orderBy('provider')->get(), 'canManage' => $this->canManage(),
             'models' => (array) config("ai_workspace.own_key_models.{$this->provider}", [])];
     }
 }

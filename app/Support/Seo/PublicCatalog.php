@@ -1057,8 +1057,17 @@ class PublicCatalog
      * otherwise «ما هو» («ما هي» when the term is marked `ar_feminine` by Growth), and the English in brackets is dropped
      * when the page title would pass 60 characters with " | AdsRanger".
      */
-    public static function glossaryHeading(array $item, bool $ar): string
+    /**
+     * Glossary terms whose Arabic name takes «ما هي»: feminine nouns and non-human plurals (E1, 2026-11-13, filling the
+     * gender list asked of Growth in O-413; Growth can change any entry). Terms with a fixed title are not listed.
+     */
+    public const AR_FEMININE = ['cpr', 'ctr', 'cpm', 'cpc', 'pacing', 'impression-share', 'quality-score', 'utm', 'budget', 'bid-strategy',
+        'retargeting', 'conversions-api', 'performance-max', 'search-terms', 'ad-set', 'creative', 'thruplay', 'targets', 'cac', 'ltv', 'mena',
+        'ad-network', 'benchmarks'];
+
+    public static function glossaryHeading(array $item, bool $ar, ?string $slug = null): string
     {
+        $item['ar_feminine'] = ! empty($item['ar_feminine']) || in_array($slug, self::AR_FEMININE, true);
         $fixed = $item[$ar ? 'title_ar' : 'title_en'] ?? null;
         if (is_string($fixed) && $fixed !== '') {
             return $fixed;

@@ -18,6 +18,7 @@ use App\Http\Controllers\GoogleSignInController;
 use App\Http\Controllers\PushController;
 use App\Http\Middleware\EnsureAgencyTwoStep;
 use App\Http\Middleware\EnsureOnboarded;
+use App\Http\Middleware\FreePlanFence;
 use App\Http\Middleware\SetPanelLocale;
 use App\Http\Middleware\TrialLifecycleGate;
 use App\Models\Agency;
@@ -102,7 +103,7 @@ class AppPanelProvider extends PanelProvider
             ->tenantProfile(EditAgencyProfile::class)
             // D-61 trial lifecycle (self-signup only): read-only pages refuse create/edit; closed workspaces open only
             // the "trial ended" page, Plan & usage and the exports. Livewire calls: App\Support\ReadOnlyGuard.
-            ->tenantMiddleware([TrialLifecycleGate::class, EnsureOnboarded::class])
+            ->tenantMiddleware([TrialLifecycleGate::class, EnsureOnboarded::class, FreePlanFence::class])
             ->colors([
                 // UX-6: buttons fill with #0F766E (teal-700, white text 5.5:1) in both themes; #14B8A6 stays for accents.
                 'primary' => PanelColors::primary(),

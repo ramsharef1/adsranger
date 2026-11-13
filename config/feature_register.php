@@ -11,6 +11,7 @@ use App\Filament\Pages\AccountAuditPage;
 use App\Filament\Pages\AiConnectionsPage;
 use App\Filament\Pages\AiKeysPage;
 use App\Filament\Pages\ClientBrainPage;
+use App\Filament\Pages\FreeLiteView;
 use App\Filament\Pages\MyDevices;
 use App\Filament\Pages\NightShiftPage;
 use App\Filament\Pages\OnboardingPage;
@@ -18,12 +19,14 @@ use App\Filament\Pages\SeoAuditPage;
 use App\Filament\Pages\WhatsNewPage;
 use App\Filament\Pages\WorkspaceActivity;
 use App\Http\Middleware\AiConnectorGuard;
+use App\Http\Middleware\FreePlanFence;
 use App\Http\Middleware\ToolAbuseGuard;
 use App\Mcp\Servers\AdsRangerServer;
 use App\Models\CostLine;
 use App\Models\LaunchCheck;
 use App\Support\AiWorkspace\AiBox;
 use App\Support\AiWorkspace\Brain;
+use App\Support\AiWorkspace\FreePlan;
 use App\Support\AiWorkspace\NightShift;
 use App\Support\AiWorkspace\QualityGate;
 use App\Support\Arabic\Normaliser;
@@ -77,4 +80,6 @@ return [
     'AIW-M1a' => ['title' => 'AI Workspace M1 core: quality gate (Q1, Q2, Q3, Q5, Q9), rule clean-up, output contracts, client brain + screen (module ai_workspace, off)', 'code' => [QualityGate::class, Brain::class, ClientBrainPage::class], 'tests' => ['Feature/AiWorkspaceM1CoreTest.php']],
     'AIW-M1b' => ['title' => 'AI Workspace M1: AdsRanger connector at mcp.adsranger.com (OAuth 2.1 + DCR, consent with ownership tick, 8 tools, 3 playbooks, guard, Connections screen)', 'code' => [AdsRangerServer::class, AiConnectorGuard::class, AiConnectionsPage::class], 'tests' => ['Feature/AiConnectorM1bTest.php']],
     'AIW-M1d' => ['title' => 'AI Workspace M1: own API keys with monthly cap (#159), AI box with 3 playbooks, night shift v0 (read + morning list)', 'code' => [AiKeysPage::class, AiBox::class, NightShift::class, NightShiftPage::class], 'tests' => ['Feature/AiWorkspaceM1dTest.php']],
+    'AIW-M1c' => ['title' => 'AI Workspace M1: Free plan «الباقة المجانية» (lite view, fence, one Free per ad account, spend fence, idle sync pause), daily caps by plan, full AI Workspace from Pro (D-286)', 'code' => [FreePlan::class, FreePlanFence::class, FreeLiteView::class], 'tests' => ['Feature/AiWorkspaceM1cFreeTest.php']],
+    'GB-11a' => ['title' => 'Glossary titles «ما هو / ما هي» by gender, ≤ 60 characters', 'code' => [PublicCatalog::class], 'tests' => ['Feature/GlossaryHeadingTest.php']],
 ];

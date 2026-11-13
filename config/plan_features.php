@@ -8,9 +8,11 @@
  */
 return [
     // Order matters: a higher tier includes everything below it.
-    'tiers' => ['solo' => 1, 'starter' => 2, 'pro' => 3, 'agency' => 4],
+    // D-280 / D-286: Free «الباقة المجانية» is the first step of the one ladder (AI Workspace basics; lite view in the app).
+    'tiers' => ['free' => 0, 'solo' => 1, 'starter' => 2, 'pro' => 3, 'agency' => 4],
 
     'tier_labels' => [
+        'free' => ['en' => 'Free', 'ar' => 'الباقة المجانية'],
         'solo' => ['en' => 'Solo', 'ar' => 'باقة المستقل'],
         // Full glossary names (EX-61, UX-65): used inside sentences, so templates never add «الباقة».
         'starter' => ['en' => 'Starter', 'ar' => 'الباقة الأساسية'],
@@ -19,6 +21,7 @@ return [
     ],
     // Short forms for badges (PlanBadge, nav badge, locked buttons).
     'tier_short' => [
+        'free' => ['en' => 'Free', 'ar' => 'المجانية'],
         'solo' => ['en' => 'Solo', 'ar' => 'المستقل'],
         'starter' => ['en' => 'Starter', 'ar' => 'الأساسية'],
         'pro' => ['en' => 'Pro', 'ar' => 'الاحترافية'],
@@ -26,12 +29,17 @@ return [
     ],
 
     // In-app prices (D-19). Shown in Settings › Plan and upgrade screens only, never on public pages (D-07).
-    'prices' => ['solo' => 19, 'starter' => 49, 'pro' => 149, 'agency' => 399],
+    'prices' => ['free' => 0, 'solo' => 19, 'starter' => 49, 'pro' => 149, 'agency' => 399],
 
     // A workspace on trial gets this tier (D-61: the 14-day trial runs at Pro, capped).
     'trial_tier' => 'pro',
 
     'features' => [
+        // D-286: AI Workspace in full (AI box on own key, night shift, editing the client brain) from Pro; lower plans keep the
+        // connector + a read-only client brain.
+        'ai_workspace_full' => ['tier' => 'pro', 'refs' => [169],
+            'name' => ['en' => 'AI Workspace in full', 'ar' => 'مساحة الذكاء الاصطناعي كاملة'],
+            'what' => ['en' => 'Run AI on your own key inside AdsRanger, get the night shift\'s morning list, and organise each client brain.', 'ar' => 'شغّل الذكاء بمفتاحك داخل AdsRanger، واحصل على قائمة المناوب الليلي الصباحية، ونظّم ذاكرة كل عميل.']],
         // key => tier, register row(s), names and one-line descriptions (EN / AR) for the locked state (EX-50).
         // #173 (FR-016): every plan gets the audit; Starter sees the top 3 findings, Pro and up see all of them.
         'account_audit_full' => ['tier' => 'pro', 'refs' => [173, 31, 32, 33, 34],

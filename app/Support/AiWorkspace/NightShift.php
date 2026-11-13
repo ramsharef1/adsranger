@@ -10,6 +10,7 @@ use App\Models\Alert;
 use App\Models\AuditLog;
 use App\Models\Client;
 use App\Support\Modules;
+use App\Support\PlanGate;
 
 /**
  * AI Workspace M1 item 8 (spec v1 §13.1 N1, Product M1 screens §8): night shift v0. Each night, at the workspace's chosen
@@ -40,6 +41,9 @@ class NightShift
         $fail = fn (string $why) => tap($run)->update(['status' => 'failed', 'error' => $why, 'finished_at' => now()]);
         if (! Modules::on('ai_workspace', null, $agency) && ! Modules::isPreviewAgency($agency)) {
             return $fail(__('AI Workspace is not available for this workspace yet.'));
+        }
+        if (! PlanGate::allows($agency, 'ai_workspace_full')) {
+            return $fail(__('The night shift comes with :plan.', ['plan' => PlanGate::tierLabel('pro')]));
         }
         if (! $key) {
             return $fail(__('No key for this provider. Add one in My API keys.'));

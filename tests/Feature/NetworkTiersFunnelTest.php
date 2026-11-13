@@ -24,7 +24,7 @@ class NetworkTiersFunnelTest extends TestCase
     {
         return DB::table('ad_network_plan')->join('plans', 'plans.id', '=', 'plan_id')
             ->join('ad_networks', 'ad_networks.id', '=', 'ad_network_id')
-            ->where('ad_networks.key', $network)->orderBy('plans.sort')->pluck('plans.key')->all();
+            ->where('ad_networks.key', $network)->where('plans.key', '!=', 'free')->orderBy('plans.sort')->pluck('plans.key')->all();
     }
 
     public function test_network_tiers_follow_d32_and_d01(): void
@@ -32,6 +32,11 @@ class NetworkTiersFunnelTest extends TestCase
         // #177 Solo gets the same networks as Starter.
         $this->assertSame(['solo', 'starter', 'pro', 'agency'], $this->plansFor('tiktok'));
         $this->assertSame(['solo', 'starter', 'pro', 'agency'], $this->plansFor('snapchat'));
+        // D-286: Free «الباقة المجانية» has Solo's networks (one ad account).
+        $free = DB::table('ad_network_plan')->join('plans', 'plans.id', '=', 'plan_id')->join('ad_networks', 'ad_networks.id', '=', 'ad_network_id')
+            ->where('plans.key', 'free')->pluck('ad_networks.key')->all();
+        $this->assertContains('tiktok', $free);
+        $this->assertNotContains('microsoft', $free);
         $this->assertSame(['pro', 'agency'], $this->plansFor('microsoft'));
         $this->assertSame(['pro', 'agency'], $this->plansFor('linkedin'));
         $this->assertSame(['pro', 'agency'], $this->plansFor('ga4'));

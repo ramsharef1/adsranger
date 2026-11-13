@@ -71,7 +71,10 @@
         </details>
     @endif
 
-    @if ($client && $canRun)
+    @if ($client && ! $full)
+        <p style="{{ $muted }};font-size:13px">{!! __('Organising the client brain, the AI box and the night shift come with :plan.', ['plan' => e(\App\Support\PlanGate::tierLabel('pro'))]) !!}</p>
+    @endif
+    @if ($client && $canRun && $full)
         <section style="{{ $card }}" aria-label="{{ __('AI box') }}">
             <h3 style="font-size:15px;font-weight:700;margin:0">{{ __('AI box') }}</h3>
             @if ($keys->isEmpty())

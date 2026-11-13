@@ -5,7 +5,7 @@
     $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
     $item = \App\Support\Seo\PublicCatalog::glossary()[$term];
     $name = $ar ? $item['term_ar'] : $item['term_en'];
-    $heading = \App\Support\Seo\PublicCatalog::glossaryHeading($item, $ar);
+    $heading = \App\Support\Seo\PublicCatalog::glossaryHeading($item, $ar, $term);
     $title = $heading.' | AdsRanger';
     $meta = $ar ? $item['def_ar'] : $item['def_en'];
     $selfUrl = \App\Support\PublicUrl::absolute($arPath, $lang);

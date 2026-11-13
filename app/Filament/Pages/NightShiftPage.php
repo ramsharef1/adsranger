@@ -11,6 +11,7 @@ use App\Models\AiNightShift;
 use App\Models\AuditLog;
 use App\Models\Client;
 use App\Support\AiWorkspace\NightShift;
+use App\Support\PlanGate;
 use App\Support\TeamRoles;
 use BackedEnum;
 use Filament\Facades\Filament;
@@ -66,9 +67,15 @@ class NightShiftPage extends Page
         $this->clientIds = array_map('strval', (array) $s->client_ids);
     }
 
+    /** D-286: keys, the AI box and the night shift come with Pro and up. */
+    protected function full(): bool
+    {
+        return PlanGate::allows(Filament::getTenant(), 'ai_workspace_full');
+    }
+
     protected function canManage(): bool
     {
-        return TeamRoles::canManageTeam(auth()->user(), Filament::getTenant());
+        return $this->full() && TeamRoles::canManageTeam(auth()->user(), Filament::getTenant());
     }
 
     public function save(): void
@@ -90,7 +97,7 @@ class NightShiftPage extends Page
 
     public function runNow(): void
     {
-        abort_unless(TeamRoles::isOwner(auth()->user(), Filament::getTenant()), 403);
+        abort_unless($this->full() && TeamRoles::isOwner(auth()->user(), Filament::getTenant()), 403);
         $s = $this->shift();
         if (! $s->exists || ! $s->provider) {
             Notification::make()->title(__('Save the settings first.'))->danger()->send();
@@ -111,7 +118,7 @@ class NightShiftPage extends Page
             ->whereBetween('created_at', [$last->started_at, $last->finished_at ?? now()])->get()
             ->sortBy(fn ($i) => array_search($i->meta['level'] ?? 'info', ['critical', 'warning', 'info'], true))->values() : collect();
 
-        return ['runs' => $runs, 'last' => $last, 'items' => $items, 'keys' => AiKey::where('agency_id', $agency->getKey())->get(),
+        return ['full' => $this->full(), 'runs' => $runs, 'last' => $last, 'items' => $items, 'keys' => AiKey::where('agency_id', $agency->getKey())->get(),
             'clients' => Client::visibleTo(auth()->user(), $agency)->orderBy('name')->get(), 'canManage' => $this->canManage(),
             'isOwner' => TeamRoles::isOwner(auth()->user(), $agency), 'tz' => $agency->timezone ?: 'UTC'];
     }

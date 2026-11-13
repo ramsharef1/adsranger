@@ -6,6 +6,7 @@ use App\Models\AiBrainItem;
 use App\Models\Client;
 use App\Support\AiWorkspace\Brain;
 use App\Support\AiWorkspace\Connector;
+use App\Support\AiWorkspace\FreePlan;
 use App\Support\AiWorkspace\OutputContract;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Laravel\Mcp\Request;
@@ -51,6 +52,9 @@ class SaveToClient extends AiTool
     protected function store(Client $client, array $data): Response
     {
         $connection = $this->connection();
+        if (FreePlan::isFree($connection->agency) && FreePlan::spendFence($connection->agency)['view_only']) {
+            return Response::error('This Free workspace is view-only: its ad spend passed the Free plan limit two months running. Saving works again on a paid plan.');
+        }
         $result = Brain::save($client, [
             'type' => $data['type'], 'title' => $data['title'], 'body' => $data['body'] ?? null, 'output_type' => $data['output_type'] ?? null,
             'output' => $data['output'] ?? null, 'url' => $data['url'] ?? null, 'try' => $data['try'] ?? 1, 'ai' => $connection->provider,

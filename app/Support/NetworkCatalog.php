@@ -21,7 +21,7 @@ class NetworkCatalog
 
     /**
      * @return array<string, list<array{key: string, name: string, category: string, status: string, connected: int, tier: ?string, requested: bool, requests: int}>>
-     *         grouped by category in the configured order
+     *                                                                                                                                                                grouped by category in the configured order
      */
     public static function forMember(User $user, Agency $agency): array
     {
@@ -105,7 +105,7 @@ class NetworkCatalog
         $out = [];
         $rows = DB::table('ad_network_plan')->join('plans', 'plans.id', '=', 'ad_network_plan.plan_id')->select('ad_network_plan.ad_network_id', 'plans.key')->get();
         foreach ($rows as $r) {
-            if (! isset(config('plan_features.tiers')[$r->key])) {
+            if (! isset(config('plan_features.tiers')[$r->key]) || $r->key === 'free') {
                 continue;
             }
             $cur = $out[$r->ad_network_id] ?? null;

@@ -61,7 +61,7 @@ class PlanUsage extends Page
         $user = auth()->user();
         abort_unless($agency && PlanGate::canUpgrade($user, $agency), 403);
 
-        $tiers = array_keys((array) config('plan_features.tiers', []));
+        $tiers = PlanGate::offeredTiers();
         $this->validate([
             'targetPlan' => ['required', Rule::in($tiers)],
             'upgradeNote' => ['nullable', 'string', 'max:500'],
