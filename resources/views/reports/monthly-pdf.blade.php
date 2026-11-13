@@ -115,6 +115,16 @@
     @endif
 @endif
 
+{{-- XS-03 / FS-20 (R4): the agency's own lines, edited before sending. --}}
+@if (! empty($notes?->done))
+    <h2>{{ __('report.what_we_did') }}</h2>
+    <div style="white-space:pre-line">{{ $notes->done }}</div>
+@endif
+@if (! empty($notes?->next))
+    <h2>{{ __('report.next_month') }}</h2>
+    <div style="white-space:pre-line">{{ $notes->next }}</div>
+@endif
+
 <div class="foot">
     {{ __('report.generated', ['date' => $generated]) }} · {{ __('report.pdf_note') }}@if (\App\Support\PoweredBy::on($agency ?? null)) · {!! \App\Support\PoweredBy::html($agency ?? null) !!}@endif
 </div>

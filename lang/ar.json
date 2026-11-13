@@ -2532,5 +2532,10 @@
     "No contact logged yet": "لا تواصل مسجّل بعد",
     "This week's clients": "عملاء هذا الأسبوع",
     "Ranked: open Critical alerts first, then warnings, reports going out soon and clients nobody has talked to in 14 days.": "مرتّبون: التنبيهات الحرجة المفتوحة أولًا، ثم التحذيرات، ثم التقارير القريبة، ثم العملاء الذين لم يتواصل معهم أحد منذ 14 يومًا.",
-    "Copy as WhatsApp message": "انسخ كرسالة WhatsApp"
+    "Copy as WhatsApp message": "انسخ كرسالة WhatsApp",
+    "Month notes for the report": "ملاحظات الشهر للتقرير",
+    "Drafted from what happened in the app. Edit freely: it goes into the monthly report as written.": "مسودة مما حدث في التطبيق. عدّلها كما تشاء: تدخل التقرير الشهري كما هي.",
+    "What we did this month": "ما أنجزناه هذا الشهر",
+    "Next month": "الشهر القادم",
+    "Saved. It will appear in that month's report.": "حُفظت. ستظهر في تقرير ذلك الشهر."
 }

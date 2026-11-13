@@ -22,6 +22,7 @@ use App\Support\HealthScore;
 use App\Support\MetricsQuery;
 use App\Support\Modules;
 use App\Support\MonthlyReport;
+use App\Support\MonthNotes;
 use App\Support\Pacing;
 use App\Support\Periods;
 use App\Support\PlanGate;
@@ -66,6 +67,28 @@ class ViewClient extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            // XS-03 / FS-20 (R4): "what we did" and "next month" for the monthly report; drafted from the app, edited by the agency.
+            Action::make('monthNotes')->label(__('Month notes for the report'))->icon('heroicon-o-pencil-square')->color('gray')
+                ->visible(fn () => TeamRoles::canManageData(auth()->user(), $this->record->agency))
+                ->fillForm(function (): array {
+                    $month = now($this->record->agency?->timezone ?: 'UTC')->format('Y-m');
+                    $lang = $this->record->reportSchedule?->lang === 'en' ? 'en' : 'ar';
+                    $saved = MonthNotes::get($this->record, $month);
+                    $draft = MonthNotes::draft($this->record, $month, $lang);
+
+                    return ['month' => $month, 'done' => $saved?->done ?? $draft['done'], 'next' => $saved?->next ?? $draft['next']];
+                })
+                ->modalDescription(__('Drafted from what happened in the app. Edit freely: it goes into the monthly report as written.'))
+                ->schema([
+                    Select::make('month')->label(__('Month'))->required()
+                        ->options(fn () => [now($this->record->agency?->timezone ?: 'UTC')->format('Y-m') => __('This month')] + MonthlyReport::months(6, app()->getLocale(), $this->record->agency?->timezone ?: 'UTC')),
+                    Textarea::make('done')->label(__('What we did this month'))->rows(6)->maxLength(3000),
+                    Textarea::make('next')->label(__('Next month'))->rows(4)->maxLength(3000),
+                ])
+                ->action(function (array $data): void {
+                    MonthNotes::save($this->record, $data['month'], $data['done'] ?? null, $data['next'] ?? null, auth()->id());
+                    Notification::make()->title(__('Saved. It will appear in that month\'s report.'))->success()->send();
+                }),
             // XS-08 (R4): the period's summary as text ready for WhatsApp, Arabic and English (no AI, no AdsRanger name).
             Action::make('copyWhatsApp')->label(__('Copy as WhatsApp message'))->icon('heroicon-o-clipboard-document')->color('gray')
                 ->modalSubmitAction(false)->modalCancelActionLabel(__('Close'))

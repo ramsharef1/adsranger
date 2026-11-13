@@ -17,6 +17,8 @@ return [
     'spent' => 'Spent so far',
     'pace' => 'Pace',
     'pace_note' => 'Spent compared with the budget expected by now.',
+    'what_we_did' => 'What we did this month',
+    'next_month' => 'Next month',
     'campaigns' => 'Campaigns',
     'campaign' => 'Campaign',
     'no_data' => 'No results in this period yet.',
