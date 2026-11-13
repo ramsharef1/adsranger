@@ -128,6 +128,18 @@
                 <span><bdi dir="ltr">{{ $e->network }}</bdi> · {{ $e->label }} · {{ $e->active ? __('reach_ui.admin.active') : __('reach_ui.admin.inactive') }} · {{ $e->allowed_ips ? __('reach_ui.admin.ip_list') : __('reach_ui.admin.signature_only') }}@if ($e->last_received_at) · <bdi dir="ltr">{{ $e->last_received_at->timezone('Asia/Amman')->format('Y-m-d H:i') }}</bdi>@endif</span>
                 <x-filament::button size="sm" color="gray" wire:click="toggleEndpoint({{ $e->id }})" style="min-height:44px">{{ $e->active ? __('reach_ui.admin.disable') : __('reach_ui.admin.enable') }}</x-filament::button>
             </div>
+            @php $preset = \App\Support\Reach\Postbacks::preset($e); @endphp
+            <details style="padding:6px 0 10px;border-bottom:1px solid rgba(127,127,127,.2)">
+                <summary style="min-height:44px;display:flex;align-items:center;cursor:pointer">{{ __('reach_ui.admin.preset') }}: <bdi dir="ltr">&nbsp;{{ $preset['subid'] }}</bdi> · {{ __('reach_ui.admin.trust_'.$preset['trust']) }}</summary>
+                <p style="font-size:12.5px;opacity:.8">{{ __('reach_ui.admin.postback_template') }}</p>
+                <p><bdi dir="ltr" style="word-break:break-all;font-family:monospace;font-size:12.5px">{{ \App\Support\Reach\Postbacks::template($e, url('/reach/v1/postback/').'/…') }}</bdi></p>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:6px">
+                    @foreach (['subid' => $preset['subid'], 'conversion_id' => $preset['fields']['conversion_id'], 'payout' => $preset['fields']['payout'], 'status' => $preset['fields']['status'], 'offer_id' => $preset['fields']['offer_id']] as $field => $current)
+                        <label><bdi dir="ltr">{{ $field }}</bdi><input wire:model="overrides.{{ $e->id }}.{{ $field }}" dir="ltr" placeholder="{{ $current }}" style="{{ $input }}"></label>
+                    @endforeach
+                </div>
+                <div style="margin-top:8px"><x-filament::button size="sm" wire:click="saveOverride({{ $e->id }})" style="min-height:44px">{{ __('reach_ui.admin.save_override') }}</x-filament::button></div>
+            </details>
         @endforeach
     </x-filament::section>
 
