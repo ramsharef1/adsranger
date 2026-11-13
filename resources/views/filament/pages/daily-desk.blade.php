@@ -6,6 +6,17 @@
 @endphp
 <x-filament-panels::page>
     @include('filament.partials.onboarding-checklist')
+    @if ($brainsToCheck->isNotEmpty())
+        {{-- WS-34 (D-301): monthly check of each client brain by a person. --}}
+        <x-filament::section :heading="__('Client brains to check')" data-brains-to-check>
+            <x-slot name="description">{{ __('Nobody has checked these in 30 days. Old rules make your AI write the wrong thing.') }}</x-slot>
+            <ul style="margin:0;padding-inline-start:18px;display:grid;gap:4px;font-size:13.5px">
+                @foreach ($brainsToCheck as $bc)
+                    <li><a href="{{ \App\Filament\Pages\ClientBrainPage::getUrl() }}?client={{ $bc->id }}" style="color:#0F766E;text-decoration:underline"><bdi>{{ $bc->name }}</bdi></a></li>
+                @endforeach
+            </ul>
+        </x-filament::section>
+    @endif
     @if ($night->isNotEmpty())
         {{-- EG-26 / FS-08: overnight AI notes on the agency's own key; read-only suggestions. --}}
         <x-filament::section :heading="__('Night shift notes')" data-night-notes>
@@ -16,6 +27,18 @@
                         <div style="font-size:12px;opacity:.7"><bdi>{{ $clientNames[$n->client_id] ?? '' }}</bdi> · {{ ['critical' => __('Critical'), 'warning' => __('Warning')][$n->meta['level'] ?? ''] ?? __('Info') }}</div>
                         <strong><bdi>{{ $n->title }}</bdi></strong>
                         <div style="font-size:13px;white-space:pre-line" dir="auto">{{ $n->clean ?? $n->original }}</div>
+                        {{-- NM-04 (R7 end): show me why: where each number came from. --}}
+                        @if (! empty($n->meta['sources']))
+                            <details data-night-why style="font-size:12.5px">
+                                <summary style="cursor:pointer;min-height:32px">{{ __('Show me why') }}</summary>
+                                <ul style="margin:4px 0 0;padding-inline-start:18px">
+                                    @foreach ($n->meta['sources'] as $src)
+                                        <li><bdi dir="ltr">{{ $src['raw'] }}</bdi> ← {{ __($src['label']) }} · <bdi dir="ltr">{{ $src['period'] }}</bdi> · {{ $src['source'] }}@if ($src['date']) · <bdi dir="ltr">{{ $src['date'] }}</bdi>@endif</li>
+                                    @endforeach
+                                </ul>
+                                @if (! empty($n->meta['campaign']))<div>{{ __('Campaign') }}: <bdi>{{ $n->meta['campaign'] }}</bdi></div>@endif
+                            </details>
+                        @endif
                         <div style="display:flex;gap:8px">
                             <x-filament::button size="xs" color="gray" wire:click="nightFeedback({{ $n->id }}, true)">{{ __('Useful') }}</x-filament::button>
                             <x-filament::button size="xs" color="gray" wire:click="nightFeedback({{ $n->id }}, false)">{{ __('Not useful') }}</x-filament::button>

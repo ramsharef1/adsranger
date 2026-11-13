@@ -6,13 +6,17 @@ use App\Filament\Concerns\HeldBackModule;
 use App\Filament\Concerns\TranslatesPageLabels;
 use App\Models\AiBrainItem;
 use App\Models\AiKey;
+use App\Models\AiPrompt;
 use App\Models\AuditLog;
 use App\Models\Client;
+use App\Models\User;
 use App\Support\AiWorkspace\AiBox;
 use App\Support\AiWorkspace\AiScope;
+use App\Support\AiWorkspace\Brain;
 use App\Support\AiWorkspace\ContextPack;
 use App\Support\AiWorkspace\OwnKey;
 use App\Support\AiWorkspace\Playbooks;
+use App\Support\AiWorkspace\PromptLibrary;
 use App\Support\AiWorkspace\StyleNotes;
 use App\Support\CurrentClient;
 use App\Support\PlanGate;
@@ -70,6 +74,14 @@ class ClientBrainPage extends Page
 
     public string $boxPlatform = 'meta';
 
+    /** NM-07 (R7 end): short answer on the agency's own key. */
+    public bool $boxShort = false;
+
+    /** WS-32 (D-301): the saved prompt picked from the library, and the title to save the current one under. */
+    public string $promptKey = '';
+
+    public string $promptTitle = '';
+
     public ?string $boxError = null;
 
     public ?string $boxBilling = null;
@@ -118,7 +130,7 @@ class ClientBrainPage extends Page
 
             return;
         }
-        $r = AiBox::run($client, $key, $this->boxPlaybook, $this->boxNotes, auth()->user(), $this->boxDialect, $this->boxPlatform);
+        $r = AiBox::run($client, $key, $this->boxPlaybook, $this->boxNotes, auth()->user(), $this->boxDialect, $this->boxPlatform, $this->boxShort);
         if (! $r['ok']) {
             $this->boxError = $r['error'];
             $this->boxBilling = ($r['billing'] ?? false) ? config("ai_workspace.own_key_billing.{$key->provider}") : null;
@@ -170,11 +182,100 @@ class ClientBrainPage extends Page
 
             return;
         }
-        $item->forceFill(['clean' => $after, 'meta' => array_merge($item->meta ?? [], ['edited_by' => auth()->id(), 'edited_at' => now()->toIso8601String()])])->save();
+        // WS-33: the edited text goes through the gate again, so the score matches what is now saved.
+        Brain::recheck($item, $after);
+        $item->forceFill(['meta' => array_merge($item->meta ?? [], ['edited_by' => auth()->id(), 'edited_at' => now()->toIso8601String()])])->save();
         $n = $item->type === 'rule' ? 0 : StyleNotes::learn($client, $before, $after, auth()->user());
         $this->editingId = null;
         Notification::make()->success()->title(__('Saved.'))
             ->body($n ? __('Style notes learned from your edit: :n. They are in this client\'s rules and can be deleted.', ['n' => $n]) : null)->send();
+    }
+
+    /** WS-32 (D-301): fill the AI box from a saved or starter prompt. */
+    public function updatedPromptKey(): void
+    {
+        $p = $this->promptKey !== '' ? PromptLibrary::find(Filament::getTenant(), $this->promptKey) : null;
+        if ($p) {
+            if (isset(Playbooks::all()[$p['playbook']])) {
+                $this->boxPlaybook = $p['playbook'];
+            }
+            $this->boxNotes = $p['body'];
+        }
+    }
+
+    public function savePrompt(): void
+    {
+        abort_unless(TeamRoles::canManageTeam(auth()->user(), Filament::getTenant()), 403);
+        $title = trim(strip_tags($this->promptTitle));
+        $body = trim(strip_tags($this->boxNotes));
+        if ($title === '' || $body === '') {
+            Notification::make()->warning()->title(__('Write the prompt and give it a name first.'))->send();
+
+            return;
+        }
+        $p = AiPrompt::create(['agency_id' => Filament::getTenant()->id, 'title' => mb_substr($title, 0, 120), 'body' => mb_substr($body, 0, Playbooks::notesMax($this->boxPlaybook)),
+            'playbook' => $this->boxPlaybook, 'created_by' => auth()->id()]);
+        AuditLog::record('ai_workspace.prompt_saved', Filament::getTenant(), ['prompt' => $p->id]);
+        $this->promptTitle = '';
+        $this->promptKey = 'p'.$p->id;
+        Notification::make()->success()->title(__('Saved for your team.'))->send();
+    }
+
+    public function deletePrompt(int $id): void
+    {
+        abort_unless(TeamRoles::canManageTeam(auth()->user(), Filament::getTenant()), 403);
+        AiPrompt::where('agency_id', Filament::getTenant()->id)->whereKey($id)->delete();
+        $this->promptKey = '';
+    }
+
+    /** DS-29 / NM-03 (D-301): a person adds one proposed rule to the client's rules; the AI gets only added rules. */
+    public function approveRule(int $itemId, int $index): void
+    {
+        $client = $this->client();
+        abort_unless($client && TeamRoles::canManageData(auth()->user(), Filament::getTenant()), 403);
+        $item = AiBrainItem::where('client_id', $client->id)->where('output_type', 'brand_rules_set')->findOrFail($itemId);
+        $rule = $item->output['rules'][$index] ?? null;
+        $done = (array) ($item->meta['approved'] ?? []);
+        if (! is_array($rule) || in_array($index, $done, true)) {
+            return;
+        }
+        Brain::save($client, ['type' => 'rule', 'title' => mb_substr(trim(strip_tags((string) $rule['rule'])), 0, 200), 'playbook' => 'brand_book'], auth()->user());
+        $item->forceFill(['meta' => array_merge($item->meta ?? [], ['approved' => [...$done, $index]])])->save();
+        Notification::make()->success()->title(__('Added to this client\'s rules.'))->send();
+    }
+
+    /** WS-33 (R7 end): one-tap fix for a blocked item: remove the sentence that holds the problem, then check again. */
+    public function fixCheck(int $itemId, int $index): void
+    {
+        $client = $this->client();
+        abort_unless($client && TeamRoles::canManageData(auth()->user(), Filament::getTenant()), 403);
+        $item = AiBrainItem::where('client_id', $client->id)->findOrFail($itemId);
+        $check = $item->checks[$index] ?? null;
+        if (! is_array($check) || ! in_array($check['rule'] ?? '', self::REMOVABLE, true)) {
+            return;
+        }
+        $before = (string) ($item->clean ?? $item->original);
+        $after = Brain::withoutSentence($before, (string) $check['found']);
+        if ($after === '' || $after === $before) {
+            Notification::make()->warning()->title(__('Nothing left to keep. Edit the text instead.'))->send();
+
+            return;
+        }
+        Brain::recheck($item, $after);
+        $item->forceFill(['meta' => array_merge($item->meta ?? [], ['edited_by' => auth()->id(), 'edited_at' => now()->toIso8601String()])])->save();
+        Notification::make()->success()->title(__('Sentence removed and checked again.'))->send();
+    }
+
+    /** Gate rules a sentence removal can fix. */
+    public const REMOVABLE = ['number_not_in_data', 'competitor_named', 'overclaim', 'joined_letter', 'brand_feminine'];
+
+    /** WS-34 (D-301): a person says the client's brain is still right. */
+    public function markChecked(): void
+    {
+        $client = $this->client();
+        abort_unless($client && TeamRoles::canManageData(auth()->user(), Filament::getTenant()), 403);
+        $client->forceFill(['brain_checked_at' => now(), 'brain_checked_by' => auth()->id()])->save();
+        Notification::make()->success()->title(__('Marked as checked.'))->send();
     }
 
     public function remove(int $id): void
@@ -204,12 +305,14 @@ class ClientBrainPage extends Page
         }
         $key = $keys->firstWhere('provider', $this->boxKey);
         $estimate = ($client && $key && isset(Playbooks::all()[$this->boxPlaybook]))
-            ? OwnKey::estimate($key, json_encode(Playbooks::envelope($client, $this->boxPlaybook, $this->boxNotes, $this->boxDialect, $this->boxPlatform), JSON_UNESCAPED_UNICODE))
+            ? OwnKey::estimate($key, json_encode(Playbooks::envelope($client, $this->boxPlaybook, $this->boxNotes, $this->boxDialect, $this->boxPlatform), JSON_UNESCAPED_UNICODE), $this->boxShort ? AiBox::SHORT_TOKENS : null)
             : null;
 
         return ['clients' => $this->clients(), 'client' => $client, 'items' => $items, 'pack' => $client ? ContextPack::forAi($client) : null, 'scopeParts' => AiScope::PARTS,
             'full' => $full = PlanGate::allows(Filament::getTenant(), 'ai_workspace_full'),
             'canManage' => $full && TeamRoles::canManageTeam(auth()->user(), Filament::getTenant()),
-            'canRun' => TeamRoles::canManageData(auth()->user(), Filament::getTenant()), 'keys' => $keys, 'key' => $key, 'estimate' => $estimate];
+            'canRun' => TeamRoles::canManageData(auth()->user(), Filament::getTenant()), 'keys' => $keys, 'key' => $key, 'estimate' => $estimate,
+            'prompts' => PromptLibrary::for(Filament::getTenant()), 'canEditPrompts' => TeamRoles::canManageTeam(auth()->user(), Filament::getTenant()),
+            'checkedBy' => $client?->brain_checked_by ? User::find($client->brain_checked_by)?->name : null];
     }
 }

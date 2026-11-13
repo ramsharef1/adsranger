@@ -19,7 +19,7 @@ class AiKey extends Model
 
     protected function casts(): array
     {
-        return ['api_key' => 'encrypted', 'monthly_cap_usd' => 'decimal:2', 'spent_usd' => 'decimal:4', 'tested_at' => 'datetime', 'test_ok' => 'boolean'];
+        return ['api_key' => 'encrypted', 'monthly_cap_usd' => 'decimal:2', 'spent_usd' => 'decimal:4', 'tested_at' => 'datetime', 'test_ok' => 'boolean', 'model_check' => 'array'];
     }
 
     public function spentThisMonth(): float

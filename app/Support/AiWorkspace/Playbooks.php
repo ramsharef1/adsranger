@@ -13,7 +13,7 @@ class Playbooks
 {
     public const VERSION = 'v1';
 
-    public const DIALECTS = ['gulf', 'levantine', 'egyptian', 'maghrebi'];
+    public const DIALECTS = ['gulf', 'levantine', 'egyptian', 'maghrebi', 'msa'];
 
     public const PLATFORMS = ['meta', 'google_ads', 'tiktok', 'snapchat'];
 
@@ -29,11 +29,17 @@ class Playbooks
             'alt_text' => ['title_en' => 'Alt text for site images', 'title_ar' => 'نص بديل لصور الموقع', 'output_type' => 'alt_text_set'],
             'audit_summary' => ['title_en' => 'Site audit in plain words', 'title_ar' => 'فحص الموقع بكلام بسيط', 'output_type' => null],
             'dialect_negatives' => ['title_en' => 'Negative keywords, all forms', 'title_ar' => 'كلمات سلبية بكل الصيغ', 'output_type' => 'negatives_set'],
+            // R7 end (D-301)
+            'brand_rules' => ['title_en' => 'Rules from a brand guide or brief', 'title_ar' => 'قواعد من دليل العلامة أو الموجز', 'output_type' => 'brand_rules_set'],
+            'report_narrative' => ['title_en' => 'Report narrative', 'title_ar' => 'سرد التقرير', 'output_type' => null],
         ];
     }
 
     /** Playbooks where the person's text is the material itself (text to translate, search terms), not a side note. */
-    public const MATERIAL = ['translate' => 6000, 'dialect_negatives' => 6000];
+    public const MATERIAL = ['translate' => 6000, 'dialect_negatives' => 6000, 'brand_rules' => 6000];
+
+    /** Playbooks that take a dialect pick in the AI box. */
+    public const WITH_DIALECT = ['dialect_ad_copy', 'report_narrative'];
 
     public static function notesMax(string $playbook): int
     {
@@ -51,6 +57,8 @@ class Playbooks
             'translate' => 'Translate context.source into '.(Glossary::target($notes) === 'ar' ? 'Arabic' : 'English').'. Use the exact term from context.glossary for each term it lists, keep every name in context.keep in Latin letters, and keep all numbers, currencies and dates exactly. Return only the translation.',
             'alt_text' => 'For each image in context.images, write short alt text (at most 125 characters) in Arabic and in English that says what the image most likely shows, from its file name and the page title. Do not start with "image of". If the file name says nothing, write a neutral description that fits the page.',
             'audit_summary' => 'Write one short paragraph (at most 90 words) for the client that explains this site audit in plain words: the overall state, the 2–3 issues that matter most and what fixing them changes. No jargon, no codes, no promise of rankings or traffic.',
+            'brand_rules' => 'Read context.source (a client brand guide or brief pasted by the agency). Propose up to 12 short rules an AI writer must follow for this client, each one line: kind is voice (tone and how to address people), avoid (words or claims never to use), offer (offers, prices or terms to mention or not), or other. Do not repeat context.existing_rules. Use only what the text says; do not invent rules.',
+            'report_narrative' => "Write this client's report narrative in the $dialect dialect (msa means Modern Standard Arabic) for the period in context.facts: 3 short paragraphs (what happened, why, what we do next), using only numbers from context.facts with their period and currency. The agency will edit it before sending.",
             'dialect_negatives' => 'For each term in context.terms (search terms that brought clicks), decide if it is a bad fit for this client (people who will not buy: jobs, free, how-to, other products or places the client does not serve). Return only the bad-fit terms as negatives with a short reason. Return {"negatives": []} if none are.',
         };
         if (isset(self::MATERIAL[$playbook])) {
@@ -85,6 +93,7 @@ class Playbooks
             'alt_text' => ['client' => $pack['client'], 'site' => $audit?->site?->host, 'images' => $audit ? SiteContext::imagesNoAlt($audit) : []],
             'audit_summary' => ['client' => $pack['client'], 'audit' => $audit ? SiteContext::summary($audit) : null],
             'dialect_negatives' => ['client' => $pack['client'], 'client_rules' => $pack['rules'], 'terms' => Negatives::classify(Negatives::split($material))['unclear']],
+            'brand_rules' => ['client' => $pack['client'], 'existing_rules' => $pack['rules'], 'source' => $material],
             default => ['client' => $pack['client'], 'client_id' => $client->id, 'currency' => $pack['currency'], 'data_until' => $pack['data_until'],
                 'facts' => $pack['facts'], 'client_rules' => $pack['rules'], 'do_not_claim' => $pack['do_not_claim']],
         };

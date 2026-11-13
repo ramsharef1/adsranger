@@ -51,10 +51,15 @@ class GoldenSet
      *
      * @return array{at: string, provider: string, model: string, total: int, passed: int, avg_score: int, cost: float, seconds: float, failed: list<string>}
      */
-    public static function live(AiKey $key): array
+    public static function live(AiKey $key, ?int $limit = null, bool $store = true): array
     {
         $g = self::load();
         $tasks = array_values(array_filter($g['items'], fn ($i) => $i['expect'] === 'ready'));
+        // DS-30: the quick check takes one task per dialect first (MSA, Gulf, Levant, Egypt, Arabizi, EN), then the rest.
+        if ($limit !== null) {
+            $first = collect($tasks)->unique('dialect')->values();
+            $tasks = $first->concat(collect($tasks)->reject(fn ($t) => $first->contains('id', $t['id'])))->take($limit)->values()->all();
+        }
         $passed = 0;
         $scores = [];
         $cost = 0.0;
@@ -80,10 +85,29 @@ class GoldenSet
         $result = ['at' => now()->toIso8601String(), 'provider' => $key->provider, 'model' => $key->model, 'total' => count($tasks), 'passed' => $passed,
             'avg_score' => $scores ? (int) round(array_sum($scores) / count($scores)) : 0, 'cost' => round($cost, 4),
             'seconds' => round(microtime(true) - $t0, 1), 'failed' => $failed, 'set' => $g['version']];
-        $all = (array) PlatformSetting::get(self::SCORECARD_KEY, []);
-        $all[$key->provider.'|'.$key->model] = $result;
-        PlatformSetting::put(self::SCORECARD_KEY, $all);
+        if ($store) {
+            $all = (array) PlatformSetting::get(self::SCORECARD_KEY, []);
+            $all[$key->provider.'|'.$key->model] = $result;
+            PlatformSetting::put(self::SCORECARD_KEY, $all);
+        }
 
         return $result;
+    }
+
+    public const QUICK = 5;
+
+    /** DS-30 (D-301): estimate of the 5-task check on an agency's own key. */
+    public static function quickEstimate(AiKey $key): float
+    {
+        return round(static::estimate($key) * self::QUICK / max(1, count(array_filter(self::load()['items'], fn ($i) => $i['expect'] === 'ready'))), 4);
+    }
+
+    /** DS-30 (D-301): the 5-task check after a model change; kept on the key, not in the platform scorecard. */
+    public static function quick(AiKey $key): array
+    {
+        $r = static::live($key, self::QUICK, false);
+        $key->forceFill(['model_check' => $r])->save();
+
+        return $r;
     }
 }

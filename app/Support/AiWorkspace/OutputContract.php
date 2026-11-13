@@ -33,6 +33,12 @@ class OutputContract
                 'items' => ['items' => ['image' => 'string', 'alt_ar' => 'string', 'alt_en' => 'string']],
                 'min' => ['items' => 1],
             ],
+            // DS-29 / NM-03 (D-301): rules proposed from a pasted brand guide; a person adds each one.
+            'brand_rules_set' => [
+                'required' => ['rules' => 'list'],
+                'items' => ['rules' => ['rule' => 'string', 'kind' => 'string']],
+                'min' => ['rules' => 1],
+            ],
             // FS-15 (R7 part 4): negative keywords with their reason and other forms.
             'negatives_set' => [
                 'required' => ['negatives' => 'list'],
@@ -108,7 +114,7 @@ class OutputContract
     {
         $lines = [];
         array_walk_recursive($output, function ($v, $k) use (&$lines) {
-            if (is_string($v) && ! in_array($k, ['source', 'date', 'platform', 'dialect', 'image'], true)) {
+            if (is_string($v) && ! in_array($k, ['source', 'date', 'platform', 'dialect', 'image', 'kind'], true)) {
                 $lines[] = $v;
             }
         });

@@ -99,9 +99,16 @@ class DailyDesk extends Page
                 ->reject(fn (AiBrainItem $i) => isset($i->meta['feedback']))->values()
             : collect();
 
+        // WS-34 (D-301): client brains nobody has checked in 30 days (only clients with something saved), for the people who see them.
+        $toCheck = (Modules::on('ai_workspace', null, $a) || Modules::isPreviewAgency($a))
+            ? $clients->filter(fn (Client $c) => ! $c->brain_checked_at || $c->brain_checked_at->lt(now()->subDays(30)))
+                ->whereIn('id', AiBrainItem::where('agency_id', $a->id)->whereIn('client_id', $clients->pluck('id'))->distinct()->pluck('client_id'))
+                ->take(5)->values()
+            : collect();
+
         return [
             'from' => $from, 'rows' => $rows, 'synced' => $synced ? Carbon::parse($synced) : null,
-            'tz' => $tz, 'night' => $night, 'clientNames' => $clients->pluck('name', 'id'),
+            'tz' => $tz, 'night' => $night, 'clientNames' => $clients->pluck('name', 'id'), 'brainsToCheck' => $toCheck,
         ];
     }
 

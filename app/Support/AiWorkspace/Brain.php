@@ -81,6 +81,32 @@ class Brain
         return ['ok' => true, 'item' => $item];
     }
 
+    /**
+     * WS-33 (R7 end): run the gate again on a person's corrected text (an edit, or "remove this sentence"), so the card
+     * shows the new score instead of the old block. The original stays as it was.
+     */
+    public static function recheck(AiBrainItem $item, string $text): AiBrainItem
+    {
+        $client = $item->client;
+        $gate = QualityGate::check($text, ContextPack::for($client)['facts'], ['client_id' => $client->id]);
+        $item->forceFill(['clean' => $gate['text'], 'score' => $gate['score'], 'band' => $gate['band'], 'blocking' => $gate['blocking'], 'checks' => $gate['checks'],
+            'state' => 'ok', 'meta' => array_filter(array_merge($item->meta ?? [], ['sources' => $gate['sources'] ?? []]))])->save();
+
+        return $item;
+    }
+
+    /** WS-33: the text with every sentence that contains $found removed (Arabic and Latin sentence ends). */
+    public static function withoutSentence(string $text, string $found): string
+    {
+        $found = trim($found);
+        if ($found === '') {
+            return $text;
+        }
+        $parts = preg_split('/(?<=[.!?؟。\n])\s*/u', $text) ?: [$text];
+
+        return trim(implode(' ', array_filter($parts, fn ($p) => ! str_contains($p, $found))));
+    }
+
     /** Chat links: https only, shown as a plain link; anything else is dropped. */
     protected static function safeUrl(?string $url): ?string
     {

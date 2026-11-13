@@ -23,6 +23,25 @@
             @if ((float) $k->monthly_cap_usd > 0 && $k->spentThisMonth() >= 0.8 * (float) $k->monthly_cap_usd)
                 <div data-cap-80 style="font-size:13px;color:#b45309;font-weight:600">{{ __('Over 80% of the monthly cap. At the cap, requests on this key stop until next month.') }}</div>
             @endif
+            {{-- DS-30 (D-301): the model changed; a one-tap 5-task check shows the quality before the night shift runs on it. --}}
+            @if ($k->previous_model)
+                @php
+                    $mc = $k->model_check;
+                @endphp
+                <div data-model-changed style="border:1px solid rgba(180,83,9,.35);border-radius:10px;padding:10px;font-size:13px;display:grid;gap:6px">
+                    <div>{!! __('Model changed from :old to :new.', ['old' => $ltr(\App\Support\AiWorkspace\OwnKey::modelLabel($k->provider, $k->previous_model)), 'new' => $ltr(\App\Support\AiWorkspace\OwnKey::modelLabel($k->provider, $k->model))]) !!}</div>
+                    @if (! empty($mc['running']))
+                        <div style="{{ $muted }}">{{ __('Check running…') }}</div>
+                    @elseif (isset($mc['total']))
+                        <div>{!! __('5-task check: :passed of :total passed · average score :score · cost :usd', ['passed' => $ltr($mc['passed']), 'total' => $ltr($mc['total']), 'score' => $ltr($mc['avg_score']), 'usd' => $ltr(number_format((float) $mc['cost'], 3).' USD')]) !!}</div>
+                    @else
+                        <div style="{{ $muted }}">{!! __('Check the new model on 5 Arabic and English tasks before the night shift uses it (about :usd on your key).', ['usd' => $ltr('≤ '.number_format(\App\Support\AiWorkspace\GoldenSet::quickEstimate($k), 3).' USD')]) !!}</div>
+                    @endif
+                    @if ($canManage && empty($mc['running']))
+                        <div><x-filament::button size="sm" color="gray" wire:click="checkModel({{ $k->id }})" style="min-height:44px">{{ isset($mc['total']) ? __('Check again') : __('Run the 5-task check') }}</x-filament::button></div>
+                    @endif
+                </div>
+            @endif
             <div style="{{ $muted }}">@if ($k->tested_at){{ $k->test_ok ? '✓' : '✗' }} {{ $k->test_message }} · <time datetime="{{ $k->tested_at->toIso8601String() }}">{{ $k->tested_at->locale(app()->getLocale())->diffForHumans() }}</time>@endif</div>
             @if ($canManage)
                 <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:end" x-data="{ cap: '{{ (float) $k->monthly_cap_usd }}' }">

@@ -6,6 +6,7 @@ use App\Filament\Concerns\HeldBackModule;
 use App\Filament\Concerns\TranslatesPageLabels;
 use App\Models\AiKey;
 use App\Models\AuditLog;
+use App\Support\AiWorkspace\GoldenSet;
 use App\Support\AiWorkspace\OwnKey;
 use App\Support\PlanGate;
 use App\Support\TeamRoles;
@@ -78,10 +79,13 @@ class AiKeysPage extends Page
             return;
         }
         $agency = Filament::getTenant();
+        $before = AiKey::where('agency_id', $agency->getKey())->where('provider', $this->provider)->first();
+        // DS-30 (D-301): a new model on an existing key gets a notice and a one-tap 5-task check.
+        $changed = $before && $before->model !== $this->model;
         $key = AiKey::updateOrCreate(['agency_id' => $agency->getKey(), 'provider' => $this->provider], [
             'api_key' => trim($this->apiKey), 'last4' => mb_substr(trim($this->apiKey), -4), 'model' => $this->model, 'monthly_cap_usd' => round((float) $this->cap, 2),
             'tested_at' => now(), 'test_ok' => true, 'test_message' => $msg, 'created_by' => auth()->id(),
-        ]);
+        ] + ($changed ? ['previous_model' => $before->model, 'model_check' => null] : []));
         AuditLog::record('ai_workspace.key_saved', $agency, ['provider' => $this->provider, 'last4' => $key->last4, 'cap' => $key->monthly_cap_usd]);
         $this->reset('apiKey', 'cap', 'model');
         Notification::make()->title(__('Key saved. It won\'t be shown again.'))->success()->send();
@@ -100,6 +104,17 @@ class AiKeysPage extends Page
         $key->update(['monthly_cap_usd' => $cap]);
         AuditLog::record('ai_workspace.key_cap', Filament::getTenant(), ['provider' => $key->provider, 'cap' => $cap]);
         Notification::make()->title(__('Cap updated.'))->success()->send();
+    }
+
+    /** DS-30 (D-301): run the 5-task check on this key now (queued; the result shows on this page). */
+    public function checkModel(int $id): void
+    {
+        abort_unless($this->canManage(), 403);
+        $key = AiKey::where('agency_id', Filament::getTenant()->getKey())->findOrFail($id);
+        $key->forceFill(['model_check' => ['running' => true, 'at' => now()->toIso8601String()]])->save();
+        dispatch(fn () => GoldenSet::quick(AiKey::findOrFail($id)));
+        AuditLog::record('ai_workspace.model_check', Filament::getTenant(), ['provider' => $key->provider, 'model' => $key->model]);
+        Notification::make()->title(__('Check started. Refresh in a minute.'))->success()->send();
     }
 
     public function remove(int $id): void

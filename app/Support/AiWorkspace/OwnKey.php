@@ -38,11 +38,11 @@ class OwnKey
     }
 
     /** Worst-case estimate before a run: the full prompt plus the most output we allow. */
-    public static function estimate(AiKey $key, string $prompt): float
+    public static function estimate(AiKey $key, string $prompt, ?int $maxTokens = null): float
     {
         [, $in, $out] = static::model($key->provider, $key->model) ?? ['', 5.0, 15.0];
 
-        return round(static::tokens($prompt) * $in / 1e6 + (int) config('ai_workspace.max_output_tokens', 1500) * $out / 1e6, 4);
+        return round(static::tokens($prompt) * $in / 1e6 + ($maxTokens ?? (int) config('ai_workspace.max_output_tokens', 1500)) * $out / 1e6, 4);
     }
 
     /** Check the key with a free call (list models). @return array{0: bool, 1: string} */
@@ -67,18 +67,18 @@ class OwnKey
     /**
      * @return array{ok: bool, text?: string, cost: float, error?: string, billing?: bool}
      */
-    public static function complete(AiKey $key, string $system, string $user, bool $json): array
+    public static function complete(AiKey $key, string $system, string $user, bool $json, ?int $maxTokens = null): array
     {
         // FS-01 (D-299): phones, emails and ID-like numbers never leave for the AI; the count goes back to the caller.
         $rs = Redactor::clean($system);
         $ru = Redactor::clean($user);
         [$system, $user] = [$rs['text'], $ru['text']];
         $redacted = Redactor::total($rs['counts']) + Redactor::total($ru['counts']);
-        $estimate = static::estimate($key, $system.$user);
+        $estimate = static::estimate($key, $system.$user, $maxTokens);
         if ($estimate > $key->remaining()) {
             return ['ok' => false, 'cost' => 0.0, 'error' => __('This would go over the monthly cap you set for this key. Raise the cap or wait for next month.')];
         }
-        $max = (int) config('ai_workspace.max_output_tokens', 1500);
+        $max = $maxTokens ?? (int) config('ai_workspace.max_output_tokens', 1500);
         try {
             $r = match ($key->provider) {
                 'openai' => Http::timeout(60)->withToken($key->api_key)->post('https://api.openai.com/v1/chat/completions', array_filter([

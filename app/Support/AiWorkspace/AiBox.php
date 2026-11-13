@@ -15,8 +15,12 @@ use Illuminate\Support\Facades\Cache;
  */
 class AiBox
 {
+    public const SHORT_TOKENS = 400;
+
+    public const SHORT_RULE = 'Keep it short: at most 120 words in total (or the fewest items the schema allows).';
+
     /** @return array{ok: bool, item?: AiBrainItem, cost: float, error?: string, billing?: bool} */
-    public static function run(Client $client, AiKey $key, string $playbook, string $notes, ?User $user, ?string $dialect = null, ?string $platform = null): array
+    public static function run(Client $client, AiKey $key, string $playbook, string $notes, ?User $user, ?string $dialect = null, ?string $platform = null, bool $short = false): array
     {
         if (AiKill::off('ai_box')) { // FS-49
             return ['ok' => false, 'cost' => 0.0, 'error' => __('The AI box is paused for everyone for now. Try again later.')];
@@ -37,7 +41,8 @@ class AiBox
         if ($negatives !== null && $negatives['unclear'] === []) {
             return static::save($client, $key, $playbook, $def, 'negatives_set', null, Negatives::output($negatives['clear']), [], $user, 0.0, 0, '');
         }
-        $system = "You work inside AdsRanger for a marketing agency.\n- ".implode("\n- ", $env['rules']);
+        // NM-07 (R7 end): short mode keeps the answer and its cost small on the agency's own key.
+        $system = "You work inside AdsRanger for a marketing agency.\n- ".implode("\n- ", [...$env['rules'], ...($short ? [self::SHORT_RULE] : [])]);
         $user_ = json_encode(['context' => $env['context'], 'task' => $env['task'], 'output_schema' => $env['output_schema']], JSON_UNESCAPED_UNICODE);
 
         // EG-24: the same request on the same data within 4 hours returns the saved answer, with no new call.
@@ -51,7 +56,7 @@ class AiBox
         $output = null;
         $text = '';
         for ($try = 1; $try <= OutputContract::MAX_TRIES; $try++) {
-            $r = OwnKey::complete($key, $system, $user_, $type !== null);
+            $r = OwnKey::complete($key, $system, $user_, $type !== null, $short ? self::SHORT_TOKENS : null);
             $cost += $r['cost'];
             $redacted = max($redacted, (int) ($r['redacted'] ?? 0));
             if (! $r['ok']) {

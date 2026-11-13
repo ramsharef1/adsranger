@@ -43,6 +43,18 @@
         </div>
     </div>
 
+    {{-- WS-34 (D-301): when a person last checked this client's brain. --}}
+    @if ($client)
+        <div data-brain-checked style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:13px">
+            @if ($client->brain_checked_at)
+                <span>{!! __('Last checked by a person: :date', ['date' => '<bdi>'.e($client->brain_checked_at->locale(app()->getLocale())->translatedFormat('j M Y')).'</bdi>']) !!}@if ($checkedBy) · <bdi>{{ $checkedBy }}</bdi>@endif</span>
+            @else
+                <span style="{{ $muted }}">{{ __('Not checked by a person yet.') }}</span>
+            @endif
+            @if ($canRun)<x-filament::button size="xs" color="gray" wire:click="markChecked" style="min-height:32px">{{ __('Mark as checked') }}</x-filament::button>@endif
+        </div>
+    @endif
+
     @if ($pack)
         <details style="{{ $card }}">
             <summary style="cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:600">{{ __('What your AI sees about this client') }}</summary>
@@ -96,21 +108,46 @@
                         <select id="bx-pb" wire:model.live="boxPlaybook" style="{{ $field }}">@foreach (\App\Support\AiWorkspace\Playbooks::all() as $k => $p)<option value="{{ $k }}">{{ app()->getLocale() === 'ar' ? $p['title_ar'] : $p['title_en'] }}</option>@endforeach</select></div>
                     <div><label for="bx-key" style="{{ $label }}">{{ __('Key') }}</label>
                         <select id="bx-key" wire:model.live="boxKey" style="{{ $field }}">@foreach ($keys as $kk)<option value="{{ $kk->provider }}">{{ \App\Models\AiKey::PROVIDERS[$kk->provider] }} · {{ \App\Support\AiWorkspace\OwnKey::modelLabel($kk->provider, $kk->model) }}</option>@endforeach</select></div>
-                    @if ($boxPlaybook === 'dialect_ad_copy')
+                    @if (in_array($boxPlaybook, \App\Support\AiWorkspace\Playbooks::WITH_DIALECT, true))
                         <div><label for="bx-d" style="{{ $label }}">{{ __('Dialect') }}</label>
-                            <select id="bx-d" wire:model.live="boxDialect" style="{{ $field }}">@foreach (['gulf' => __('Gulf'), 'levantine' => __('Levantine'), 'egyptian' => __('Egyptian'), 'maghrebi' => __('Maghrebi')] as $k => $v)<option value="{{ $k }}">{{ $v }}</option>@endforeach</select></div>
+                            <select id="bx-d" wire:model.live="boxDialect" style="{{ $field }}">@foreach (['gulf' => __('Gulf'), 'levantine' => __('Levantine'), 'egyptian' => __('Egyptian'), 'maghrebi' => __('Maghrebi'), 'msa' => __('Modern Standard Arabic')] as $k => $v)<option value="{{ $k }}">{{ $v }}</option>@endforeach</select></div>
+                    @endif
+                    @if ($boxPlaybook === 'dialect_ad_copy')
                         <div><label for="bx-p" style="{{ $label }}">{{ __('Platform') }}</label>
                             <select id="bx-p" wire:model.live="boxPlatform" style="{{ $field }}">@foreach (['meta' => 'Meta', 'google_ads' => 'Google Ads', 'tiktok' => 'TikTok', 'snapchat' => 'Snapchat'] as $k => $v)<option value="{{ $k }}">{{ $v }}</option>@endforeach</select></div>
                     @endif
                 </div>
+                {{-- WS-32 (D-301): the team's saved prompts, with an Arabic starter set. --}}
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;align-items:end" data-prompt-library>
+                    <div><label for="bx-pr" style="{{ $label }}">{{ __('Saved prompts') }}</label>
+                        <select id="bx-pr" wire:model.live="promptKey" style="{{ $field }}">
+                            <option value="">{{ __('None') }}</option>
+                            <optgroup label="{{ __('Starter set') }}">@foreach (collect($prompts)->where('starter', true) as $p)<option value="{{ $p['key'] }}">{{ $p['title'] }}</option>@endforeach</optgroup>
+                            @if (collect($prompts)->where('starter', false)->isNotEmpty())
+                                <optgroup label="{{ __('Your team') }}">@foreach (collect($prompts)->where('starter', false) as $p)<option value="{{ $p['key'] }}">{{ $p['title'] }}</option>@endforeach</optgroup>
+                            @endif
+                        </select></div>
+                    @if ($canEditPrompts)
+                        <div><label for="bx-pt" style="{{ $label }}">{{ __('Save what you wrote as a team prompt') }}</label>
+                            <div style="display:flex;gap:6px"><input id="bx-pt" type="text" wire:model="promptTitle" maxlength="120" placeholder="{{ __('Name') }}" style="{{ $field }}" dir="auto">
+                                <x-filament::button size="sm" color="gray" wire:click="savePrompt" style="min-height:44px">{{ __('Save') }}</x-filament::button>
+                                @if (str_starts_with($promptKey, 'p'))
+                                    <x-filament::button size="sm" color="danger" wire:click="deletePrompt({{ (int) substr($promptKey, 1) }})" wire:confirm="{{ __('Delete this prompt for the whole team?') }}" style="min-height:44px">{{ __('Delete') }}</x-filament::button>
+                                @endif
+                            </div></div>
+                    @endif
+                </div>
                 @php
-                    $boxLabel = ['translate' => __('Text to translate (Arabic or English)'), 'dialect_negatives' => __('Search terms, one per line')][$boxPlaybook] ?? __('Anything to add (goal, offer, period)');
+                    $boxLabel = ['translate' => __('Text to translate (Arabic or English)'), 'dialect_negatives' => __('Search terms, one per line'), 'brand_rules' => __('Paste the brand guide or client brief')][$boxPlaybook] ?? __('Anything to add (goal, offer, period)');
                 @endphp
                 <div><label for="bx-n" style="{{ $label }}">{{ $boxLabel }}</label>
                     <textarea id="bx-n" wire:model.blur="boxNotes" rows="{{ isset(\App\Support\AiWorkspace\Playbooks::MATERIAL[$boxPlaybook]) ? 6 : 2 }}" maxlength="{{ \App\Support\AiWorkspace\Playbooks::notesMax($boxPlaybook) }}" style="{{ $field }};min-height:64px" dir="auto"></textarea>
                     @if ($boxPlaybook === 'dialect_negatives')<p style="{{ $muted }};font-size:12px;margin:4px 0 0">{{ __('Clear cases (jobs, free, downloads, courses) are decided here at no cost; only the rest go to your AI.') }}</p>@endif
+                    @if ($boxPlaybook === 'brand_rules')<p style="{{ $muted }};font-size:12px;margin:4px 0 0">{{ __('Voice, words to avoid, offers. Your AI proposes rules; you add the ones you agree with.') }}</p>@endif
                     @if (in_array($boxPlaybook, ['alt_text', 'audit_summary'], true))<p style="{{ $muted }};font-size:12px;margin:4px 0 0">{{ __('Uses this client\'s last finished site audit.') }}</p>@endif
                 </div>
+                {{-- NM-07 (R7 end): short mode --}}
+                <label style="display:flex;gap:8px;align-items:center;font-size:13px;min-height:44px"><input type="checkbox" wire:model.live="boxShort"> {{ __('Short answer (lower cost on your key)') }}</label>
                 <div style="display:flex;gap:6px;flex-wrap:wrap;font-size:12.5px">
                     <span style="border:1px solid rgba(148,163,184,.35);border-radius:999px;padding:4px 10px">✓ <bdi>{{ $client->name }}</bdi></span>
                     @if (in_array($boxPlaybook, ['weekly_summary', 'dialect_ad_copy', 'ramadan_plan'], true))<span style="border:1px solid rgba(148,163,184,.35);border-radius:999px;padding:4px 10px">{{ __('Last 7 days vs the 7 before') }}</span>@endif
@@ -192,6 +229,29 @@
                         @if (! empty($item->meta['edited_at']))<div style="{{ $muted }};font-size:12px">{{ __('Edited by your team') }}</div>@endif
                     @endif
 
+                    {{-- DS-29 / NM-03 (D-301): proposed rules; a person adds each one. --}}
+                    @if ($item->output_type === 'brand_rules_set' && is_array($item->output['rules'] ?? null))
+                        @php
+                            $approved = (array) ($item->meta['approved'] ?? []);
+                            $kinds = ['voice' => __('Voice'), 'avoid' => __('Avoid'), 'offer' => __('Offer'), 'other' => __('Other')];
+                        @endphp
+                        <ul data-brand-rules style="margin:0;padding:0;list-style:none;display:grid;gap:6px;font-size:13.5px">
+                            @foreach ($item->output['rules'] as $ri => $rr)
+                                @continue(! is_array($rr))
+                                <li style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                                    <span style="{{ $muted }}">{{ $kinds[$rr['kind'] ?? 'other'] ?? __('Other') }}</span>
+                                    <span dir="auto" style="flex:1;min-width:200px">{{ $rr['rule'] ?? '' }}</span>
+                                    @if (in_array($ri, $approved, true))
+                                        <span style="color:#0F766E">✓ {{ __('Added') }}</span>
+                                    @elseif ($canRun)
+                                        <x-filament::button size="xs" color="gray" wire:click="approveRule({{ $item->id }}, {{ $ri }})" style="min-height:32px">{{ __('Add as a rule') }}</x-filament::button>
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ul>
+                        <p style="{{ $muted }};font-size:12px;margin:0">{{ __('Your AI gets only the rules you add.') }}</p>
+                    @endif
+
                     {{-- FS-03: where each number came from. --}}
                     @if (! empty($item->meta['sources']))
                         <details data-sources style="font-size:12.5px">
@@ -222,8 +282,13 @@
 
                     @if ($failed->isNotEmpty() && $item->state !== 'needs_formatting')
                         <ul style="margin:0;padding-inline-start:18px;font-size:13px">
-                            @foreach ($failed as $chk)
-                                <li>{{ $families[$chk['family']] ?? $chk['family'] }}: {{ trans('ai_check.'.$chk['rule']) }} {!! $ltr($chk['found']) !!}@if ($chk['fix'] === 'suggest') · <em>{{ __('Suggestion') }}</em>@endif</li>
+                            @foreach ($failed as $idx => $chk)
+                                <li>{{ $families[$chk['family']] ?? $chk['family'] }}: {{ trans('ai_check.'.$chk['rule']) }} {!! $ltr($chk['found']) !!}@if ($chk['fix'] === 'suggest') · <em>{{ __('Suggestion') }}</em>@endif
+                                    {{-- WS-33: one-tap fix --}}
+                                    @if ($canRun && in_array($chk['rule'], \App\Filament\Pages\ClientBrainPage::REMOVABLE, true) && ! in_array($item->type, ['rule', 'chat_link'], true))
+                                        <button type="button" wire:click="fixCheck({{ $item->id }}, {{ $idx }})" data-fix-check style="color:#0F766E;text-decoration:underline;min-height:32px;margin-inline-start:6px">{{ __('Remove this sentence') }}</button>
+                                    @endif
+                                </li>
                             @endforeach
                         </ul>
                     @endif
