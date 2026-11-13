@@ -7,6 +7,7 @@ use App\Mail\AlertsDigestMail;
 use App\Models\Agency;
 use App\Models\Alert;
 use App\Support\CriticalPush;
+use App\Support\Ops\Lanes;
 use App\Support\Trial;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -19,6 +20,11 @@ use Illuminate\Support\Facades\Mail;
 class RunAlerts implements ShouldQueue
 {
     use Queueable;
+
+    public function __construct()
+    {
+        $this->onQueue(Lanes::for(self::class));
+    }
 
     public function handle(): void
     {

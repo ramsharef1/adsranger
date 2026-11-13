@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Audit\AccountAudit;
 use App\Models\Audit;
 use App\Models\Client;
+use App\Support\Ops\Lanes;
 use App\Support\Trial;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -18,7 +19,10 @@ class RunAccountAudit implements ShouldQueue
 
     public int $timeout = 120;
 
-    public function __construct(public int $clientId, public string $trigger = 'first_sync') {}
+    public function __construct(public int $clientId, public string $trigger = 'first_sync')
+    {
+        $this->onQueue(Lanes::for(self::class));
+    }
 
     public function handle(): void
     {

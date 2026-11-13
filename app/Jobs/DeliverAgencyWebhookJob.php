@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\AgencyWebhook;
+use App\Support\Ops\Lanes;
 use App\Support\Webhooks;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -26,7 +27,10 @@ class DeliverAgencyWebhookJob implements ShouldQueue
 
     public array $backoff = [60, 300];
 
-    public function __construct(public int $webhookId, public string $event, public array $data) {}
+    public function __construct(public int $webhookId, public string $event, public array $data)
+    {
+        $this->onQueue(Lanes::for(self::class));
+    }
 
     public function handle(): void
     {

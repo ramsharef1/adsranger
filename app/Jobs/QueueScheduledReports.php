@@ -4,6 +4,8 @@ namespace App\Jobs;
 
 use App\Models\ReportSchedule;
 use App\Models\ReportSend;
+use App\Support\Modules;
+use App\Support\Ops\Lanes;
 use App\Support\PlanGate;
 use App\Support\Trial;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -19,9 +21,14 @@ class QueueScheduledReports implements ShouldQueue
 {
     use Queueable;
 
+    public function __construct()
+    {
+        $this->onQueue(Lanes::for(self::class));
+    }
+
     public function handle(): void
     {
-        if (! config('reports.email_enabled') && ! (config('reports.whatsapp_enabled', false) && \App\Support\Modules::enabled('whatsapp_reports'))) {
+        if (! config('reports.email_enabled') && ! (config('reports.whatsapp_enabled', false) && Modules::enabled('whatsapp_reports'))) {
             Log::info('scheduled reports: both email_enabled and whatsapp_enabled are off, nothing queued');
 
             return;
@@ -35,7 +42,7 @@ class QueueScheduledReports implements ShouldQueue
                     return;
                 }
                 $emails = config('reports.email_enabled') ? $s->activeRecipients() : [];
-                $phones = (config('reports.whatsapp_enabled', false) && \App\Support\Modules::enabled('whatsapp_reports')) ? $s->activeWhatsAppRecipients() : [];
+                $phones = (config('reports.whatsapp_enabled', false) && Modules::enabled('whatsapp_reports')) ? $s->activeWhatsAppRecipients() : [];
                 if (! $emails && ! $phones) {
                     return;
                 }

@@ -12,11 +12,20 @@ use App\Http\Controllers\ReportUnsubscribeController;
 use App\Http\Controllers\StudioBriefController;
 use App\Http\Middleware\PublicTrailingSlash;
 use App\Http\Middleware\ToolAbuseGuard;
+use App\Support\Ops\Heartbeat;
 use App\Support\Seo\PublicCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Public site (Website P-0 / P-5): Arabic at the root, English under /en; `/en/` is the English home (301 from /en).
+
+// EG-03 (D-289): scheduler heartbeat for the outside watcher. 200 while fresh, 503 when the scheduler stopped. No data.
+Route::get('/up/heartbeat', function () {
+    $s = Heartbeat::status();
+
+    return response()->json($s, $s['ok'] ? 200 : 503)->header('Cache-Control', 'no-store');
+})->middleware('throttle:30,1');
+
 Route::middleware(PublicTrailingSlash::class)->group(function () {
     Route::get('/', fn () => view('welcome', ['lang' => 'ar']));
     Route::get('/en', fn () => view('welcome', ['lang' => 'en']));

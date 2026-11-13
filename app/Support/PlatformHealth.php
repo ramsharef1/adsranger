@@ -6,6 +6,9 @@ use App\Models\AuditLog;
 use App\Models\PlatformSetting;
 use App\Models\PushSubscription;
 use App\Models\User;
+use App\Support\Ops\CertExpiry;
+use App\Support\Ops\ConfigDrift;
+use App\Support\Ops\JobRuns;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -94,6 +97,21 @@ class PlatformHealth
             }
         }
 
+        // 7. EG-06 / EG-14: production settings and HTTPS certificates (production only).
+        if (ConfigDrift::applies()) {
+            foreach (ConfigDrift::problems() as $i => $text) {
+                $problems[] = ['kind' => 'config'.$i, 'text' => $text];
+            }
+            foreach (CertExpiry::problems() as $i => $text) {
+                $problems[] = ['kind' => 'cert'.$i, 'text' => $text];
+            }
+        }
+
+        // 8. EG-07: a scheduled task missed its run or failed last time.
+        if (Schema::hasTable('job_runs') && ($missed = JobRuns::problems()) !== []) {
+            $problems[] = ['kind' => 'jobs', 'text' => __('Scheduled tasks late or failed: :list', ['list' => implode(', ', $missed)])];
+        }
+
         // 6. A-5: the monthly restore test passed and is recent.
         if (config('health.restore_test', true) && ($restore = RestoreTest::problem()) !== null) {
             $problems[] = ['kind' => 'restore', 'text' => $restore];
@@ -123,7 +141,7 @@ class PlatformHealth
         $admins = User::where('role', 'super_admin')->pluck('id');
         foreach (PushSubscription::whereIn('user_id', $admins)->get() as $sub) {
             try {
-                WebPush::send($sub, ['title' => __('AdsRanger server needs a look'), 'body' => mb_substr($body, 0, 400), 'url' => '/admin/live-verification']);
+                WebPush::send($sub, ['title' => __('AdsRanger server needs a look'), 'body' => mb_substr($body, 0, 400), 'url' => '/admin/operations']);
             } catch (\Throwable) {
                 // A failed push must not stop the check; the alert is still in the audit log and on the board.
             }

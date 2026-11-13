@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\AdAccount;
+use App\Support\Ops\Lanes;
 use App\Support\Trial;
 use App\Sync\SyncService;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -16,7 +17,10 @@ class SyncAdAccount implements ShouldQueue
 
     public int $timeout = 600;
 
-    public function __construct(public int $adAccountId, public string $from, public string $to, public string $kind = 'daily') {}
+    public function __construct(public int $adAccountId, public string $from, public string $to, public string $kind = 'daily')
+    {
+        $this->onQueue(Lanes::for(self::class));
+    }
 
     public function backoff(): array
     {

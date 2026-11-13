@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Agency;
 use App\Models\Client;
 use App\Support\HealthScore;
+use App\Support\Ops\Lanes;
 use App\Support\Trial;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -21,7 +22,10 @@ class SnapshotHealth implements ShouldQueue
 
     public int $timeout = 900;
 
-    public function __construct(public ?int $agencyId = null) {}
+    public function __construct(public ?int $agencyId = null)
+    {
+        $this->onQueue(Lanes::for(self::class));
+    }
 
     public function handle(): void
     {

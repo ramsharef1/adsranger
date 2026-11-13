@@ -7,6 +7,7 @@ use App\Models\ReportSchedule;
 use App\Models\ReportSend;
 use App\Support\Modules;
 use App\Support\MonthlyReport;
+use App\Support\Ops\Lanes;
 use App\Support\Webhooks;
 use App\Support\WhatsAppReport;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -23,7 +24,10 @@ class SendScheduledReport implements ShouldQueue
 
     public int $tries = 1;
 
-    public function __construct(public int $scheduleId, public string $kind, public string $period) {}
+    public function __construct(public int $scheduleId, public string $kind, public string $period)
+    {
+        $this->onQueue(Lanes::for(self::class));
+    }
 
     public function handle(): void
     {

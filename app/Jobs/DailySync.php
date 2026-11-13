@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Connectors\ConnectorRegistry;
 use App\Models\AdAccount;
 use App\Support\AiWorkspace\FreePlan;
+use App\Support\Ops\Lanes;
 use App\Support\Trial;
 use App\Sync\SyncService;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -14,6 +15,11 @@ use Illuminate\Foundation\Queue\Queueable;
 class DailySync implements ShouldQueue
 {
     use Queueable;
+
+    public function __construct()
+    {
+        $this->onQueue(Lanes::for(self::class));
+    }
 
     public function handle(): void
     {

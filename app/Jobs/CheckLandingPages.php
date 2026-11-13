@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\LandingPage;
 use App\Support\LandingPages;
+use App\Support\Ops\Lanes;
 use App\Support\Trial;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -17,7 +18,10 @@ class CheckLandingPages implements ShouldQueue
 
     public int $timeout = 1800;
 
-    public function __construct(public ?int $agencyId = null) {}
+    public function __construct(public ?int $agencyId = null)
+    {
+        $this->onQueue(Lanes::for(self::class));
+    }
 
     public function handle(): void
     {

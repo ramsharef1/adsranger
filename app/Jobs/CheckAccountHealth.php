@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Connectors\ConnectorRegistry;
 use App\Models\Ad;
 use App\Models\AdAccount;
+use App\Support\Ops\Lanes;
 use App\Support\Trial;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -19,7 +20,10 @@ class CheckAccountHealth implements ShouldQueue
 
     public int $timeout = 120;
 
-    public function __construct(public int $adAccountId) {}
+    public function __construct(public int $adAccountId)
+    {
+        $this->onQueue(Lanes::for(self::class));
+    }
 
     public function handle(): void
     {

@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\SeoAudit;
+use App\Support\Ops\Lanes;
 use App\Support\Seo\Audit\SiteAuditor;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -17,7 +18,10 @@ class RunSeoAudit implements ShouldQueue
     /** 200 pages × 1 s + up to 50 link checks + fetch time. */
     public int $timeout = 900;
 
-    public function __construct(public int $auditId, public ?string $keyword = null) {}
+    public function __construct(public int $auditId, public ?string $keyword = null)
+    {
+        $this->onQueue(Lanes::for(self::class));
+    }
 
     public function handle(): void
     {
