@@ -115,15 +115,15 @@
                     @case('done')
                         @php $band = $audit->score >= 80 ? '' : ($audit->score >= 50 ? 'mid' : 'low'); @endphp
                         <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-top:14px">
-                            <div class="sa-ring {{ $band }}" role="img" aria-label="{{ __('Site health score') }} {{ $audit->score }}" title="{{ __('Site health score: 100 minus the average deduction per page audited (:c points per error, :w per warning). Not a Google ranking.', ['c' => $weights['critical'], 'w' => $weights['warning']]) }}">{{ $audit->score }}</div>
+                            <div class="sa-ring {{ $band }}" role="img" aria-label="{{ __('Site health score') }} {{ $audit->score }}" title="{{ __('Site health score: 100 minus the average deduction per page audited (:c points per critical finding, :w per warning). Not a Google ranking.', ['c' => $weights['critical'], 'w' => $weights['warning']]) }}">{{ $audit->score }}</div>
                             <div class="sa-grid" style="flex:1 1 320px">
-                                <div class="sa-card"><strong>{{ $audit->critical_count }}</strong><span>{{ __('Errors') }}</span></div>
+                                <div class="sa-card"><strong>{{ $audit->critical_count }}</strong><span>{{ __('Critical') }}</span></div>
                                 <div class="sa-card"><strong>{{ $audit->warning_count }}</strong><span>{{ __('Warnings') }}</span></div>
-                                <div class="sa-card"><strong>{{ $audit->info_count }}</strong><span>{{ __('Notes') }}</span></div>
+                                <div class="sa-card"><strong>{{ $audit->info_count }}</strong><span>{{ __('Info') }}</span></div>
                                 <div class="sa-card"><strong>{{ $audit->pages_done }}</strong><span>{{ __('Pages audited') }}</span></div>
                             </div>
                         </div>
-                        <p class="sa-muted" style="margin-top:8px">{{ __('Site health score: 100 minus the average deduction per page audited (:c points per error, :w per warning). Not a Google ranking.', ['c' => $weights['critical'], 'w' => $weights['warning']]) }}@if ($audit->critical_count > 0) · {{ __('An error needs fixing.') }}@endif · {{ $fmtDate($audit->finished_at) }}</p>
+                        <p class="sa-muted" style="margin-top:8px">{{ __('Site health score: 100 minus the average deduction per page audited (:c points per critical finding, :w per warning). Not a Google ranking.', ['c' => $weights['critical'], 'w' => $weights['warning']]) }}@if ($audit->critical_count > 0) · {{ __('A critical finding needs fixing.') }}@endif · {{ $fmtDate($audit->finished_at) }}</p>
                         <div class="sa-cats">
                             @foreach (\App\Support\Seo\Audit\Catalog::CATEGORIES as $key => [$catAr, $catEn])
                                 @continue($key === 'speed') {{-- UX-250: no speed rule until A2 --}}

@@ -1855,5 +1855,8 @@
     "automatic, until :time": "تلقائي، حتى :time",
     "Lift": "رفع الحظر",
     "blocked by hand": "محظور يدويًا",
-    "Block a host": "حظر نطاق"
+    "Block a host": "حظر نطاق",
+    "Site health score: 100 minus the average deduction per page audited (:c points per critical finding, :w per warning). Not a Google ranking.": "درجة صحة الموقع: 100 ناقص متوسط ما يُخصم لكل صفحة مفحوصة (:c نقاط لكل مشكلة حرجة، ثم :w نقاط لكل تحذير). ليست ترتيبًا في Google.",
+    "A critical finding needs fixing.": "توجد مشكلة حرجة تحتاج إصلاحًا.",
+    "Confirm you own this site or have its owner's permission before the first audit.": "أكّد أنك تملك هذا الموقع أو أن لديك إذن صاحبه قبل أول فحص."
 }

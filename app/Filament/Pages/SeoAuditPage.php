@@ -119,7 +119,7 @@ class SeoAuditPage extends Page
             'consent' => ['accepted'],
         ]);
         if ($v->fails()) {
-            $this->addError('newSiteUrl', $v->errors()->has('consent') ? __('Confirm the client\'s permission before the first audit.') : __('Enter the full site address, such as https://example.sa'));
+            $this->addError('newSiteUrl', $v->errors()->has('consent') ? __('Confirm you own this site or have its owner\'s permission before the first audit.') : __('Enter the full site address, such as https://example.sa'));
 
             return;
         }
@@ -157,7 +157,7 @@ class SeoAuditPage extends Page
             return;
         }
         if (! $site->hasConsent()) {
-            Notification::make()->title(__('Confirm the client\'s permission before the first audit.'))->warning()->send();
+            Notification::make()->title(__('Confirm you own this site or have its owner\'s permission before the first audit.'))->warning()->send();
 
             return;
         }

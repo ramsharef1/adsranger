@@ -159,9 +159,10 @@ class Catalog
     public static function levelLabel(string $level, bool $ar): string
     {
         return match ($level) {
-            self::CRITICAL => $ar ? 'خطأ' : 'Error',
+            // D-274 (UX-267): the D-88 words on every screen, never «خطأ / ملاحظة».
+            self::CRITICAL => $ar ? 'حرج' : 'Critical',
             self::WARNING => $ar ? 'تحذير' : 'Warning',
-            default => $ar ? 'ملاحظة' : 'Note',
+            default => $ar ? 'للعلم' : 'Info',
         };
     }
 }
