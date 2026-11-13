@@ -9,9 +9,11 @@ use App\Http\Controllers\LeadDeskController;
 use App\Http\Controllers\MagicLoginController;
 use App\Http\Controllers\PublicAttributionCollectorController;
 use App\Http\Controllers\PublicSiteController;
+use App\Http\Controllers\ReachPostbackController;
 use App\Http\Controllers\ReportUnsubscribeController;
 use App\Http\Controllers\StudioBriefController;
 use App\Http\Middleware\PublicTrailingSlash;
+use App\Http\Middleware\ReachEnabled;
 use App\Http\Middleware\ToolAbuseGuard;
 use App\Http\Middleware\TrackOrigin;
 use App\Support\Ops\Heartbeat;
@@ -141,6 +143,11 @@ Route::middleware([PublicTrailingSlash::class, TrackOrigin::class])->group(funct
 // #176 agency logo on client reports (random file name, see App\Support\AgencyLogo)
 Route::get('/brand/agency/{file}', [AgencyLogoController::class, 'show'])
     ->middleware('throttle:120,1')->where('file', '[A-Za-z0-9]{40}\.(png|svg)')->name('agency.logo');
+// FR-REACH (module reach, off): every route 404s while the module is off, and is noindex.
+Route::middleware([ReachEnabled::class])->group(function () {
+    Route::match(['get', 'post'], '/reach/v1/postback/{token}', ReachPostbackController::class)
+        ->middleware('throttle:600,1')->where('token', '[A-Za-z0-9]{40}');
+});
 // XS-13 / XS-23 (R4, D-306): no-login lead page for a client's front desk (module lead_desk).
 Route::get('/l/{token}', [LeadDeskController::class, 'show'])->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{40}');
 Route::post('/l/{token}', [LeadDeskController::class, 'store'])->middleware('throttle:30,1')->where('token', '[A-Za-z0-9]{40}');

@@ -29,6 +29,8 @@ return [
         'panel_shell' => (bool) env('MODULE_PANEL_SHELL', false),
         // XS-13 / XS-23 no-login lead page for a client's front desk (D-306).
         'lead_desk' => (bool) env('MODULE_LEAD_DESK', false),
+        // FR-REACH AdsRanger Reach (publisher offers, postbacks, wallets): estimates only until launch (D-262).
+        'reach' => (bool) env('MODULE_REACH', false),
     ],
 
     'preview_agencies' => array_values(array_filter(array_map('trim', explode(',', (string) env('MODULES_PREVIEW_AGENCIES', ''))))),
