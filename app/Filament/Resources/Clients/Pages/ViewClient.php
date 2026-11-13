@@ -112,7 +112,7 @@ class ViewClient extends ViewRecord
                 ->visible(fn () => TeamRoles::canManageData(auth()->user(), $this->record->agency))
                 ->modalDescription(__('It shows at the top of this client\'s report link. The client types their name and taps Approve or Ask for changes; you see who answered and when.'))
                 ->schema([
-                    Select::make('kind')->label(__('Type'))->options(['plan' => __('Plan'), 'budget' => __('Budget'), 'creative' => __('Creative'), 'other' => __('Other')])->default('plan')->required(),
+                    Select::make('kind')->label(__('Type'))->options(['plan' => __('plan.plan'), 'budget' => __('Budget'), 'creative' => __('Creative'), 'other' => __('Other')])->default('plan')->required(),
                     TextInput::make('title')->label(__('Title'))->required()->maxLength(160),
                     Textarea::make('details')->label(__('Details'))->rows(4)->maxLength(3000),
                 ])

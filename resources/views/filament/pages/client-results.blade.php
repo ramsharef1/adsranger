@@ -317,7 +317,7 @@
                 @foreach ($approvals as $ap)
                     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:baseline">
                         <strong>{{ $ap->title }}</strong>
-                        <span style="{{ $muted }}">{{ ['plan' => __('Plan'), 'budget' => __('Budget'), 'creative' => __('Creative'), 'other' => __('Other')][$ap->kind] ?? $ap->kind }}</span>
+                        <span style="{{ $muted }}">{{ ['plan' => __('plan.plan'), 'budget' => __('Budget'), 'creative' => __('Creative'), 'other' => __('Other')][$ap->kind] ?? $ap->kind }}</span>
                         <span>·
                             @if ($ap->status === 'pending'){{ __('Waiting for the client') }}
                             @elseif ($ap->status === 'approved'){{ __('Approved by :name', ['name' => $ap->answered_by]) }} <bdi dir="ltr">{{ $ap->answered_at?->format('Y-m-d H:i') }}</bdi>
@@ -355,7 +355,7 @@
             <x-slot name="heading">{{ __('Season review: :season', ['season' => $season['label']]) }}</x-slot>
             <x-slot name="description"><bdi dir="ltr">{{ $season['start'] }} → {{ $season['end'] }}</bdi>@if ($season['spend_vs_before'] !== null && ! $client->hide_spend) · {{ __('spend per day :pct% vs the 28 days before', ['pct' => ($season['spend_vs_before'] > 0 ? '+' : '').$season['spend_vs_before']]) }}@endif</x-slot>
             <div style="overflow-x:auto"><table style="width:100%;font-size:13.5px;border-collapse:collapse">
-                <thead><tr><th style="text-align:start;padding:6px">{{ __('Week') }}</th>@unless ($client->hide_spend)<th style="text-align:end;padding:6px">{{ __('Spend') }}</th><th style="text-align:end;padding:6px">{{ __('Plan') }}</th>@endunless<th style="text-align:end;padding:6px">{{ __('Results') }}</th>@unless ($client->hide_spend)<th style="text-align:end;padding:6px">{{ __('Cost per result') }}</th>@endunless</tr></thead>
+                <thead><tr><th style="text-align:start;padding:6px">{{ __('Week') }}</th>@unless ($client->hide_spend)<th style="text-align:end;padding:6px">{{ __('Spend') }}</th><th style="text-align:end;padding:6px">{{ __('plan.plan') }}</th>@endunless<th style="text-align:end;padding:6px">{{ __('Results') }}</th>@unless ($client->hide_spend)<th style="text-align:end;padding:6px">{{ __('Cost per result') }}</th>@endunless</tr></thead>
                 <tbody>@foreach ($season['weeks'] as $w)<tr style="border-top:1px solid rgba(148,163,184,.2)"><td style="padding:6px"><bdi dir="ltr">{{ $w['from'] }}</bdi></td>
                     @unless ($client->hide_spend)<td style="padding:6px;text-align:end">{{ R::money($w['spend'], $cur) }}</td><td style="padding:6px;text-align:end">{{ $w['planned'] ? R::money($w['planned'], $cur) : '–' }}@if ($w['vs_plan'] !== null)<span style="{{ abs($w['vs_plan']) > 15 ? 'color:#B45309;font-weight:600' : 'opacity:.7' }}"> ({{ ($w['vs_plan'] > 0 ? '+' : '').$w['vs_plan'] }}%)</span>@endif</td>@endunless
                     <td style="padding:6px;text-align:end">{{ number_format($w['results']) }}</td>@unless ($client->hide_spend)<td style="padding:6px;text-align:end">{{ $w['cpr'] !== null ? R::money($w['cpr'], $cur) : '–' }}</td>@endunless</tr>@endforeach</tbody>
