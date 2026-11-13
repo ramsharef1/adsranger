@@ -19,6 +19,8 @@ use App\Filament\Pages\OnboardingPage;
 use App\Filament\Pages\SeoAuditPage;
 use App\Filament\Pages\WhatsNewPage;
 use App\Filament\Pages\WorkspaceActivity;
+use App\Http\Controllers\ReachPortalController;
+use App\Http\Controllers\ReachServeController;
 use App\Http\Middleware\AiConnectorGuard;
 use App\Http\Middleware\FreePlanFence;
 use App\Http\Middleware\ToolAbuseGuard;
@@ -41,6 +43,7 @@ use App\Support\PublicSite;
 use App\Support\Reach\Attribution;
 use App\Support\Reach\OfferImporter;
 use App\Support\Reach\Postbacks;
+use App\Support\Reach\Serve;
 use App\Support\Reach\Wallet;
 use App\Support\RestoreTest;
 use App\Support\Seo\PageAudit;
@@ -90,4 +93,5 @@ return [
     'BX-01' => ['title' => '/data hub: MENA ad calendar 2027 as CSV + JSON (CC BY 4.0) on our own domain, Dataset schema, drift test', 'code' => ['view:public.data', 'config:datasets'], 'tests' => ['Feature/OpenDataBx01Test.php']],
     'BX-03' => ['title' => '"Cite this" block + stable anchors on /data, /mena-calendar, glossary terms', 'code' => ['view:public.partials.cite'], 'tests' => ['Feature/OpenDataBx01Test.php']],
     'FR-REACH-R1' => ['title' => 'AdsRanger Reach R-1: schema, offer + coupon importer (AR/EN CSV), S2S postback receiver, 3-tier coupon attribution, dual estimate wallet, /admin Reach board (module reach, off; D-262 estimates)', 'code' => [OfferImporter::class, Postbacks::class, Attribution::class, Wallet::class, ReachControlBoard::class, 'route:reach/v1/postback/{token}'], 'tests' => ['Feature/ReachR1Test.php']],
+    'FR-REACH-R2' => ['title' => 'AdsRanger Reach R-2: stateless /reach/v1/serve + offerwall + AI feed (geo, OS, URL keywords, payday / meal-time boost, UCB1, cached), < 5 KB web tag (no CLS, 0x0 guard, auto-skim), incent firewall, family-safe + 20-domain blocklist, human vs AI-agent counters, 4-tab /reach/portal, /reach landing (noindex, 404 while off)', 'code' => [Serve::class, ReachServeController::class, ReachPortalController::class, 'view:reach.portal', 'view:reach.landing', 'route:reach/v1/serve', 'route:reach/v1/ai-feed'], 'tests' => ['Feature/ReachR2Test.php']],
 ];

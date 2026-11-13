@@ -1,4 +1,5 @@
 @php
+    $h = fn (string $s) => \App\Support\Seo\ToolCopy::html($s, app()->getLocale() === 'ar');
     $money = fn (float $v, string $cur = 'USD') => \App\Support\ResultResolver::money($v, $cur);
     $cell = 'padding:6px;text-align:start;vertical-align:top';
     $input = 'width:100%;min-height:44px;border:1px solid rgba(127,127,127,.35);border-radius:8px;padding:6px 10px;background:transparent';
@@ -52,13 +53,13 @@
     </x-filament::section>
 
     <x-filament::section :heading="__('reach_ui.admin.import')">
-        <x-slot name="description">{{ __('reach_ui.admin.import_help') }}</x-slot>
+        <x-slot name="description">{{ $h(__('reach_ui.admin.import_help')) }}</x-slot>
         <textarea wire:model="csv" rows="6" dir="ltr" style="{{ $input }};font-family:monospace" placeholder="title,network,external_id,payout,type,coupon,url"></textarea>
         <div style="margin-top:8px"><x-filament::button wire:click="importCsv" style="min-height:44px">{{ __('reach_ui.admin.import_button') }}</x-filament::button></div>
         @if ($importResult)
             <p style="margin-top:8px">{{ __('reach_ui.admin.imported', ['created' => $importResult['created'], 'updated' => $importResult['updated']]) }}</p>
             @foreach ($importResult['errors'] as $line => $err)
-                <p style="color:rgb(var(--danger-600))">{{ __('reach_ui.admin.line', ['line' => $line]) }} · {{ __('reach_ui.error.'.$err) }}</p>
+                <p style="color:rgb(var(--danger-600))">{{ __('reach_ui.admin.line', ['line' => $line]) }} · {{ $h(__('reach_ui.error.'.$err)) }}</p>
             @endforeach
         @endif
     </x-filament::section>
@@ -97,18 +98,18 @@
     </x-filament::section>
 
     <x-filament::section :heading="__('reach_ui.admin.codes')">
-        <x-slot name="description">{{ __('reach_ui.admin.codes_help') }}</x-slot>
+        <x-slot name="description">{{ $h(__('reach_ui.admin.codes_help')) }}</x-slot>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px">
             <label>{{ __('reach_ui.admin.offer_id') }}<input wire:model="code.offer_id" inputmode="numeric" dir="ltr" style="{{ $input }}"></label>
             <label>{{ __('reach_ui.field.coupon') }}<input wire:model="code.code" dir="ltr" style="{{ $input }}"></label>
-            <label>{{ __('reach_ui.admin.tier') }}<select wire:model="code.tier" style="{{ $input }}">@foreach (\App\Models\ReachCouponCode::TIERS as $t)<option value="{{ $t }}">{{ __('reach_ui.tier.'.$t) }}</option>@endforeach</select></label>
+            <label>{{ __('reach_ui.admin.tier') }}<select wire:model="code.tier" style="{{ $input }}">@foreach (\App\Models\ReachCouponCode::TIERS as $t)<option value="{{ $t }}">{{ $h(__('reach_ui.tier.'.$t)) }}</option>@endforeach</select></label>
             <label>{{ __('reach_ui.admin.ref') }}<input wire:model="code.publisher_ref" dir="ltr" style="{{ $input }}"></label>
         </div>
         <div style="margin-top:8px"><x-filament::button wire:click="addCode" style="min-height:44px">{{ __('reach_ui.admin.save_code') }}</x-filament::button></div>
     </x-filament::section>
 
     <x-filament::section :heading="__('reach_ui.admin.postbacks')">
-        <x-slot name="description">{{ __('reach_ui.admin.postbacks_help') }}</x-slot>
+        <x-slot name="description">{{ $h(__('reach_ui.admin.postbacks_help')) }}</x-slot>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
             <label>{{ __('reach_ui.field.network') }}<select wire:model="endpoint.network" style="{{ $input }}">@foreach (config('reach.networks') as $n)<option value="{{ $n }}">{{ $n }}</option>@endforeach</select></label>
             <label>{{ __('reach_ui.admin.label') }}<input wire:model="endpoint.label" style="{{ $input }}"></label>
@@ -131,7 +132,7 @@
     </x-filament::section>
 
     <x-filament::section :heading="__('reach_ui.admin.billing')">
-        <x-slot name="description">{{ __('reach_ui.admin.billing_help') }}</x-slot>
+        <x-slot name="description">{{ $h(__('reach_ui.admin.billing_help')) }}</x-slot>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
             <label>{{ __('reach_ui.admin.advertiser') }}<select wire:model="billing.advertiser_id" style="{{ $input }}"><option value="">—</option>@foreach ($clients as $c)<option value="{{ $c->id }}">{{ $c->name }}</option>@endforeach</select></label>
             <label>{{ __('reach_ui.admin.billing_mode') }}<select wire:model="billing.billing_mode" style="{{ $input }}">@foreach (config('reach.billing_modes') as $m)<option value="{{ $m }}">{{ __('reach_ui.billing.'.$m) }}</option>@endforeach</select></label>

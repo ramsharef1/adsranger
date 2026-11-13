@@ -19,7 +19,9 @@ class Reach
     /** Anonymous endpoints (postbacks, serve, landing): on for everyone, or for a signed-in super admin checking it. */
     public static function publicOn(): bool
     {
-        return Modules::enabled(self::MODULE) || static::on();
+        $user = auth()->user();
+
+        return Modules::enabled(self::MODULE) || static::on($user, $user instanceof User ? $user->agencies()->first() : null);
     }
 
     /** Round to 3 decimals (3-decimal currencies: KWD, BHD, OMR, JOD). */

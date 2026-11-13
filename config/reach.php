@@ -54,6 +54,10 @@ return [
 
     'max_blocked_domains' => 20,
 
+    // Query parameter each network reads back as the Sub-ID in its postback ({publisher ref}_{placement}). Set from the
+    // network's own docs when an account is opened; "subid" until then.
+    'subid_params' => ['arabclicks' => 'subid', 'admitad' => 'subid', 'impact' => 'subid', 'direct_client' => 'subid'],
+
     // R-2 serve: the cache store for the stateless endpoints (null = the app's default store; set to "redis" where it runs).
     'cache_store' => env('REACH_CACHE_STORE'),
     'serve_cache_seconds' => 60,

@@ -9,7 +9,10 @@ use App\Http\Controllers\LeadDeskController;
 use App\Http\Controllers\MagicLoginController;
 use App\Http\Controllers\PublicAttributionCollectorController;
 use App\Http\Controllers\PublicSiteController;
+use App\Http\Controllers\ReachLandingController;
+use App\Http\Controllers\ReachPortalController;
 use App\Http\Controllers\ReachPostbackController;
+use App\Http\Controllers\ReachServeController;
 use App\Http\Controllers\ReportUnsubscribeController;
 use App\Http\Controllers\StudioBriefController;
 use App\Http\Middleware\PublicTrailingSlash;
@@ -147,6 +150,28 @@ Route::get('/brand/agency/{file}', [AgencyLogoController::class, 'show'])
 Route::middleware([ReachEnabled::class])->group(function () {
     Route::match(['get', 'post'], '/reach/v1/postback/{token}', ReachPostbackController::class)
         ->middleware('throttle:600,1')->where('token', '[A-Za-z0-9]{40}');
+    // R-2: stateless serve endpoints (no cookies, CORS-open), web tag, AI feed.
+    Route::get('/reach/v1/tag.js', [ReachServeController::class, 'tag'])->middleware('throttle:600,1');
+    Route::get('/reach/v1/serve', [ReachServeController::class, 'serve'])->middleware('throttle:600,1');
+    Route::get('/reach/v1/offerwall', [ReachServeController::class, 'offerwall'])->middleware('throttle:300,1');
+    Route::get('/reach/v1/click', [ReachServeController::class, 'click'])->middleware('throttle:120,1');
+    Route::post('/reach/v1/copy', [ReachServeController::class, 'copy'])->middleware('throttle:60,1');
+    Route::get('/reach/v1/ai-feed', [ReachServeController::class, 'aiFeed'])->middleware('throttle:300,1');
+    Route::get('/reach/v1/llms/{ref}.txt', [ReachServeController::class, 'llms'])->middleware('throttle:300,1')->where('ref', '[a-z0-9]{4,16}');
+    // R-2: landing + publisher portal.
+    Route::get('/reach', ReachLandingController::class)->defaults('lang', 'ar')->middleware('throttle:60,1');
+    Route::get('/en/reach', ReachLandingController::class)->defaults('lang', 'en')->middleware('throttle:60,1');
+    // Sign-in is checked in the controller, after the module gate, so a signed-out visitor also gets 404 while off.
+    Route::middleware(['throttle:60,1'])->group(function () {
+        Route::get('/reach/portal', [ReachPortalController::class, 'show'])->defaults('lang', 'ar');
+        Route::get('/en/reach/portal', [ReachPortalController::class, 'show'])->defaults('lang', 'en');
+        Route::get('/reach/portal/stats', [ReachPortalController::class, 'stats']);
+        Route::get('/en/reach/portal/stats', [ReachPortalController::class, 'stats']);
+        Route::post('/reach/portal/join', [ReachPortalController::class, 'join']);
+        Route::post('/reach/portal/widgets', [ReachPortalController::class, 'addWidget']);
+        Route::post('/reach/portal/settings', [ReachPortalController::class, 'settings']);
+        Route::post('/reach/portal/wallet/{action}', [ReachPortalController::class, 'wallet'])->where('action', 'early-cashout|withdraw|ad-credit');
+    });
 });
 // XS-13 / XS-23 (R4, D-306): no-login lead page for a client's front desk (module lead_desk).
 Route::get('/l/{token}', [LeadDeskController::class, 'show'])->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{40}');
