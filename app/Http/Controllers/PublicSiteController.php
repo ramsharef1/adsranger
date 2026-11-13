@@ -388,7 +388,7 @@ class PublicSiteController extends Controller
 
     public static function sitemapPageViews(): array
     {
-        return [
+        $views = [
             '/' => 'welcome',
             '/waitlist' => 'public/waitlist',
             '/ramadan-2027' => 'public/ramadan-2027',
@@ -419,12 +419,13 @@ class PublicSiteController extends Controller
             '/terms' => 'legal/page',
             '/data-deletion' => 'legal/page',
         ] + collect(PublicCatalog::glossary())->mapWithKeys(fn ($t, string $slug) => ['/glossary/'.$slug => 'public/glossary/show'])->all()
-          + (PublicSite::articlesPublic()
-              ? ['/blog' => 'public/blog/index', '/guides' => 'public/guides/index']
-                + collect(PublicCatalog::guides())->mapWithKeys(fn ($g, string $slug) => ['/guides/'.$slug => 'public/guides/show'])->all()
-                + collect(PublicCatalog::posts())->mapWithKeys(fn ($p, string $slug) => ['/blog/'.$slug => 'public/blog/show'])->all()
-              : [])
+          + (PublicSite::articlesPublic() ? ['/blog' => 'public/blog/index', '/guides' => 'public/guides/index'] : [])
+          + collect(PublicCatalog::guides())->mapWithKeys(fn ($g, string $slug) => ['/guides/'.$slug => 'public/guides/show'])->all()
+          + collect(PublicCatalog::posts())->mapWithKeys(fn ($p, string $slug) => ['/blog/'.$slug => 'public/blog/show'])->all()
           + (config('seo_tools.public') ? (['/tools' => 'public/tools/index'] + collect(PublicSite::publicTools())->mapWithKeys(fn (string $t) => ['/tools/'.$t => 'public/tools/'.$t])->all()) : []);
+
+        // D-279: held guides, posts and glossary terms stay out of the sitemap until released.
+        return array_filter($views, fn (string $view, string $path) => ! PublicSite::held($path), ARRAY_FILTER_USE_BOTH);
     }
 
     /** R-13: /sitemap.xml is a sitemap index; children are added as sections ship (features, guides, blog, …). */
@@ -527,8 +528,13 @@ class PublicSiteController extends Controller
     public function glossaryTerm(string $lang = 'ar', string $term = 'roas'): Response
     {
         abort_unless(isset(PublicCatalog::glossary()[$term]), 404);
+        $held = PublicSite::held('/glossary/'.$term);
+        $response = response()->view('public.glossary.show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'term' => $term, 'noindex' => $held]);
+        if ($held) {
+            $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+        }
 
-        return response()->view('public.glossary.show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'term' => $term]);
+        return $response;
     }
 
     public function blogIndex(string $lang = 'ar'): Response
@@ -540,7 +546,7 @@ class PublicSiteController extends Controller
     {
         abort_unless(isset(PublicCatalog::posts()[$slug]), 404);
 
-        return $this->article('public.blog.show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'slug' => $slug]);
+        return $this->article('public.blog.show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'slug' => $slug], '/blog/'.$slug);
     }
 
     public function guidesIndex(string $lang = 'ar'): Response
@@ -552,7 +558,7 @@ class PublicSiteController extends Controller
     {
         abort_unless(isset(PublicCatalog::guides()[$slug]), 404);
 
-        return $this->article('public.guides.show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'slug' => $slug]);
+        return $this->article('public.guides.show', ['lang' => $lang === 'en' ? 'en' : 'ar', 'slug' => $slug], '/guides/'.$slug);
     }
 
     /**
@@ -560,9 +566,9 @@ class PublicSiteController extends Controller
      *
      * @param  array<string, mixed>  $data
      */
-    private function article(string $view, array $data): Response
+    private function article(string $view, array $data, ?string $path = null): Response
     {
-        $public = PublicSite::articlesPublic();
+        $public = $path !== null ? ! PublicSite::held($path) : PublicSite::articlesPublic();
         $response = response()->view($view, $data + ['noindex' => ! $public]);
         if (! $public) {
             $response->headers->set('X-Robots-Tag', 'noindex, nofollow');

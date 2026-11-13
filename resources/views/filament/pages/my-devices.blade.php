@@ -31,7 +31,7 @@
         <x-filament::section :heading="__('New devices in the last 30 days')">
             <x-slot name="description">{{ __('We send a phone alert (if you turned phone alerts on) when your account signs in from a browser and system it hasn\'t used in 6 months.') }}</x-slot>
             @foreach ($fresh as $r)
-                <div style="padding:6px 0;font-size:14px"><bdi>{{ $r->meta['label'] ?? __('Unknown device') }}</bdi> · <bdi dir="ltr">{{ $r->created_at?->timezone(\Filament\Facades\Filament::getTenant()?->timezone ?: 'Asia/Amman')->format('Y-m-d H:i') }}</bdi></div>
+                <div style="padding:6px 0;font-size:14px"><bdi>{{ $r->meta['label'] ?? __('Unknown device') }}</bdi> · <time datetime="{{ $r->created_at?->toIso8601String() }}">{{ $r->created_at?->timezone(\Filament\Facades\Filament::getTenant()?->timezone ?: 'Asia/Amman')->locale(app()->getLocale())->translatedFormat(app()->getLocale() === 'ar' ? 'j F Y، g:i A' : 'j M Y, g:i a') }}</time></div>
             @endforeach
         </x-filament::section>
     @endif

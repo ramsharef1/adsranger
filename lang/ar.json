@@ -1823,7 +1823,7 @@
     "That device is signed out.": "تم تسجيل خروج هذا الجهاز.",
     "Nothing to sign out.": "لا يوجد جهاز آخر لتسجيل خروجه.",
     "{0} No other device was signed in.|{1} :count other device is signed out.|[2,*] :count other devices are signed out.": "{0} لا يوجد جهاز آخر مسجّل الدخول.|{1} تم تسجيل خروج جهاز آخر واحد.|{2} تم تسجيل خروج جهازين آخرين.|[3,10] تم تسجيل خروج :count أجهزة أخرى.|[11,*] تم تسجيل خروج :count جهازًا آخر.",
-    "Where your account is signed in now. If you see a device you don't know, sign out the other devices and change your password.": "الأماكن التي حسابك مسجّل الدخول فيها الآن. إن رأيت جهازًا لا تعرفه، سجّل الخروج من الأجهزة الأخرى وغيّر كلمة المرور.",
+    "Where your account is signed in now. If you see a device you don't know, sign out the other devices and change your password.": "هذه الأجهزة مسجّلة الدخول إلى حسابك الآن. إن رأيت جهازًا لا تعرفه، سجّل الخروج من الأجهزة الأخرى وغيّر كلمة المرور.",
     "This device": "هذا الجهاز",
     "Last active :time": "آخر نشاط :time",
     "No signed-in devices found.": "لا توجد أجهزة مسجّلة الدخول.",
@@ -1856,7 +1856,7 @@
     "Lift": "رفع الحظر",
     "blocked by hand": "محظور يدويًا",
     "Block a host": "حظر نطاق",
-    "Site health score: 100 minus the average deduction per page audited (:c points per critical finding, :w per warning). Not a Google ranking.": "درجة صحة الموقع: 100 ناقص متوسط ما يُخصم لكل صفحة مفحوصة (:c نقاط لكل مشكلة حرجة، ثم :w نقاط لكل تحذير). ليست ترتيبًا في Google.",
+    "Site health score: 100 minus the average deduction per page audited (:c points per critical finding, :w per warning). Not a Google ranking.": "درجة صحة الموقع: 100 ناقص متوسط ما يُخصم لكل صفحة مفحوصة (:c نقاط لكل مشكلة حرجة، ثم :w نقاط لكل تحذير). ليست ترتيبًا في ⁦Google⁩.",
     "A critical finding needs fixing.": "توجد مشكلة حرجة تحتاج إصلاحًا.",
     "Confirm you own this site or have its owner's permission before the first audit.": "أكّد أنك تملك هذا الموقع أو أن لديك إذن صاحبه قبل أول فحص."
 }

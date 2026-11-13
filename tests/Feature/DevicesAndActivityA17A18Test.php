@@ -101,7 +101,7 @@ class DevicesAndActivityA17A18Test extends TestCase
         $this->withSession(['locale' => 'en'])->get("/app/{$agency->slug}/activity")->assertOk()
             ->assertSee('Added a client')->assertSee('Jeddah Shop')->assertSee('Social: other change')
             ->assertDontSee('Deleted a client')->assertDontSee('client.created');
-        $this->withSession(['locale' => 'ar'])->get("/app/{$agency->slug}/activity")->assertOk()->assertSee('أضاف عميلًا');
+        $this->withSession(['locale' => 'ar'])->get("/app/{$agency->slug}/activity")->assertOk()->assertSee('إضافة عميل');
 
         // The new user can already be attached here (unique pivot), so set the role rather than attach twice.
         $admin = User::factory()->create();

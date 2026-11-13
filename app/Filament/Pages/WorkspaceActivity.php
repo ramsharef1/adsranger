@@ -62,6 +62,7 @@ class WorkspaceActivity extends Page
         $text = $actions[$action] ?? ($group !== null ? __('activity.other', ['group' => $group]) : __('activity.unknown'));
         $html = e($text);
 
-        return app()->getLocale() === 'ar' ? preg_replace('/[A-Za-z][A-Za-z0-9 .()\-]*[A-Za-z0-9)]|[A-Za-z]/', '<bdi>$0</bdi>', $html) : $html;
+        // UX-271: Latin runs (with their brackets) are isolated left-to-right so «(webhook)» doesn't flip in RTL.
+        return app()->getLocale() === 'ar' ? preg_replace('/\(?[A-Za-z][A-Za-z0-9 .\-]*[A-Za-z0-9]\)?|\(?[A-Za-z]\)?/', '<bdi dir="ltr">$0</bdi>', $html) : $html;
     }
 }

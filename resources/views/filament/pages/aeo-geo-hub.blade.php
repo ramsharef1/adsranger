@@ -10,7 +10,7 @@
             {{ __('Unconnected AI engines run in honest deterministic readiness mode — no live LLM rankings or crawl volumes are ever fabricated.') }}
         </div>
 
-        {{-- #182 Share-of-Model Matrix & #183 LLM Referral Slice --}}
+        {{-- #302 Share-of-Model Matrix & #303 LLM Referral Slice --}}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:14px">
             <x-filament::section>
                 <x-slot name="heading">{{ __('Share-of-Model & Citation Matrix') }}</x-slot>
@@ -60,7 +60,7 @@
             </x-filament::section>
         </div>
 
-        {{-- #181 Multi-Engine Brand Citation Tracker --}}
+        {{-- #301 Multi-Engine Brand Citation Tracker --}}
         <x-filament::section style="margin-top:16px">
             <x-slot name="heading">{{ __('AI Brand Citation Prompts') }}</x-slot>
             <x-slot name="description">{!! __('Track prompts across <bdi dir="ltr">ChatGPT</bdi>, <bdi dir="ltr">Perplexity</bdi>, <bdi dir="ltr">Gemini</bdi>, <bdi dir="ltr">Claude</bdi>, and <bdi dir="ltr">AI Overviews</bdi>.') !!}</x-slot>
@@ -101,7 +101,7 @@
             @endforelse
         </x-filament::section>
 
-        {{-- #184, #185, #188, #189, #191 Domain Audit & SafeFetcher Inspector --}}
+        {{-- #304, #305, #308, #309, #311 Domain Audit & SafeFetcher Inspector --}}
         <x-filament::section style="margin-top:16px">
             <x-slot name="heading">{!! __('Domain <bdi dir="ltr">llms.txt</bdi>, AI Crawler & Internal Link Auditor') !!}</x-slot>
             @if ($canEdit)
@@ -132,7 +132,7 @@
             @endif
         </x-filament::section>
 
-        {{-- #186 Query Fan-Out & #192 Programmatic Comparison Brief Previews --}}
+        {{-- #306 Query Fan-Out & #312 Programmatic Comparison Brief Previews --}}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:16px">
             <x-filament::section>
                 <x-slot name="heading">{{ __('Conversational Query Fan-Out') }}</x-slot>

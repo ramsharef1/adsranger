@@ -20,7 +20,7 @@ use Illuminate\Validation\Rule;
 use UnitEnum;
 
 /**
- * Wave B.1 (#181–#192): AEO & GEO AI Search Visibility & Organic SEO Depth Hub.
+ * Wave B.1 (#301–#312, relabelled from #181–#192 by D-281; FR-087…095 keep #181–#189): AEO & GEO AI Search Visibility & Organic SEO Depth Hub.
  * Gated behind `Modules::on('organic')` (D-229 global default `false`).
  */
 class AeoGeoHubPage extends Page
@@ -198,7 +198,7 @@ class AeoGeoHubPage extends Page
         Notification::make()->title(__('Domain AEO & GEO audit saved'))->success()->send();
     }
 
-    /** Read-only view method (#186). */
+    /** Read-only view method (#306). */
     public function previewFanOut(): void
     {
         if (trim($this->fanOutSeed) === '') {
@@ -208,7 +208,7 @@ class AeoGeoHubPage extends Page
         $this->fanOutResults = AeoGeoManager::generateQueryFanOut($this->fanOutSeed, $locale);
     }
 
-    /** Read-only view method (#189). */
+    /** Read-only view method (#309). */
     public function previewSnippetRewrite(): void
     {
         if (! preg_match('#^https?://#i', trim($this->snippetTargetUrl))) {
@@ -218,7 +218,7 @@ class AeoGeoHubPage extends Page
         $this->snippetPreview = AeoGeoManager::rewriteAnswerFirstSnippet($this->snippetTargetUrl, $this->snippetQuestion ?: 'Overview', $locale);
     }
 
-    /** Read-only view method (#188). */
+    /** Read-only view method (#308). */
     public function previewEntitySchema(): void
     {
         $client = $this->resolveScopedClient();
@@ -237,7 +237,7 @@ class AeoGeoHubPage extends Page
         $this->schemaPreviewJson = $res['json_ld'];
     }
 
-    /** Read-only view method (#192). */
+    /** Read-only view method (#312). */
     public function previewComparisonBrief(): void
     {
         $client = $this->resolveScopedClient();

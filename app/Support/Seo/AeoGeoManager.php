@@ -11,7 +11,7 @@ use App\Support\Arabic\Normaliser;
 use Illuminate\Support\Facades\Http;
 
 /**
- * Wave B.1 (#181–#192): AEO & GEO AI Search Visibility & Organic SEO Depth Suite.
+ * Wave B.1 (#301–#312, relabelled from #181–#192 by D-281; FR-087…095 keep #181–#189): AEO & GEO AI Search Visibility & Organic SEO Depth Suite.
  *
  * Strictly obeys D-229 Honesty Rules:
  * - Never fabricates live LLM rankings or crawl volumes.
@@ -37,7 +37,7 @@ class AeoGeoManager
     ];
 
     /**
-     * #181 Multi-Engine AI Brand Citation Tracker.
+     * #301 Multi-Engine AI Brand Citation Tracker.
      *
      * @param  list<string>|null  $engines
      * @return list<AeoCitationRun>
@@ -121,7 +121,7 @@ class AeoGeoManager
     }
 
     /**
-     * #182 Share-of-Model Competitor Matrix.
+     * #302 Share-of-Model Competitor Matrix.
      *
      * @return array{
      *   total_runs: int,
@@ -208,7 +208,7 @@ class AeoGeoManager
     }
 
     /**
-     * #183 GA4 & Server-Side LLM Referral Revenue Slice.
+     * #303 GA4 & Server-Side LLM Referral Revenue Slice.
      *
      * @param  list<array{source: string, sessions?: int, conversions?: int, revenue?: float}>|null  $syncedRows
      * @return array{
@@ -259,7 +259,7 @@ class AeoGeoManager
     }
 
     /**
-     * #184 Client `llms.txt` & `llms-full.txt` Generator & Validator.
+     * #304 Client `llms.txt` & `llms-full.txt` Generator & Validator.
      *
      * @param  list<array{title: string, url: string, summary?: string, detail?: string}>  $keyPages
      * @return array{llms_txt: string, llms_full_txt: string, live_validation: array{checked: bool, status: ?int, valid_markdown: bool, error: ?string}}
@@ -306,7 +306,7 @@ class AeoGeoManager
     }
 
     /**
-     * #185 AI Crawler Access & `robots.txt` / X-Robots-Tag Auditor.
+     * #305 AI Crawler Access & `robots.txt` / X-Robots-Tag Auditor.
      *
      * @return array{ok: bool, error?: string, origin?: string, robots_status?: ?int, x_robots_tag?: string, x_robots_blocks_ai?: bool, bots?: array<string, string>}
      */
@@ -342,7 +342,7 @@ class AeoGeoManager
     }
 
     /**
-     * #186 Query Fan-Out & Conversational Prompt Generator (Arabic Normaliser + MENA markets).
+     * #306 Query Fan-Out & Conversational Prompt Generator (Arabic Normaliser + MENA markets).
      *
      * @return array{normalized_key: string, dialects: list<string>, prompts: list<array{stage: string, market: string, prompt: string}>}
      */
@@ -380,7 +380,7 @@ class AeoGeoManager
     }
 
     /**
-     * #187 Third-Party Citation Gap Finder.
+     * #307 Third-Party Citation Gap Finder.
      *
      * @return list<array{domain: string, url: string, competitor_mentions: list<string>, citation_count: int}>
      */
@@ -425,7 +425,7 @@ class AeoGeoManager
     }
 
     /**
-     * #188 Client JSON-LD Entity & Knowledge Graph Builder.
+     * #308 Client JSON-LD Entity & Knowledge Graph Builder.
      *
      * @param  array<string, mixed>  $input
      * @return array{valid: bool, json_ld: string, data: array<string, mixed>}
@@ -488,7 +488,7 @@ class AeoGeoManager
     }
 
     /**
-     * #189 Answer-First 40–60 Word Snippet & FAQ Rewriter via SafeFetcher.
+     * #309 Answer-First 40–60 Word Snippet & FAQ Rewriter via SafeFetcher.
      *
      * @return array{ok: bool, error?: string, readiness_score?: int, lead_word_count?: int, draft_ar?: string, draft_en?: string}
      */
@@ -541,7 +541,7 @@ class AeoGeoManager
     }
 
     /**
-     * #190 GSC Keyword Cannibalization & 30-Day Traffic-Decay Detector.
+     * #310 GSC Keyword Cannibalization & 30-Day Traffic-Decay Detector.
      *
      * @param  list<array{query: string, url: string, clicks: int, impressions: int, position?: float}>  $gscPageQueryRows
      * @param  list<array{url: string, current_clicks: int, previous_clicks: int}>  $periodComparisonRows
@@ -608,7 +608,7 @@ class AeoGeoManager
     }
 
     /**
-     * #191 Internal Link Orphan & Bilingual Anchor-Text Auditor (bounded SafeFetcher crawl <= 5 pages).
+     * #311 Internal Link Orphan & Bilingual Anchor-Text Auditor (bounded SafeFetcher crawl <= 5 pages).
      *
      * @param  list<string>  $pageUrls
      * @param  list<string>  $highConvertingUrls
@@ -673,7 +673,7 @@ class AeoGeoManager
     }
 
     /**
-     * #192 Programmatic Comparison & "Alternatives" Page Brief Builder.
+     * #312 Programmatic Comparison & "Alternatives" Page Brief Builder.
      *
      * @return array{slug: string, h1: string, answer_first_lead: string, h2_sections: list<string>, matrix_columns: list<string>, faqs: list<string>}
      */
@@ -729,7 +729,7 @@ class AeoGeoManager
     }
 
     /**
-     * Run & persist a consolidated Domain AEO/GEO Audit record (#184, #185, #188, #189, #191).
+     * Run & persist a consolidated Domain AEO/GEO Audit record (#304, #305, #308, #309, #311).
      */
     public static function runAndSaveDomainAudit(Client $client, string $domainUrl, array $highConvertingUrls = []): ?AeoDomainAudit
     {

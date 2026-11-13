@@ -99,10 +99,25 @@ class PublicSite
         return (bool) preg_match('#^/(guides|blog)(/|$)#', $path);
     }
 
+    /** D-279: a page Growth has rewritten and E1 has released (SITE_ARTICLES_RELEASED), given in its Arabic path. */
+    public static function released(string $path): bool
+    {
+        return in_array(preg_replace('#^/en(?=/)#', '', $path), (array) config('seo_tools.articles_released', []), true);
+    }
+
+    /** D-279: true while a guide, blog page or glossary term is held (noindex, out of the sitemap). */
+    public static function held(string $path): bool
+    {
+        $path = preg_replace('#^/en(?=/)#', '', $path);
+        $kind = self::isArticlePath($path) || preg_match('#^/glossary/[^/]+$#', $path);
+
+        return $kind && ! self::articlesPublic() && ! self::released($path);
+    }
+
     /** False for an article path while the articles are held, so no public page links to them. */
     public static function linkable(string $path): bool
     {
-        return self::articlesPublic() || ! self::isArticlePath($path);
+        return self::articlesPublic() || ! self::isArticlePath($path) || self::released($path);
     }
 
     /** Tools that are published: SEO_TOOLS_PUBLIC on and not held back (D-249). @return list<string> slugs */

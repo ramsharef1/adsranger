@@ -149,7 +149,7 @@ class SafeFetcher
                 'url' => $url,
                 'body' => self::toUtf8($body, $type),
                 'content_type' => $type,
-                'x_robots_tag' => trim((string) $res->header('X-Robots-Tag')), // AEO crawler check (#185)
+                'x_robots_tag' => trim((string) $res->header('X-Robots-Tag')), // AEO crawler check (#305)
                 'error' => $res->status() === 200 ? null : 'status',
             ];
         }

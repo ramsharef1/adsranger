@@ -13,6 +13,11 @@ return [
     // and blog instead: noindex, out of the sitemap, /llms.txt and the hubs' cards, and no page links to them.
     'articles_public' => (bool) env('SITE_ARTICLES_PUBLIC', true),
 
+    // D-279 (Rami: "Noindex until rewritten"): with SITE_ARTICLES_PUBLIC=false the glossary terms are held too (noindex,
+    // out of the sitemap; the /glossary index stays). A page Growth has rewritten to its band goes back in by listing its
+    // path here (comma-separated, e.g. "/guides/ad-budget-pacing,/glossary/roas"); both languages follow.
+    'articles_released' => array_values(array_filter(array_map('trim', explode(',', (string) env('SITE_ARTICLES_RELEASED', ''))))),
+
     // Each tool's view is resources/views/public/tools/<slug>.blade.php. URLs per Content's map (ADSR-042 §13) where set;
     // the three ad tools (D-90) wait for Content's OK on their slugs.
     'tools' => [
