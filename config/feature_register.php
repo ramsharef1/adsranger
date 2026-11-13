@@ -22,6 +22,7 @@ use App\Filament\Pages\WorkspaceActivity;
 use App\Http\Controllers\ReachPortalController;
 use App\Http\Controllers\ReachServeController;
 use App\Http\Controllers\ReachToolController;
+use App\Http\Controllers\StoreWebhookController;
 use App\Http\Middleware\AiConnectorGuard;
 use App\Http\Middleware\FreePlanFence;
 use App\Http\Middleware\ToolAbuseGuard;
@@ -34,6 +35,7 @@ use App\Support\AiWorkspace\FreePlan;
 use App\Support\AiWorkspace\NightShift;
 use App\Support\AiWorkspace\QualityGate;
 use App\Support\Arabic\Normaliser;
+use App\Support\Attribution\StoreWebhooks;
 use App\Support\CriticalPush;
 use App\Support\Devices;
 use App\Support\LiveVerification;
@@ -52,8 +54,6 @@ use App\Support\Seo\Audit\PageSpeed;
 use App\Support\Seo\Audit\SiteAuditor;
 use App\Support\Seo\PageAudit;
 use App\Support\Seo\PublicCatalog;
-use App\Support\Seo\SiteAuditRunner;
-use App\Support\Seo\ToolGuard;
 /*
  * A-12 (FR-029) register-to-code guard. Every row marked Done or Live in ADSR-060 / ADSR-920 is listed here with the
  * code it lives in and the test that proves it. RegisterToCodeTest fails if a listed class, view or test is missing,
@@ -61,6 +61,8 @@ use App\Support\Seo\ToolGuard;
  *
  * 'code' entries: a class name, "view:<name>", "route:<uri>" or "config:<file>". 'tests': files under tests/.
  */
+use App\Support\Seo\SiteAuditRunner;
+use App\Support\Seo\ToolGuard;
 use App\Support\Site\CopyLint;
 use App\Support\WebPush;
 
@@ -100,4 +102,5 @@ return [
     'FR-REACH-R2' => ['title' => 'AdsRanger Reach R-2: stateless /reach/v1/serve + offerwall + AI feed (geo, OS, URL keywords, payday / meal-time boost, UCB1, cached), < 5 KB web tag (no CLS, 0x0 guard, auto-skim), incent firewall, family-safe + 20-domain blocklist, human vs AI-agent counters, 4-tab /reach/portal, /reach landing (noindex, 404 while off)', 'code' => [Serve::class, ReachServeController::class, ReachPortalController::class, 'view:reach.portal', 'view:reach.landing', 'route:reach/v1/serve', 'route:reach/v1/ai-feed'], 'tests' => ['Feature/ReachR2Test.php']],
     'FR-REACH-R3' => ['title' => 'AdsRanger Reach R-3: free AI Bot Traffic & Unmonetized Revenue Checker (/tools/ai-crawler-revenue-checker): robots.txt per AI crawler, llms.txt + Offer markup, SafeFetcher + ToolAbuseGuard, noindex and out of sitemap / menus / hub / share cards (seo_tools.module_gated, module reach)', 'code' => [AiCrawlerChecker::class, ReachToolController::class, 'view:public.tools.ai-crawler-revenue-checker', 'config:seo_tools', 'route:tools/ai-crawler-revenue-checker/run'], 'tests' => ['Feature/ReachR3Test.php']],
     'FR-089-A2' => ['title' => 'Site audit A2 speed lab (E2-062): static asset checks SPEED-01..04 (render-blocking script / CSS, first image without dimensions, inline payload) + optional PageSpeed Insights v5 mobile (score, LCP, INP field-only, CLS, TTFB); speed chip only when speed_checked_at exists (UX-250); module seo_audit, off', 'code' => [PageSpeed::class, SiteAuditor::class, 'view:filament.pages.seo-audit'], 'tests' => ['Feature/SeoAuditA2SpeedTest.php']],
+    'FR-STORE-SYNC' => ['title' => 'Salla / Zid / Shopify signed store webhooks (E2-063): /webhooks/stores/{token} (CSRF-exempt, hash_equals HMAC-SHA256, replay window + unique event_uid), finished orders → per-SKU snapshots + observed COD rates on client_unit_economics (#193), returned COD orders, stock updates → #197 bleed guard; store connections in the profit hub (managers only); module intelligence_hub, off', 'code' => [StoreWebhooks::class, StoreWebhookController::class, 'route:webhooks/stores/{token}', 'config:store_sync'], 'tests' => ['Feature/MenaStoreWebhooksTest.php']],
 ];
