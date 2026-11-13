@@ -82,4 +82,6 @@ return [
     'AIW-M1d' => ['title' => 'AI Workspace M1: own API keys with monthly cap (#159), AI box with 3 playbooks, night shift v0 (read + morning list)', 'code' => [AiKeysPage::class, AiBox::class, NightShift::class, NightShiftPage::class], 'tests' => ['Feature/AiWorkspaceM1dTest.php']],
     'AIW-M1c' => ['title' => 'AI Workspace M1: Free plan «الباقة المجانية» (lite view, fence, one Free per ad account, spend fence, idle sync pause), daily caps by plan, full AI Workspace from Pro (D-286)', 'code' => [FreePlan::class, FreePlanFence::class, FreeLiteView::class], 'tests' => ['Feature/AiWorkspaceM1cFreeTest.php']],
     'GB-11a' => ['title' => 'Glossary titles «ما هو / ما هي» by gender, ≤ 60 characters', 'code' => [PublicCatalog::class], 'tests' => ['Feature/GlossaryHeadingTest.php']],
+    'BX-01' => ['title' => '/data hub: MENA ad calendar 2027 as CSV + JSON (CC BY 4.0) on our own domain, Dataset schema, drift test', 'code' => ['view:public.data', 'config:datasets'], 'tests' => ['Feature/OpenDataBx01Test.php']],
+    'BX-03' => ['title' => '"Cite this" block + stable anchors on /data, /mena-calendar, glossary terms', 'code' => ['view:public.partials.cite'], 'tests' => ['Feature/OpenDataBx01Test.php']],
 ];

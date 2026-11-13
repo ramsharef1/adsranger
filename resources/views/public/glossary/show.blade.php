@@ -27,11 +27,11 @@
 
 @section('content')
 <div style="display:grid;gap:18px;padding-top:24px">
-    <section class="card" style="padding:20px">
+    <section class="card" id="formula" style="padding:20px">
         <h2 style="font-size:19px;margin:0 0 8px">{{ $ar ? 'المعادلة وطريقة الحساب' : 'Formula & calculation' }}</h2>
         <p style="font-weight:600;margin:0" dir="ltr">{{ $ar ? $item['formula_ar'] : $item['formula_en'] }}</p>
     </section>
-    <section class="card" style="padding:20px">
+    <section class="card" id="example" style="padding:20px">
         <h2 style="font-size:19px;margin:0 0 8px">{{ $ar ? 'مثال تطبيقي' : 'Practical example' }}</h2>
         <p class="muted" style="margin:0;line-height:1.7">{{ $ar ? $item['example_ar'] : $item['example_en'] }}</p>
     </section>
@@ -41,5 +41,6 @@
         · <a href="{{ $u($item['related_path']) }}">{{ $ar ? 'الأداة أو الصفحة المرتبطة →' : 'Related tool or page →' }}</a>
         @endif
     </p>
+    @include('public.partials.cite', ['citeTitle' => $heading, 'citeUrl' => $selfUrl])
 </div>
 @endsection

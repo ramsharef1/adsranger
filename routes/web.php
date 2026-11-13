@@ -104,6 +104,8 @@ Route::middleware(PublicTrailingSlash::class)->group(function () {
     Route::get('/en/solutions/business-owners', [PublicSiteController::class, 'businessOwners'])->defaults('lang', 'en');
 
     Route::get('/llms.txt', [PublicSiteController::class, 'llmsTxt']);
+    Route::get('/data', [PublicSiteController::class, 'data'])->defaults('lang', 'ar');
+    Route::get('/en/data', [PublicSiteController::class, 'data'])->defaults('lang', 'en');
     Route::get('/accessibility', [PublicSiteController::class, 'accessibility'])->defaults('lang', 'ar');
     Route::get('/en/accessibility', [PublicSiteController::class, 'accessibility'])->defaults('lang', 'en');
     Route::get('/bot', [PublicSiteController::class, 'bot'])->defaults('lang', 'ar');

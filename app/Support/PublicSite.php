@@ -60,6 +60,7 @@ class PublicSite
             '/tools/cpm-cpc-cpa-calculator' => ['حاسبة مؤشرات الإعلانات الشاملة', 'CPM, CPC & CPA calculator', 'حوّل بين الميزانية والظهور والنقرات والتكلفة', 'Full-funnel media math converter from budget to CPA'],
             '/tools/agency-fee-vat-calculator' => ['حاسبة أتعاب الوكالة وضريبة القيمة المضافة', 'Agency fee & MENA VAT calculator', 'قارن الأتعاب الثابتة والنسبة مع ضريبة الدول العربية', 'Compare retainer vs % of spend, media float and MENA VAT'],
             '/tools/robots-sitemap-checker' => ['فاحص robots.txt وخريطة الموقع', 'Robots.txt & sitemap checker', 'اكشف تعارضات الحظر وخريطة الموقع والرابط المعتمد', 'Check robots.txt rules, XML sitemaps and page canonicals'],
+            '/data' => ['بيانات مفتوحة', 'Open data', 'تقويم المواسم 2027 بصيغة CSV أو JSON مجانًا', 'The 2027 seasons calendar as free CSV and JSON'],
             '/mena-calendar' => ['تقويم المواسم', 'Seasons calendar', 'مواسم 2027 ومناسباتها في المنطقة', 'The region\'s 2027 seasons and occasions'],
             '/about' => ['من نحن', 'About', 'لماذا نبني AdsRanger في عمّان', 'Why we\'re building AdsRanger in Amman'],
             '/contact' => ['تواصل معنا', 'Contact', 'راسلنا بالعربية أو الإنجليزية', 'Email us in Arabic or English'],
@@ -161,7 +162,7 @@ class PublicSite
     {
         return [
             [$ar ? 'المنتج' : 'Product', ['/features', '/reports', '/studio', '/search', '/ai', '/demo-report', '/integrations', '/pricing', '/security']],
-            [$ar ? 'أدوات وأدلة مجانية' : 'Free tools & guides', array_merge(config('seo_tools.public') ? ['/tools'] : [], ['/tools/ramadan-budget-calculator', '/ramadan-2027', '/mena-calendar'])],
+            [$ar ? 'أدوات وأدلة مجانية' : 'Free tools & guides', array_merge(config('seo_tools.public') ? ['/tools'] : [], ['/tools/ramadan-budget-calculator', '/ramadan-2027', '/mena-calendar', '/data'])],
             [$ar ? 'الشركة' : 'Company', ['/about', '/roadmap', '/partners', '/contact', '/solutions/agencies', '/solutions/freelancers', '/solutions/business-owners']],
             [$ar ? 'القانونية' : 'Legal', ['/privacy', '/terms', '/data-deletion', '/accessibility']],
         ];
@@ -187,7 +188,8 @@ class PublicSite
             '/roadmap' => ['/features', '/integrations', '/tools'],
             '/tools' => ['/tools/page-audit', '/tools/ramadan-budget-calculator', '/ramadan-2027'],
             '/tools/ramadan-budget-calculator' => ['/ramadan-2027', '/mena-calendar', '/pricing'],
-            '/mena-calendar' => ['/ramadan-2027', '/tools/ramadan-budget-calculator', '/demo-report'],
+            '/mena-calendar' => ['/data', '/ramadan-2027', '/tools/ramadan-budget-calculator'],
+            '/data' => ['/mena-calendar', '/ramadan-2027', '/glossary'],
             '/pricing' => ['/demo-report', '/integrations', '/security'],
             '/integrations' => ['/demo-report', '/security', '/pricing'],
             '/demo-report' => ['/pricing', '/integrations', '/security'],

@@ -132,7 +132,7 @@ $t = $ar ? [
         <tbody>
             @foreach ($rows as $r)
                 @php $note = $noteOf($r); @endphp
-                <tr data-mc data-date="{{ $r['date'] }}" data-codes="{{ implode(',', $r['country_codes']) }}">
+                <tr id="{{ $r['id'] }}" data-mc data-date="{{ $r['date'] }}" data-codes="{{ implode(',', $r['country_codes']) }}">
                     <td>{{ $fmt($r['date'], $r['alt_date']) }}@if ($r['end']) – {{ $fmt($r['end']) }}@endif</td>
                     <th scope="row" style="font-weight:600">{{ $ar ? $r['event_ar'] : $r['event_en'] }}@if ($note)<span class="mc-note">{{ $note }}</span>@endif</th>
                     <td>{{ $countriesOf($r) }}</td>
@@ -147,7 +147,7 @@ $t = $ar ? [
 <ul class="mc-cards">
     @foreach ($rows as $r)
         @php $note = $noteOf($r); @endphp
-        <li data-mc data-date="{{ $r['date'] }}" data-codes="{{ implode(',', $r['country_codes']) }}">
+        <li id="m-{{ $r['id'] }}" data-mc data-date="{{ $r['date'] }}" data-codes="{{ implode(',', $r['country_codes']) }}">
             <h2 style="font-size:17px;margin:0">{{ $ar ? $r['event_ar'] : $r['event_en'] }}</h2>
             <p><strong>{{ $fmt($r['date'], $r['alt_date']) }}@if ($r['end']) – {{ $fmt($r['end']) }}@endif</strong> <span class="badge {{ $r['status'] === 'fixed' ? '' : 'badge-neutral' }}">{{ $r['status'] === 'fixed' ? $t['fixed'] : $t['expected'] }}</span></p>
             @if ($note)<p class="mc-note">{{ $note }}</p>@endif
@@ -157,6 +157,8 @@ $t = $ar ? [
         </li>
     @endforeach
 </ul>
+<p style="margin-top:18px">{!! $ar ? 'نزّل هذا التقويم بصيغة <bdi dir="ltr">CSV</bdi> أو <bdi dir="ltr">JSON</bdi> من صفحة <a href="'.e(\App\Support\PublicUrl::path('/data', 'ar')).'">البيانات المفتوحة</a>.' : 'Download this calendar as CSV or JSON from our <a href="'.e(\App\Support\PublicUrl::path('/data', 'en')).'">open data</a> page.' !!}</p>
+@include('public.partials.cite', ['citeTitle' => $ar ? 'تقويم المواسم الإعلانية 2027' : 'MENA ad calendar 2027', 'citeUrl' => \App\Support\PublicUrl::absolute('/mena-calendar', $ar ? 'ar' : 'en'), 'citeLicense' => 'CC BY 4.0'])
 @endsection
 
 @push('scripts')

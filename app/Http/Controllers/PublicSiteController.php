@@ -124,6 +124,12 @@ class PublicSiteController extends Controller
         return view('public.bot', ['lang' => $lang === 'en' ? 'en' : 'ar']);
     }
 
+    /** /data (BX-01, B-43 / B-44): open datasets hosted on our own domain. */
+    public function data(string $lang = 'ar')
+    {
+        return view('public.data', ['lang' => $lang === 'en' ? 'en' : 'ar']);
+    }
+
     /** /accessibility (R2-46, D-263; copy Growth Site_Adds_R2-46-48). */
     public function accessibility(string $lang = 'ar')
     {
@@ -400,6 +406,7 @@ class PublicSiteController extends Controller
             '/security' => 'public/security',
             '/bot' => 'public/bot',
             '/accessibility' => 'public/accessibility',
+            '/data' => 'public/data',
             '/about' => 'public/about',
             '/contact' => 'public/contact',
             '/partners' => 'public/partners',
