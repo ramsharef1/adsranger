@@ -19,6 +19,15 @@ class RedditConnector extends Connector
         'IMPRESSIONS' => 'impressions', 'BRAND_AWARENESS_AND_REACH' => 'reach', 'VIDEO_VIEWABLE_IMPRESSIONS' => 'thruplay', 'VIDEO_VIEWS' => 'thruplay',
         'APP_INSTALLS' => 'app_install', 'CATALOG_SALES' => 'purchase', 'SALES' => 'purchase', 'ENGAGEMENT' => 'engagement'];
 
+    /** Report breakdowns we ask for. Keep HOUR out: from 8 Dec 2026 Reddit answers 400 to HOUR over more than 7 days (WR-06). */
+    public const REPORT_BREAKDOWNS = ['DATE', 'AD_ID'];
+
+    /** Longest report window in days: 7 if HOUR is ever asked for, else 31. @return array<int, array{0:string,1:string}> */
+    public static function reportWindows(string $from, string $to, array $breakdowns = self::REPORT_BREAKDOWNS): array
+    {
+        return static::windows($from, $to, in_array('HOUR', $breakdowns, true) ? 7 : 31);
+    }
+
     protected function ua(): string
     {
         return 'web:adsranger:1.0 (by /u/'.($this->cred('reddit_username') ?: 'adsranger').')';
@@ -130,9 +139,9 @@ class RedditConnector extends Connector
             'CONVERSION_PURCHASE_TOTAL_VALUE', 'CONVERSION_LEAD_CLICKS', 'CONVERSION_SIGN_UP_CLICKS', 'REDDIT_LEADS', 'CONVERSION_ADD_TO_CART_CLICKS',
             'CONVERSION_PAGE_VISIT_CLICKS', 'VIDEO_WATCHED_100_PERCENT'];
         $rows = [];
-        foreach (static::windows($from, $to, 31) as [$f, $t]) {
+        foreach (static::reportWindows($from, $to) as [$f, $t]) {
             $url = self::API."ad_accounts/$id/reports?".http_build_query(['page.size' => 1000]);
-            $body = ['data' => ['breakdowns' => ['DATE', 'AD_ID'], 'fields' => $fields, 'time_zone_id' => $tz,
+            $body = ['data' => ['breakdowns' => self::REPORT_BREAKDOWNS, 'fields' => $fields, 'time_zone_id' => $tz,
                 'starts_at' => Carbon::parse($f)->format('Y-m-d').'T00:00:00Z', 'ends_at' => Carbon::parse($t)->addDay()->format('Y-m-d').'T00:00:00Z']];
             for ($i = 0; $url && $i < 200; $i++) {
                 $res = $this->req($c)->post($url, $body);

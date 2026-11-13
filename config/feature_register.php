@@ -1,6 +1,8 @@
 <?php
 
 use App\Audit\AccountAudit;
+use App\Connectors\ConnectorRegistry;
+use App\Connectors\RedditConnector;
 use App\Filament\Admin\Pages\CostsAndLaunch;
 use App\Filament\Admin\Pages\LiveVerificationBoard;
 use App\Filament\Admin\Pages\PlatformSettings;
@@ -61,4 +63,5 @@ return [
     'GB-01b' => ['title' => 'Held guides, posts and glossary terms; per-page release (D-279)', 'code' => [PublicSite::class, 'config:seo_tools'], 'tests' => ['Feature/ArticlesHeldD279Test.php']],
     'BX-05' => ['title' => '"Powered by AdsRanger" on client reports, opt-out (D-278 / D-280)', 'code' => [PoweredBy::class], 'tests' => ['Feature/PoweredByOptOutBx05Test.php', 'Feature/AgencyLogoTest.php']],
     'O-394' => ['title' => 'Copy rewrites 1–26 + glossary title template, no email promises (D-266)', 'code' => [PublicCatalog::class, CopyLint::class], 'tests' => ['Feature/PublicCopyLintTest.php']],
+    'A-2' => ['title' => 'Recorded API replies as contract tests (Meta, Google Ads, TikTok, Reddit) + no-fake-success guard on 16 connectors; WR-06, WR-07', 'code' => [ConnectorRegistry::class, RedditConnector::class], 'tests' => ['Feature/ConnectorContractsA2Test.php']],
 ];
