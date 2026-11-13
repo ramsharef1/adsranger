@@ -41,14 +41,15 @@ class ProfitAndAttributionManager
                 'client_id' => $client->id,
             ],
             [
-                'cogs_pct' => 35.0,
-                'shipping_fee' => 4.0,
-                'return_shipping_fee' => 3.5,
-                'cod_share_pct' => 55.0,
-                'cod_return_rate_pct' => 22.0,
-                'bnpl_share_pct' => 25.0,
-                'bnpl_fee_pct' => 6.0,
-                'gateway_fee_pct' => 2.5,
+                // UX-255: no invented costs; the hub calculates only after the agency enters its own (costs_entered_at).
+                'cogs_pct' => 0,
+                'shipping_fee' => 0,
+                'return_shipping_fee' => 0,
+                'cod_share_pct' => 0,
+                'cod_return_rate_pct' => 0,
+                'bnpl_share_pct' => 0,
+                'bnpl_fee_pct' => 0,
+                'gateway_fee_pct' => 0,
                 'currency' => $client->currency ?: 'USD',
                 'collector_token' => Str::random(40),
             ]
@@ -132,7 +133,7 @@ class ProfitAndAttributionManager
         $breakEvenRoas = $effectiveMarginRatio > 0 ? round(1.0 / $effectiveMarginRatio, 2) : null;
 
         return [
-            'currency' => $econ->currency ?: ($client->currency ?: 'USD'),
+            'currency' => (string) ($client->currency ?: ''),
             'gross_revenue' => round($grossRevenue, 2),
             'cod_revenue_loss' => round($codRevenueLoss, 2),
             'realized_revenue' => round($realizedRevenue, 2),
@@ -771,17 +772,22 @@ class ProfitAndAttributionManager
 
         $out = [];
         foreach ($kpis as $kpi) {
-            try {
-                $val = SafeFormulaEvaluator::evaluate($kpi->formula_expression, $metrics);
-            } catch (\InvalidArgumentException) {
-                $val = 0.0;
+            // UX-255: a KPI whose formula needs a figure we don't have shows "—", never a 0 from a missing value.
+            $needs = SafeFormulaEvaluator::validate($kpi->formula_expression)['variables'];
+            $val = null;
+            if (array_diff($needs, array_keys($metrics)) === []) {
+                try {
+                    $val = SafeFormulaEvaluator::evaluate($kpi->formula_expression, $metrics);
+                } catch (\InvalidArgumentException) {
+                    $val = null;
+                }
             }
             $out[] = [
                 'id' => $kpi->id,
                 'name' => $kpi->name,
                 'formula' => $kpi->formula_expression,
                 'value' => $val,
-                'formatted' => SafeFormulaEvaluator::formatValue($val, $kpi->format, $client->currency ?: 'USD'),
+                'formatted' => $val === null ? '—' : SafeFormulaEvaluator::formatValue($val, $kpi->format, (string) ($client->currency ?: '')),
             ];
         }
 

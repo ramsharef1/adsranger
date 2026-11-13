@@ -32,28 +32,33 @@ class ProfitAttributionHubPage extends Page
 
     public ?int $clientId = null;
 
-    // #193 Unit economics & POAS simulator
-    public float $cogsPct = 35.0;
+    /**
+     * #193 Unit economics + POAS estimate (UX-255): every input starts empty. Nothing is calculated until the agency has
+     * entered all its own costs and one period's revenue, spend and orders; no number on this page is invented.
+     */
+    public ?float $cogsPct = null;
 
-    public float $shippingFee = 4.0;
+    public ?float $shippingFee = null;
 
-    public float $returnShippingFee = 3.5;
+    public ?float $returnShippingFee = null;
 
-    public float $codSharePct = 55.0;
+    public ?float $codSharePct = null;
 
-    public float $codReturnRatePct = 22.0;
+    public ?float $codReturnRatePct = null;
 
-    public float $bnplSharePct = 25.0;
+    public ?float $bnplSharePct = null;
 
-    public float $bnplFeePct = 6.0;
+    public ?float $bnplFeePct = null;
 
-    public float $gatewayFeePct = 2.5;
+    public ?float $gatewayFeePct = null;
 
-    public float $sampleGrossRevenue = 10000.0;
+    public ?float $periodRevenue = null;
 
-    public float $sampleAdSpend = 2000.0;
+    public ?float $periodSpend = null;
 
-    public int $sampleOrdersCount = 120;
+    public ?int $periodOrders = null;
+
+    public bool $poasMissingInputs = true;
 
     public array $poasPreview = [];
 
@@ -113,7 +118,7 @@ class ProfitAttributionHubPage extends Page
             $econ = ClientUnitEconomic::where('agency_id', $client->agency_id)
                 ->where('client_id', $client->id)
                 ->first();
-            if ($econ) {
+            if ($econ && $econ->costs_entered_at) {
                 $this->cogsPct = (float) $econ->cogs_pct;
                 $this->shippingFee = (float) $econ->shipping_fee;
                 $this->returnShippingFee = (float) $econ->return_shipping_fee;
@@ -158,30 +163,72 @@ class ProfitAttributionHubPage extends Page
         return $this->clientId ? $q->whereKey($this->clientId)->first() : $q->orderBy('name')->first();
     }
 
-    /** View-only preview allowed under ReadOnlyGuard. */
+    /** @return array<string, float> the cost inputs, or [] while any of them is empty */
+    protected function costInputs(): array
+    {
+        $costs = [
+            'cogs_pct' => $this->cogsPct,
+            'shipping_fee' => $this->shippingFee,
+            'return_shipping_fee' => $this->returnShippingFee,
+            'cod_share_pct' => $this->codSharePct,
+            'cod_return_rate_pct' => $this->codReturnRatePct,
+            'bnpl_share_pct' => $this->bnplSharePct,
+            'bnpl_fee_pct' => $this->bnplFeePct,
+            'gateway_fee_pct' => $this->gatewayFeePct,
+        ];
+        foreach ($costs as $v) {
+            if ($v === null || $v === '') {
+                return [];
+            }
+        }
+
+        return array_map(fn ($v) => (float) $v, $costs);
+    }
+
+    protected function hasPeriod(): bool
+    {
+        return $this->periodRevenue !== null && $this->periodSpend !== null && $this->periodOrders !== null
+            && (float) $this->periodSpend > 0;
+    }
+
+    /** View-only preview allowed under ReadOnlyGuard. Calculates only from what the agency entered (UX-255). */
     public function previewCodPoas(): void
     {
         $client = $this->resolveSelectedClient();
-        if (! $client) {
+        $costs = $this->costInputs();
+        if (! $client || $costs === [] || ! $this->hasPeriod()) {
+            $this->poasPreview = [];
+            $this->poasMissingInputs = true;
+
             return;
         }
 
+        $this->poasMissingInputs = false;
         $this->poasPreview = ProfitAndAttributionManager::computeCodPoas(
             $client,
-            $this->sampleGrossRevenue,
-            $this->sampleAdSpend,
-            $this->sampleOrdersCount,
-            [
-                'cogs_pct' => $this->cogsPct,
-                'shipping_fee' => $this->shippingFee,
-                'return_shipping_fee' => $this->returnShippingFee,
-                'cod_share_pct' => $this->codSharePct,
-                'cod_return_rate_pct' => $this->codReturnRatePct,
-                'bnpl_share_pct' => $this->bnplSharePct,
-                'bnpl_fee_pct' => $this->bnplFeePct,
-                'gateway_fee_pct' => $this->gatewayFeePct,
-            ]
+            (float) $this->periodRevenue,
+            (float) $this->periodSpend,
+            (int) $this->periodOrders,
+            $costs
         );
+    }
+
+    /** @return array<string, float> only the figures the agency entered or that follow from them */
+    protected function knownMetrics(): array
+    {
+        if (! $this->hasPeriod()) {
+            return [];
+        }
+        $m = [
+            'spend' => (float) $this->periodSpend,
+            'revenue' => (float) $this->periodRevenue,
+            'conversions' => (float) $this->periodOrders,
+        ];
+        if (isset($this->poasPreview['net_profit'])) {
+            $m['net_profit'] = (float) $this->poasPreview['net_profit'];
+        }
+
+        return $m;
     }
 
     /** View-only MTA switcher allowed under ReadOnlyGuard. */
@@ -192,22 +239,27 @@ class ProfitAttributionHubPage extends Page
         }
     }
 
-    /** View-only KPI formula check allowed under ReadOnlyGuard. */
+    /** View-only KPI formula check allowed under ReadOnlyGuard. Uses only figures the agency entered (UX-255). */
     public function previewFormula(): void
     {
+        $this->formulaPreviewValue = null;
+        $check = SafeFormulaEvaluator::validate($this->kpiFormula);
+        if (! $check['valid']) {
+            $this->formulaPreviewError = $check['error'];
+
+            return;
+        }
+        $known = $this->knownMetrics();
+        $missing = array_values(array_diff($check['variables'], array_keys($known)));
+        if ($missing !== []) {
+            $this->formulaPreviewError = __('This formula needs :vars, which this page does not have yet. Enter the period figures above, or wait for the ad accounts to connect.', ['vars' => implode(', ', $missing)]);
+
+            return;
+        }
         try {
-            $this->formulaPreviewValue = SafeFormulaEvaluator::evaluate($this->kpiFormula, [
-                'spend' => max(0.0, $this->sampleAdSpend),
-                'revenue' => max(0.0, $this->sampleGrossRevenue),
-                'net_profit' => (float) ($this->poasPreview['net_profit'] ?? 1500.0),
-                'clicks' => 1200,
-                'impressions' => 48000,
-                'conversions' => max(1, $this->sampleOrdersCount),
-                'leads' => 180,
-            ]);
+            $this->formulaPreviewValue = SafeFormulaEvaluator::evaluate($this->kpiFormula, $known);
             $this->formulaPreviewError = null;
         } catch (InvalidArgumentException $e) {
-            $this->formulaPreviewValue = null;
             $this->formulaPreviewError = $e->getMessage();
         }
     }
@@ -216,6 +268,13 @@ class ProfitAttributionHubPage extends Page
     {
         $client = $this->resolveSelectedClient();
         if (! $client) {
+            return;
+        }
+
+        $costs = $this->costInputs();
+        if ($costs === []) {
+            Notification::make()->title(__('Enter all the costs before saving.'))->warning()->send();
+
             return;
         }
 
@@ -229,7 +288,8 @@ class ProfitAttributionHubPage extends Page
             'bnpl_share_pct' => min(100.0, max(0.0, $this->bnplSharePct)),
             'bnpl_fee_pct' => min(100.0, max(0.0, $this->bnplFeePct)),
             'gateway_fee_pct' => min(100.0, max(0.0, $this->gatewayFeePct)),
-            'currency' => $client->currency ?: 'USD',
+            'currency' => $client->currency ?: $econ->currency,
+            'costs_entered_at' => now(),
         ]);
 
         $this->previewCodPoas();
@@ -253,7 +313,7 @@ class ProfitAttributionHubPage extends Page
 
         $this->ctwaClid = '';
         $this->ctwaPhone = '';
-        Notification::make()->title(__('WhatsApp CAPI event queued in simulated mode'))->success()->send();
+        Notification::make()->title(__('Event saved here. Nothing was sent to Meta.'))->success()->send();
     }
 
     public function addSkuSnapshot(): void
@@ -275,7 +335,7 @@ class ProfitAttributionHubPage extends Page
 
         $this->skuCode = '';
         $this->skuTitle = '';
-        Notification::make()->title(__('SKU snapshot recorded'))->success()->send();
+        Notification::make()->title(__('Product performance saved'))->success()->send();
     }
 
     public function saveCustomKpi(): void
@@ -306,22 +366,6 @@ class ProfitAttributionHubPage extends Page
         Notification::make()->title(__('Custom KPI saved'))->success()->send();
     }
 
-    public function syncRfmAudiences(): void
-    {
-        $client = $this->resolveSelectedClient();
-        if (! $client) {
-            return;
-        }
-
-        ProfitAndAttributionManager::buildRfmSegments($client, [
-            ['recency_days' => 10, 'frequency' => 4, 'monetary' => 650, 'cod_return_rate_pct' => 5],
-            ['recency_days' => 60, 'frequency' => 3, 'monetary' => 280, 'cod_return_rate_pct' => 10],
-            ['recency_days' => 20, 'frequency' => 2, 'monetary' => 120, 'cod_return_rate_pct' => 60],
-        ], true);
-
-        Notification::make()->title(__('Audience segments prepared in simulated mode'))->success()->send();
-    }
-
     public function importPosOfflineCsv(): void
     {
         $client = $this->resolveSelectedClient();
@@ -349,9 +393,7 @@ class ProfitAttributionHubPage extends Page
         }
 
         $econ = ClientUnitEconomic::where('agency_id', $client->agency_id)->where('client_id', $client->id)->first();
-        $poas = $this->poasPreview !== []
-            ? $this->poasPreview
-            : ProfitAndAttributionManager::computeCodPoas($client, $this->sampleGrossRevenue, $this->sampleAdSpend, $this->sampleOrdersCount);
+        $poas = $this->poasPreview;
 
         $skuMatrix = ProfitAndAttributionManager::skuMatrix($client);
         $oosBleed = ProfitAndAttributionManager::detectOutOfStockBleed($client);
@@ -374,15 +416,7 @@ class ProfitAttributionHubPage extends Page
             : [];
 
         $mtaModels = ProfitAndAttributionManager::compareMtaModels($journeys);
-        $customKpis = ProfitAndAttributionManager::evaluateClientKpis($client, [
-            'spend' => $this->sampleAdSpend,
-            'revenue' => $this->sampleGrossRevenue,
-            'net_profit' => (float) ($poas['net_profit'] ?? 0.0),
-            'clicks' => 1200,
-            'impressions' => 48000,
-            'conversions' => max(1, $this->sampleOrdersCount),
-            'leads' => 180,
-        ]);
+        $customKpis = ProfitAndAttributionManager::evaluateClientKpis($client, $this->knownMetrics());
 
         return [
             'client' => $client,
@@ -399,6 +433,7 @@ class ProfitAttributionHubPage extends Page
             'mtaModels' => $mtaModels,
             'activeMtaCredits' => $mtaModels[$this->activeMtaModel] ?? [],
             'customKpis' => $customKpis,
+            'currency' => (string) ($client->currency ?: ''),
         ];
     }
 }

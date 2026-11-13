@@ -358,6 +358,9 @@ class WaveB2PoasCapiSkuTest extends TestCase
 
         $lw = Livewire::test(ProfitAttributionHubPage::class)
             ->call('setMtaModel', 'linear')
+            ->set('periodRevenue', 9000)
+            ->set('periodSpend', 1500)
+            ->set('periodOrders', 90)
             ->set('kpiFormula', 'revenue / conversions')
             ->call('previewFormula');
 

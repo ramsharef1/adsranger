@@ -83,6 +83,11 @@ class PublicAttributionCollectorController extends Controller
             'friend_recommendation',
         ];
 
+        // UX-264: buyers can always answer "Other".
+        if (! in_array('other', $options, true)) {
+            $options[] = 'other';
+        }
+
         return response()->view('public.post-purchase-survey', [
             'survey' => $survey,
             'client' => $survey->client,

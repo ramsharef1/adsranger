@@ -1,109 +1,155 @@
+@php
+    // UX-258: people see labels, never raw codes.
+    $stateLabels = ['simulated' => __('Simulated · not sent'), 'queued_offline' => __('Waiting for connection')];
+    $channelLabels = ['ctwa' => __('WhatsApp chat'), 'pixel_relay' => __('Website'), 'pos_offline' => __('In-store sales')];
+    $eventLabels = ['Purchase' => __('Purchase'), 'Lead' => __('Lead'), 'AddToCart' => __('Add to cart'), 'InitiateCheckout' => __('Checkout started')];
+    $models = [
+        'first_touch' => __('First touch'),
+        'last_touch' => __('Last touch'),
+        'linear' => __('Even split'),
+        'time_decay' => __('Recent weighs more'),
+        'position_based' => __('First + last weigh more'),
+    ];
+    // UX-260: plain names, each with its rule.
+    $skuGroups = [
+        'hero' => [__('Winner'), __('Winner: high ad spend and a profit.')],
+        'sidekick' => [__('Support'), __('Support: lower ad spend and a profit.')],
+        'villain' => [__('Loser'), __('Loser: high ad spend and no profit.')],
+        'zombie' => [__('Idle'), __('Idle: lower ad spend and no profit or no orders.')],
+    ];
+    $cur = (string) ($currency ?? '');
+    $money = fn ($v) => number_format((float) $v, 2).($cur !== '' ? ' '.$cur : '');
+    $costFields = [
+        'cogsPct' => [__('Cost of goods (COGS) %'), '0.5'],
+        'shippingFee' => [__('Shipping per order'), '0.5'],
+        'returnShippingFee' => [__('Return shipping per returned order'), '0.5'],
+        'codSharePct' => [__('COD share %'), '0.5'],
+        'codReturnRatePct' => [__('COD return rate %'), '0.5'],
+        'bnplSharePct' => [__('Pay-later share % (Tabby / Tamara)'), '0.5'],
+        'bnplFeePct' => [__('Pay-later fee %'), '0.25'],
+        'gatewayFeePct' => [__('Card gateway fee %'), '0.25'],
+    ];
+    $periodFields = [
+        'periodRevenue' => [__('Revenue'), '0.01'],
+        'periodSpend' => [__('Ad spend'), '0.01'],
+        'periodOrders' => [__('Orders'), '1'],
+    ];
+@endphp
 <x-filament-panels::page>
+    {{-- UX-262: colours from the theme (light + dark), not inline light-only values. --}}
+    <style>
+        .pah-banner{padding:14px 16px;border-radius:12px;border:1px solid rgba(20,184,166,.35);background:rgba(15,118,110,.10);font-size:13.5px;line-height:1.65}
+        .pah-accent{color:#0f766e}
+        .dark .pah-accent{color:#5eead4}
+        .pah-input{width:100%;min-height:44px;padding:8px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.4);background:transparent;color:inherit}
+        .pah-btn{min-height:44px;padding:0 16px;border-radius:8px;font-weight:600;cursor:pointer}
+        .pah-btn-ghost{border:1px solid currentColor;background:transparent}
+        .pah-btn-solid{border:0;background:#0f766e;color:#fff}
+        .pah-row{display:flex;justify-content:space-between;gap:10px;border-top:1px solid rgba(148,163,184,.2);padding-top:6px}
+        .pah-muted{opacity:.75;font-size:12.5px}
+        .pah-tile{padding:8px;border-radius:8px;background:rgba(148,163,184,.12)}
+    </style>
+
     @if (! $client)
         <x-filament::section>
             <p style="font-size:14px;opacity:.85">{{ __('Select or create a client workspace first to configure unit economics and attribution.') }}</p>
         </x-filament::section>
     @else
-        {{-- D-229 Honesty Banner (Brand Teal + Slate, zero orange) --}}
-        <div style="padding:14px 16px;border-radius:12px;border:1px solid rgba(20,184,166,.35);background:rgba(15,118,110,.10);color:#0f172a;font-size:13.5px;line-height:1.65">
-            <strong style="color:#0f766e">{{ $client->name }}</strong> ·
-            <span>{!! __('Outbound <bdi>CAPI</bdi> and <bdi>RFM</bdi> relays stay in honest <bdi>simulated</bdi> or <bdi>queued_offline</bdi> mode until live platform conversion tokens are connected.') !!}</span>
+        {{-- UX-259 --}}
+        <div class="pah-banner">
+            <strong class="pah-accent">{{ $client->name }}</strong> ·
+            <span>{{ __('Nothing is sent to the ad platforms yet: events are only saved here until you connect a conversions account.') }}</span>
         </div>
 
-        {{-- #193 COD-Adjusted POAS & Net Margin Engine --}}
+        {{-- #193 Unit economics + estimate (UX-255, UX-256) --}}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px">
             <x-filament::section>
-                <x-slot name="heading">{!! __('COD-Adjusted <bdi>POAS</bdi> & Unit Economics') !!}</x-slot>
+                <x-slot name="heading">{!! __('Unit economics and a <bdi>POAS</bdi> estimate') !!}</x-slot>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px">
-                    <label>
-                        <span>{!! __('<bdi>COGS</bdi> %') !!}</span>
-                        <input type="number" step="0.5" wire:model="cogsPct" style="width:100%;min-height:44px;padding:8px;border-radius:8px;border:1px solid rgba(148,163,184,.4)">
-                    </label>
-                    <label>
-                        <span>{{ __('COD share %') }}</span>
-                        <input type="number" step="0.5" wire:model="codSharePct" style="width:100%;min-height:44px;padding:8px;border-radius:8px;border:1px solid rgba(148,163,184,.4)">
-                    </label>
-                    <label>
-                        <span>{{ __('COD return rate %') }}</span>
-                        <input type="number" step="0.5" wire:model="codReturnRatePct" style="width:100%;min-height:44px;padding:8px;border-radius:8px;border:1px solid rgba(148,163,184,.4)">
-                    </label>
-                    <label>
-                        <span>{!! __('<bdi>Tabby</bdi> / <bdi>Tamara</bdi> fee %') !!}</span>
-                        <input type="number" step="0.25" wire:model="bnplFeePct" style="width:100%;min-height:44px;padding:8px;border-radius:8px;border:1px solid rgba(148,163,184,.4)">
-                    </label>
+                    @foreach ($costFields as $prop => [$label, $step])
+                        <label><span>{{ $label }}</span>
+                            <input type="number" min="0" step="{{ $step }}" wire:model="{{ $prop }}" dir="ltr" class="pah-input">
+                        </label>
+                    @endforeach
+                </div>
+                <p class="pah-muted" style="margin:12px 0 6px">{{ __('One period\'s figures (for example last month)') }}</p>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:13px">
+                    @foreach ($periodFields as $prop => [$label, $step])
+                        <label><span>{{ $label }}</span>
+                            <input type="number" min="0" step="{{ $step }}" wire:model="{{ $prop }}" dir="ltr" class="pah-input">
+                        </label>
+                    @endforeach
                 </div>
                 <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px">
-                    <button type="button" wire:click="previewCodPoas" style="min-height:44px;padding:0 16px;border-radius:8px;border:1px solid #0f766e;background:transparent;color:#0f766e;font-weight:600;cursor:pointer">
-                        {!! __('Recalculate <bdi>POAS</bdi>') !!}
-                    </button>
-                    <button type="button" wire:click="saveUnitEconomics" style="min-height:44px;padding:0 16px;border-radius:8px;border:0;background:#0f766e;color:#ffffff;font-weight:600;cursor:pointer">
-                        {{ __('Save unit economics') }}
-                    </button>
+                    <button type="button" wire:click="previewCodPoas" class="pah-btn pah-btn-ghost pah-accent">{{ __('Calculate') }}</button>
+                    <button type="button" wire:click="saveUnitEconomics" class="pah-btn pah-btn-solid">{{ __('Save costs') }}</button>
                 </div>
             </x-filament::section>
 
             <x-filament::section>
-                <x-slot name="heading">{{ __('Net Margin & Break-Even Snapshot') }}</x-slot>
-                <div style="display:grid;gap:8px;font-size:13.5px">
-                    <div style="display:flex;justify-content:space-between">
-                        <span>{{ __('Realized revenue after COD returns') }}</span>
-                        <strong dir="ltr">{{ number_format($poas['realized_revenue'] ?? 0, 2) }} {{ $poas['currency'] ?? 'USD' }}</strong>
+                <x-slot name="heading">{{ __('Profit estimate') }}</x-slot>
+                @if ($poas === [])
+                    <p style="font-size:13.5px;margin:0">{{ __('Enter your costs and one period\'s revenue, spend and orders to calculate profit.') }}</p>
+                @else
+                    <div style="display:grid;gap:8px;font-size:13.5px">
+                        <div class="pah-row" style="border-top:0;padding-top:0">
+                            <span>{{ __('Revenue kept after COD returns') }}</span>
+                            <strong dir="ltr">{{ $money($poas['realized_revenue'] ?? 0) }}</strong>
+                        </div>
+                        <div class="pah-row">
+                            <span>{{ __('Net profit after ad spend') }}</span>
+                            <strong dir="ltr" class="pah-accent">{{ $money($poas['net_profit'] ?? 0) }}</strong>
+                        </div>
+                        <div class="pah-row">
+                            <span>{!! __('Estimated <bdi>POAS</bdi> (from your inputs)') !!}</span>
+                            <strong dir="ltr">{{ number_format($poas['poas'] ?? 0, 2) }}x</strong>
+                        </div>
+                        <div class="pah-row">
+                            <span>{!! __('Break-even <bdi>ROAS</bdi>') !!}</span>
+                            <strong dir="ltr">{{ isset($poas['break_even_roas']) && $poas['break_even_roas'] !== null ? number_format($poas['break_even_roas'], 2).'x' : '—' }}</strong>
+                        </div>
+                        <p class="pah-muted" style="margin:4px 0 0">{{ __('An estimate from the rates you entered, not from store data.') }}</p>
                     </div>
-                    <div style="display:flex;justify-content:space-between">
-                        <span>{{ __('Net profit after ad spend') }}</span>
-                        <strong dir="ltr" style="color:#0f766e">{{ number_format($poas['net_profit'] ?? 0, 2) }} {{ $poas['currency'] ?? 'USD' }}</strong>
-                    </div>
-                    <div style="display:flex;justify-content:space-between">
-                        <span>{!! __('Real <bdi>POAS</bdi> (Net Profit / Spend)') !!}</span>
-                        <strong dir="ltr">{{ number_format($poas['poas'] ?? 0, 2) }}x</strong>
-                    </div>
-                    <div style="display:flex;justify-content:space-between">
-                        <span>{!! __('Break-even <bdi>ROAS</bdi>') !!}</span>
-                        <strong dir="ltr">{{ isset($poas['break_even_roas']) && $poas['break_even_roas'] !== null ? number_format($poas['break_even_roas'], 2).'x' : '—' }}</strong>
-                    </div>
-                </div>
+                @endif
             </x-filament::section>
         </div>
 
-        {{-- #194 Click-to-WhatsApp (ctwa_clid) CAPI Bridge & #196/#197 SKU Matrix --}}
+        {{-- #194 WhatsApp click IDs + #196 / #197 products --}}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px">
             <x-filament::section>
-                <x-slot name="heading">{!! __('WhatsApp <bdi>ctwa_clid</bdi> & <bdi>CAPI</bdi> Bridge') !!}</x-slot>
+                <x-slot name="heading">{!! __('<bdi>WhatsApp</bdi> click events (<bdi>ctwa_clid</bdi>)') !!}</x-slot>
                 <div style="display:grid;gap:10px;font-size:13px">
-                    <input type="text" wire:model="ctwaClid" placeholder="ctwa_clid" dir="ltr" style="width:100%;min-height:44px;padding:8px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.4)">
+                    <input type="text" wire:model="ctwaClid" placeholder="ctwa_clid" dir="ltr" class="pah-input">
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-                        <input type="number" step="1" wire:model="ctwaValue" placeholder="0.00" dir="ltr" style="width:100%;min-height:44px;padding:8px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.4)">
-                        <button type="button" wire:click="recordCtwaEvent" style="min-height:44px;padding:0 14px;border-radius:8px;border:0;background:#0f766e;color:#ffffff;font-weight:600;cursor:pointer">
-                            {!! __('Queue <bdi>CAPI</bdi> event') !!}
-                        </button>
+                        <input type="number" min="0" step="0.01" wire:model="ctwaValue" aria-label="{{ __('Value') }}" placeholder="{{ __('Value') }}" dir="ltr" class="pah-input">
+                        <button type="button" wire:click="recordCtwaEvent" class="pah-btn pah-btn-solid">{{ __('Save event') }}</button>
                     </div>
                     @foreach ($capiEvents as $ev)
-                        <div style="display:flex;justify-content:space-between;border-top:1px solid rgba(148,163,184,.2);padding-top:6px">
-                            <span dir="ltr">{{ $ev->event_name }} · {{ $ev->channel }}</span>
-                            <span dir="ltr" style="color:#0f766e;font-weight:600">{{ $ev->delivery_state }}</span>
+                        <div class="pah-row">
+                            <span>{{ $eventLabels[$ev->event_name] ?? $ev->event_name }} · {{ $channelLabels[$ev->channel] ?? $ev->channel }}</span>
+                            <span class="pah-accent" style="font-weight:600">{{ $stateLabels[$ev->delivery_state] ?? $ev->delivery_state }}</span>
                         </div>
                     @endforeach
                 </div>
             </x-filament::section>
 
             <x-filament::section>
-                <x-slot name="heading">{!! __('<bdi>SKU</bdi> Profit Matrix & Out-of-Stock Bleed Guard') !!}</x-slot>
+                <x-slot name="heading">{!! __('Product profit (<bdi>SKU</bdi>) and out-of-stock spend') !!}</x-slot>
                 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center;font-size:12.5px;margin-bottom:10px">
-                    <div style="padding:8px;border-radius:8px;background:rgba(15,118,110,.12)"><strong>{{ $skuMatrix['counts']['hero'] ?? 0 }}</strong><div>{{ __('Hero') }}</div></div>
-                    <div style="padding:8px;border-radius:8px;background:rgba(20,184,166,.12)"><strong>{{ $skuMatrix['counts']['sidekick'] ?? 0 }}</strong><div>{{ __('Sidekick') }}</div></div>
-                    <div style="padding:8px;border-radius:8px;background:rgba(15,23,42,.08)"><strong>{{ $skuMatrix['counts']['villain'] ?? 0 }}</strong><div>{{ __('Villain') }}</div></div>
-                    <div style="padding:8px;border-radius:8px;background:rgba(148,163,184,.15)"><strong>{{ $skuMatrix['counts']['zombie'] ?? 0 }}</strong><div>{{ __('Zombie') }}</div></div>
+                    @foreach ($skuGroups as $key => [$label, $rule])
+                        <div class="pah-tile" title="{{ $rule }}" tabindex="0" aria-label="{{ $rule }}"><strong>{{ $skuMatrix['counts'][$key] ?? 0 }}</strong><div>{{ $label }}</div></div>
+                    @endforeach
                 </div>
                 <div style="font-size:13px;display:grid;gap:6px">
-                    <div style="display:flex;justify-content:space-between">
-                        <span>{{ __('Out-of-stock ad bleed flagged') }}</span>
-                        <strong dir="ltr">{{ number_format($oosBleed['wasted_spend'] ?? 0, 2) }}</strong>
+                    <div class="pah-row" style="border-top:0;padding-top:0">
+                        <span>{{ __('Ad spend on out-of-stock products') }}</span>
+                        <strong dir="ltr">{{ $money($oosBleed['wasted_spend'] ?? 0) }}</strong>
                     </div>
-                    <div style="display:flex;justify-content:space-between">
+                    <div class="pah-row">
                         <span>{{ __('Leaked or high-bleed promo codes') }}</span>
                         <strong dir="ltr">{{ count($promoBleed['flagged_codes'] ?? []) }}</strong>
                     </div>
-                    <div style="display:flex;justify-content:space-between">
+                    <div class="pah-row">
                         <span>{{ __('Co-purchased bundle pairs') }}</span>
                         <strong dir="ltr">{{ count($bundles ?? []) }}</strong>
                     </div>
@@ -111,15 +157,14 @@
             </x-filament::section>
         </div>
 
-        {{-- #204 MTA Switcher, #205 Custom Formula Builder & #206 Hash-Only POS CSV Matcher --}}
+        {{-- #204 attribution model · #205 custom KPI --}}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px">
             <x-filament::section>
-                <x-slot name="heading">{!! __('<bdi>MTA</bdi> Model Switcher & <bdi>HDYHAU</bdi> Survey') !!}</x-slot>
+                <x-slot name="heading">{{ __('Attribution model and buyer survey') }}</x-slot>
                 <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
-                    @foreach (['first_touch', 'last_touch', 'linear', 'time_decay', 'position_based'] as $m)
-                        <button type="button" wire:click="setMtaModel('{{ $m }}')" style="min-height:44px;padding:0 12px;border-radius:8px;border:1px solid #0f766e;background:{{ $activeMtaModel === $m ? '#0f766e' : 'transparent' }};color:{{ $activeMtaModel === $m ? '#ffffff' : '#0f766e' }};font-size:12.5px;cursor:pointer">
-                            <bdi>{{ $m }}</bdi>
-                        </button>
+                    @foreach ($models as $m => $label)
+                        <button type="button" wire:click="setMtaModel('{{ $m }}')" aria-pressed="{{ $activeMtaModel === $m ? 'true' : 'false' }}"
+                            class="pah-btn {{ $activeMtaModel === $m ? 'pah-btn-solid' : 'pah-btn-ghost pah-accent' }}" style="font-size:12.5px;padding:0 12px">{{ $label }}</button>
                     @endforeach
                 </div>
                 <div style="font-size:13px">
@@ -129,23 +174,21 @@
             </x-filament::section>
 
             <x-filament::section>
-                <x-slot name="heading">{!! __('Custom KPI Formula & <bdi>SHA-256</bdi> Offline Matcher') !!}</x-slot>
+                <x-slot name="heading">{{ __('Custom KPI formula') }}</x-slot>
                 <div style="display:grid;gap:8px;font-size:13px">
-                    <input type="text" wire:model="kpiName" placeholder="{{ __('KPI name') }}" style="width:100%;min-height:44px;padding:8px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.4)">
-                    <input type="text" wire:model="kpiFormula" dir="ltr" style="width:100%;min-height:44px;padding:8px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.4)">
+                    <input type="text" wire:model="kpiName" placeholder="{{ __('KPI name') }}" class="pah-input">
+                    <input type="text" wire:model="kpiFormula" dir="ltr" aria-label="{{ __('Formula') }}" class="pah-input">
                     <div style="display:flex;flex-wrap:wrap;gap:8px">
-                        <button type="button" wire:click="previewFormula" style="min-height:44px;padding:0 14px;border-radius:8px;border:1px solid #0f766e;background:transparent;color:#0f766e;font-weight:600;cursor:pointer">
-                            {{ __('Preview formula') }}
-                        </button>
-                        <button type="button" wire:click="saveCustomKpi" style="min-height:44px;padding:0 14px;border-radius:8px;border:0;background:#0f766e;color:#ffffff;font-weight:600;cursor:pointer">
-                            {{ __('Save KPI') }}
-                        </button>
+                        <button type="button" wire:click="previewFormula" class="pah-btn pah-btn-ghost pah-accent">{{ __('Preview formula') }}</button>
+                        <button type="button" wire:click="saveCustomKpi" class="pah-btn pah-btn-solid">{{ __('Save KPI') }}</button>
                     </div>
-                    @if ($formulaPreviewValue !== null)
-                        <div dir="ltr" style="color:#0f766e;font-weight:600">= {{ number_format($formulaPreviewValue, 4) }}</div>
+                    @if ($formulaPreviewError)
+                        <div role="alert" style="font-size:12.5px">{{ $formulaPreviewError }}</div>
+                    @elseif ($formulaPreviewValue !== null)
+                        <div dir="ltr" class="pah-accent" style="font-weight:600">= {{ number_format($formulaPreviewValue, 2) }}</div>
                     @endif
                     @foreach ($customKpis as $kpi)
-                        <div style="display:flex;justify-content:space-between;border-top:1px solid rgba(148,163,184,.2);padding-top:6px">
+                        <div class="pah-row">
                             <span>{{ $kpi['name'] }}</span>
                             <strong dir="ltr">{{ $kpi['formatted'] }}</strong>
                         </div>

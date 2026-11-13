@@ -20,6 +20,7 @@ class ClientUnitEconomic extends Model
             'bnpl_share_pct' => 'float',
             'bnpl_fee_pct' => 'float',
             'gateway_fee_pct' => 'float',
+            'costs_entered_at' => 'datetime',
         ];
     }
 

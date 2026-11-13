@@ -101,7 +101,7 @@ class SafeFormulaEvaluator
     public static function formatValue(float $value, string $format = 'decimal', string $currency = 'USD'): string
     {
         return match ($format) {
-            'currency' => number_format($value, 2).' '.$currency,
+            'currency' => trim(number_format($value, 2).' '.$currency),
             'percent' => number_format($value, 2).'%',
             default => number_format($value, 2),
         };

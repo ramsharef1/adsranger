@@ -20,7 +20,7 @@
 <body>
     <main class="card">
         <h1>{{ __('How did you hear about us?') }}</h1>
-        <p class="sub">{{ __('Your quick answer helps us improve your shopping experience.') }}</p>
+        <p class="sub">{{ __('Your answer helps us know where to advertise.') }}</p>
 
         @if (session('survey_submitted'))
             <div class="done">{{ __('Thank you! Your response has been recorded.') }}</div>
@@ -35,6 +35,7 @@
                         'google_search' => $lang === 'ar' ? 'بحث <bdi>Google</bdi>' : 'Google Search',
                         'whatsapp' => $lang === 'ar' ? 'محادثة <bdi>WhatsApp</bdi>' : 'WhatsApp',
                         'friend_recommendation' => __('Friend or family recommendation'),
+                        'other' => __('Something else'),
                     ];
                 @endphp
                 @foreach ($options as $opt)
@@ -44,6 +45,8 @@
                     </label>
                 @endforeach
                 <button type="submit" class="btn">{{ __('Submit answer') }}</button>
+                {{-- UX-257 (Product's proposal; Business may replace the wording). No AdsRanger branding: the client collects it. --}}
+                <p class="sub" style="margin:14px 0 0;font-size:12.5px">{!! __(':client collects this answer to learn how you found them. We don\'t ask for your name or number.', ['client' => '<bdi>'.e($client->name).'</bdi>']) !!}</p>
             </form>
         @endif
     </main>
