@@ -11,6 +11,7 @@ use App\Jobs\VerifyOwnLinks;
 use App\Support\Business\UsageLedger;
 use App\Support\ClientFreeze;
 use App\Support\Fx;
+use App\Support\Modules;
 use App\Support\Ops\Heartbeat;
 use App\Support\Ops\JobRuns;
 use App\Support\Ops\LiveSiteCheck;
@@ -18,6 +19,7 @@ use App\Support\Ops\LogRoll;
 use App\Support\Ops\NetworkDeadlines;
 use App\Support\Ops\Prune;
 use App\Support\PlatformHealth;
+use App\Support\Reach\Wallet;
 use App\Support\Site\ReindexGate;
 use App\Support\UploadReminders;
 use Illuminate\Support\Facades\Schedule;
@@ -32,6 +34,8 @@ Schedule::job(new SnapshotHealth)->dailyAt('04:00')->name('health-snapshot')->wi
 // DB-01 (D-292): once each morning, 06:30 Amman (03:30 UTC); the broken-page alert follows on the next alert run.
 Schedule::job(new CheckLandingPages)->dailyAt('03:30')->name('landing-pages')->withoutOverlapping();
 Schedule::call(fn () => JobRuns::track('fx-pull', fn () => Fx::pull()))->dailyAt('01:15')->name('fx-pull')->withoutOverlapping();
+// FR-REACH: pending → cleared after the lock period (estimates only, D-262). Does nothing while the module is off.
+Schedule::call(fn () => Modules::enabled('reach') ? JobRuns::track('reach-clear', fn () => Wallet::clearDue()) : null)->dailyAt('01:40')->name('reach-clear')->withoutOverlapping();
 // #106 scheduled email reports: daily, sends whatever is due on each workspace's date (off with REPORTS_EMAIL_ENABLED=false).
 Schedule::job(new QueueScheduledReports)->dailyAt(config('reports.send_at_utc', '05:20'))->name('scheduled-reports')->withoutOverlapping();
 // D-61 trial lifecycle (self-signup agencies only): ending / ended / deletion mails, read-only → closed → archived.

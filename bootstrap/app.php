@@ -21,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(NoIndexPrivateRoutes::class);
         // Website W2 (2026-11-08): baseline security headers on every response.
         $middleware->append(SecurityHeaders::class);
-        $middleware->validateCsrfTokens(except: ['collect/*']);
+        $middleware->validateCsrfTokens(except: ['collect/*', 'reach/v1/*']);
         // AI Workspace connect (OAuth): a signed-out person is sent to the app login, then back to the consent screen.
         $middleware->redirectGuestsTo(fn () => route('filament.app.auth.login'));
     })

@@ -6,6 +6,7 @@ use App\Connectors\RedditConnector;
 use App\Filament\Admin\Pages\CostsAndLaunch;
 use App\Filament\Admin\Pages\LiveVerificationBoard;
 use App\Filament\Admin\Pages\PlatformSettings;
+use App\Filament\Admin\Pages\ReachControlBoard;
 use App\Filament\Admin\Pages\ToolGuardBoard;
 use App\Filament\Pages\AccountAuditPage;
 use App\Filament\Pages\AiConnectionsPage;
@@ -37,6 +38,10 @@ use App\Support\Modules;
 use App\Support\PlatformHealth;
 use App\Support\PoweredBy;
 use App\Support\PublicSite;
+use App\Support\Reach\Attribution;
+use App\Support\Reach\OfferImporter;
+use App\Support\Reach\Postbacks;
+use App\Support\Reach\Wallet;
 use App\Support\RestoreTest;
 use App\Support\Seo\PageAudit;
 use App\Support\Seo\PublicCatalog;
@@ -84,4 +89,5 @@ return [
     'GB-11a' => ['title' => 'Glossary titles «ما هو / ما هي» by gender, ≤ 60 characters', 'code' => [PublicCatalog::class], 'tests' => ['Feature/GlossaryHeadingTest.php']],
     'BX-01' => ['title' => '/data hub: MENA ad calendar 2027 as CSV + JSON (CC BY 4.0) on our own domain, Dataset schema, drift test', 'code' => ['view:public.data', 'config:datasets'], 'tests' => ['Feature/OpenDataBx01Test.php']],
     'BX-03' => ['title' => '"Cite this" block + stable anchors on /data, /mena-calendar, glossary terms', 'code' => ['view:public.partials.cite'], 'tests' => ['Feature/OpenDataBx01Test.php']],
+    'FR-REACH-R1' => ['title' => 'AdsRanger Reach R-1: schema, offer + coupon importer (AR/EN CSV), S2S postback receiver, 3-tier coupon attribution, dual estimate wallet, /admin Reach board (module reach, off; D-262 estimates)', 'code' => [OfferImporter::class, Postbacks::class, Attribution::class, Wallet::class, ReachControlBoard::class, 'route:reach/v1/postback/{token}'], 'tests' => ['Feature/ReachR1Test.php']],
 ];

@@ -79,6 +79,11 @@ class Modules
                 'description' => __('Areas in the header, a shorter side menu per area, the season line and a bottom bar on phones.'),
                 'beta_requestable' => false,
             ],
+            'reach' => [
+                'label' => __('AdsRanger Reach (publishers)'),
+                'description' => __('Publisher offers, coupon attribution, conversion postbacks and estimate wallets. No money moves before launch.'),
+                'beta_requestable' => false,
+            ],
             'custom_domains' => [
                 'label' => __('Custom report domain'),
                 'description' => __('Client report links on the agency\'s own domain.'),
