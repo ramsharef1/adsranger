@@ -15,6 +15,7 @@ use App\Models\CodWeek;
 use App\Models\ReportSchedule;
 use App\Support\ClientFreeze;
 use App\Support\ClientSetupCopy;
+use App\Support\ClientSummaryText;
 use App\Support\CodOutcomes;
 use App\Support\DataGaps;
 use App\Support\HealthScore;
@@ -65,6 +66,14 @@ class ViewClient extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            // XS-08 (R4): the period's summary as text ready for WhatsApp, Arabic and English (no AI, no AdsRanger name).
+            Action::make('copyWhatsApp')->label(__('Copy as WhatsApp message'))->icon('heroicon-o-clipboard-document')->color('gray')
+                ->modalSubmitAction(false)->modalCancelActionLabel(__('Close'))
+                ->modalContent(function () {
+                    [$from, $to] = Periods::range($this->period, $this->record->agency?->timezone ?? 'UTC');
+
+                    return view('filament.pages.client-whatsapp-text', ['texts' => ['ar' => ClientSummaryText::make($this->record, $from, $to, 'ar'), 'en' => ClientSummaryText::make($this->record, $from, $to, 'en')]]);
+                }),
             // XS-02 (R4, D-303): log a call, WhatsApp chat or meeting, with an optional next contact date.
             Action::make('logContact')->label(__('Log contact'))->icon('heroicon-o-chat-bubble-left-right')->color('gray')
                 ->visible(fn () => TeamRoles::canManageData(auth()->user(), $this->record->agency))

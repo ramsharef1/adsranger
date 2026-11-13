@@ -6,6 +6,18 @@
 @endphp
 <x-filament-panels::page>
     @include('filament.partials.onboarding-checklist')
+    @if ($weekList)
+        {{-- XS-01 (R4): the clients that need a touch this week, with one line of reason each. --}}
+        <x-filament::section :heading="__('This week\'s clients')" data-week-list>
+            <x-slot name="description">{{ __('Ranked: open Critical alerts first, then warnings, reports going out soon and clients nobody has talked to in 14 days.') }}</x-slot>
+            <ol style="margin:0;padding-inline-start:20px;display:grid;gap:6px;font-size:14px">
+                @foreach ($weekList as $w)
+                    <li><a href="{{ \App\Filament\Resources\Clients\ClientResource::getUrl('view', ['record' => $w['client']->id]) }}" style="color:#0F766E;text-decoration:underline;font-weight:600"><bdi>{{ $w['client']->name }}</bdi></a>
+                        <span style="opacity:.8"> · {{ implode(' · ', $w['reasons']) }}</span></li>
+                @endforeach
+            </ol>
+        </x-filament::section>
+    @endif
     @if ($followUps->isNotEmpty())
         {{-- XS-02 (R4, D-303): contacts due today or earlier. --}}
         <x-filament::section :heading="__('Follow-ups due')" data-follow-ups>

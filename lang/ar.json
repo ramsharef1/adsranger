@@ -2523,5 +2523,14 @@
     "Daily spend for the period; days without data are marked as gaps": "الإنفاق اليومي للفترة؛ الأيام بلا بيانات معلَّمة كفجوات",
     "No data": "لا بيانات",
     "Data for every day in this period.": "توجد بيانات لكل يوم في هذه الفترة.",
-    "No data for :n day|No data for :n days": "{0} لا أيام بلا بيانات|{1} يوم واحد بلا بيانات|{2} يومان بلا بيانات|[3,10] :n أيام بلا بيانات|[11,*] :n يومًا بلا بيانات"
+    "No data for :n day|No data for :n days": "{0} لا أيام بلا بيانات|{1} يوم واحد بلا بيانات|{2} يومان بلا بيانات|[3,10] :n أيام بلا بيانات|[11,*] :n يومًا بلا بيانات",
+    "Comes back from pause on :date": "يعود من الإيقاف في :date",
+    ":n open Critical alert|:n open Critical alerts": "{0} لا تنبيهات حرجة|{1} تنبيه حرج مفتوح|{2} تنبيهان حرجان مفتوحان|[3,10] :n تنبيهات حرجة مفتوحة|[11,*] :n تنبيهًا حرجًا مفتوحًا",
+    ":n open Warning|:n open Warnings": "{0} لا تحذيرات|{1} تحذير مفتوح|{2} تحذيران مفتوحان|[3,10] :n تحذيرات مفتوحة|[11,*] :n تحذيرًا مفتوحًا",
+    "Monthly report goes out on :date": "يُرسل التقرير الشهري في :date",
+    "No contact logged since :date": "لا تواصل مسجّل منذ :date",
+    "No contact logged yet": "لا تواصل مسجّل بعد",
+    "This week's clients": "عملاء هذا الأسبوع",
+    "Ranked: open Critical alerts first, then warnings, reports going out soon and clients nobody has talked to in 14 days.": "مرتّبون: التنبيهات الحرجة المفتوحة أولًا، ثم التحذيرات، ثم التقارير القريبة، ثم العملاء الذين لم يتواصل معهم أحد منذ 14 يومًا.",
+    "Copy as WhatsApp message": "انسخ كرسالة WhatsApp"
 }

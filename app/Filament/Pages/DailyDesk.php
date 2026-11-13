@@ -14,6 +14,7 @@ use App\Support\CurrentClient;
 use App\Support\MetricsQuery;
 use App\Support\Modules;
 use App\Support\Periods;
+use App\Support\WeekList;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
@@ -112,6 +113,7 @@ class DailyDesk extends Page
             ->whereNull('next_done_at')->whereNotNull('next_on')->where('next_on', '<=', now($tz)->toDateString())->orderBy('next_on')->limit(8)->get();
 
         return [
+            'weekList' => WeekList::for($a, auth()->user()),
             'followUps' => $followUps,
             'from' => $from, 'rows' => $rows, 'synced' => $synced ? Carbon::parse($synced) : null,
             'tz' => $tz, 'night' => $night, 'clientNames' => $clients->pluck('name', 'id'), 'brainsToCheck' => $toCheck,
