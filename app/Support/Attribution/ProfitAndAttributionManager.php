@@ -30,7 +30,7 @@ class ProfitAndAttributionManager
 
         return Modules::enabled('intelligence_hub')
             || Modules::hasAgencyOverride('intelligence_hub', $agency)
-            || in_array($agency->slug, (array) config('modules.preview_agencies', []), true);
+            || Modules::isPreviewAgency($agency);
     }
 
     public static function ensureUnitEconomics(Client $client): ClientUnitEconomic

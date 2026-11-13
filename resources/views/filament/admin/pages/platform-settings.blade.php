@@ -1,6 +1,7 @@
 @php
     $modules = (array) config('modules.enabled', []);
     $previewAgencies = (array) config('modules.preview_agencies', []);
+    $catalog = \App\Support\Modules::catalog();
     $currentModels = $aiProviders[$aiProvider]['models'] ?? [];
 @endphp
 <x-filament-panels::page>
@@ -85,28 +86,33 @@
         <div><x-filament::button type="submit">{{ __('Save settings') }}</x-filament::button></div>
     </form>
 
+    {{-- A-10 (FR-030): switch modules without a deploy --}}
+    <form wire:submit="saveModules">
     <x-filament::section style="margin-top:16px">
-        <x-slot name="heading">{{ __('Held-back modules (config/modules.php)') }}</x-slot>
-        <x-slot name="description">{{ __('Read-only status of feature switches governed by D-149 and D-229. Standard workspaces only see modules that are turned on.') }}</x-slot>
+        <x-slot name="heading">{{ __('Modules') }}</x-slot>
+        <x-slot name="description">{{ __('Turn a held-back module on or off for every workspace without a deploy. "Server default" follows the server file. Every change is audit-logged.') }}</x-slot>
 
         <div style="overflow-x:auto">
             <table style="width:100%;border-collapse:collapse;font-size:14px">
+                <caption class="sr-only">{{ __('Modules') }}</caption>
                 <thead>
                     <tr style="text-align:start;border-bottom:1px solid rgba(148,163,184,.25)">
-                        <th style="padding:8px">{{ __('Module key') }}</th>
-                        <th style="padding:8px">{{ __('Status') }}</th>
+                        <th scope="col" style="padding:8px;text-align:start">{{ __('Module') }}</th>
+                        <th scope="col" style="padding:8px;text-align:start">{{ __('Server default') }}</th>
+                        <th scope="col" style="padding:8px;text-align:start">{{ __('Setting') }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($modules as $key => $on)
                         <tr style="border-top:1px solid rgba(148,163,184,.18)">
-                            <td style="padding:8px;font-family:monospace;font-weight:600"><bdi dir="ltr">{{ $key }}</bdi></td>
+                            <td style="padding:8px">{{ $catalog[$key]['label'] ?? $key }} <span style="opacity:.6;font-size:12px"><bdi dir="ltr">{{ $key }}</bdi></span></td>
+                            <td style="padding:8px">{{ $on ? __('On') : __('Off') }}</td>
                             <td style="padding:8px">
-                                @if ($on)
-                                    <span style="display:inline-block;padding:2px 10px;border-radius:99px;background:rgba(16,185,129,.15);color:#10b981;font-size:12.5px;font-weight:600">{{ __('On') }}</span>
-                                @else
-                                    <span style="display:inline-block;padding:2px 10px;border-radius:99px;background:rgba(148,163,184,.2);font-size:12.5px">{{ __('Off (held back)') }}</span>
-                                @endif
+                                <select wire:model="moduleSwitches.{{ $key }}" aria-label="{{ $catalog[$key]['label'] ?? $key }}" style="min-height:44px;padding:6px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.4);background:transparent;color:inherit">
+                                    <option value="default">{{ __('Server default') }}</option>
+                                    <option value="on">{{ __('On for every workspace') }}</option>
+                                    <option value="off">{{ __('Off for every workspace') }}</option>
+                                </select>
                             </td>
                         </tr>
                     @endforeach
@@ -114,10 +120,14 @@
             </table>
         </div>
 
+        <label style="display:block;margin-top:14px;font-size:14px">
+            <span>{{ __('Preview workspaces (one slug per line): they see every held-back module') }}</span>
+            <textarea wire:model="previewSlugs" rows="3" dir="ltr" style="width:100%;margin-top:6px;padding:8px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.4);background:transparent;color:inherit"></textarea>
+        </label>
         @if (! empty($previewAgencies))
-            <p style="margin:12px 0 0;font-size:13px;opacity:.8">
-                {{ __('Preview workspaces') }}: <bdi dir="ltr">{{ implode(', ', $previewAgencies) }}</bdi>
-            </p>
+            <p style="margin:8px 0 0;font-size:13px;opacity:.8">{{ __('Also from the server file') }}: <bdi dir="ltr">{{ implode(', ', $previewAgencies) }}</bdi></p>
         @endif
+        <div style="margin-top:12px"><x-filament::button type="submit">{{ __('Save modules') }}</x-filament::button></div>
     </x-filament::section>
+    </form>
 </x-filament-panels::page>

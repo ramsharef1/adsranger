@@ -8,6 +8,7 @@ use App\Models\ModuleEarlyAccessRequest;
 use App\Models\PlanUpgradeRequest;
 use App\Models\PlatformSetting;
 use App\Support\AiSettings;
+use App\Support\Modules;
 use App\Support\Signup;
 use BackedEnum;
 use Filament\Notifications\Notification;
@@ -47,6 +48,11 @@ class PlatformSettings extends Page
 
     public ?bool $aiTestOk = null;
 
+    /** A-10: module => default | on | off */
+    public array $moduleSwitches = [];
+
+    public string $previewSlugs = '';
+
     public static function canAccess(): bool
     {
         return auth()->user()?->role === 'super_admin';
@@ -58,6 +64,36 @@ class PlatformSettings extends Page
         $this->allowlist = implode("\n", Signup::allowlist());
         $this->aiProvider = AiSettings::provider();
         $this->aiModel = AiSettings::model($this->aiProvider);
+        $global = Modules::globalSwitches();
+        foreach (array_keys((array) config('modules.enabled', [])) as $m) {
+            $this->moduleSwitches[$m] = array_key_exists($m, $global) ? ($global[$m] ? 'on' : 'off') : 'default';
+        }
+        $this->previewSlugs = implode("\n", (array) PlatformSetting::get(Modules::PREVIEW_KEY, []));
+    }
+
+    /** A-10 (FR-030): switch modules for everyone, and add preview workspaces, without a deploy. Audit-logged. */
+    public function saveModules(): void
+    {
+        abort_unless(static::canAccess(), 403);
+        $known = array_keys((array) config('modules.enabled', []));
+        $global = [];
+        foreach ($this->moduleSwitches as $m => $state) {
+            if (in_array($m, $known, true) && in_array($state, ['on', 'off'], true)) {
+                $global[$m] = $state === 'on';
+            }
+        }
+        $slugs = collect(preg_split('/[\s,]+/', strtolower($this->previewSlugs)) ?: [])
+            ->map(fn ($v) => trim($v))->filter(fn ($v) => preg_match('/^[a-z0-9][a-z0-9-]{0,62}$/', $v))->unique()->values()->all();
+
+        $before = ['global' => (array) PlatformSetting::get(Modules::GLOBAL_KEY, []), 'preview' => (array) PlatformSetting::get(Modules::PREVIEW_KEY, [])];
+        PlatformSetting::put(Modules::GLOBAL_KEY, $global);
+        PlatformSetting::put(Modules::PREVIEW_KEY, $slugs);
+        $after = ['global' => $global, 'preview' => $slugs];
+        $this->previewSlugs = implode("\n", $slugs);
+        if ($before !== $after) {
+            AuditLog::record('platform.modules_updated', null, ['before' => $before, 'after' => $after]);
+        }
+        Notification::make()->title(__('Modules saved'))->success()->send();
     }
 
     public function updatedAiProvider(string $value): void

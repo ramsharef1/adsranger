@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\Agency;
+use App\Models\PlatformSetting;
 use App\Models\User;
 use Filament\Facades\Filament;
 
@@ -71,9 +72,53 @@ class Modules
         ];
     }
 
+    public const GLOBAL_KEY = 'modules.global';
+
+    public const PREVIEW_KEY = 'modules.preview_agencies';
+
+    /**
+     * A-10 (FR-030): a super admin can turn a module on or off for everyone in /admin › Platform settings, without a
+     * deploy. A module with no switch there follows config/modules.php (the server .env).
+     */
     public static function enabled(string $module): bool
     {
+        $global = static::globalSwitches();
+        if (array_key_exists($module, $global)) {
+            return (bool) $global[$module];
+        }
+
         return (bool) config("modules.enabled.$module", false);
+    }
+
+    /** @return array<string, bool> module => on/off set in /admin (modules absent here follow the config) */
+    public static function globalSwitches(): array
+    {
+        return once(function (): array {
+            try {
+                return array_map(fn ($v) => (bool) $v, (array) PlatformSetting::get(self::GLOBAL_KEY, []));
+            } catch (\Throwable) {
+                return [];
+            }
+        });
+    }
+
+    /** @return list<string> preview workspace slugs: config (.env) plus the ones added in /admin */
+    public static function previewAgencies(): array
+    {
+        $extra = once(function (): array {
+            try {
+                return array_map('strval', (array) PlatformSetting::get(self::PREVIEW_KEY, []));
+            } catch (\Throwable) {
+                return [];
+            }
+        });
+
+        return array_values(array_unique(array_merge((array) config('modules.preview_agencies', []), $extra)));
+    }
+
+    public static function isPreviewAgency(?Agency $agency): bool
+    {
+        return $agency instanceof Agency && in_array($agency->slug, static::previewAgencies(), true);
     }
 
     /** M3.1: Super Admin per-agency override stored in `agencies.module_overrides`. */
@@ -121,7 +166,7 @@ class Modules
             return true;
         }
 
-        return $agency instanceof Agency && in_array($agency->slug, (array) config('modules.preview_agencies', []), true);
+        return static::isPreviewAgency($agency);
     }
 
     /** True when this user sees the module only as a preview (not globally enabled and not overridden on for the agency). */

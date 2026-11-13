@@ -89,6 +89,6 @@ class ClientOnboardingController extends Controller
     /** #105 links only open where the client_onboarding module is on (or a preview workspace), D-229. */
     protected static function onboardingLive(?Agency $agency): bool
     {
-        return $agency !== null && (Modules::enabled('client_onboarding') || in_array($agency->slug, (array) config('modules.preview_agencies', []), true));
+        return $agency !== null && (Modules::enabled('client_onboarding') || Modules::isPreviewAgency($agency));
     }
 }
