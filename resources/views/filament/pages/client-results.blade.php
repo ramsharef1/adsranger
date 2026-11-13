@@ -271,6 +271,23 @@
         </x-filament::section>
     @endif
 
+    {{-- FS-19 (R4): several ad-account currencies (one brand in several markets) --}}
+    @if ($byCurrency->count() > 1 && ! $client->hide_spend)
+        <x-filament::section data-by-currency>
+            <x-slot name="heading">{{ __('By account currency') }}</x-slot>
+            <x-slot name="description">{{ __('Each market in its own money, then the total in the client\'s currency and in USD (rate on the last day of the period).') }}</x-slot>
+            <table style="width:100%;font-size:13.5px;border-collapse:collapse">
+                <thead><tr><th style="text-align:start;padding:6px">{{ __('Currency') }}</th><th style="text-align:end;padding:6px">{{ __('Spend') }}</th><th style="text-align:end;padding:6px">{{ __('Results') }}</th><th style="text-align:end;padding:6px"><bdi dir="ltr">{{ $cur }}</bdi></th><th style="text-align:end;padding:6px">USD</th></tr></thead>
+                <tbody>
+                    @foreach ($byCurrency as $bc)
+                        <tr style="border-top:1px solid rgba(148,163,184,.2)"><td style="padding:6px"><bdi dir="ltr">{{ $bc['currency'] }}</bdi></td><td style="padding:6px;text-align:end"><bdi dir="ltr">{{ number_format($bc['spend'], 2) }} {{ $bc['currency'] }}</bdi></td><td style="padding:6px;text-align:end">{{ number_format($bc['results']) }}</td><td style="padding:6px;text-align:end"><bdi dir="ltr">{{ number_format($bc['local'], 2) }}</bdi></td><td style="padding:6px;text-align:end"><bdi dir="ltr">{{ number_format($bc['usd'], 2) }}</bdi></td></tr>
+                    @endforeach
+                    <tr style="border-top:2px solid rgba(148,163,184,.4);font-weight:700"><td style="padding:6px">{{ __('Total') }}</td><td></td><td style="padding:6px;text-align:end">{{ number_format($byCurrency->sum('results')) }}</td><td style="padding:6px;text-align:end"><bdi dir="ltr">{{ number_format($byCurrency->sum('local'), 2) }} {{ $cur }}</bdi></td><td style="padding:6px;text-align:end"><bdi dir="ltr">{{ number_format($byCurrency->sum('usd'), 2) }} USD</bdi></td></tr>
+                </tbody>
+            </table>
+        </x-filament::section>
+    @endif
+
     {{-- FS-24 / XS-44 (R4): daily spend; a day without data is a gap with its reason, never a zero. --}}
     @php
         $sd = $series['days'];

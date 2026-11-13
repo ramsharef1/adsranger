@@ -16,6 +16,7 @@ use App\Support\CriticalPush;
 use App\Support\Fx;
 use App\Support\GoogleInsights;
 use App\Support\MetricsQuery;
+use App\Support\OnCall;
 use App\Support\Pacing;
 use App\Support\PlanGate;
 use App\Support\Severity;
@@ -27,6 +28,9 @@ use Illuminate\Support\Facades\Schema;
 /** Evaluates the alert rules for one agency and keeps the inbox in sync (open, refresh, auto-resolve). */
 class AlertEngine
 {
+    /** @var array<int, int> agency id → on-call user id for this run (0 = nobody) */
+    protected static array $onCall = [];
+
     /** Effective rules for an agency: [key => ['enabled'=>bool,'locked'=>bool,'severity'=>..,'t'=>thresholds,'label'=>..]]. A rule above the plan is locked and never runs (#23, D-30). */
     public static function rules(Agency $a): array
     {
@@ -45,6 +49,7 @@ class AlertEngine
     /** @return array{opened:int,refreshed:int,resolved:int} */
     public static function run(Agency $a, string $day): array
     {
+        static::$onCall = [];
         $rules = static::rules($a);
         $found = [];
         $d = Carbon::parse($day);
@@ -523,7 +528,9 @@ class AlertEngine
                     + ($ex->status === 'snoozed' && $ex->snoozed_until?->isPast() ? ['status' => 'open', 'snoozed_until' => null] : []));
                 $stats['refreshed']++;
             } else {
-                $new[] = Alert::create($data + ['agency_id' => $a->id, 'status' => 'open', 'last_seen_at' => now()]);
+                // FS-21: a new Critical alert goes to today's on-call person first.
+                $assign = Severity::normalize($data['severity'] ?? null) === 'critical' ? (static::$onCall[$a->id] ??= OnCall::userFor($a)?->id ?? 0) : 0;
+                $new[] = Alert::create($data + ['agency_id' => $a->id, 'status' => 'open', 'last_seen_at' => now()] + ($assign ? ['assigned_to' => $assign] : []));
                 $stats['opened']++;
             }
         }

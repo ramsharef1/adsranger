@@ -50,7 +50,7 @@ class MeetingPrepPage extends Page
             'c' => $c, 'from' => $from, 'to' => $to,
             't' => MetricsQuery::totals($c, $from, $to), 'prev' => MetricsQuery::totals($c, $pf, $pt),
             'top' => array_slice(array_values(array_filter(MetricsQuery::breakdown($c, $from, $to, 'campaign'), fn ($r) => ($r['main_results'] ?? 0) > 0)), 0, 3),
-            'alerts' => Alert::where('client_id', $c->id)->where('status', 'open')->whereIn('severity', ['high', 'medium'])->latest()->limit(5)->get(),
+            'alerts' => Alert::where('client_id', $c->id)->where('status', 'open')->whereIn('severity', ['critical', 'warning', 'high', 'medium'])->latest()->limit(5)->get(),
             'season' => collect(MenaCalendar::events($today, now($tz)->addDays(60)->toDateString(), $a->country ?: null))->first(fn ($e) => $e['start'] >= $today),
             'decisions' => array_values(array_filter([
                 $c->monthly_budget ? null : __('Agree a monthly budget'),

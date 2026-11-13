@@ -35,6 +35,22 @@
             </div>
         @endif
     </x-filament::section>
+    {{-- FS-21 (R4): alert on-call rota, Friday and Saturday included. --}}
+    <x-filament::section data-on-call>
+        <x-slot name="heading">{{ __('On-call rota') }}</x-slot>
+        <x-slot name="description">{{ __('New Critical alerts are assigned to the person on call that day, and their phone hears Critical alerts even in quiet hours. Leave a day empty to keep the usual behaviour.') }}</x-slot>
+        @if ($today)<p style="margin:0 0 8px;font-size:13.5px">{{ __('On call today: :name', ['name' => $today->name]) }}</p>@endif
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+            @foreach ([6 => __('Saturday'), 7 => __('Sunday'), 1 => __('Monday'), 2 => __('Tuesday'), 3 => __('Wednesday'), 4 => __('Thursday'), 5 => __('Friday')] as $d => $dn)
+                <label style="display:grid;gap:4px;font-size:13px">{{ $dn }}
+                    <select wire:model="onCall.{{ $d }}" @disabled(! $editRota) style="min-height:44px;padding:6px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.35);background:transparent">
+                        <option value="">{{ __('Nobody') }}</option>
+                        @foreach ($members as $id => $name)<option value="{{ $id }}">{{ $name }}</option>@endforeach
+                    </select></label>
+            @endforeach
+        </div>
+        @if ($editRota)<div style="margin-top:10px"><x-filament::button wire:click="saveOnCall">{{ __('Save rota') }}</x-filament::button></div>@endif
+    </x-filament::section>
     @if ($locked)
         <x-locked-modal feature="alert_rules_pro" :can-upgrade="$canUpgrade" />
     @endif

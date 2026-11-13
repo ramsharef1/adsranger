@@ -12,6 +12,7 @@ use App\Models\AuditLog;
 use App\Models\Client;
 use App\Support\Modules;
 use App\Support\PlanGate;
+use App\Support\Severity;
 
 /**
  * AI Workspace M1 item 8 (spec v1 §13.1 N1, Product M1 screens §8): night shift v0. Each night, at the workspace's chosen
@@ -115,7 +116,7 @@ class NightShift
     {
         $pack = ContextPack::forAi($client);
         $alerts = Alert::where('client_id', $client->id)->where('status', 'open')->latest('last_seen_at')->limit(20)->get()
-            ->map(fn (Alert $a) => ['level' => ['high' => 'critical', 'medium' => 'warning'][$a->severity] ?? 'info', 'title' => strip_tags((string) $a->title), 'concerns' => strip_tags((string) $a->entity_name)])->all();
+            ->map(fn (Alert $a) => ['level' => Severity::normalize($a->severity), 'title' => strip_tags((string) $a->title), 'concerns' => strip_tags((string) $a->entity_name)])->all();
         // FS-07 (R7 part 4): new Critical site-audit issues from an audit that finished in the last day.
         $siteIssues = SiteContext::newCritical($client, now()->subDay());
         if ($pack['facts'] === [] && $alerts === [] && $siteIssues === []) {

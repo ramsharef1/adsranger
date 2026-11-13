@@ -29,12 +29,13 @@ class CriticalPush
             return 0;
         }
         $sent = 0;
+        $onCall = OnCall::userFor($a, $now)?->id; // FS-21: the on-call person hears Critical alerts even in quiet hours
         foreach ($a->members()->whereHas('pushSubscriptions')->get() as $u) {
             $mine = static::visible($u, $a, $critical);
             if ($mine->isEmpty()) {
                 continue;
             }
-            if (static::isQuiet($u, $a, $now)) {
+            if ($u->id !== $onCall && static::isQuiet($u, $a, $now)) {
                 $urgent = $u->push_override_spend ? $mine->filter(fn (Alert $al) => static::spendTwiceBudget($al)) : collect();
                 foreach ($mine->diff($urgent) as $al) {
                     DB::table('push_held')->insertOrIgnore(['user_id' => $u->id, 'agency_id' => $a->id, 'alert_id' => $al->id, 'created_at' => $now]);

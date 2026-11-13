@@ -2611,5 +2611,13 @@
     "Next season": "الموسم القادم",
     "Decisions needed": "قرارات مطلوبة",
     "Nothing waiting for a decision.": "لا شيء ينتظر قرارًا.",
-    "Internal notes (hidden in presentation mode)": "ملاحظات داخلية (مخفية في وضع العرض)"
+    "Internal notes (hidden in presentation mode)": "ملاحظات داخلية (مخفية في وضع العرض)",
+    "On-call rota saved.": "حُفظ جدول المناوبة.",
+    "On-call rota": "جدول المناوبة",
+    "New Critical alerts are assigned to the person on call that day, and their phone hears Critical alerts even in quiet hours. Leave a day empty to keep the usual behaviour.": "تُسند التنبيهات الحرجة الجديدة إلى المناوب في ذلك اليوم، ويصل التنبيه الحرج إلى هاتفه حتى في ساعات الهدوء. اترك اليوم فارغًا لإبقاء السلوك المعتاد.",
+    "On call today: :name": "مناوب اليوم: :name",
+    "Nobody": "لا أحد",
+    "Save rota": "احفظ الجدول",
+    "By account currency": "حسب عملة الحساب",
+    "Each market in its own money, then the total in the client's currency and in USD (rate on the last day of the period).": "كل سوق بعملته، ثم الإجمالي بعملة العميل وبالدولار (بسعر آخر يوم في الفترة)."
 }

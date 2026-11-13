@@ -6,6 +6,7 @@ use App\Alerts\AlertEngine;
 use App\Filament\Concerns\TranslatesPageLabels;
 use App\Models\AlertRule;
 use App\Models\AuditLog;
+use App\Support\OnCall;
 use App\Support\PlanGate;
 use App\Support\TeamRoles;
 use BackedEnum;
@@ -35,8 +36,12 @@ class AlertRules extends Page
 
     public array $rules = [];
 
+    /** FS-21: ISO weekday → user id */
+    public array $onCall = [];
+
     public function mount(): void
     {
+        $this->onCall = array_map('strval', (array) (Filament::getTenant()->on_call ?? []));
         foreach (AlertEngine::rules(Filament::getTenant()) as $k => $r) {
             $this->rules[$k] = ['enabled' => $r['enabled'], 't' => $r['t']];
         }
@@ -67,6 +72,15 @@ class AlertRules extends Page
         Notification::make()->title(__('Alert rules saved'))->body(__('They apply from the next run (every morning after the sync).'))->success()->send();
     }
 
+    /** FS-21 (R4): owners and admins set who watches alerts each day. */
+    public function saveOnCall(): void
+    {
+        abort_unless(TeamRoles::canManageTeam(auth()->user(), Filament::getTenant()), 403);
+        OnCall::save(Filament::getTenant(), $this->onCall);
+        AuditLog::record('alerts.on_call_updated', Filament::getTenant(), []);
+        Notification::make()->title(__('On-call rota saved.'))->success()->send();
+    }
+
     public function runNow(): void
     {
         abort_unless($this->canEdit(), 403);
@@ -81,6 +95,8 @@ class AlertRules extends Page
         $locked = collect(array_keys(config('alerts.rules')))->filter(fn ($k) => ! PlanGate::allowsAlertRule($a, $k))->values()->all();
 
         return ['defs' => config('alerts.rules'), 'edit' => $this->canEdit(), 'locked' => $locked,
+            'members' => $a->members()->orderBy('users.name')->pluck('users.name', 'users.id'), 'editRota' => TeamRoles::canManageTeam(auth()->user(), $a),
+            'today' => OnCall::userFor($a),
             'canUpgrade' => PlanGate::canUpgrade(auth()->user(), $a)];
     }
 }

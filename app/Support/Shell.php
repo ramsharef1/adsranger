@@ -203,14 +203,14 @@ class Shell
         $ids = Client::visibleTo(auth()->user(), $agency)->where('status', 'active')->pluck('id');
         $open = Alert::where('agency_id', $agency->id)->where('status', 'open')->whereIn('client_id', $ids)
             ->selectRaw('severity, count(*) as n, count(distinct client_id) as c')->groupBy('severity')->get()->keyBy('severity');
-        $withAlerts = Alert::where('agency_id', $agency->id)->where('status', 'open')->whereIn('client_id', $ids)->whereIn('severity', ['high', 'medium'])->distinct()->count('client_id');
+        $withAlerts = Alert::where('agency_id', $agency->id)->where('status', 'open')->whereIn('client_id', $ids)->whereIn('severity', ['critical', 'warning', 'high', 'medium'])->distinct()->count('client_id');
 
         return [
             'date' => now($tz)->locale(app()->getLocale())->translatedFormat($ar ? 'l j F Y' : 'l j M Y'),
             'hijri' => MenaCalendar::hijriLabel($today, $ar ? 'ar' : 'en'),
             'next' => $next,
             'clients' => $ids->count(), 'calm' => $ids->count() - $withAlerts,
-            'critical' => (int) ($open['high']->n ?? 0), 'warning' => (int) ($open['medium']->n ?? 0),
+            'critical' => (int) (($open['critical']->n ?? 0) + ($open['high']->n ?? 0)), 'warning' => (int) (($open['warning']->n ?? 0) + ($open['medium']->n ?? 0)),
         ];
     }
 
@@ -219,7 +219,7 @@ class Shell
     {
         $clients = Client::visibleTo(auth()->user(), $agency)->where('status', 'active')->orderBy('name')->get(['id', 'name']);
         $worst = Alert::where('agency_id', $agency->id)->where('status', 'open')->whereIn('client_id', $clients->pluck('id'))
-            ->selectRaw("client_id, max(case when severity = 'high' then 2 when severity = 'medium' then 1 else 0 end) as w")->groupBy('client_id')->pluck('w', 'client_id');
+            ->selectRaw("client_id, max(case when severity in ('critical', 'high') then 2 when severity in ('warning', 'medium') then 1 else 0 end) as w")->groupBy('client_id')->pluck('w', 'client_id');
 
         return $clients->map(fn (Client $c) => ['id' => $c->id, 'name' => $c->name, 'level' => [2 => 'critical', 1 => 'warning'][(int) ($worst[$c->id] ?? 0)] ?? 'ok'])->all();
     }

@@ -47,12 +47,12 @@ class WeekList
 
                 continue;
             }
-            $byLevel = ($alerts[$c->id] ?? collect())->pluck('n', 'severity');
-            if ($n = (int) ($byLevel['high'] ?? 0)) {
+            $byLevel = ($alerts[$c->id] ?? collect())->groupBy(fn ($r) => Severity::normalize($r->severity))->map(fn ($g) => (int) $g->sum('n'));
+            if ($n = (int) ($byLevel['critical'] ?? 0)) {
                 $score += 3 * $n;
                 $reasons[] = trans_choice(':n open Critical alert|:n open Critical alerts', $n, ['n' => $n]);
             }
-            if ($n = (int) ($byLevel['medium'] ?? 0)) {
+            if ($n = (int) ($byLevel['warning'] ?? 0)) {
                 $score += $n;
                 $reasons[] = trans_choice(':n open Warning|:n open Warnings', $n, ['n' => $n]);
             }

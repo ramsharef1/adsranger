@@ -69,7 +69,7 @@ class MonthNotes
         foreach (array_slice(MenaCalendar::events($nStart->toDateString(), $nStart->copy()->endOfMonth()->toDateString()), 0, 3) as $e) {
             $next[] = $ar ? 'نستعد لموسم '.$e['ar'].'.' : 'Prepare for '.$e['label'].'.';
         }
-        $open = Alert::where('client_id', $c->id)->where('status', 'open')->whereIn('severity', ['high', 'medium'])->count();
+        $open = Alert::where('client_id', $c->id)->where('status', 'open')->whereIn('severity', ['critical', 'warning', 'high', 'medium'])->count();
         if ($open) {
             $next[] = $ar ? "معالجة التنبيهات المفتوحة (العدد: {$open})." : "Work through {$open} open alerts.";
         }

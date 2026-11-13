@@ -14,12 +14,14 @@ use App\Models\ClientContact;
 use App\Models\ClientLicence;
 use App\Models\ClientLink;
 use App\Models\CodWeek;
+use App\Models\DailyMetric;
 use App\Models\ReportSchedule;
 use App\Support\ClientFreeze;
 use App\Support\ClientSetupCopy;
 use App\Support\ClientSummaryText;
 use App\Support\CodOutcomes;
 use App\Support\DataGaps;
+use App\Support\Fx;
 use App\Support\HealthScore;
 use App\Support\MetricsQuery;
 use App\Support\Modules;
@@ -461,6 +463,11 @@ class ViewClient extends ViewRecord
             'top' => MetricsQuery::topAds($c, $from, $to),
             'alerts' => Alert::where('client_id', $c->id)->where('status', 'open')->latest()->limit(5)->get(),
             'series' => DataGaps::series($c, $from, $to),
+            // FS-19 (R4): one brand in several markets: each ad-account currency in its own money, plus the client total.
+            'byCurrency' => DailyMetric::where('client_id', $c->id)->whereBetween('date', [$from, $to])->whereNotNull('currency')
+                ->selectRaw('currency, SUM(spend) as spend, SUM(results) as results, MIN(date) as d')->groupBy('currency')->get()
+                ->map(fn ($r) => ['currency' => strtoupper($r->currency), 'spend' => (float) $r->spend, 'results' => (float) $r->results,
+                    'local' => Fx::convert((float) $r->spend, $r->currency, $c->currency ?: 'USD', $to), 'usd' => Fx::convert((float) $r->spend, $r->currency, 'USD', $to)])->values(),
             'cod' => CodOutcomes::summary($c, now($c->agency?->timezone ?: 'UTC')->subWeeks(8)->toDateString(), now($c->agency?->timezone ?: 'UTC')->toDateString()),
             'codWeeks' => CodWeek::with('campaign')->where('client_id', $c->id)->orderByDesc('week_start')->limit(8)->get(),
             'licences' => ClientLicence::where('client_id', $c->id)->orderBy('expires_on')->get(),
