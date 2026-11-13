@@ -27,4 +27,11 @@ return [
         'inline_bytes_max' => 100_000,    // SPEED-04 inline <script> + <style> + data: URIs over this many bytes
         'psi_timeout_s' => 60,
     ],
+
+    // E2-065 AEO / GEO radar: probes run on the workspace's own AI key (#159), capped by that key's monthly cap.
+    'aeo' => [
+        'max_prompts' => 10,
+        'max_prompts_per_probe' => 5,
+        'max_output_tokens' => 600,
+    ],
 ];
