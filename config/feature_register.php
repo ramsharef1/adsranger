@@ -18,6 +18,7 @@ use App\Filament\Pages\FreeLiteView;
 use App\Filament\Pages\MyDevices;
 use App\Filament\Pages\NightShiftPage;
 use App\Filament\Pages\OnboardingPage;
+use App\Filament\Pages\RetainerSplitPage;
 use App\Filament\Pages\SeoAuditPage;
 use App\Filament\Pages\WhatsNewPage;
 use App\Filament\Pages\WorkspaceActivity;
@@ -31,6 +32,7 @@ use App\Http\Middleware\ToolAbuseGuard;
 use App\Mcp\Servers\AdsRangerServer;
 use App\Models\CostLine;
 use App\Models\LaunchCheck;
+use App\Support\AgencyOps\RetainerSplit;
 use App\Support\AiWorkspace\AiBox;
 use App\Support\AiWorkspace\Brain;
 use App\Support\AiWorkspace\FreePlan;
@@ -52,8 +54,6 @@ use App\Support\Reach\PublisherKit;
 use App\Support\Reach\Serve;
 use App\Support\Reach\Wallet;
 use App\Support\RestoreTest;
-use App\Support\Seo\AeoCitationRadar;
-use App\Support\Seo\AiCrawlerChecker;
 /*
  * A-12 (FR-029) register-to-code guard. Every row marked Done or Live in ADSR-060 / ADSR-920 is listed here with the
  * code it lives in and the test that proves it. RegisterToCodeTest fails if a listed class, view or test is missing,
@@ -61,6 +61,8 @@ use App\Support\Seo\AiCrawlerChecker;
  *
  * 'code' entries: a class name, "view:<name>", "route:<uri>" or "config:<file>". 'tests': files under tests/.
  */
+use App\Support\Seo\AeoCitationRadar;
+use App\Support\Seo\AiCrawlerChecker;
 use App\Support\Seo\Audit\PageSpeed;
 use App\Support\Seo\Audit\SiteAuditor;
 use App\Support\Seo\PageAudit;
@@ -111,4 +113,5 @@ return [
     'FR-REACH-R4' => ['title' => 'AdsRanger Reach R-4 (E2-064): network Sub-ID + postback presets (arabclicks / linkaraby aff_sub, admitad subid, impact subId1, direct_client subid) with per-endpoint overrides on /admin › Reach, and a deterministic WordPress plugin .zip + Cloudflare Worker snippet in /reach/portal › Placements (async tag.js, /llms.txt promo codes, schema.org Offer JSON-LD on pages that show offers); module reach, off', 'code' => [PublisherKit::class, Postbacks::class, ReachControlBoard::class, ReachPortalController::class, 'route:reach/portal/wordpress-plugin.zip'], 'tests' => ['Feature/ReachR4Test.php']],
     'FR-AEO-RADAR' => ['title' => 'AEO / GEO brand citation & AI readiness radar (E2-065): deterministic readiness out of 100 from SafeFetcher checks (robots.txt per AI crawler, /llms.txt, Organization / FAQPage / Product JSON-LD, AR / EN entity parity) + optional probes on the workspace\'s own AI key under its monthly cap (#159); no citation rate without probes; module seo_audit, off', 'code' => [AeoCitationRadar::class, AeoCitationRadarPage::class, 'view:filament.pages.aeo-citation-radar'], 'tests' => ['Feature/AeoGeoCitationRadarTest.php']],
     'FR-CREATIVE-FATIGUE' => ['title' => 'Creative fatigue & peak-season decay guard (E2-066): ad-level frequency saturation + click-through / ThruPlay rate drop vs the ad\'s own 3-week baseline, tighter limits during Ramadan\'s last ten nights, Eid and White Friday (MenaCalendar), open / resolved alerts, board with visibleTo + hide_spend and a draft-replacement link into Creative Studio; module studio, off', 'code' => [CreativeFatigueDetector::class, CreativeFatigueBoardPage::class, 'view:filament.pages.creative-fatigue-board', 'config:creative_fatigue'], 'tests' => ['Feature/CreativeFatigueGuardTest.php']],
+    'FR-RETAINER-SPLIT' => ['title' => 'Retainer vs ad-spend split (E2-067): monthly pass-through ad spend vs agency management fee (fixed / share of spend / hybrid, minimum, tax on the fee only at the typed rate), ResultResolver::money (3 decimals JOD / KWD / BHD / OMR), CSV + ZATCA TLV Base64 + JoFotara UBL 2.1 XML drafts with a neutral reminder; no export for hide_spend clients; module agency_ops_hub, off', 'code' => [RetainerSplit::class, RetainerSplitPage::class, 'view:filament.pages.retainer-split'], 'tests' => ['Feature/AgencyRetainerSplitTest.php']],
 ];
