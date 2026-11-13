@@ -9,7 +9,7 @@ use App\Support\Seo\SafeFetcher;
  * Reads the parts of one HTML page the A1 rules need (regex over the raw HTML, no DOM: pages in the wild are often not well-formed).
  *
  * @phpstan-type Parsed array{lang: string, dir: string, title: string, description: string, h1s: list<string>, canonical: string,
- *   hreflang: list<array{lang: string, href: string}>, links: list<string>, images_no_alt: int, noindex: bool, fonts: list<string>,
+ *   hreflang: list<array{lang: string, href: string}>, links: list<string>, images_no_alt: int, images_no_alt_src: list<string>, noindex: bool, fonts: list<string>,
  *   font_display: bool, arabic_font: bool, json_ld: list<string>, json_ld_invalid: int, text: string, word_count: int, arabic_ratio: float,
  *   title_px: int}
  */
@@ -61,7 +61,15 @@ class PageParser
         }
 
         preg_match_all('/<img\b[^>]*>/i', $html, $im);
-        $imagesNoAlt = count(array_filter($im[0], fn (string $tag) => ! preg_match('/\balt\s*=/i', $tag)));
+        $noAlt = array_values(array_filter($im[0], fn (string $tag) => ! preg_match('/\balt\s*=/i', $tag)));
+        $imagesNoAlt = count($noAlt);
+        // FS-13: keep the first 5 addresses so the AI box can draft alt text for them.
+        $imagesNoAltSrc = [];
+        foreach (array_slice($noAlt, 0, 5) as $tag) {
+            if (preg_match('/\bsrc\s*=\s*["\']([^"\']+)["\']/i', $tag, $sm) && ! str_starts_with(trim($sm[1]), 'data:')) {
+                $imagesNoAltSrc[] = mb_substr(self::absolute($pageUrl, trim(html_entity_decode($sm[1]))), 0, 90);
+            }
+        }
 
         $fonts = [];
         $fontDisplay = true;
@@ -107,7 +115,7 @@ class PageParser
 
         return [
             'lang' => $lang, 'dir' => $dir, 'title' => $title, 'description' => $description, 'h1s' => $h1s, 'canonical' => $canonical,
-            'hreflang' => $hreflang, 'links' => array_values(array_unique($pageLinks)), 'images_no_alt' => $imagesNoAlt, 'noindex' => $noindex,
+            'hreflang' => $hreflang, 'links' => array_values(array_unique($pageLinks)), 'images_no_alt' => $imagesNoAlt, 'images_no_alt_src' => $imagesNoAltSrc, 'noindex' => $noindex,
             'fonts' => $fonts, 'font_display' => $fontDisplay, 'arabic_font' => $arabicFont, 'json_ld' => $jsonLd, 'json_ld_invalid' => $invalid,
             'text' => mb_substr($text, 0, 4000), 'word_count' => $wordCount, 'arabic_ratio' => round($ratio, 3),
             'title_px' => (int) PageAudit::serpWidths($title, $description)['title_px'],

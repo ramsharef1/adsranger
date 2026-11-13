@@ -116,14 +116,16 @@ class NightShift
         $pack = ContextPack::forAi($client);
         $alerts = Alert::where('client_id', $client->id)->where('status', 'open')->latest('last_seen_at')->limit(20)->get()
             ->map(fn (Alert $a) => ['level' => ['high' => 'critical', 'medium' => 'warning'][$a->severity] ?? 'info', 'title' => strip_tags((string) $a->title), 'concerns' => strip_tags((string) $a->entity_name)])->all();
-        if ($pack['facts'] === [] && $alerts === []) {
+        // FS-07 (R7 part 4): new Critical site-audit issues from an audit that finished in the last day.
+        $siteIssues = SiteContext::newCritical($client, now()->subDay());
+        if ($pack['facts'] === [] && $alerts === [] && $siteIssues === []) {
             return ['ok' => true, 'items' => 0, 'cost' => 0.0];
         }
         $max = (int) config('ai_workspace.night_shift.max_items_per_client', 3);
         $system = "You are the night shift for a marketing agency inside AdsRanger.\n- ".implode("\n- ", Playbooks::rules('night')).
-            "\n- Return {\"items\": [...]} with at most $max items, most important first. Each item: level (critical, warning or info), title, why (with numbers from facts), action (one specific step), campaign (name or null). Return {\"items\": []} if nothing needs attention.";
+            "\n- Return {\"items\": [...]} with at most $max items, most important first. Each item: level (critical, warning or info), title, why (with numbers from facts), action (one specific step), campaign (name or null). New site issues in new_site_issues come from AdsRanger's site audit; mention them only when they matter for this client's ads or search. Return {\"items\": []} if nothing needs attention.";
         $r = OwnKey::complete($key, $system, json_encode(['context' => ['client' => $pack['client'], 'currency' => $pack['currency'], 'data_until' => $pack['data_until'],
-            'facts' => $pack['facts'], 'client_rules' => $pack['rules'], 'open_alerts' => $alerts]], JSON_UNESCAPED_UNICODE), true);
+            'facts' => $pack['facts'], 'client_rules' => $pack['rules'], 'open_alerts' => $alerts, 'new_site_issues' => $siteIssues]], JSON_UNESCAPED_UNICODE), true);
         if (! $r['ok']) {
             return ['ok' => false, 'items' => 0, 'cost' => $r['cost'], 'transient' => (bool) ($r['transient'] ?? false), 'redacted' => (int) ($r['redacted'] ?? 0),
                 'error' => ($r['billing'] ?? false) ? __('Your key is out of credit.') : ($r['error'] ?? __('The provider answered with an error.'))];

@@ -53,7 +53,10 @@ class Brain
             : (string) ($data['body'] ?? '');
         $text = $outputType !== null && is_array($output) ? OutputContract::text($outputType, $output) : $original;
         $clean = $type === 'chat_link' ? ['text' => $text, 'hidden' => 0, 'generic' => [], 'actions' => [], 'no_fix' => false] : CleanUp::pass($text);
-        $gate = QualityGate::check($clean['text'], ContextPack::for($client)['facts'], [
+        // R7 part 4: numbers the person gave in the material (a text to translate) count as known, labelled as theirs.
+        $facts = array_merge(ContextPack::for($client)['facts'], array_map(fn (array $n) => ['label' => 'Your text', 'value' => $n['value'], 'period' => '', 'source' => 'Your text', 'date' => null],
+            QualityGate::numbers((string) ($data['material'] ?? ''))));
+        $gate = QualityGate::check($clean['text'], $facts, [
             'type' => $state === 'ok' ? $outputType : null, 'output' => $output, 'client_facing' => (bool) ($data['client_facing'] ?? false),
             'allowed_client_ids' => $data['allowed_client_ids'] ?? null, 'client_id' => $client->id,
         ]);

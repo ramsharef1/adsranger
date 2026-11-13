@@ -1,0 +1,31 @@
+{
+    "version": "v1",
+    "_about": "FS-06 (R7 part 4): terms an AI translation must keep, AR <-> EN. Same words as lang/ar.json. 'keep' terms stay in Latin in both languages.",
+    "pairs": [
+        ["Spend", "الإنفاق"],
+        ["Results", "النتائج"],
+        ["Cost per result", "تكلفة النتيجة"],
+        ["Impressions", "مرات الظهور"],
+        ["Link clicks", "نقرات الروابط"],
+        ["Clicks", "النقرات"],
+        ["Conversions", "التحويلات"],
+        ["Purchases", "المشتريات"],
+        ["Revenue", "الإيراد"],
+        ["Leads", "العملاء المحتملون"],
+        ["Daily budget", "الميزانية اليومية"],
+        ["Budget", "الميزانية"],
+        ["Ad set", "المجموعة الإعلانية"],
+        ["Campaign", "الحملة"],
+        ["Reach", "الوصول"],
+        ["Frequency", "معدل التكرار"],
+        ["Landing page", "صفحة الهبوط"],
+        ["Ad account", "الحساب الإعلاني"],
+        ["Negative keywords", "الكلمات الرئيسية السلبية"],
+        ["Keyword", "الكلمة المفتاحية"],
+        ["Pacing", "الوتيرة"],
+        ["Workspace", "مساحة العمل"],
+        ["Night shift", "المناوب الليلي"],
+        ["Client brain", "ذاكرة العميل"]
+    ],
+    "keep": ["AdsRanger", "ROAS", "CTR", "CPM", "CPC", "Meta", "Google Ads", "Google", "TikTok", "Snapchat", "WhatsApp", "Instagram", "Search Console", "GA4"]
+}

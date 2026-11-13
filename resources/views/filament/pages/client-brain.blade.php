@@ -103,11 +103,17 @@
                             <select id="bx-p" wire:model.live="boxPlatform" style="{{ $field }}">@foreach (['meta' => 'Meta', 'google_ads' => 'Google Ads', 'tiktok' => 'TikTok', 'snapchat' => 'Snapchat'] as $k => $v)<option value="{{ $k }}">{{ $v }}</option>@endforeach</select></div>
                     @endif
                 </div>
-                <div><label for="bx-n" style="{{ $label }}">{{ __('Anything to add (goal, offer, period)') }}</label>
-                    <textarea id="bx-n" wire:model.blur="boxNotes" rows="2" maxlength="1000" style="{{ $field }};min-height:64px" dir="auto"></textarea></div>
+                @php
+                    $boxLabel = ['translate' => __('Text to translate (Arabic or English)'), 'dialect_negatives' => __('Search terms, one per line')][$boxPlaybook] ?? __('Anything to add (goal, offer, period)');
+                @endphp
+                <div><label for="bx-n" style="{{ $label }}">{{ $boxLabel }}</label>
+                    <textarea id="bx-n" wire:model.blur="boxNotes" rows="{{ isset(\App\Support\AiWorkspace\Playbooks::MATERIAL[$boxPlaybook]) ? 6 : 2 }}" maxlength="{{ \App\Support\AiWorkspace\Playbooks::notesMax($boxPlaybook) }}" style="{{ $field }};min-height:64px" dir="auto"></textarea>
+                    @if ($boxPlaybook === 'dialect_negatives')<p style="{{ $muted }};font-size:12px;margin:4px 0 0">{{ __('Clear cases (jobs, free, downloads, courses) are decided here at no cost; only the rest go to your AI.') }}</p>@endif
+                    @if (in_array($boxPlaybook, ['alt_text', 'audit_summary'], true))<p style="{{ $muted }};font-size:12px;margin:4px 0 0">{{ __('Uses this client\'s last finished site audit.') }}</p>@endif
+                </div>
                 <div style="display:flex;gap:6px;flex-wrap:wrap;font-size:12.5px">
                     <span style="border:1px solid rgba(148,163,184,.35);border-radius:999px;padding:4px 10px">✓ <bdi>{{ $client->name }}</bdi></span>
-                    <span style="border:1px solid rgba(148,163,184,.35);border-radius:999px;padding:4px 10px">{{ __('Last 7 days vs the 7 before') }}</span>
+                    @if (in_array($boxPlaybook, ['weekly_summary', 'dialect_ad_copy', 'ramadan_plan'], true))<span style="border:1px solid rgba(148,163,184,.35);border-radius:999px;padding:4px 10px">{{ __('Last 7 days vs the 7 before') }}</span>@endif
                     <span style="border:1px solid rgba(148,163,184,.35);border-radius:999px;padding:4px 10px">{{ __('Checked by AdsRanger before it is saved') }}</span>
                 </div>
                 @if ($key)
@@ -196,6 +202,15 @@
                                 @endforeach
                             </ul>
                         </details>
+                    @endif
+                    {{-- FS-06: glossary check on a translation. --}}
+                    @if (! empty($item->meta['glossary']))
+                        @php($g = $item->meta['glossary'])
+                        <div data-glossary style="font-size:12.5px">
+                            {!! __('Terms kept: :kept of :total', ['kept' => $ltr($g['kept']), 'total' => $ltr($g['total'])]) !!}
+                            @if (! empty($g['missing']))<span style="color:#B45309"> · {{ __('Check:') }} <bdi>{{ implode(' · ', $g['missing']) }}</bdi></span>@endif
+                            @foreach ($g['lint'] ?? [] as $l)<div style="color:#B45309">{{ $l }}</div>@endforeach
+                        </div>
                     @endif
                     @if (! empty($item->meta['redacted']))<div style="{{ $muted }};font-size:12.5px">{{ __('Personal data hidden before sending: :n', ['n' => $item->meta['redacted']]) }}</div>@endif
 

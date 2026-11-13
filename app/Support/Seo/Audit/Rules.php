@@ -120,7 +120,7 @@ class Rules
 
         // Images and schema.
         if ($p['images_no_alt'] > 0) {
-            $issues[] = ['IMG-01', $p['images_no_alt'].' img'];
+            $issues[] = ['IMG-01', mb_substr($p['images_no_alt'].' img'.(($p['images_no_alt_src'] ?? []) ? ': '.implode(' · ', $p['images_no_alt_src']) : ''), 0, 480)];
         }
         if ($p['json_ld_invalid'] > 0) {
             $issues[] = ['SCHEMA-02', $p['json_ld_invalid'].' block(s)'];

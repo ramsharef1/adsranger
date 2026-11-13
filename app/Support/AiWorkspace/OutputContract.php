@@ -27,6 +27,18 @@ class OutputContract
                 // Headline / primary text limits per platform (characters). Unknown platform: the strictest set.
                 'limits' => ['meta' => [40, 125], 'google_ads' => [30, 90], 'tiktok' => [100, 100], 'snapchat' => [34, 100], 'default' => [30, 90]],
             ],
+            // FS-13 (R7 part 4): alt text for images A1 found without it.
+            'alt_text_set' => [
+                'required' => ['items' => 'list'],
+                'items' => ['items' => ['image' => 'string', 'alt_ar' => 'string', 'alt_en' => 'string']],
+                'min' => ['items' => 1],
+            ],
+            // FS-15 (R7 part 4): negative keywords with their reason and other forms.
+            'negatives_set' => [
+                'required' => ['negatives' => 'list'],
+                'items' => ['negatives' => ['term' => 'string', 'reason' => 'string']],
+                'min' => ['negatives' => 0],
+            ],
         ];
     }
 
@@ -47,7 +59,7 @@ class OutputContract
         }
         $out = [];
         foreach ($c['required'] as $field => $kind) {
-            if (! array_key_exists($field, $output) || $output[$field] === null || $output[$field] === '' || $output[$field] === []) {
+            if (! array_key_exists($field, $output) || $output[$field] === null || $output[$field] === '' || ($output[$field] === [] && ($c['min'][$field] ?? 1) > 0)) {
                 $out[] = "missing: $field";
 
                 continue;
@@ -96,7 +108,7 @@ class OutputContract
     {
         $lines = [];
         array_walk_recursive($output, function ($v, $k) use (&$lines) {
-            if (is_string($v) && ! in_array($k, ['source', 'date', 'platform', 'dialect'], true)) {
+            if (is_string($v) && ! in_array($k, ['source', 'date', 'platform', 'dialect', 'image'], true)) {
                 $lines[] = $v;
             }
         });
