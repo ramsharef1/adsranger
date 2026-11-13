@@ -64,6 +64,11 @@ class Modules
                 'description' => __('Arabic-first site audit: RTL, language links, titles, indexing, broken links.'),
                 'beta_requestable' => false,
             ],
+            'ai_workspace' => [
+                'label' => __('AI Workspace (connector + client brain)'),
+                'description' => __('Your own AI with your clients\' data: client brain, quality checks, and the AdsRanger connector.'),
+                'beta_requestable' => false,
+            ],
             'custom_domains' => [
                 'label' => __('Custom report domain'),
                 'description' => __('Client report links on the agency\'s own domain.'),
