@@ -40,7 +40,7 @@ class ClientCalendar
 
         foreach (MenaCalendar::events($from, $to, $a->country ?: null) as $e) {
             if ($e['start'] >= $from) {
-                $add($e['start'], 'season', $ar ? $e['ar'] : $e['label'], null);
+                $add($e['start'], 'season', ($ar ? $e['ar'] : $e['label']).(($e['status'] ?? '') === 'expected' ? ' · '.__('expected') : (($e['status'] ?? '') === 'confirmed' ? ' · '.__('confirmed') : '')), null);
             }
         }
         // PS-21 / XS-20 (R5): the agency's own payday and school / exam dates for the countries of these clients.

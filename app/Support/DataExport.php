@@ -52,9 +52,9 @@ class DataExport
         return $f == floor($f) && $dp <= 2 ? (string) (int) round($f) : rtrim(rtrim(number_format($f, $dp, '.', ''), '0'), '.');
     }
 
-    protected static function money(mixed $v): string
+    protected static function money(mixed $v, ?string $cur = null): string
     {
-        return number_format((float) $v, abs((float) $v) < 1 && (float) $v != 0 ? 3 : 2, '.', '');
+        return number_format((float) $v, ResultResolver::decimals((float) $v, $cur), '.', ''); // DS-24
     }
 
     protected static function networkName(?string $key): string
@@ -109,14 +109,14 @@ class DataExport
             }
             array_push($cells, static::networkName($r->network), $r->account_name ?? '', $r->account_ext ?? '', $r->campaign_ref_name ?? $r->campaign_name ?? '', $r->currency ?? '');
             if ($withSpend) {
-                $cells[] = static::money($r->spend);
+                $cells[] = static::money($r->spend, $r->currency);
             }
             array_push($cells, static::num($r->impressions), static::num($r->reach), static::num($r->link_clicks), static::num($r->clicks),
                 static::num($r->results), ResultResolver::label($r->result_type ?: 'conversion', $lang));
             if ($withSpend) {
-                $cells[] = (float) $r->results > 0 ? static::money((float) $r->spend / (float) $r->results) : '';
+                $cells[] = (float) $r->results > 0 ? static::money((float) $r->spend / (float) $r->results, $r->currency) : '';
             }
-            array_push($cells, static::num($r->leads), static::num($r->messages), static::num($r->calls), static::num($r->calls_confirmed), static::num($r->calls_20s), static::num($r->purchases), static::money($r->revenue));
+            array_push($cells, static::num($r->leads), static::num($r->messages), static::num($r->calls), static::num($r->calls_confirmed), static::num($r->calls_20s), static::num($r->purchases), static::money($r->revenue, $r->currency));
             static::row($out, $cells);
             $n++;
         }

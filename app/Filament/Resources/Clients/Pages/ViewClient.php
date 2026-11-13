@@ -40,6 +40,7 @@ use App\Support\PlanGate;
 use App\Support\SeasonReview;
 use App\Support\TeamRoles;
 use App\Support\WhatsAppReport;
+use App\Support\WorkingDays;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Filament\Actions\Action;
@@ -513,7 +514,8 @@ class ViewClient extends ViewRecord
             'from' => $from, 'to' => $to,
             'periods' => Periods::options(),
             't' => $t,
-            'prev' => MetricsQuery::totals($c, $pf, $pt),
+            'prev' => $prevTotals = MetricsQuery::totals($c, $pf, $pt),
+            'workdays' => WorkingDays::compare(MarketDates::countryOf($c), $from, $to, $pf, $pt, $t, $prevTotals), // DS-26 (R5)
             'months' => MetricsQuery::monthly($c, 6),
             'level' => $level,
             'rows' => MetricsQuery::breakdown($c, $from, $to, $level, $this->adSet ?: $this->campaign),

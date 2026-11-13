@@ -59,8 +59,8 @@ class CriticalPush
         foreach (DB::table('push_held')->select('user_id', 'agency_id')->distinct()->get() as $row) {
             $u = User::find($row->user_id);
             $a = Agency::find($row->agency_id);
-            if (! $u || ! $a || static::isQuiet($u, $a, $now)) {
-                continue;
+            if (! $u || ! $a || static::isQuiet($u, $a, $now) || PrayerWindows::now($a, $now)) {
+                continue; // WK-12 (D-308): the catch-up summary is not urgent, so it also waits for prayer to end
             }
             $ids = DB::table('push_held')->where('user_id', $u->id)->where('agency_id', $a->id)->pluck('alert_id');
             DB::table('push_held')->where('user_id', $u->id)->where('agency_id', $a->id)->delete();

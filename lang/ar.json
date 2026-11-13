@@ -2746,5 +2746,18 @@
     "Separator": "الفاصل",
     "Hijri month": "الشهر الهجري",
     "Year and month (YYYYMM)": "السنة والشهر (YYYYMM)",
-    "Use as utm_campaign": "استخدمه في utm_campaign"
+    "Use as utm_campaign": "استخدمه في utm_campaign",
+    "This period has :a working days, the previous one :b. Per working day:": "في هذه الفترة :a يوم عمل، وفي السابقة :b. لكل يوم عمل:",
+    "spend": "الإنفاق",
+    "expected": "متوقع",
+    "confirmed": "مؤكد",
+    "Hold non-urgent pushes during Friday prayer and Taraweeh": "أجّل الإشعارات غير العاجلة وقت صلاة الجمعة والتراويح",
+    "Approximate times: Friday 11:30–13:30, and 20:00–22:30 in Ramadan. Critical alerts still arrive.": "أوقات تقريبية: الجمعة 11:30–13:30، و20:00–22:30 في رمضان. التنبيهات الحرجة تصل دائمًا.",
+    "Holiday status": "حالة المناسبات",
+    "Hijri dates are calculated and shown as expected. When a country announces the moon sighting, set the first day, mark it confirmed and add the source. Every calendar, pacing hint and season review uses it.": "تُحسب التواريخ الهجرية وتظهر «متوقعة». عند إعلان رؤية الهلال، حدّد اليوم الأول واجعلها «مؤكدة» وأضف المصدر. تستخدمها كل التقاويم وتلميحات الوتيرة ومراجعات المواسم.",
+    "Holiday": "المناسبة",
+    "First day": "اليوم الأول",
+    "Calculated": "المحسوب",
+    "Expected": "متوقع",
+    "Confirmed": "مؤكد"
 }

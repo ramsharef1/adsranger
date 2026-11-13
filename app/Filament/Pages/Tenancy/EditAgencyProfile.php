@@ -70,6 +70,10 @@ class EditAgencyProfile extends EditTenantProfile
             Section::make(__('Ramadan hours'))->description(__('During Ramadan the daily summary comes after iftar, and push quiet hours move to 03:00–12:00 for members who kept the default. It switches on and off by itself from the Ramadan dates.'))
                 ->columns(2)->schema([
                     Toggle::make('ramadan_hours')->label(__('Use Ramadan hours'))->default(true)->formatStateUsing(fn ($state): bool => $state === null || (bool) $state),
+                    // WK-12 (R5, D-308): fixed approximate windows; Critical alerts still send.
+                    Toggle::make('prayer_quiet')->label(__('Hold non-urgent pushes during Friday prayer and Taraweeh'))->default(true)
+                        ->formatStateUsing(fn ($state): bool => $state === null || (bool) $state)
+                        ->helperText(__('Approximate times: Friday 11:30–13:30, and 20:00–22:30 in Ramadan. Critical alerts still arrive.')),
                     Select::make('ramadan_digest_at')->label(__('Daily summary time in Ramadan'))->options(RamadanHours::digestTimes())->default(RamadanHours::DEFAULT_DIGEST)
                         ->formatStateUsing(fn ($state): string => $state ?: RamadanHours::DEFAULT_DIGEST),
                 ]),

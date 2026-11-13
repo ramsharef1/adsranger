@@ -61,6 +61,8 @@ return [
         'anghami' => 'Anghami Ads', 'shahid' => 'Shahid (MBC)', 'osn' => 'OSN+', 'telegram' => 'Telegram Ads',
         'arabclicks' => 'ArabClicks', 'publisher' => 'Arabic publisher (other)', 'other' => 'Other network',
     ],
+    // DS-24 (R5): currencies with 3 minor digits; shown and exported with 3 decimals everywhere.
+    'three_decimal_currencies' => ['KWD', 'BHD', 'OMR', 'JOD', 'TND', 'LYD'],
     'verticals' => [
         'clinic' => 'Clinic / medical', 'charity' => 'Charity / NGO', 'ecommerce' => 'E-commerce', 'real_estate' => 'Real estate',
         'education' => 'Education', 'restaurant' => 'Restaurant / food', 'beauty' => 'Beauty / salon', 'automotive' => 'Automotive',

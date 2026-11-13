@@ -55,6 +55,14 @@
             </div>
         @endforeach
     </div>
+    {{-- DS-26 (R5): the two periods have different numbers of working days, so compare per working day too. --}}
+    @if ($workdays)
+        <div data-working-days style="{{ $muted }};margin-top:-4px">
+            {{ __('This period has :a working days, the previous one :b. Per working day:', ['a' => $workdays['days_now'], 'b' => $workdays['days_before']]) }}
+            @unless ($client->hide_spend){{ __('spend') }} {{ R::money($workdays['spend_now'], $cur) }}@if ($workdays['spend_pct'] !== null) (<bdi dir="ltr">{{ ($workdays['spend_pct'] > 0 ? '+' : '').$workdays['spend_pct'] }}%</bdi>)@endif · @endunless
+            {{ __('results') }} {{ number_format($workdays['results_now'], 1) }}@if ($workdays['results_pct'] !== null) (<bdi dir="ltr">{{ ($workdays['results_pct'] > 0 ? '+' : '').$workdays['results_pct'] }}%</bdi>)@endif
+        </div>
+    @endif
 
     @php [$pl, $pc] = \App\Support\Pacing::label($pace['status']); @endphp
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">

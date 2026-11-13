@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\Client;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /** MENA calendar with Hijri dates (#40), seasonality from a client's own history, and the Ramadan / Eid scenario planner (#96). */
 class MenaCalendar
@@ -111,11 +112,41 @@ class MenaCalendar
             }
         }
 
+        // DS-25 (R5): Hijri dates are "expected" until /admin marks them confirmed (with the announced first day).
+        $statuses = static::statuses();
+        foreach ($out as &$e) {
+            if ($e['kind'] !== 'hijri') {
+                $e['status'] = 'fixed';
+
+                continue;
+            }
+            $e['calc_start'] = $e['start'];
+            $s = $statuses[$e['key'].'|'.substr($e['start'], 0, 4)] ?? null;
+            if ($s && $s->status === 'confirmed' && $s->start_date) {
+                $shift = Carbon::parse($e['start'])->diffInDays(Carbon::parse($s->start_date), false);
+                $e['start'] = Carbon::parse($s->start_date)->toDateString();
+                $e['end'] = Carbon::parse($e['end'])->addDays((int) $shift)->toDateString();
+            }
+            $e['status'] = $s->status ?? 'expected';
+            $e['source'] = $s->source ?? null;
+        }
+        unset($e);
+
         $out = array_values(array_filter($out, fn ($e) => $e['end'] >= $from && $e['start'] <= $to
             && (! $market || ! $e['markets'] || in_array($market, $e['markets'], true))));
         usort($out, fn ($a, $b) => $a['start'] <=> $b['start']);
 
         return $out;
+    }
+
+    /** @return array<string, object> "key|year" → holiday_statuses row */
+    public static function statuses(): array
+    {
+        try {
+            return DB::table('holiday_statuses')->get()->keyBy(fn ($r) => $r->event_key.'|'.$r->year)->all();
+        } catch (\Throwable) {
+            return [];
+        }
     }
 
     protected static function row(string $key, array $e, string $start, string $kind, array $markets, bool $estimated): array

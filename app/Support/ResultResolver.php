@@ -49,6 +49,7 @@ class ResultResolver
 
     /**
      * One Meta insights row → metric columns.
+     *
      * @param  array  $row  insights row (spend, impressions, reach, clicks, inline_link_clicks, actions, action_values, video_thruplay_watched_actions)
      */
     public static function meta(array $row, string $type): array
@@ -108,6 +109,7 @@ class ResultResolver
 
     /**
      * Google Ads campaign-day: metrics + per-action rows.
+     *
      * @param  array  $base  ['cost_micros','impressions','clicks','conversions','conversions_value']
      * @param  array  $actions  list of ['name','category','conversions','value']
      */
@@ -220,13 +222,22 @@ class ResultResolver
         return $locale === 'ar' ? $l[1] : $l[0];
     }
 
-    /** Costs under 1 show 3 decimals. */
+    /** DS-24: KWD, BHD, OMR, JOD, TND and LYD always show 3 decimals; other costs under 1 show 3 too. */
+    public static function decimals(?float $v, ?string $cur = null): int
+    {
+        if ($cur && in_array(strtoupper($cur), config('adsranger.three_decimal_currencies', []), true)) {
+            return 3;
+        }
+
+        return $v !== null && abs($v) < 1 && $v != 0 ? 3 : 2;
+    }
+
     public static function money(?float $v, ?string $cur = null): string
     {
         if ($v === null) {
             return '–';
         }
-        $s = number_format($v, abs($v) < 1 && $v != 0 ? 3 : 2);
+        $s = number_format($v, static::decimals($v, $cur));
 
         return $cur ? $s.' '.$cur : $s;
     }
