@@ -10,6 +10,7 @@ use App\Filament\Resources\Clients\Pages\ViewClient;
 use App\Models\AdAccount;
 use App\Models\Client;
 use App\Models\DailyMetric;
+use App\Support\Arabic\Phrases;
 use App\Support\CallResults;
 use App\Support\ClientSetupScore;
 use App\Support\HealthScore;
@@ -85,6 +86,9 @@ class ClientResource extends Resource
                 Select::make('status')->label(__('Status'))->options(['active' => __('Active'), 'paused' => __('Paused'), 'archived' => __('Archived')])->default('active')->required(),
                 Select::make('vertical')->options(config('adsranger.verticals'))->searchable(),
                 Select::make('market')->label(__('Main market'))->options(config('adsranger.countries'))->searchable()->default($agency?->country),
+                // XS-16 (R5): one dialect per client; empty = from the market.
+                Select::make('dialect')->label(__('Dialect'))->options(Phrases::dialectLabels())->placeholder(__('From the main market'))
+                    ->helperText(__('Used for phrases, ad line variants and AI drafts for this client.')),
                 Select::make('currency')->options($cur)->default($agency?->currency ?? 'USD')->required()
                     ->helperText(__('Results and spend are shown in this currency. Accounts in other currencies are converted with daily rates.')),
                 Toggle::make('hide_spend')->label(__('Hide spend from this client'))->helperText(__('For client links and reports.'))->inline(false),

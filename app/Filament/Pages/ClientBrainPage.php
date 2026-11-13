@@ -18,6 +18,7 @@ use App\Support\AiWorkspace\OwnKey;
 use App\Support\AiWorkspace\Playbooks;
 use App\Support\AiWorkspace\PromptLibrary;
 use App\Support\AiWorkspace\StyleNotes;
+use App\Support\Arabic\Phrases;
 use App\Support\CurrentClient;
 use App\Support\PlanGate;
 use App\Support\TeamRoles;
@@ -101,6 +102,7 @@ class ClientBrainPage extends Page
     {
         $client = $this->client();
         $this->scope = $client ? AiScope::allowed($client) : [];
+        $this->boxDialect = Phrases::dialectOf($client); // XS-16 (R5)
     }
 
     protected function clients(): Collection

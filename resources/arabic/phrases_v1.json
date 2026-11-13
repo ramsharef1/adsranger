@@ -1,0 +1,372 @@
+{
+ "version": 1,
+ "status": "draft",
+ "note": "E1 draft set (D-307). Growth replaces or approves; until then every phrase shows as a draft.",
+ "phrases": [
+  {
+   "id": 1,
+   "kind": "cta",
+   "sector": "general",
+   "season": "any",
+   "dialect": "msa",
+   "text": "احجز موعدك الآن"
+  },
+  {
+   "id": 2,
+   "kind": "cta",
+   "sector": "general",
+   "season": "any",
+   "dialect": "gulf",
+   "text": "احجز موعدك الحين"
+  },
+  {
+   "id": 3,
+   "kind": "cta",
+   "sector": "general",
+   "season": "any",
+   "dialect": "levantine",
+   "text": "احجز موعدك هلّق"
+  },
+  {
+   "id": 4,
+   "kind": "cta",
+   "sector": "general",
+   "season": "any",
+   "dialect": "egyptian",
+   "text": "احجز معادك دلوقتي"
+  },
+  {
+   "id": 5,
+   "kind": "cta",
+   "sector": "ecommerce",
+   "season": "any",
+   "dialect": "msa",
+   "text": "اطلب الآن"
+  },
+  {
+   "id": 6,
+   "kind": "cta",
+   "sector": "ecommerce",
+   "season": "any",
+   "dialect": "gulf",
+   "text": "اطلب الحين"
+  },
+  {
+   "id": 7,
+   "kind": "cta",
+   "sector": "ecommerce",
+   "season": "any",
+   "dialect": "levantine",
+   "text": "اطلب هلّق"
+  },
+  {
+   "id": 8,
+   "kind": "cta",
+   "sector": "ecommerce",
+   "season": "any",
+   "dialect": "egyptian",
+   "text": "اطلب دلوقتي"
+  },
+  {
+   "id": 9,
+   "kind": "cta",
+   "sector": "general",
+   "season": "any",
+   "dialect": "msa",
+   "text": "تواصل معنا عبر واتساب"
+  },
+  {
+   "id": 10,
+   "kind": "cta",
+   "sector": "general",
+   "season": "any",
+   "dialect": "gulf",
+   "text": "كلّمنا على الواتساب"
+  },
+  {
+   "id": 11,
+   "kind": "cta",
+   "sector": "general",
+   "season": "any",
+   "dialect": "levantine",
+   "text": "احكي معنا على واتساب"
+  },
+  {
+   "id": 12,
+   "kind": "cta",
+   "sector": "general",
+   "season": "any",
+   "dialect": "egyptian",
+   "text": "كلّمنا على واتساب"
+  },
+  {
+   "id": 13,
+   "kind": "cta",
+   "sector": "real_estate",
+   "season": "any",
+   "dialect": "msa",
+   "text": "احجز معاينتك"
+  },
+  {
+   "id": 14,
+   "kind": "cta",
+   "sector": "real_estate",
+   "season": "any",
+   "dialect": "gulf",
+   "text": "احجز زيارتك للمشروع"
+  },
+  {
+   "id": 15,
+   "kind": "cta",
+   "sector": "education",
+   "season": "any",
+   "dialect": "msa",
+   "text": "سجّل الآن"
+  },
+  {
+   "id": 16,
+   "kind": "cta",
+   "sector": "education",
+   "season": "any",
+   "dialect": "gulf",
+   "text": "سجّل الحين واحجز مقعدك"
+  },
+  {
+   "id": 17,
+   "kind": "cta",
+   "sector": "education",
+   "season": "any",
+   "dialect": "egyptian",
+   "text": "احجز مكانك دلوقتي"
+  },
+  {
+   "id": 18,
+   "kind": "cta",
+   "sector": "restaurant",
+   "season": "any",
+   "dialect": "msa",
+   "text": "اطلب وجبتك الآن"
+  },
+  {
+   "id": 19,
+   "kind": "cta",
+   "sector": "restaurant",
+   "season": "any",
+   "dialect": "gulf",
+   "text": "اطلب وجبتك الحين"
+  },
+  {
+   "id": 20,
+   "kind": "cta",
+   "sector": "beauty",
+   "season": "any",
+   "dialect": "msa",
+   "text": "احجزي موعدك الآن"
+  },
+  {
+   "id": 21,
+   "kind": "cta",
+   "sector": "beauty",
+   "season": "any",
+   "dialect": "gulf",
+   "text": "احجزي موعدك الحين"
+  },
+  {
+   "id": 22,
+   "kind": "cta",
+   "sector": "clinic",
+   "season": "any",
+   "dialect": "msa",
+   "text": "احجز استشارتك اليوم"
+  },
+  {
+   "id": 23,
+   "kind": "offer",
+   "sector": "general",
+   "season": "ramadan",
+   "dialect": "msa",
+   "text": "عروض رمضان لفترة محدودة"
+  },
+  {
+   "id": 24,
+   "kind": "offer",
+   "sector": "general",
+   "season": "ramadan",
+   "dialect": "gulf",
+   "text": "عروض رمضان وصلت"
+  },
+  {
+   "id": 25,
+   "kind": "offer",
+   "sector": "general",
+   "season": "ramadan",
+   "dialect": "levantine",
+   "text": "عروض رمضان بلّشت"
+  },
+  {
+   "id": 26,
+   "kind": "offer",
+   "sector": "general",
+   "season": "ramadan",
+   "dialect": "egyptian",
+   "text": "عروض رمضان بدأت"
+  },
+  {
+   "id": 27,
+   "kind": "offer",
+   "sector": "general",
+   "season": "eid",
+   "dialect": "msa",
+   "text": "عرض العيد"
+  },
+  {
+   "id": 28,
+   "kind": "offer",
+   "sector": "general",
+   "season": "eid",
+   "dialect": "gulf",
+   "text": "عيدكم مبارك، وعروضنا أحلى"
+  },
+  {
+   "id": 29,
+   "kind": "offer",
+   "sector": "general",
+   "season": "eid",
+   "dialect": "egyptian",
+   "text": "كل سنة وأنت طيب، وعروض العيد مستنياك"
+  },
+  {
+   "id": 30,
+   "kind": "offer",
+   "sector": "ecommerce",
+   "season": "white_friday",
+   "dialect": "msa",
+   "text": "خصومات الجمعة البيضاء"
+  },
+  {
+   "id": 31,
+   "kind": "offer",
+   "sector": "ecommerce",
+   "season": "white_friday",
+   "dialect": "gulf",
+   "text": "خصومات الجمعة البيضاء بدأت"
+  },
+  {
+   "id": 32,
+   "kind": "offer",
+   "sector": "general",
+   "season": "national_day",
+   "dialect": "msa",
+   "text": "عروض اليوم الوطني"
+  },
+  {
+   "id": 33,
+   "kind": "offer",
+   "sector": "education",
+   "season": "back_to_school",
+   "dialect": "msa",
+   "text": "جاهزون للعودة إلى المدارس؟"
+  },
+  {
+   "id": 34,
+   "kind": "offer",
+   "sector": "general",
+   "season": "any",
+   "dialect": "msa",
+   "text": "خصم لفترة محدودة"
+  },
+  {
+   "id": 35,
+   "kind": "offer",
+   "sector": "general",
+   "season": "any",
+   "dialect": "gulf",
+   "text": "الكمية محدودة، الحق على العرض"
+  },
+  {
+   "id": 36,
+   "kind": "offer",
+   "sector": "general",
+   "season": "any",
+   "dialect": "levantine",
+   "text": "العرض لفترة محدودة، لا تفوّته"
+  },
+  {
+   "id": 37,
+   "kind": "offer",
+   "sector": "general",
+   "season": "any",
+   "dialect": "egyptian",
+   "text": "العرض لفترة محدودة، متفوّتهوش"
+  },
+  {
+   "id": 38,
+   "kind": "offer",
+   "sector": "ecommerce",
+   "season": "any",
+   "dialect": "msa",
+   "text": "توصيل مجاني داخل المدينة"
+  },
+  {
+   "id": 39,
+   "kind": "offer",
+   "sector": "ecommerce",
+   "season": "any",
+   "dialect": "msa",
+   "text": "الدفع عند الاستلام"
+  },
+  {
+   "id": 40,
+   "kind": "offer",
+   "sector": "ecommerce",
+   "season": "any",
+   "dialect": "gulf",
+   "text": "الدفع عند الاستلام، والتوصيل سريع"
+  },
+  {
+   "id": 41,
+   "kind": "offer",
+   "sector": "clinic",
+   "season": "any",
+   "dialect": "msa",
+   "text": "الاستشارة الأولى مجانًا"
+  }
+ ],
+ "swaps": {
+  "gulf": {
+   "الآن": "الحين",
+   "تريد": "تبغى",
+   "ماذا": "وش",
+   "لماذا": "ليش",
+   "جدًا": "مرّة",
+   "كثيرًا": "وايد",
+   "أيضًا": "بعد"
+  },
+  "levantine": {
+   "الآن": "هلّق",
+   "تريد": "بدك",
+   "ماذا": "شو",
+   "لماذا": "ليش",
+   "جدًا": "كتير",
+   "كثيرًا": "كتير",
+   "أيضًا": "كمان"
+  },
+  "egyptian": {
+   "الآن": "دلوقتي",
+   "تريد": "عايز",
+   "ماذا": "إيه",
+   "لماذا": "ليه",
+   "جدًا": "أوي",
+   "كثيرًا": "كتير",
+   "أيضًا": "كمان"
+  },
+  "maghrebi": {
+   "الآن": "دابا",
+   "تريد": "بغيتي",
+   "ماذا": "واش",
+   "لماذا": "علاش",
+   "جدًا": "بزاف",
+   "كثيرًا": "بزاف"
+  }
+ }
+}

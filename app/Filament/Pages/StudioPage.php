@@ -2,17 +2,17 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Concerns\FollowsCurrentClient;
+use App\Filament\Concerns\HeldBackModule;
 use App\Filament\Concerns\TranslatesPageLabels;
 use App\Models\AuditLog;
 use App\Models\BrandKit;
 use App\Models\Client;
 use App\Models\CreativeAsset;
 use App\Models\CreativeBrief;
-use App\Support\Trial;
+use App\Support\Arabic\Phrases;
 use App\Support\StudioCopyGenerator;
 use App\Support\TeamRoles;
-use App\Filament\Concerns\HeldBackModule;
+use App\Support\Trial;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
@@ -127,7 +127,8 @@ class StudioPage extends Page
         $this->primaryColor = $kit?->primary_color ?: '#14B8A6';
         $this->headingFont = $kit?->heading_font ?: 'IBM Plex Sans Arabic';
         $this->tone = $kit?->tone ?: 'professional';
-        $this->defaultDialect = $kit?->default_dialect ?: 'gulf';
+        $own = Phrases::dialectOf($c); // XS-16 (R5): the client's dialect when the kit has none
+        $this->defaultDialect = $kit?->default_dialect ?: (array_key_exists($own, StudioCopyGenerator::DIALECTS) ? $own : 'msa');
         $this->dialect = $this->defaultDialect;
         $this->bannedWordsInput = implode(', ', (array) ($kit?->banned_words ?? []));
         $this->generateDraft();

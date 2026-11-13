@@ -54,6 +54,7 @@ class Shell
         Pages\InsightsPage::class => 'ads',
         Pages\LandingPagesPage::class => 'ads',
         Pages\UtmBuilderPage::class => 'ads',
+        Pages\ArabicPhrasesPage::class => 'ads',
         Pages\LaunchCheckPage::class => 'ads',
         Pages\StudioPage::class => 'ads',
         Pages\AgencyOpsHubPage::class => 'ads',
