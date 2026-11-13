@@ -13,6 +13,7 @@ use App\Http\Controllers\ReachLandingController;
 use App\Http\Controllers\ReachPortalController;
 use App\Http\Controllers\ReachPostbackController;
 use App\Http\Controllers\ReachServeController;
+use App\Http\Controllers\ReachToolController;
 use App\Http\Controllers\ReportUnsubscribeController;
 use App\Http\Controllers\StudioBriefController;
 use App\Http\Middleware\PublicTrailingSlash;
@@ -172,6 +173,10 @@ Route::middleware([ReachEnabled::class])->group(function () {
         Route::post('/reach/portal/settings', [ReachPortalController::class, 'settings']);
         Route::post('/reach/portal/wallet/{action}', [ReachPortalController::class, 'wallet'])->where('action', 'early-cashout|withdraw|ad-credit');
     });
+    // R-3: free AI crawler checker (config seo_tools.module_gated): noindex, never in the sitemap, menus or /tools hub.
+    Route::get('/tools/'.ReachToolController::SLUG, [ReachToolController::class, 'show'])->defaults('lang', 'ar');
+    Route::get('/en/tools/'.ReachToolController::SLUG, [ReachToolController::class, 'show'])->defaults('lang', 'en');
+    Route::post('/tools/'.ReachToolController::SLUG.'/run', [ReachToolController::class, 'run'])->middleware(['throttle:30,1', ToolAbuseGuard::class]);
 });
 // XS-13 / XS-23 (R4, D-306): no-login lead page for a client's front desk (module lead_desk).
 Route::get('/l/{token}', [LeadDeskController::class, 'show'])->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{40}');

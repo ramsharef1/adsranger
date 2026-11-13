@@ -37,6 +37,13 @@ return [
         // all 12 Wave A.2 tools published by Rami, 2026-11-12 (D-250)
     ],
 
+    // Tools that belong to a held-back module (FR-REACH R-3): slug => module. They answer only while that module is on
+    // (404 otherwise), always send noindex, and are never in `tools`, so never in the sitemap, the menus, the /tools hub,
+    // the share cards or /llms.txt. Their routes live with the module (routes/web.php, ReachEnabled group).
+    'module_gated' => [
+        'ai-crawler-revenue-checker' => 'reach',
+    ],
+
     // Our own hosts, pinned to the server's public IP for SafeFetcher: the VPS resolves adsranger.com to ::1 in its hosts
     // file, which the SSRF guard (rightly) refuses. Only these exact hosts are mapped; every other host goes through DNS.
     'own_hosts' => [
