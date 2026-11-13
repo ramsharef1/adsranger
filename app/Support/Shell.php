@@ -31,9 +31,11 @@ class Shell
         Pages\PacingBoard::class => 'today',
         Pages\MenaCalendarPage::class => 'today',
         Pages\ClientCalendarPage::class => 'today',
+        Pages\RamadanReadinessPage::class => 'today',
 
         Resources\Clients\ClientResource::class => 'clients',
         Pages\CompareClients::class => 'clients',
+        Pages\MeetingPrepPage::class => 'clients',
         Pages\AccountAuditPage::class => 'clients',
         Resources\DataImports\DataImportResource::class => 'clients',
         Pages\ImportReviewPage::class => 'clients',

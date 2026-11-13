@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Clients\Pages;
 
 use App\Filament\Pages\ExportData;
+use App\Filament\Pages\MeetingPrepPage;
 use App\Filament\Resources\Clients\ClientResource;
 use App\Models\AdSet;
 use App\Models\Alert;
@@ -105,6 +106,9 @@ class ViewClient extends ViewRecord
                     MonthNotes::save($this->record, $data['month'], $data['done'] ?? null, $data['next'] ?? null, auth()->id());
                     Notification::make()->title(__('Saved. It will appear in that month\'s report.'))->success()->send();
                 }),
+            // XS-07 / PX-39 (R4): meeting prep page with presentation mode.
+            Action::make('meetingPrep')->label(__('Meeting prep'))->icon('heroicon-o-presentation-chart-bar')->color('gray')
+                ->url(fn () => MeetingPrepPage::getUrl(['client' => $this->record->id])),
             // XS-08 (R4): the period's summary as text ready for WhatsApp, Arabic and English (no AI, no AdsRanger name).
             Action::make('copyWhatsApp')->label(__('Copy as WhatsApp message'))->icon('heroicon-o-clipboard-document')->color('gray')
                 ->modalSubmitAction(false)->modalCancelActionLabel(__('Close'))
