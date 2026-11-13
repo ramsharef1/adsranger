@@ -30,6 +30,7 @@ class Shell
         Resources\Alerts\AlertResource::class => 'today',
         Pages\PacingBoard::class => 'today',
         Pages\MenaCalendarPage::class => 'today',
+        Pages\ClientCalendarPage::class => 'today',
 
         Resources\Clients\ClientResource::class => 'clients',
         Pages\CompareClients::class => 'clients',

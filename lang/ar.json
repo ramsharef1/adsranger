@@ -2571,5 +2571,16 @@
     "Expires on (optional)": "ينتهي في (اختياري)",
     "Licence saved.": "حُفظ الترخيص.",
     "Licences": "التراخيص",
-    "Remove this licence?": "إزالة هذا الترخيص؟"
+    "Remove this licence?": "إزالة هذا الترخيص؟",
+    "Season": "موسم",
+    "Campaign ends": "تنتهي حملة",
+    "Report goes out": "يُرسل تقرير",
+    "Follow-up": "متابعة",
+    "Licence expires": "ينتهي ترخيص",
+    "Client resumes": "يُستأنف العميل",
+    "Back from pause": "يعود من الإيقاف",
+    "Client calendar": "تقويم العملاء",
+    "Show": "اعرض",
+    "Nothing on the calendar for this period.": "لا شيء في التقويم لهذه الفترة.",
+    "Next :n day|Next :n days": "{0} اليوم|{1} اليوم التالي|{2} اليومان التاليان|[3,10] الأيام :n التالية|[11,*] الـ :n يومًا التالية"
 }
