@@ -14,6 +14,7 @@ use App\Support\Reach\OfferImporter;
 use App\Support\Reach\Reach;
 use App\Support\Reach\TextCleanCode;
 use App\Support\Reach\Wallet;
+use App\Support\Seo\ToolCopy;
 use BackedEnum;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -78,6 +79,12 @@ class ReachControlBoard extends Page
     public function getTitle(): string|Htmlable
     {
         return __('reach_ui.admin.title');
+    }
+
+    /** On-page heading: the Latin product name sits in <bdi> inside Arabic. */
+    public function getHeading(): string|Htmlable
+    {
+        return ToolCopy::html(__('reach_ui.admin.title'), app()->getLocale() === 'ar');
     }
 
     public function importCsv(): void

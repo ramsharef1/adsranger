@@ -213,7 +213,11 @@ class ReachR1Test extends TestCase
             $this->assertDoesNotMatchRegularExpression('/(?<![\x{0600}-\x{06FF}])[وبلك]\x{0640}?(?=[A-Za-z:<])/u', $v, "joined letter in reach_ui.$k");
             $this->assertDoesNotMatchRegularExpression('/[٠-٩]/u', $v, "Eastern digit in reach_ui.$k");
         }
-        $this->assertCount(5, explode('|', $ar['admin.cleared']), 'Arabic plural needs {0}|{1}|{2}|[3,10]|[11,*]');
+        foreach (array_filter($ar, fn ($v) => str_starts_with($v, '{0}')) as $k => $v) {
+            $this->assertCount(5, explode('|', $v), "reach_ui.$k: Arabic plural needs {0}|{1}|{2}|[3,10]|[11,*]");
+            $this->assertStringContainsString('|[3,10] ', $v, "reach_ui.$k");
+            $this->assertStringContainsString('|[11,*] ', $v, "reach_ui.$k");
+        }
         app()->setLocale('en');
         $this->assertSame('Reach', __('Reach'), 'the Meta "Reach" metric label must not load a Reach lang group');
         app()->setLocale('ar');
