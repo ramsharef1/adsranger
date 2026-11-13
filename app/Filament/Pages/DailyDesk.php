@@ -6,10 +6,12 @@ use App\Connectors\ConnectorRegistry;
 use App\Filament\Concerns\TranslatesPageLabels;
 use App\Jobs\SyncAdAccount;
 use App\Models\AdAccount;
+use App\Models\AiBrainItem;
 use App\Models\Alert;
 use App\Models\Client;
 use App\Support\CurrentClient;
 use App\Support\MetricsQuery;
+use App\Support\Modules;
 use App\Support\Periods;
 use BackedEnum;
 use Filament\Facades\Filament;
@@ -90,9 +92,25 @@ class DailyDesk extends Page
         $rows = $clients->map(fn (Client $c) => ['client' => $c, 't' => MetricsQuery::totals($c, $from, $to), 'alerts' => $alerts[$c->id] ?? collect()]);
         $synced = AdAccount::where('agency_id', $a->id)->where('is_active', true)->max('last_synced_at');
 
+        // EG-26 (R7): the night shift's findings from the last 24 h, one card per item, with useful / not useful (FS-08).
+        $night = (Modules::on('ai_workspace', null, $a) || Modules::isPreviewAgency($a))
+            ? AiBrainItem::where('agency_id', $a->id)->where('playbook', 'night_shift')->whereIn('client_id', $clients->pluck('id'))
+                ->where('created_at', '>=', now()->subDay())->latest()->limit(12)->get()
+                ->reject(fn (AiBrainItem $i) => isset($i->meta['feedback']))->values()
+            : collect();
+
         return [
             'from' => $from, 'rows' => $rows, 'synced' => $synced ? Carbon::parse($synced) : null,
-            'tz' => $tz,
+            'tz' => $tz, 'night' => $night, 'clientNames' => $clients->pluck('name', 'id'),
         ];
+    }
+
+    /** FS-08: the member says whether a night-shift item helped; kept in the item, counted per level on the night shift page. */
+    public function nightFeedback(int $id, bool $useful): void
+    {
+        $a = Filament::getTenant();
+        $item = AiBrainItem::where('agency_id', $a->id)->where('playbook', 'night_shift')->findOrFail($id);
+        abort_unless(Client::visibleTo(auth()->user(), $a)->whereKey($item->client_id)->exists(), 403);
+        $item->forceFill(['meta' => array_merge($item->meta ?? [], ['feedback' => $useful ? 'useful' : 'not_useful', 'feedback_by' => auth()->id()])])->save();
     }
 }

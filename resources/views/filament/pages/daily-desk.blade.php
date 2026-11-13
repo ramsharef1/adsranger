@@ -6,6 +6,25 @@
 @endphp
 <x-filament-panels::page>
     @include('filament.partials.onboarding-checklist')
+    @if ($night->isNotEmpty())
+        {{-- EG-26 / FS-08: overnight AI notes on the agency's own key; read-only suggestions. --}}
+        <x-filament::section :heading="__('Night shift notes')" data-night-notes>
+            <x-slot name="description">{{ __('Written overnight by your own AI from your data. Suggestions only; nothing was changed.') }}</x-slot>
+            <div style="display:grid;gap:10px">
+                @foreach ($night as $n)
+                    <div style="display:grid;gap:4px;padding-bottom:8px;border-bottom:1px solid rgba(148,163,184,.2)" wire:key="nn-{{ $n->id }}">
+                        <div style="font-size:12px;opacity:.7"><bdi>{{ $clientNames[$n->client_id] ?? '' }}</bdi> · {{ ['critical' => __('Critical'), 'warning' => __('Warning')][$n->meta['level'] ?? ''] ?? __('Info') }}</div>
+                        <strong><bdi>{{ $n->title }}</bdi></strong>
+                        <div style="font-size:13px;white-space:pre-line" dir="auto">{{ $n->clean ?? $n->original }}</div>
+                        <div style="display:flex;gap:8px">
+                            <x-filament::button size="xs" color="gray" wire:click="nightFeedback({{ $n->id }}, true)">{{ __('Useful') }}</x-filament::button>
+                            <x-filament::button size="xs" color="gray" wire:click="nightFeedback({{ $n->id }}, false)">{{ __('Not useful') }}</x-filament::button>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </x-filament::section>
+    @endif
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between">
         <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
             <button type="button" wire:click="setDay('yesterday')" style="{{ $pill($day === 'yesterday') }}">{{ __('Yesterday') }}</button>

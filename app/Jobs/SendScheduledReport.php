@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Mail\ScheduledReportMail;
 use App\Models\ReportSchedule;
 use App\Models\ReportSend;
+use App\Support\AiWorkspace\ReportMemory;
 use App\Support\Modules;
 use App\Support\MonthlyReport;
 use App\Support\Ops\Lanes;
@@ -88,6 +89,7 @@ class SendScheduledReport implements ShouldQueue
 
         if ($sent) {
             $s->forceFill(['last_sent_at' => now()])->saveQuietly();
+            ReportMemory::remember($s->client, $this->kind, $this->period);
             if ($s->agency) {
                 Webhooks::fire($s->agency, 'report.sent', ['client' => $s->client->name, 'kind' => $this->kind,
                     'period' => $this->period, 'recipients' => $sent], $s->client_id);

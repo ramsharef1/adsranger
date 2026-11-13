@@ -2368,5 +2368,21 @@
     "An AI key is at 80% of its monthly cap": "مفتاح ذكاء اصطناعي بلغ 80% من حده الشهري",
     ":provider key: :spent of :cap USD used this month. At the cap, AI requests on this key stop until next month.": "مفتاح :provider: استُخدم :spent من :cap USD هذا الشهر. عند بلوغ الحد تتوقف الطلبات على هذا المفتاح حتى الشهر القادم.",
     "What AI sees": "ما يراه الذكاء الاصطناعي",
-    "AI connector": "ربط الذكاء الاصطناعي"
+    "AI connector": "ربط الذكاء الاصطناعي",
+    "Where the numbers come from (:n)": "من أين جاءت الأرقام (:n)",
+    "Night shift notes": "ملاحظات العمل الليلي",
+    "Written overnight by your own AI from your data. Suggestions only; nothing was changed.": "كتبها ذكاؤك ليلًا من بياناتك. اقتراحات فقط، ولم يتغير شيء.",
+    "Useful": "مفيدة",
+    "Not useful": "غير مفيدة",
+    "Your team on the last 30 days of notes": "رأي فريقك في ملاحظات آخر 30 يومًا",
+    "useful :u · not useful :n": "مفيدة :u · غير مفيدة :n",
+    "Many notes were not useful. Try fewer clients or a stricter brief.": "كثير من الملاحظات لم تكن مفيدة. جرّب عددًا أقل من العملاء أو تعليمات أدق.",
+    "Tools your AI can call": "الأدوات التي يستطيع ذكاؤك استدعاءها",
+    "Every tool is read or save only; none changes an ad account. Switch off a tool and every AI connected to this workspace loses it.": "كل الأدوات للقراءة أو الحفظ فقط، ولا تغيّر أي حساب إعلاني. إذا أوقفت أداة فقدها كل ذكاء مربوط بمساحة العمل هذه.",
+    "Off (switch on)": "متوقفة (شغّلها)",
+    "On (switch off)": "تعمل (أوقفها)",
+    "Last calls": "آخر الاستدعاءات",
+    "Refused": "مرفوض",
+    "No calls yet. Once your AI uses a tool, it shows here, so you can see the connection works.": "لا استدعاءات بعد. عندما يستخدم ذكاؤك أداة تظهر هنا، فتعرف أن الربط يعمل.",
+    "AI connector tool calls": "استدعاءات أدوات ربط الذكاء الاصطناعي"
 }

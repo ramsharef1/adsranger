@@ -38,6 +38,7 @@ return [
         'failed_jobs' => 30,
         'notifications_read' => 90,
         'ai_night_runs' => 90,
+        'ai_tool_calls' => 30,
         'missing_pages' => 180,
         'job_runs_errors' => 90,
     ],

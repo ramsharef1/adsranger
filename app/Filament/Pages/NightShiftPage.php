@@ -118,7 +118,12 @@ class NightShiftPage extends Page
             ->whereBetween('created_at', [$last->started_at, $last->finished_at ?? now()])->get()
             ->sortBy(fn ($i) => array_search($i->meta['level'] ?? 'info', ['critical', 'warning', 'info'], true))->values() : collect();
 
-        return ['full' => $this->full(), 'runs' => $runs, 'last' => $last, 'items' => $items, 'keys' => AiKey::where('agency_id', $agency->getKey())->get(),
+        // FS-08: what members said about the last 30 days of night-shift notes, by level.
+        $feedback = AiBrainItem::where('agency_id', $agency->getKey())->where('playbook', 'night_shift')->where('created_at', '>=', now()->subDays(30))->get()
+            ->filter(fn ($i) => isset($i->meta['feedback']))->groupBy(fn ($i) => $i->meta['level'] ?? 'info')
+            ->map(fn ($g) => ['useful' => $g->where('meta.feedback', 'useful')->count(), 'not' => $g->where('meta.feedback', 'not_useful')->count()]);
+
+        return ['full' => $this->full(), 'runs' => $runs, 'last' => $last, 'items' => $items, 'feedback' => $feedback, 'keys' => AiKey::where('agency_id', $agency->getKey())->get(),
             'clients' => Client::visibleTo(auth()->user(), $agency)->orderBy('name')->get(), 'canManage' => $this->canManage(),
             'isOwner' => TeamRoles::isOwner(auth()->user(), $agency), 'tz' => $agency->timezone ?: 'UTC'];
     }

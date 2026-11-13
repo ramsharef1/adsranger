@@ -36,6 +36,7 @@ class Prune
         $del('failed_jobs', 'failed_jobs', fn ($q) => $q->where('failed_at', '<', now()->subDays((int) ($days['failed_jobs'] ?? 30))));
         $del('notifications', 'notifications', fn ($q) => $q->whereNotNull('read_at')->where('read_at', '<', now()->subDays((int) ($days['notifications_read'] ?? 90))));
         $del('ai_night_runs', 'ai_night_runs', fn ($q) => $q->where('created_at', '<', now()->subDays((int) ($days['ai_night_runs'] ?? 90))));
+        $del('ai_tool_calls', 'ai_tool_calls', fn ($q) => $q->where('created_at', '<', now()->subDays((int) ($days['ai_tool_calls'] ?? 30))));
         $del('missing_pages', 'missing_pages', fn ($q) => $q->where('ignored', false)->where('last_seen_at', '<', now()->subDays((int) ($days['missing_pages'] ?? 180))));
 
         PlatformSetting::put(self::LAST_KEY, ['at' => now()->toIso8601String(), 'deleted' => $out]);
@@ -53,6 +54,7 @@ class Prune
             ['what' => __('Failed queue jobs'), 'keep' => __(':n days', ['n' => $d['failed_jobs'] ?? 30])],
             ['what' => __('Read notifications'), 'keep' => __(':n days', ['n' => $d['notifications_read'] ?? 90])],
             ['what' => __('AI night shift run logs'), 'keep' => __(':n days', ['n' => $d['ai_night_runs'] ?? 90])],
+            ['what' => __('AI connector tool calls'), 'keep' => __(':n days', ['n' => $d['ai_tool_calls'] ?? 30])],
             ['what' => __('404 paths no one visits'), 'keep' => __(':n days after the last visit', ['n' => $d['missing_pages'] ?? 180])],
             ['what' => __('Server log files'), 'keep' => __(':n weekly files', ['n' => config('ops.log_keep', 8)])],
             ['what' => __('Customer data and the audit log'), 'keep' => __('not pruned here (workspace purge stays manual)')],

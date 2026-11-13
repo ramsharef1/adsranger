@@ -68,6 +68,12 @@
 
     <section style="{{ $card }}">
         <h3 style="font-size:15px;font-weight:700;margin:0">{{ __('Run log') }}</h3>
+        @if ($feedback->isNotEmpty())
+            <p style="{{ $muted }}" data-night-feedback>{{ __('Your team on the last 30 days of notes') }}:
+                @foreach ($feedback as $level => $f){{ ['critical' => __('Critical'), 'warning' => __('Warning')][$level] ?? __('Info') }} {{ __('useful :u · not useful :n', ['u' => $f['useful'], 'n' => $f['not']]) }}@if (! $loop->last) · @endif @endforeach
+                @if ($feedback->sum('not') >= 5) · <strong>{{ __('Many notes were not useful. Try fewer clients or a stricter brief.') }}</strong>@endif
+            </p>
+        @endif
         @forelse ($runs as $r)
             <div style="font-size:13px;border-top:1px solid rgba(148,163,184,.2);padding-top:6px">
                 <time datetime="{{ $r->started_at->toIso8601String() }}">{{ $fmt($r->started_at) }}</time> ·

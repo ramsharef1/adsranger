@@ -68,7 +68,8 @@ class Brain
             'url' => $type === 'chat_link' ? static::safeUrl($data['url'] ?? null) : null,
             'ai_provider' => $data['ai'] ?? null, 'playbook' => $data['playbook'] ?? null, 'playbook_version' => $data['playbook_version'] ?? null,
             'state' => $state, 'score' => $gate['score'], 'band' => $gate['band'], 'blocking' => $gate['blocking'], 'checks' => $gate['checks'],
-            'meta' => isset($data['meta']) && is_array($data['meta']) ? $data['meta'] : null,
+            // FS-03: where each number in the saved text came from.
+            'meta' => array_filter((isset($data['meta']) && is_array($data['meta']) ? $data['meta'] : []) + ['sources' => $gate['sources'] ?? []]) ?: null,
             'cleanup' => ['hidden' => $clean['hidden'], 'generic' => $clean['generic'], 'actions' => $clean['actions'], 'no_fix' => $clean['no_fix'],
                 'fixed' => $gate['fixed'], 'suggested' => $gate['suggested']],
         ]);

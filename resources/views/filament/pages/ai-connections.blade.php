@@ -59,4 +59,28 @@
             @endforeach
         </div>
     @endif
+    {{-- WS-10 / FS-10: what an external AI can call, a switch per tool, and the last calls. --}}
+    <x-filament::section :heading="__('Tools your AI can call')" data-tool-catalogue>
+        <x-slot name="description">{{ __('Every tool is read or save only; none changes an ad account. Switch off a tool and every AI connected to this workspace loses it.') }}</x-slot>
+        <div style="display:grid;gap:8px">
+            @foreach ($tools as $name => $t)
+                <div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;border-bottom:1px solid rgba(148,163,184,.2);padding-bottom:6px">
+                    <div style="min-width:0"><bdi dir="ltr" style="font-weight:600">{{ $name }}</bdi><div style="font-size:12.5px;opacity:.75" dir="ltr">{{ \Illuminate\Support\Str::limit($t['description'], 160) }}</div></div>
+                    @if ($canManage)
+                        <x-filament::button size="xs" :color="$t['off'] ? 'danger' : 'gray'" wire:click="toggleTool('{{ $name }}')">{{ $t['off'] ? __('Off (switch on)') : __('On (switch off)') }}</x-filament::button>
+                    @else
+                        <span style="font-size:12.5px">{{ $t['off'] ? __('Off') : __('On') }}</span>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+        @if ($canManage)
+            <h4 style="font-size:14px;margin:14px 0 6px">{{ __('Last calls') }}</h4>
+            @forelse ($toolCalls as $c)
+                <div style="font-size:12.5px"><bdi dir="ltr">{{ \Illuminate\Support\Carbon::parse($c->created_at)->timezone($tz)->format('Y-m-d H:i') }}</bdi> · <bdi dir="ltr">{{ $c->tool }}</bdi>@if ($c->client_id) · <bdi>{{ $clientNames[$c->client_id] ?? '#'.$c->client_id }}</bdi>@endif · <span style="{{ $c->status < 400 ? 'color:#0d9488' : 'color:#dc2626' }}">{{ $c->status < 400 ? __('OK') : __('Refused') }}</span></div>
+            @empty
+                <p style="font-size:13px;opacity:.75;margin:0">{{ __('No calls yet. Once your AI uses a tool, it shows here, so you can see the connection works.') }}</p>
+            @endforelse
+        @endif
+    </x-filament::section>
 </x-filament-panels::page>

@@ -178,6 +178,19 @@
                         <div style="font-size:14px;line-height:1.8" dir="auto">{!! nl2br(e($item->clean ?? $item->original)) !!}</div>
                     @endif
 
+                    {{-- FS-03: where each number came from. --}}
+                    @if (! empty($item->meta['sources']))
+                        <details data-sources style="font-size:12.5px">
+                            <summary style="cursor:pointer;min-height:32px">{{ __('Where the numbers come from (:n)', ['n' => count($item->meta['sources'])]) }}</summary>
+                            <ul style="margin:4px 0 0;padding-inline-start:18px">
+                                @foreach ($item->meta['sources'] as $src)
+                                    <li>{!! $ltr($src['raw']) !!} ← {{ __($src['label']) }} · {!! $ltr($src['period']) !!} · {{ $src['source'] }}@if ($src['date']) · {!! $ltr($src['date']) !!}@endif</li>
+                                @endforeach
+                            </ul>
+                        </details>
+                    @endif
+                    @if (! empty($item->meta['redacted']))<div style="{{ $muted }};font-size:12.5px">{{ __('Personal data hidden before sending: :n', ['n' => $item->meta['redacted']]) }}</div>@endif
+
                     <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:12.5px">
                         @if (! empty($c['actions']))<span>✓ {{ __('Actionable') }}</span>@endif
                         @if (($c['no_fix'] ?? false) && in_array($item->type, ['output', 'learning'], true))<span>⚠ {{ __('No fix found') }}</span>@endif

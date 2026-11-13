@@ -100,7 +100,7 @@ class WhatsAppReport
     }
 
     /** @return array{0:string,1:string} */
-    protected static function periodRange(string $kind, string $period, string $tz): array
+    public static function periodRange(string $kind, string $period, string $tz): array
     {
         if ($kind === 'monthly' && preg_match('/^\d{4}-\d{2}$/', $period)) {
             $start = CarbonImmutable::createFromFormat('Y-m-d', $period.'-01', $tz)->startOfMonth();

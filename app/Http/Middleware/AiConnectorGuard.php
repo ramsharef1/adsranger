@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Support\AiWorkspace\Connector;
 use App\Support\AiWorkspace\FreePlan;
+use App\Support\AiWorkspace\ToolCatalogue;
 use App\Support\Modules;
 use Closure;
 use Illuminate\Http\Request;
@@ -52,10 +53,29 @@ class AiConnectorGuard
         if ($this->isToolCall($request) && $calls >= FreePlan::dailyCap($connection->agency)) {
             return $this->refuse(429, 'Daily limit reached for this AI connection. It resets at midnight, workspace time.');
         }
+        // FS-10: a tool the workspace switched off is refused before it runs.
+        $tool = $this->isToolCall($request) ? (string) $request->json('params.name', '') : null;
+        if ($tool !== null && ToolCatalogue::off($connection->agency, $tool)) {
+            ToolCatalogue::log($connection->agency, $connection->id, $tool, $this->clientId($request), 403);
+
+            return $this->refuse(403, 'This tool is switched off for this workspace in AdsRanger › AI Workspace › Connections.');
+        }
         $connection->forceFill(['last_call_at' => now(), 'calls_day' => $today, 'calls_today' => $calls + ($this->isToolCall($request) ? 1 : 0)])->save();
         $request->attributes->set('ai_connection', $connection);
 
-        return $next($request);
+        $response = $next($request);
+        if ($tool !== null) {
+            ToolCatalogue::log($connection->agency, $connection->id, $tool, $this->clientId($request), $response->getStatusCode());
+        }
+
+        return $response;
+    }
+
+    protected function clientId(Request $request): ?int
+    {
+        $id = $request->json('params.arguments.client_id');
+
+        return is_numeric($id) ? (int) $id : null;
     }
 
     protected function isToolCall(Request $request): bool

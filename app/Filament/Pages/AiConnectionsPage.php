@@ -6,6 +6,7 @@ use App\Filament\Concerns\HeldBackModule;
 use App\Filament\Concerns\TranslatesPageLabels;
 use App\Models\AiConnection;
 use App\Models\Client;
+use App\Support\AiWorkspace\ToolCatalogue;
 use App\Support\TeamRoles;
 use BackedEnum;
 use Filament\Facades\Filament;
@@ -68,6 +69,13 @@ class AiConnectionsPage extends Page
         Notification::make()->title(__('Connection restored.'))->success()->send();
     }
 
+    /** FS-10: switch one connector tool on / off for this workspace (owner + admins). */
+    public function toggleTool(string $tool): void
+    {
+        abort_unless($this->manager() && array_key_exists($tool, ToolCatalogue::tools()), 403);
+        ToolCatalogue::toggle(Filament::getTenant(), $tool);
+    }
+
     protected function getViewData(): array
     {
         $agency = Filament::getTenant();
@@ -76,6 +84,8 @@ class AiConnectionsPage extends Page
         $names = Client::where('agency_id', $agency->getKey())->pluck('name', 'id');
 
         return ['connections' => $connections, 'clientNames' => $names, 'url' => 'https://'.config('ai_workspace.mcp_host'),
-            'cap' => (int) config('ai_workspace.calls_per_day'), 'isOwner' => TeamRoles::isOwner(auth()->user(), $agency), 'tz' => $agency->timezone ?: 'UTC'];
+            'cap' => (int) config('ai_workspace.calls_per_day'), 'isOwner' => TeamRoles::isOwner(auth()->user(), $agency), 'tz' => $agency->timezone ?: 'UTC',
+            'tools' => collect(ToolCatalogue::tools())->map(fn ($d, $name) => ['description' => $d, 'off' => ToolCatalogue::off($agency, $name)])->all(),
+            'toolCalls' => $this->manager() ? ToolCatalogue::recent($agency) : [], 'canManage' => $this->manager()];
     }
 }

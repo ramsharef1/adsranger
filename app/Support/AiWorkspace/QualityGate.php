@@ -118,6 +118,7 @@ class QualityGate
         $band = $blocking ? 'blocked' : ($score >= 85 ? 'ready' : ($score >= 70 ? 'review' : 'blocked'));
 
         return ['text' => $text, 'score' => $score, 'band' => $band, 'blocking' => $blocking, 'client_facing' => (bool) ($opts['client_facing'] ?? false),
+            'sources' => static::provenance($text, $facts),
             'families' => $families, 'checks' => $checks,
             'fixed' => count(array_filter($checks, fn ($c) => $c['fix'] === 'auto')), 'suggested' => count(array_filter($checks, fn ($c) => $c['fix'] === 'suggest'))];
     }
@@ -151,20 +152,43 @@ class QualityGate
         return $out;
     }
 
+    /**
+     * FS-03: each metric number in the text with the fact it came from (label, period, source, date), so the UI can show
+     * where every number comes from. Numbers with no fact are left out here; Q1 already blocks them.
+     *
+     * @return list<array{raw: string, label: string, period: string, source: string, date: ?string}>
+     */
+    public static function provenance(string $text, array $facts): array
+    {
+        $out = [];
+        foreach (static::numbers($text) as $n) {
+            if ($f = static::match($n, $facts)) {
+                $out[$n['raw']] = ['raw' => $n['raw'], 'label' => (string) ($f['label'] ?? ''), 'period' => (string) ($f['period'] ?? ''), 'source' => (string) ($f['source'] ?? ''), 'date' => $f['date'] ?? null];
+            }
+        }
+
+        return array_values($out);
+    }
+
     /** A number matches a fact when it equals the fact rounded the way the text rounds it (or within 0.5 %). */
     protected static function known(array $n, array $facts): bool
+    {
+        return static::match($n, $facts) !== null;
+    }
+
+    protected static function match(array $n, array $facts): ?array
     {
         foreach ($facts as $f) {
             $v = (float) $f['value'];
             foreach ([$v, abs($v)] as $candidate) {
                 if (round($candidate, $n['decimals']) == round($n['value'], $n['decimals'])
                     || ($candidate != 0.0 && abs($candidate - $n['value']) / abs($candidate) <= 0.005)) {
-                    return true;
+                    return $f;
                 }
             }
         }
 
-        return false;
+        return null;
     }
 
     /** Arabic + English band label. */
