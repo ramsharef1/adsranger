@@ -21,6 +21,27 @@ class ClientUnitEconomic extends Model
             'bnpl_fee_pct' => 'float',
             'gateway_fee_pct' => 'float',
             'costs_entered_at' => 'datetime',
+            'store_orders_observed' => 'integer',
+            'store_cod_orders' => 'integer',
+            'store_cod_returned' => 'integer',
+            'store_rates_at' => 'datetime',
+        ];
+    }
+
+    /**
+     * E2-063: COD share and COD return rate observed from the store's own webhooks (null until an order was seen).
+     *
+     * @return array{orders: int, cod_share_pct: ?float, cod_return_rate_pct: ?float}
+     */
+    public function storeRates(): array
+    {
+        $orders = (int) $this->store_orders_observed;
+        $cod = (int) $this->store_cod_orders;
+
+        return [
+            'orders' => $orders,
+            'cod_share_pct' => $orders > 0 ? round($cod / $orders * 100, 1) : null,
+            'cod_return_rate_pct' => $cod > 0 ? round((int) $this->store_cod_returned / $cod * 100, 1) : null,
         ];
     }
 

@@ -114,6 +114,73 @@
             </x-filament::section>
         </div>
 
+        {{-- E2-063 store webhooks: a store shows "receiving" only after a signed event really arrived. --}}
+        @php
+            $storeNames = ['salla' => __('Salla'), 'zid' => __('Zid'), 'shopify' => 'Shopify'];
+            $storeStates = ['webhook_ready' => __('Waiting for the first signed event'), 'active' => __('Receiving events'), 'paused' => __('Paused')];
+            $storeTz = \Filament\Facades\Filament::getTenant()?->timezone ?: 'UTC';
+        @endphp
+        <div style="margin-top:14px">
+            <x-filament::section>
+                <x-slot name="heading">{{ __('Store orders and stock (webhooks)') }}</x-slot>
+                <p class="pah-muted" style="margin:0 0 10px">{{ __('Finished orders, returned cash-on-delivery orders and stock changes from the store update the product table and the observed COD rates below. Each event must carry the store\'s signature.') }}</p>
+                @forelse ($storeConnections as $sc)
+                    <div class="pah-row" style="flex-wrap:wrap;align-items:center;padding:8px 0">
+                        <div style="flex:1 1 260px;min-width:0">
+                            <strong>{!! $sc->platform === 'shopify' ? '<bdi dir="ltr">Shopify</bdi>' : e($storeNames[$sc->platform] ?? $sc->platform) !!}</strong> · <bdi dir="ltr">{{ $sc->store_identifier }}</bdi>
+                            <div class="pah-muted">{{ $storeStates[$sc->status] ?? $sc->status }}@if ($sc->last_event_at) · {{ __('Last event') }}: <bdi dir="ltr">{{ $sc->last_event_at->timezone($storeTz)->format('Y-m-d H:i') }}</bdi>@endif · {{ trans_choice('{0} no events|{1} one event|{2} two events|[3,10] :n events|[11,*] :n events', $sc->events_count, ['n' => $sc->events_count]) }}</div>
+                            @if ($canManageStores)
+                                <div class="pah-muted" style="word-break:break-all;margin-top:4px">{{ __('Receiver address') }}: <bdi dir="ltr"><code>{{ $sc->receiverUrl() }}</code></bdi></div>
+                            @endif
+                        </div>
+                        @if ($canManageStores)
+                            <div style="display:flex;gap:8px">
+                                <button type="button" class="pah-btn pah-btn-ghost" wire:click="toggleStoreConnection({{ $sc->id }})">{{ $sc->status === 'paused' ? __('Resume') : __('Pause') }}</button>
+                                <button type="button" class="pah-btn pah-btn-ghost" wire:click="deleteStoreConnection({{ $sc->id }})" wire:confirm="{{ __('Remove this store? Its events stay out of the hub from now on.') }}">{{ __('Remove') }}</button>
+                            </div>
+                        @endif
+                    </div>
+                @empty
+                    <p class="pah-muted">{{ __('No store connected. Nothing is synced until a store sends a signed event.') }}</p>
+                @endforelse
+
+                <div class="pah-row" style="flex-wrap:wrap;padding:10px 0 0;margin-top:8px">
+                    <div style="flex:1 1 260px">
+                        <strong>{{ __('Observed from the store') }}</strong>
+                        @if ($storeRates['orders'] > 0)
+                            <div class="pah-muted">{{ trans_choice('{1} one finished order|{2} two finished orders|[3,10] :n finished orders|[11,*] :n finished orders', $storeRates['orders'], ['n' => number_format($storeRates['orders'])]) }} · {{ __('COD share') }}: <bdi dir="ltr">{{ $storeRates['cod_share_pct'] !== null ? number_format($storeRates['cod_share_pct'], 1).'%' : '—' }}</bdi> · {{ __('COD return rate') }}: <bdi dir="ltr">{{ $storeRates['cod_return_rate_pct'] !== null ? number_format($storeRates['cod_return_rate_pct'], 1).'%' : '—' }}</bdi></div>
+                        @else
+                            <div class="pah-muted">{{ __('No finished orders received yet.') }}</div>
+                        @endif
+                    </div>
+                    @if ($canManageStores && $storeRates['orders'] >= $storeMinOrders)
+                        <button type="button" class="pah-btn pah-btn-ghost" wire:click="useStoreRates">{{ __('Use store rates') }}</button>
+                    @elseif ($storeRates['orders'] > 0)
+                        <span class="pah-muted">{{ __('Store rates can be used after :n finished orders.', ['n' => $storeMinOrders]) }}</span>
+                    @endif
+                </div>
+
+                @if ($canManageStores)
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:12px;font-size:13px">
+                        <label><span>{{ __('Store platform') }}</span>
+                            <select wire:model="storePlatform" class="pah-input">
+                                @foreach ($storeNames as $key => $name)<option value="{{ $key }}">{{ $name }}</option>@endforeach
+                            </select>
+                        </label>
+                        <label><span>{{ __('Store ID or domain') }}</span>
+                            <input type="text" wire:model="storeIdentifier" dir="ltr" class="pah-input" maxlength="191">
+                            @error('storeIdentifier')<span style="color:#b91c1c;font-size:12px">{{ $message }}</span>@enderror
+                        </label>
+                        <label><span>{{ __('Webhook signing secret from the store') }}</span>
+                            <input type="password" wire:model="storeSecret" dir="ltr" class="pah-input" autocomplete="off">
+                            @error('storeSecret')<span style="color:#b91c1c;font-size:12px">{{ $message }}</span>@enderror
+                        </label>
+                    </div>
+                    <button type="button" class="pah-btn pah-btn-solid" style="margin-top:10px" wire:click="addStoreConnection">{{ __('Add store') }}</button>
+                @endif
+            </x-filament::section>
+        </div>
+
         {{-- #194 WhatsApp click IDs + #196 / #197 products --}}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px">
             <x-filament::section>

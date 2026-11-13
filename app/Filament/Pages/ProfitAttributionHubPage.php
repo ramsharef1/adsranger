@@ -6,14 +6,17 @@ use App\Filament\Concerns\HeldBackModule;
 use App\Models\CapiBridgeEvent;
 use App\Models\Client;
 use App\Models\ClientCustomKpi;
+use App\Models\ClientStoreConnection;
 use App\Models\ClientUnitEconomic;
 use App\Support\Attribution\ProfitAndAttributionManager;
 use App\Support\Attribution\SafeFormulaEvaluator;
 use App\Support\CurrentClient;
+use App\Support\TeamRoles;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 class ProfitAttributionHubPage extends Page
@@ -104,6 +107,13 @@ class ProfitAttributionHubPage extends Page
     public string $posCsvInput = '';
 
     public ?array $posMatchSummary = null;
+
+    // E2-063 store webhooks (Salla / Zid / Shopify)
+    public string $storePlatform = 'salla';
+
+    public string $storeIdentifier = '';
+
+    public string $storeSecret = '';
 
     public function mount(): void
     {
@@ -378,6 +388,78 @@ class ProfitAttributionHubPage extends Page
         Notification::make()->title(__('Offline CSV matched in hash-only mode'))->success()->send();
     }
 
+    protected function canManageStores(): bool
+    {
+        return TeamRoles::canManageData(auth()->user(), Filament::getTenant());
+    }
+
+    /** E2-063: adds a store whose signed webhooks will feed this client. It stays "waiting" until a verified event arrives. */
+    public function addStoreConnection(): void
+    {
+        $client = $this->resolveSelectedClient();
+        if (! $client || ! $this->canManageStores()) {
+            return;
+        }
+        $this->validate([
+            'storePlatform' => ['required', 'in:'.implode(',', ClientStoreConnection::PLATFORMS)],
+            'storeIdentifier' => ['required', 'string', 'max:191'],
+            'storeSecret' => ['required', 'string', 'min:16', 'max:255'],
+        ]);
+        ClientStoreConnection::create([
+            'agency_id' => $client->agency_id,
+            'client_id' => $client->id,
+            'platform' => $this->storePlatform,
+            'store_identifier' => trim($this->storeIdentifier),
+            'webhook_secret' => trim($this->storeSecret),
+            'webhook_token' => Str::random(48),
+            'status' => 'webhook_ready',
+        ]);
+        $this->reset(['storeIdentifier', 'storeSecret']);
+        Notification::make()->title(__('Store added. Paste the receiver address in the store\'s webhook settings.'))->success()->send();
+    }
+
+    public function toggleStoreConnection(int $id): void
+    {
+        $connection = $this->storeConnection($id);
+        if (! $connection) {
+            return;
+        }
+        $connection->update(['status' => $connection->status === 'paused' ? ($connection->last_event_at ? 'active' : 'webhook_ready') : 'paused']);
+    }
+
+    public function deleteStoreConnection(int $id): void
+    {
+        $this->storeConnection($id)?->delete();
+    }
+
+    /** Copies the COD rates observed from the store into the agency's unit economics (the agency can still edit them). */
+    public function useStoreRates(): void
+    {
+        $client = $this->resolveSelectedClient();
+        if (! $client || ! $this->canManageStores()) {
+            return;
+        }
+        $econ = ClientUnitEconomic::where('agency_id', $client->agency_id)->where('client_id', $client->id)->first();
+        $rates = $econ?->storeRates();
+        if (! $rates || $rates['orders'] < (int) config('store_sync.min_orders_for_rates', 20)) {
+            return;
+        }
+        $econ->update(['cod_share_pct' => $rates['cod_share_pct'] ?? 0, 'cod_return_rate_pct' => $rates['cod_return_rate_pct'] ?? 0]);
+        $this->codSharePct = (float) ($rates['cod_share_pct'] ?? 0);
+        $this->codReturnRatePct = (float) ($rates['cod_return_rate_pct'] ?? 0);
+        Notification::make()->title(__('Store rates copied into the unit economics.'))->success()->send();
+    }
+
+    protected function storeConnection(int $id): ?ClientStoreConnection
+    {
+        $client = $this->resolveSelectedClient();
+        if (! $client || ! $this->canManageStores()) {
+            return null;
+        }
+
+        return ClientStoreConnection::where('agency_id', $client->agency_id)->where('client_id', $client->id)->find($id);
+    }
+
     public function getViewData(): array
     {
         $agency = Filament::getTenant();
@@ -434,6 +516,10 @@ class ProfitAttributionHubPage extends Page
             'activeMtaCredits' => $mtaModels[$this->activeMtaModel] ?? [],
             'customKpis' => $customKpis,
             'currency' => (string) ($client->currency ?: ''),
+            'storeConnections' => ClientStoreConnection::where('agency_id', $client->agency_id)->where('client_id', $client->id)->withCount('events')->orderBy('id')->get(),
+            'storeRates' => $econ?->storeRates() ?? ['orders' => 0, 'cod_share_pct' => null, 'cod_return_rate_pct' => null],
+            'storeMinOrders' => (int) config('store_sync.min_orders_for_rates', 20),
+            'canManageStores' => $this->canManageStores(),
         ];
     }
 }

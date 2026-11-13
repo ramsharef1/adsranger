@@ -15,6 +15,7 @@ use App\Http\Controllers\ReachPostbackController;
 use App\Http\Controllers\ReachServeController;
 use App\Http\Controllers\ReachToolController;
 use App\Http\Controllers\ReportUnsubscribeController;
+use App\Http\Controllers\StoreWebhookController;
 use App\Http\Controllers\StudioBriefController;
 use App\Http\Middleware\PublicTrailingSlash;
 use App\Http\Middleware\ReachEnabled;
@@ -232,6 +233,10 @@ Route::get('/survey/{token}', [PublicAttributionCollectorController::class, 'sho
     ->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{32,64}')->name('public.survey.show');
 Route::post('/survey/{token}', [PublicAttributionCollectorController::class, 'submitSurvey'])
     ->middleware('throttle:30,1')->where('token', '[A-Za-z0-9]{32,64}')->name('public.survey.submit');
+
+// E2-063: signed Salla / Zid / Shopify store webhooks into the profit hub (CSRF-exempt, 404 while intelligence_hub is off)
+Route::post('/webhooks/stores/{token}', [StoreWebhookController::class, 'receive'])
+    ->middleware('throttle:240,1')->where('token', '[A-Za-z0-9]{40,64}')->name('stores.webhook');
 
 // Wave 21 public growth pages (E2 `7c3df2e`) held back 2026-11-07 (D-168): the partner directory (view kept as
 // public/partners-held; /partners is now the P-25 design-partner page, D-219), case studies and
