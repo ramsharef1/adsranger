@@ -40,6 +40,7 @@ class AlertText
         '/^Cost per click up (\d+)%: (?<n1>.+)$/s' => 'ارتفاع تكلفة النقرة $1%: ~1',
         '/^Active campaign with 0 impressions: (?<n1>.+)$/s' => 'حملة نشطة دون أي ظهور: ~1',
         '/^No fresh data: (?<n1>.+)$/s' => 'لا بيانات حديثة: ~1',
+        '/^Exchange rate moved (\d+)%: (?<n1>.+)$/s' => 'تغيّر سعر الصرف بنسبة $1%: ~1',
     ];
 
     private const DETAILS = [
@@ -56,6 +57,8 @@ class AlertText
         '/^Campaign ends .+ \((\S+)\)\.$/s' => 'تنتهي الحملة في $1.',
         '/^Ad set ends .+ \((\S+)\)\.$/s' => 'تنتهي المجموعة الإعلانية في $1.',
         '/^Last upload (\d+) days ago\. Export the latest report from the ad platform and import it\.$/' => 'آخر رفع للبيانات قبل {days:$1}. صدّر أحدث تقرير من منصة الإعلانات واستورده.',
+        '/^1 ([A-Z]{3}) = ([\d.,]+) ([A-Z]{3}) now, ([\d.,]+) [A-Z]{3} on (\d{4}-\d{2}-\d{2})\. The monthly budget of ([\d.,]+) [A-Z]{3} now covers ([\d.,]+) [A-Z]{3} of spend instead of ([\d.,]+) [A-Z]{3}\.$/' => '1 $1 = $2 $3 الآن، و$4 $3 في $5. ميزانية الشهر $6 $3 تغطي الآن إنفاقًا قدره $7 $1 بدلًا من $8 $1.',
+        '/^1 ([A-Z]{3}) = ([\d.,]+) ([A-Z]{3}) now, ([\d.,]+) [A-Z]{3} on (\d{4}-\d{2}-\d{2})\.$/' => '1 $1 = $2 $3 الآن، و$4 $3 في $5.',
         '/^The connection needs attention: (?<n1>.+)$/s' => 'يحتاج الربط إلى مراجعة: ~1',
         '/^The access token expired on (\S+)\. Reconnect\.$/' => 'انتهت صلاحية رمز الوصول في $1. أعد الربط.',
         '/^Sync failed (\d+) times in a row: (?<n1>.+)$/s' => 'فشلت المزامنة {times:$1} متتالية: ~1',

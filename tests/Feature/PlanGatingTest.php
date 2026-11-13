@@ -77,7 +77,7 @@ class PlanGatingTest extends TestCase
         foreach (config('plan_features.pro_alert_rules') as $rule) {
             $this->assertArrayHasKey($rule, config('alerts.rules'), $rule);
         }
-        $this->assertCount(8, array_diff(array_keys(config('alerts.rules')), config('plan_features.pro_alert_rules')), '#23: 7 rules on Starter + the PS-08 upload reminder (D-296)');
+        $this->assertCount(9, array_diff(array_keys(config('alerts.rules')), config('plan_features.pro_alert_rules')), '#23: 7 rules on Starter + the PS-08 upload reminder (D-296) + FX drift (D-304)');
     }
 
     public function test_locked_page_shows_locked_state_with_upgrade_for_owner(): void

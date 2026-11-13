@@ -83,6 +83,9 @@ class AlertEngine
             if ($rules['high_cpc']['enabled'] ?? false) {
                 static::highCpc($c, $d, $rules['high_cpc'], $found);
             }
+            if ($rules['fx_drift']['enabled'] ?? false) {
+                static::fxDrift($c, $d, $rules['fx_drift'], $found);
+            }
         }
         if ($rules['zero_impressions']['enabled'] ?? false) {
             static::zeroImpressions($a, $d, $rules['zero_impressions'], $found);
@@ -224,6 +227,43 @@ class AlertEngine
                 'detail' => $lp->url.' — '.($offsite ? 'redirects to another site: '.mb_substr((string) $lp->final_url, 0, 200) : ($lp->error ?: 'HTTP '.$lp->status_code)).'.'
                     .($lp->down_since ? ' Down since '.$lp->down_since->format('Y-m-d H:i').' UTC.' : '').' Ads sent '.$lp->clicks_30d.' clicks here in 30 days.',
                 'payload' => ['status' => $lp->status_code, 'down_since' => $lp->down_since?->toIso8601String(), 'offsite' => $offsite]]);
+        }
+    }
+
+    /**
+     * FS-17 (R4, D-304): the client works in local money (budget, reports) but an ad account spends in another currency;
+     * the rate has moved by the threshold or more since the 1st of the month. Resolves itself when the move shrinks or the month turns.
+     */
+    protected static function fxDrift(Client $c, Carbon $d, array $r, array &$found): void
+    {
+        $local = strtoupper((string) ($c->currency ?: 'USD'));
+        $spendIn = DailyMetric::query()->where('client_id', $c->id)->where('date', '>=', $d->copy()->subDays(30)->toDateString())
+            ->where('spend', '>', 0)->whereNotNull('currency')->distinct()->pluck('currency')->map(fn ($x) => strtoupper($x))->reject(fn ($x) => $x === $local)->values();
+        if ($spendIn->isEmpty()) {
+            return;
+        }
+        $first = $d->copy()->startOfMonth()->toDateString();
+        $pct = (float) $r['t']['pct'];
+        foreach ($spendIn as $cur) {
+            $a = Fx::usdTo($cur, $first);
+            $b = Fx::usdTo($local, $first);
+            $a2 = Fx::usdTo($cur, $d->toDateString());
+            $b2 = Fx::usdTo($local, $d->toDateString());
+            if (! $a || ! $b || ! $a2 || ! $b2) {
+                continue; // no stored rates: say nothing rather than guess
+            }
+            $then = $b / $a;   // 1 unit of spend currency in local money on the 1st
+            $now = $b2 / $a2;  // … today
+            $move = ($now / $then - 1) * 100;
+            if (abs($move) < $pct) {
+                continue;
+            }
+            $budget = (float) ($c->monthly_budget ?? 0);
+            static::add($found, 'fx_drift', $r, ['client_id' => $c->id, 'entity_type' => 'client', 'entity_id' => $c->id, 'entity_name' => $c->name,
+                'title' => 'Exchange rate moved '.round(abs($move)).'%: '.$c->name,
+                'detail' => '1 '.$cur.' = '.number_format($now, 2).' '.$local.' now, '.number_format($then, 2).' '.$local.' on '.$first.'.'
+                    .($budget > 0 ? ' The monthly budget of '.number_format($budget, 2).' '.$local.' now covers '.number_format($budget / $now, 2).' '.$cur.' of spend instead of '.number_format($budget / $then, 2).' '.$cur.'.' : ''),
+                'payload' => ['spend_currency' => $cur, 'local' => $local, 'then' => round($then, 6), 'now' => round($now, 6), 'move_pct' => round($move, 1), 'since' => $first]]);
         }
     }
 

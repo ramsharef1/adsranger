@@ -26,11 +26,12 @@ class ProAlertRulesTest extends TestCase
         $starter = Agency::create(['name' => 'Starter Co', 'slug' => 'starter-co', 'plan' => 'starter', 'status' => 'active']);
         $rules = AlertEngine::rules($starter);
 
-        $this->assertCount(19, $rules); // + upload_stale (PS-08, D-296): a data-hygiene reminder on every plan
+        $this->assertCount(20, $rules); // + upload_stale (PS-08, D-296) and fx_drift (FS-17, D-304) on every plan
         $unlocked = collect($rules)->where('locked', false)->keys()->all();
         $locked = collect($rules)->where('locked', true)->keys()->all();
 
-        $this->assertCount(8, $unlocked);
+        $this->assertCount(9, $unlocked);
+        $this->assertContains('fx_drift', $unlocked);
         $this->assertContains('upload_stale', $unlocked);
         $this->assertCount(11, $locked);
         $this->assertContains('ctr_drop', $locked);

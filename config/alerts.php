@@ -22,6 +22,9 @@ return [
         // 11 Pro rules (#23)
         'pacing' => ['label' => 'Budget pacing', 'severity' => 'warning',
             'help' => 'From this day of the month: the month-end spend forecast is more than this % above or below the monthly budget.', 'thresholds' => ['pct' => 20, 'from_day' => 7]],
+        // FS-17 (R4, D-304): budget in local money, spend in another currency; the rate moved the month's budget by this % since the 1st.
+        'fx_drift' => ['label' => 'Exchange rate moved', 'severity' => 'warning',
+            'help' => 'The client\'s budget is in local money but its ad accounts spend in another currency, and the exchange rate has moved by at least this % since the 1st of the month.', 'thresholds' => ['pct' => 5]],
         // PS-08 (D-296): a client fed by uploads only, with no fresh upload for this many days (Desk + a phone reminder every 7 days).
         'upload_stale' => ['label' => 'No fresh upload', 'severity' => 'warning',
             'help' => 'A client with no live connection has had no new imported data for at least this many days.', 'thresholds' => ['days' => 7]],

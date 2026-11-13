@@ -161,6 +161,26 @@
         </div>
     @endif
 
+    {{-- FS-16 / XS-14 (R4, D-304): COD delivered orders, last 8 weeks --}}
+    @if ($cod)
+        <x-filament::section data-cod>
+            <x-slot name="heading">{{ __('Cash on delivery: delivered orders') }}</x-slot>
+            <x-slot name="description">{{ __('Last 8 weeks, from the counts your team entered. Ad spend is for the same weeks.') }}</x-slot>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+                <div><div style="{{ $muted }}">{{ __('Delivered') }}</div><strong>{{ number_format($cod['delivered']) }}</strong> <span style="{{ $muted }}">{{ __('of :n orders', ['n' => number_format($cod['placed'])]) }}</span></div>
+                <div><div style="{{ $muted }}">{{ __('Delivery rate') }}</div><strong>{{ $cod['delivery_rate'] !== null ? $cod['delivery_rate'].'%' : '–' }}</strong></div>
+                <div><div style="{{ $muted }}">{{ __('Cost per delivered order') }}</div><strong>{{ $cod['cost_per_delivered'] !== null ? R::money($cod['cost_per_delivered'], $cur) : '–' }}</strong></div>
+                <div><div style="{{ $muted }}">{{ __('Cost per order placed') }}</div><strong>{{ $cod['cost_per_placed'] !== null ? R::money($cod['cost_per_placed'], $cur) : '–' }}</strong></div>
+            </div>
+            <div style="overflow-x:auto;margin-top:10px">
+                <table style="width:100%;font-size:13px;border-collapse:collapse">
+                    <thead><tr><th style="text-align:start;padding:6px">{{ __('Week starting') }}</th><th style="text-align:start;padding:6px">{{ __('Campaign') }}</th><th style="text-align:end;padding:6px">{{ __('Delivered') }}</th><th style="text-align:end;padding:6px">{{ __('Returned') }}</th><th style="text-align:end;padding:6px">{{ __('Cancelled') }}</th></tr></thead>
+                    <tbody>@foreach ($codWeeks as $w)<tr style="border-top:1px solid rgba(148,163,184,.2)"><td style="padding:6px"><bdi>{{ $w->week_start->toDateString() }}</bdi></td><td style="padding:6px"><bdi>{{ $w->campaign?->name ?? __('All campaigns') }}</bdi></td><td style="padding:6px;text-align:end">{{ number_format($w->delivered) }}</td><td style="padding:6px;text-align:end">{{ number_format($w->returned) }}</td><td style="padding:6px;text-align:end">{{ number_format($w->cancelled) }}</td></tr>@endforeach</tbody>
+                </table>
+            </div>
+        </x-filament::section>
+    @endif
+
     {{-- XS-02 (R4): contact log --}}
     <x-filament::section data-contacts>
         <x-slot name="heading">{{ __('Contact log') }}</x-slot>

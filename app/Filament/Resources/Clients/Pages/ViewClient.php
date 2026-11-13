@@ -11,9 +11,11 @@ use App\Models\Campaign;
 use App\Models\Client;
 use App\Models\ClientContact;
 use App\Models\ClientLink;
+use App\Models\CodWeek;
 use App\Models\ReportSchedule;
 use App\Support\ClientFreeze;
 use App\Support\ClientSetupCopy;
+use App\Support\CodOutcomes;
 use App\Support\HealthScore;
 use App\Support\MetricsQuery;
 use App\Support\Modules;
@@ -29,6 +31,7 @@ use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -37,6 +40,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Utilities\Get;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 /** Client results: KPIs by goal, 6-month trend, campaigns → ad sets → ads drill-down, top ads. */
@@ -76,6 +80,48 @@ class ViewClient extends ViewRecord
                     ClientContact::where('client_id', $this->record->id)->whereNull('next_done_at')->whereNotNull('next_on')->where('next_on', '<=', $data['happened_on'])
                         ->update(['next_done_at' => now()]);
                     Notification::make()->title(__('Contact logged.'))->success()->send();
+                }),
+            // FS-16 / XS-14 (R4, D-304): COD outcomes as weekly counts, typed or from a sheet; no order IDs, no customer data.
+            Action::make('codWeek')->label(__('COD week'))->icon('heroicon-o-truck')->color('gray')
+                ->visible(fn () => TeamRoles::canManageData(auth()->user(), $this->record->agency))
+                ->modalDescription(__('Counts only: how many orders were delivered, returned and cancelled that week. No order numbers or customer details.'))
+                ->schema([
+                    DatePicker::make('week_start')->label(__('Week starting'))->required()->native(false)->default(now($this->record->agency?->timezone ?: 'UTC')->startOfWeek(CarbonInterface::SUNDAY)->toDateString()),
+                    Select::make('campaign_id')->label(__('Campaign (optional)'))->options(fn () => CodOutcomes::campaigns($this->record))->searchable()->placeholder(__('All campaigns')),
+                    TextInput::make('delivered')->label(__('Delivered'))->numeric()->integer()->minValue(0)->required()->default(0),
+                    TextInput::make('returned')->label(__('Returned'))->numeric()->integer()->minValue(0)->default(0),
+                    TextInput::make('cancelled')->label(__('Cancelled'))->numeric()->integer()->minValue(0)->default(0),
+                ])
+                ->action(function (array $data): void {
+                    CodOutcomes::save($this->record, $data['week_start'], ($data['campaign_id'] ?? null) ? (int) $data['campaign_id'] : null,
+                        (int) $data['delivered'], (int) ($data['returned'] ?? 0), (int) ($data['cancelled'] ?? 0), 'manual', auth()->user());
+                    Notification::make()->title(__('COD week saved.'))->success()->send();
+                }),
+            Action::make('codSheet')->label(__('Import COD sheet'))->icon('heroicon-o-table-cells')->color('gray')
+                ->visible(fn () => TeamRoles::canManageData(auth()->user(), $this->record->agency))
+                ->modalDescription(__('One row per week (and campaign, if you track it): Week start, Campaign (optional), Delivered, Returned, Cancelled. Arabic or English headers. No order numbers or customer details.'))
+                ->schema([
+                    FileUpload::make('file')->label(__('CSV or Excel file'))->disk('local')->directory('imports')->storeFileNamesIn('file_name')
+                        ->acceptedFileTypes(['text/csv', 'text/plain', 'application/csv', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
+                        ->maxSize(1024)->required(),
+                ])
+                ->action(function (array $data): void {
+                    $path = Storage::disk('local')->path($data['file']);
+                    try {
+                        $r = CodOutcomes::importFile($this->record, $path, (string) ($data['file_name'] ?? $data['file']), auth()->user());
+                    } finally {
+                        Storage::disk('local')->delete($data['file']);
+                    }
+                    if ($r['missing_columns']) {
+                        Notification::make()->title(__('The sheet needs a week start column and a delivered column.'))->danger()->send();
+
+                        return;
+                    }
+                    Notification::make()->title(__('COD weeks saved: :n', ['n' => $r['saved']]))
+                        ->body(collect([
+                            $r['skipped'] ? __('Rows without a valid date, skipped: :n', ['n' => $r['skipped']]) : null,
+                            $r['unknown_campaigns'] ? __('Campaign names not found, kept for the whole client: :names', ['names' => implode(', ', array_slice($r['unknown_campaigns'], 0, 5))]) : null,
+                        ])->filter()->implode(' · ') ?: null)->success()->send();
                 }),
             // XS-10 (R4, D-303): pause a client (alerts, scheduled reports, night shift stop; data kept), one click to resume.
             Action::make('pauseClient')->label(__('Pause client'))->icon('heroicon-o-pause-circle')->color('gray')
@@ -355,6 +401,8 @@ class ViewClient extends ViewRecord
             ],
             'top' => MetricsQuery::topAds($c, $from, $to),
             'alerts' => Alert::where('client_id', $c->id)->where('status', 'open')->latest()->limit(5)->get(),
+            'cod' => CodOutcomes::summary($c, now($c->agency?->timezone ?: 'UTC')->subWeeks(8)->toDateString(), now($c->agency?->timezone ?: 'UTC')->toDateString()),
+            'codWeeks' => CodWeek::with('campaign')->where('client_id', $c->id)->orderByDesc('week_start')->limit(8)->get(),
             'contacts' => ClientContact::with('user')->where('client_id', $c->id)->orderByDesc('happened_on')->orderByDesc('id')->limit(10)->get(),
             'synced' => MetricsQuery::lastSynced($c),
             'accounts' => $c->adAccounts()->with('network')->get(),
