@@ -33,7 +33,7 @@ class PublicCatalog
                 ],
                 'en' => [
                     'nav' => 'Features',
-                    'title' => 'Agency Ad Management & Arabic SEO Platform Features | AdsRanger',
+                    'title' => 'Ad Management & Arabic SEO Features for Agencies | AdsRanger',
                     'meta' => 'Explore what AdsRanger is building for MENA agencies: budget pacing, unified client reports, ad studio workflows, and Arabic search tools.',
                     'h1' => 'Features built for daily agency ad and search operations',
                     'lead' => 'AdsRanger brings budget pacing, cross-platform reporting, client approval links, and Arabic SEO checks into one workspace. In development · launching in 2027.',
@@ -113,7 +113,7 @@ class PublicCatalog
                 'en' => [
                     'nav' => 'Search & SEO',
                     'title' => 'Search Ads & Arabic SEO Tools for Agencies | AdsRanger',
-                    'meta' => 'Purpose-built Arabic keyword expansion, landing page SEO audits, and SERP pixel readiness checks for MENA marketing agencies.',
+                    'meta' => 'Arabic keyword ideas, page audits and search previews for agencies. Some are free tools you can use today; the workspace tools launch in 2027.',
                     'h1' => 'Search ad and SEO tools built around Arabic script and dialects',
                     'lead' => 'AdsRanger handles hamza variants, ta-marbuta endings, Arabizi queries, and RTL layout checks across search campaigns and landing page audits. In development · free tools live now.',
                     'cards' => [
@@ -268,6 +268,7 @@ class PublicCatalog
                 'related_path' => '/tools/serp-preview',
             ],
             'cpm' => [
+                'title_en' => 'What Is CPM (Cost per 1,000 Impressions)?', // O-394 fixed title (D-280)
                 'term_ar' => 'تكلفة الألف ظهور (CPM)',
                 'term_en' => 'Cost Per Mille / 1,000 Impressions (CPM)',
                 'def_ar' => 'تعبر تكلفة الألف ظهور عن السعر الذي يدفعه المعلن مقابل كل 1,000 مرة يظهر فيها الإعلان للجمهور المستهدف.',
@@ -411,6 +412,7 @@ class PublicCatalog
                 'related_path' => '/guides/meta-ads-mena',
             ],
             'lead-form' => [
+                'title_ar' => 'ما هو نموذج العملاء المحتملين (Lead Form)؟', // O-394 fixed title (D-280)
                 'term_ar' => 'نموذج العملاء المحتملين الفوري (Lead Form)',
                 'term_en' => 'Instant Lead Form',
                 'def_ar' => 'نموذج يفتح داخل المنصة الإعلانية نفسها ليسمح للمستخدم بإرسال اسمه ورقم هاتفه وبريده دون مغادرة التطبيق.',
@@ -477,6 +479,7 @@ class PublicCatalog
                 'related_path' => '/tools/arabic-keyword-generator',
             ],
             'negative-keywords' => [
+                'title_ar' => 'الكلمات المفتاحية السلبية (Negative Keywords)', // O-394 fixed title (D-280)
                 'term_ar' => 'الكلمات المفتاحية السلبية (Negative Keywords)',
                 'term_en' => 'Negative Keywords',
                 'def_ar' => 'كلمات أو عبارات تضيفها إلى حملة البحث لمنع ظهور إعلانك عندما يبحث المستخدم عن عبارات غير تجارية أو غير مرتبطة بخدمتك.',
@@ -488,6 +491,7 @@ class PublicCatalog
                 'related_path' => '/guides/google-ads-for-agencies',
             ],
             'match-types' => [
+                'title_ar' => 'ما أنواع مطابقة الكلمات المفتاحية (Match Types)؟', // O-394 fixed title (D-280)
                 'term_ar' => 'أنواع مطابقة الكلمات المفتاحية (Match Types)',
                 'term_en' => 'Keyword Match Types',
                 'def_ar' => 'الإعداد الذي يحدد مدى تقارب عبارة بحث المستخدم مع الكلمة المفتاحية المحددة في حملتك (مطابقة تامة، أو مطابقة عبارة، أو مطابقة واسعة).',
@@ -549,7 +553,7 @@ class PublicCatalog
                 'def_en' => 'The exact location where an ad appears—such as Stories, Reels, in-feed, search results, or display partner sites.',
                 'formula_ar' => 'مقاس Stories/Reels القياسي = 9:16 (1080×1920) · مقاس الموجز المربع = 1:1 (1080×1080)',
                 'formula_en' => 'Vertical Stories/Reels = 9:16 (1080x1920) · Feed Square = 1:1 (1080x1080)',
-                'example_ar' => 'توفير نسخة 9:16 مخصصة لمواضع القصص وReels يمنع اقتصاص النص العربي في حملة بميزانية 1,000 USD.',
+                'example_ar' => 'توفير نسخة 9:16 مخصصة لمواضع القصص ومقاطع Reels يمنع اقتصاص النص العربي في حملة بميزانية 1,000 USD.',
                 'example_en' => 'Supplying dedicated 9:16 assets for Stories and Reels prevents cropped Arabic headlines on a 1,000 USD campaign.',
                 'related_path' => '/studio',
             ],
@@ -565,6 +569,7 @@ class PublicCatalog
                 'related_path' => '/studio',
             ],
             'iftar-suhoor-scheduling' => [
+                'title_ar' => 'جدولة الإعلانات على وقت الإفطار والسحور', // O-394 fixed title (D-280)
                 'term_ar' => 'جدولة ساعات الإفطار والسحور (Iftar & Suhoor Scheduling)',
                 'term_en' => 'Iftar & Suhoor Ad Scheduling',
                 'def_ar' => 'تنظيم كثافة الظهور والعروض الإعلانية في شهر رمضان لتتوافق مع فترات تصفح الجمهور قبل الإفطار وفي المساء وحتى السحور.',
@@ -576,6 +581,7 @@ class PublicCatalog
                 'related_path' => '/blog/ramadan-ad-scheduling',
             ],
             'hijri-date' => [
+                'title_ar' => 'التقويم الهجري والميلادي في تخطيط المواسم', // O-394 fixed title (D-280)
                 'term_ar' => 'التقويم الهجري والميلادي في تخطيط المواسم (Hijri & Gregorian Dates)',
                 'term_en' => 'Hijri & Gregorian Seasonal Planning',
                 'def_ar' => 'مراعاة تقدم المواسم الهجرية (مثل رمضان وعيد الفطر وعيد الأضحى) بنحو 10 إلى 11 يومًا كل عام في التقويم الميلادي عند مقارنة الأداء السنوي.',
@@ -648,18 +654,18 @@ class PublicCatalog
                 'def_en' => 'The regional market spanning Gulf, Levant, and North African countries—requiring RTL Arabic support, multi-currency reporting, and Hijri calendar awareness.',
                 'formula_ar' => 'تخطيط حملات المنطقة يراعي: اللغة العربية (RTL) + عملة كل سوق (SAR, AED, JOD, EGP, KWD, QAR, USD) + تقويم المواسم',
                 'formula_en' => 'MENA Campaign Readiness = Arabic RTL + Local Currency Precision + Seasonal Calendar Alignment',
-                'example_ar' => 'وكالة تدير عملاء في عمّان والرياض ودبي تحتاج إلى متابعة الميزانيات بعملات JOD وSAR وAED وUSD معًا.',
+                'example_ar' => 'وكالة تدير عملاء في عمّان والرياض ودبي تحتاج إلى متابعة الميزانيات بعملات مختلفة معًا: JOD، SAR، AED، USD.',
                 'example_en' => 'An agency serving clients in Amman, Riyadh, and Dubai tracks budgets across JOD, SAR, AED, and USD.',
                 'related_path' => '/mena-calendar',
             ],
             'ad-network' => [
                 'term_ar' => 'المنصة الإعلانية (Ad Platform)',
                 'term_en' => 'Ad Platform',
-                'def_ar' => 'النظام الإعلاني الذي تُدار وتُشترى عبره المساحات الإعلانية، مثل Meta وGoogle Ads وTikTok وSnapchat وLinkedIn وMicrosoft Advertising وX.',
+                'def_ar' => 'النظام الإعلاني الذي تُدار وتُشترى عبره المساحات الإعلانية، مثل Meta، Google Ads، TikTok، Snapchat، LinkedIn، Microsoft Advertising، X.',
                 'def_en' => 'The advertising system where campaigns are bought and managed—such as Meta, Google Ads, TikTok, Snapchat, LinkedIn, Microsoft Advertising, and X.',
                 'formula_ar' => 'التقرير الموحد يجمع الإنفاق والنتائج عبر المنصات الإعلانية المفعلة لكل عميل',
                 'formula_en' => 'Unified Client Report = Sum of Normalized Spend & Objective Outcomes Across Connected Ad Platforms',
-                'example_ar' => 'جمع أداء حسابي Meta وGoogle Ads بميزانية إجمالية 10,000 USD في تقرير واحد يوفر على العميل فتح لوحتين منفصلتين.',
+                'example_ar' => 'جمع أداء حساب Meta وحساب Google Ads بميزانية إجمالية 10,000 USD في تقرير واحد يوفر على العميل فتح لوحتين منفصلتين.',
                 'example_en' => 'Combining 10,000 USD of Meta and Google Ads activity into one client report removes multi-tab confusion.',
                 'related_path' => '/integrations',
             ],
@@ -687,7 +693,7 @@ class PublicCatalog
         return [
             'eid-al-fitr-2027-campaign-checklist' => [
                 'title_ar' => 'قائمة التحقق لحملات عيد الفطر 2027 الإعلانية | AdsRanger',
-                'title_en' => 'Eid al-Fitr 2027 Ad Campaign Checklist for Agencies | AdsRanger',
+                'title_en' => 'Eid al-Fitr 2027 Ad Checklist for Agencies | AdsRanger',
                 'meta_ar' => 'خطوات عملية لوكالات الإعلان للتحضير لحملات عيد الفطر 2027 (المتوقع 9 أو 10 مارس 2027): توقيت العروض، مناوبات الفريق، وميزانية ما بعد العيد.',
                 'meta_en' => 'Practical agency checklist for Eid al-Fitr 2027 campaigns (expected 9 or 10 March 2027): offer cutoff times, holiday cover, and post-Eid pacing.',
                 'summary_ar' => 'دليل تشغيلي لتجهيز حملات عيد الفطر 2027 (المتوقع 9 أو 10 مارس 2027 حسب إعلان رؤية الهلال) دون هدر في ميزانيات الشحن أو التوصيل.',
@@ -706,7 +712,7 @@ class PublicCatalog
             ],
             'ramadan-budget-by-phase' => [
                 'title_ar' => 'توزيع ميزانية إعلانات رمضان 2027 على مراحل الشهر | AdsRanger',
-                'title_en' => 'How to Split a Ramadan 2027 Ad Budget Across 5 Phases | AdsRanger',
+                'title_en' => 'Split a Ramadan 2027 Ad Budget Across 5 Phases | AdsRanger',
                 'meta_ar' => 'مثال تطبيقي لتوزيع ميزانية عميل بقيمة 3,600 USD على مراحل رمضان الخمس من التحضير في يناير حتى عيد الفطر في مارس 2027.',
                 'meta_en' => 'Worked example showing how to allocate a 3,600 USD client budget across the 5 stages of Ramadan 2027, from January prep to Eid.',
                 'summary_ar' => 'كيف تقسّم ميزانية إعلانية شهرية (مثال تطبيقي: 3,600 USD) بين مرحلة التحضير وأسابيع الذروة والعشر الأواخر دون نفاد الرصيد مبكرًا.',
@@ -725,7 +731,7 @@ class PublicCatalog
             ],
             'ramadan-ad-scheduling' => [
                 'title_ar' => 'توقيت وجدولة إعلانات رمضان حسب ساعات الذروة | AdsRanger',
-                'title_en' => 'Ramadan Ad Scheduling Across Time Zones & Peak Hours | AdsRanger',
+                'title_en' => 'Ramadan Ad Scheduling: Time Zones and Peak Hours | AdsRanger',
                 'meta_ar' => 'دليل جدولة الحملات الإعلانية في رمضان بين ساعات النهار وما بعد الإفطار والسحور، مع الانتباه للمناطق الزمنية للحسابات الإعلانية.',
                 'meta_en' => 'How to manage Ramadan ad scheduling across daytime, post-Iftar, and Suhoor windows while verifying ad account time zones.',
                 'summary_ar' => 'إرشادات عملية لمطابقة جدولة الإعلانات مع المنطقة الزمنية لكل حساب إعلاني وسلوك الجمهور قبل الإفطار وبعده.',
@@ -759,7 +765,7 @@ class PublicCatalog
             ],
             'ramadan-client-report' => [
                 'title_ar' => 'ماذا يتضمن تقرير حملات رمضان للعميل؟ | AdsRanger',
-                'title_en' => 'What to Include in a Client Ramadan Campaign Report | AdsRanger',
+                'title_en' => 'What to Put in a Client\'s Ramadan Report | AdsRanger',
                 'meta_ar' => 'هيكل عملي لتقرير حملات رمضان للعملاء: ملخص الإنفاق والنتائج، مقارنة مراحل الشهر، والتوصيات لما بعد العيد.',
                 'meta_en' => 'How to structure a clear client Ramadan report covering spend pacing, results by phase, and post-Eid recommendations.',
                 'summary_ar' => 'كيف تقدم لعميلك تقريرًا واضحًا ومختصرًا يربط الإنفاق الإعلاني بالنتائج الفعلية خلال مراحل شهر رمضان.',
@@ -803,8 +809,8 @@ class PublicCatalog
     {
         return [
             'meta-ads-mena' => [
-                'title_ar' => 'دليل إعلانات Meta في الخليج والمنطقة (Facebook، Instagram) | AdsRanger',
-                'title_en' => 'Meta Ads (Facebook & Instagram) Guide for MENA Agencies | AdsRanger',
+                'title_ar' => 'دليل إعلانات Meta في الخليج والمنطقة | AdsRanger',
+                'title_en' => 'Meta Ads Guide for MENA Agencies | AdsRanger',
                 'meta_ar' => 'دليل شامل لوكالات الإعلان لإدارة حملات Meta في أسواق الخليج والمنطقة: هيكلة الحسابات، صياغة الإعلانات العربية، وحملات الرسائل والعملاء المحتملين.',
                 'meta_en' => 'Comprehensive agency guide to managing Meta Ads across Gulf and MENA markets: account structure, Arabic copy, messaging ads, and lead forms.',
                 'summary_ar' => 'إرشادات عملية لوكالات التسويق لإدارة حملات Meta على Facebook ومنصة Instagram في أسواق الخليج والمنطقة، من كتابة النصوص العربية إلى مراقبة التشبع الإعلاني.',
@@ -843,7 +849,7 @@ class PublicCatalog
                 'related_links' => ['/integrations/google-ads', '/tools/arabic-keyword-generator', '/tools/page-audit'],
             ],
             'snapchat-tiktok-ads-gulf' => [
-                'title_ar' => 'دليل إعلانات Snapchat ومنصة TikTok في السعودية والخليج | AdsRanger',
+                'title_ar' => 'دليل إعلانات Snapchat، TikTok في الخليج | AdsRanger',
                 'title_en' => 'Snapchat & TikTok Ads Guide for Gulf Campaigns | AdsRanger',
                 'meta_ar' => 'إرشادات لوكالات الإعلان لإدارة حملات الفيديو العمودي على Snapchat ومنصة TikTok في أسواق الخليج: المقاسات، الرسائل التسويقية، ومتابعة الميزانيات.',
                 'meta_en' => 'Agency guide to running vertical video campaigns on Snapchat and TikTok in Gulf markets: creative specs, hooks, and budget pacing.',
@@ -883,7 +889,7 @@ class PublicCatalog
                 'related_links' => ['/demo-report', '/tools/utm-builder', '/glossary/roas'],
             ],
             'ad-budget-pacing' => [
-                'title_ar' => 'دليل إدارة وتيرة إنفاق الإعلانات الشهرية للوكالات | AdsRanger',
+                'title_ar' => 'دليل وتيرة إنفاق الإعلانات الشهرية للوكالات | AdsRanger',
                 'title_en' => 'Ad Budget Pacing Guide for Marketing Agencies | AdsRanger',
                 'meta_ar' => 'كيف تتابع وتيرة إنفاق حسابات العملاء يوميًا وتوزع الميزانيات بين المنصات وتتجنب نفاد الميزانية المبكر أو نقص الصرف في نهاية الشهر.',
                 'meta_en' => 'How agencies monitor daily ad budget pacing across clients, split spend across platforms, and prevent overspend or under-delivery.',
@@ -928,7 +934,7 @@ class PublicCatalog
                 ],
                 'en' => [
                     'nav' => 'For agencies',
-                    'title' => 'Ad Operations & Client Reporting for Marketing Agencies | AdsRanger',
+                    'title' => 'Ad Operations and Client Reports for Agencies | AdsRanger',
                     'meta' => 'AdsRanger is built for MENA marketing agencies to monitor client budgets, catch pacing issues early, and share bilingual client reports.',
                     'h1' => 'One daily operations desk for every client your agency manages',
                     'lead' => 'Replace scattered tabs and manual end-of-month spreadsheets with a unified bilingual workspace built for agencies. In development · launching in 2027.',
@@ -980,7 +986,7 @@ class PublicCatalog
                 ],
                 'en' => [
                     'nav' => 'For agency clients',
-                    'title' => 'How Shared Agency Performance Links Work for Clients | AdsRanger',
+                    'title' => 'How Agency Report Links Work for Clients | AdsRanger',
                     'meta' => 'Learn how AdsRanger read-only links let agency clients view campaign progress in Arabic or English without creating an account.',
                     'h1' => 'A clear view of what your marketing budget achieves with your agency',
                     'lead' => 'When your agency shares an AdsRanger link with you, you can view approved campaign outcomes in Arabic or English—read-only and with no login required. In development · launching in 2027.',
@@ -1011,7 +1017,7 @@ class PublicCatalog
                     'h1' => 'Clear roles and per-client permissions for your agency team',
                     'lead' => 'AdsRanger scopes workspace access by role and assigned clients, complete with an audit log and read-only role previewing. In development · launching in 2027.',
                     'cards' => [
-                        ['h' => 'Four purpose-built agency roles', 'p' => 'Owner, Admin (everything except billing), Account Manager (clients, ads, and reports), and Analyst (view only).', 'link' => '/en/security', 'link_label' => 'Security & audit log'],
+                        ['h' => 'Four agency roles', 'p' => 'Owner, Admin (everything except billing), Account Manager (clients, ads, and reports), and Analyst (view only).', 'link' => '/en/security', 'link_label' => 'Security & audit log'],
                         ['h' => 'Per-client visibility assignment', 'p' => 'Restrict team members to specific client portfolios so sensitive accounts stay compartmentalized.', 'link' => '/en/solutions/agencies', 'link_label' => 'Solutions for agencies'],
                         ['h' => 'Read-only "View As" preview mode', 'p' => 'Workspace owners and admins can preview the exact navigation and client list any teammate sees.', 'link' => '/en/features', 'link_label' => 'All platform features'],
                     ],
@@ -1022,10 +1028,10 @@ class PublicCatalog
                     'nav' => 'خارطة الطريق',
                     'title' => 'خارطة طريق بناء منصة AdsRanger | AdsRanger',
                     'meta' => 'اطّلع على ما بنيناه في AdsRanger وما هو قيد التطوير أو مخطط له للإطلاق في 2027 لوكالات التسويق في المنطقة.',
-                    'h1' => 'خارطة الطريق: ما هو متاح الآن وما نبنيه للإطلاق في 2027',
+                    'h1' => 'خارطة الطريق: ما يعمل اليوم وما نبنيه للإطلاق في 2027',
                     'lead' => 'نشارك هنا حالة وحدات <bdi dir="ltr">AdsRanger</bdi> بشفافية: الأدوات المجانية المتاحة اليوم، والميزات الأساسية قيد التطوير، والتكاملات المخطط لها للإطلاق في 2027.',
                     'cards' => [
-                        ['h' => 'متاح الآن مجانًا على الموقع', 'p' => '10 أدوات مجانية للسيو العربي وحاسبات الإعلانات، وتقويم مواسم 2027، ودليل حملات رمضان، والتقرير التجريبي.', 'link' => '/tools', 'link_label' => 'جرّب الأدوات المجانية'],
+                        ['h' => 'يعمل اليوم مجانًا على الموقع', 'p' => '10 أدوات مجانية للسيو العربي وحاسبات الإعلانات، وتقويم مواسم 2027، ودليل حملات رمضان، والتقرير التجريبي.', 'link' => '/tools', 'link_label' => 'جرّب الأدوات المجانية'],
                         ['h' => 'قيد التطوير (مساحة عمل الوكالة)', 'p' => 'متابعة وتيرة الميزانيات، قواعد التنبيه الصباحية، روابط تقارير العملاء (قراءة فقط + PDF)، وفحص السيو العربي داخل المنصة.', 'link' => '/features', 'link_label' => 'استعرض الميزات'],
                         ['h' => 'مخطط له للإطلاق في 2027', 'p' => 'ربط مباشر لمنصات المرحلة الأولى الإعلانية، استوديو اعتماد الإعلانات، وتنبيهات وتقارير إضافية.', 'link' => '/integrations', 'link_label' => 'المنصات المخطط لربطها'],
                     ],
@@ -1044,5 +1050,27 @@ class PublicCatalog
                 ],
             ],
         ];
+    }
+
+    /**
+     * D-280 (Rami: "Fix the template only"): a glossary term's heading. A fixed `title_ar` / `title_en` wins (O-394);
+     * otherwise «ما هو» («ما هي» when the term is marked `ar_feminine` by Growth), and the English in brackets is dropped
+     * when the page title would pass 60 characters with " | AdsRanger".
+     */
+    public static function glossaryHeading(array $item, bool $ar): string
+    {
+        $fixed = $item[$ar ? 'title_ar' : 'title_en'] ?? null;
+        if (is_string($fixed) && $fixed !== '') {
+            return $fixed;
+        }
+        $name = $ar ? $item['term_ar'] : $item['term_en'];
+        $make = fn (string $n) => $ar ? (empty($item['ar_feminine']) ? 'ما هو ' : 'ما هي ').$n.'؟' : 'What Is '.$n.'?';
+        $heading = $make($name);
+        if (mb_strlen($heading.' | AdsRanger') > 60) {
+            $short = trim(preg_replace('/\s*\([^)]*\)\s*/u', ' ', $name));
+            $heading = $short !== '' ? $make($short) : $heading;
+        }
+
+        return $heading;
     }
 }

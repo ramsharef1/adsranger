@@ -60,6 +60,10 @@ class EditAgencyProfile extends EditTenantProfile
                             ? __(ucfirst((string) ($this->tenant->custom_domain_status ?: 'pending')))
                             : __('Not configured')),
                 ]),
+            // BX-05 (D-278 / D-280): on by default; null counts as on.
+            Toggle::make('report_powered_by')->label(__('Show "Powered by AdsRanger" on client reports'))
+                ->helperText(__('A small line at the bottom of client report links and PDFs. Switch it off to show only your agency.'))
+                ->default(true)->formatStateUsing(fn ($state): bool => $state === null || (bool) $state),
             Toggle::make('require_two_factor')->label(__('Require two-step verification for all members'))
                 ->helperText(__('Members who haven\'t set it up are asked to add an authenticator app before they can open this workspace. This includes you.')),
         ]);

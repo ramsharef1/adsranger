@@ -69,5 +69,8 @@ class PublicCopyLintTest extends TestCase
         $this->assertSame(['CR-07', 'CR-08', 'CR-20'], $rules(CopyLint::check('/x', $page('ar', 'عنوان', '<p>إعلانات Meta وGoogle على فيسبوك.</p>'))));
         $this->assertSame(['CR-05', 'CR-10', 'CR-17'], $rules(CopyLint::check('/x', $page('ar', str_repeat('Long title ', 7), '<p>نصل إلى حسابك الإعلاني قراءة فقط.</p>', $pair))));
         $this->assertSame(['CR-02', 'CR-19'], $rules(CopyLint::check('/en/x', $page('en', 'Title', '<h2>Frequently asked questions</h2><p>Purpose-built tools.</p>', $pair))));
+        $this->assertSame(['CR-22', 'CR-23'], $rules(CopyLint::check('/en/x', $page('en', 'Title', "<p>We'll email you at launch.</p><p>Free forever, unlimited reports.</p>", $pair))));
+        $this->assertSame([], $rules(CopyLint::check('/en/x', $page('en', 'Title', '<p>Unlimited reports (fair use).</p><p>Join the launch list.</p>', $pair))));
+        $this->assertSame(['CR-22'], $rules(CopyLint::check('/x', $page('ar', 'عنوان', '<p>اترك بريدك وسنراسلك عند الإطلاق.</p>', $pair))));
     }
 }

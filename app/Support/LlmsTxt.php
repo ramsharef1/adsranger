@@ -84,7 +84,7 @@ class LlmsTxt
             '- [For agencies]('.$u('/solutions/agencies').')',
             '- [For freelancers]('.$u('/solutions/freelancers').')',
             '- [For business owners]('.$u('/solutions/business-owners').')',
-            '- [Waitlist]('.$u('/waitlist').'): Get one email when AdsRanger launches.',
+            '- [Waitlist]('.$u('/waitlist').'): Join the launch list for 2027.',
             '',
             '## About and policies',
             '- [About]('.$u('/about').'): Who builds AdsRanger and why. Built in Amman, Jordan.',

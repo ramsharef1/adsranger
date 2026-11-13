@@ -72,7 +72,7 @@ class AgencyLogoTest extends TestCase
         $this->get('/r/'.$link->token)->assertOk()
             ->assertDontSee('class="agency-logo"', false)
             ->assertSee('Prepared by Acme Agency')
-            ->assertSee('Powered by AdsRanger');
+            ->assertSee('Powered by', false)->assertSee('rel="nofollow noopener"', false);
         $this->assertNull(AgencyLogo::url($this->agency));
     }
 
@@ -94,7 +94,7 @@ class AgencyLogoTest extends TestCase
             'recipients' => ['a@example.com'], 'attach_pdf' => false, 'include_link' => false, 'active' => true]);
         $mail = (new ScheduledReportMail($schedule, 'monthly', now()->subMonthNoOverflow()->format('Y-m')))->render();
         $this->assertStringContainsString($url, $mail);
-        $this->assertStringContainsString('Powered by AdsRanger', $mail);
+        $this->assertStringContainsString('Powered by <bdi dir="ltr">AdsRanger</bdi>', $mail);
     }
 
     public function test_logo_is_served_with_safe_headers_and_unknown_files_are_not_found(): void

@@ -22,7 +22,7 @@ class SiteRevampD234Test extends TestCase
     public function test_inner_pages_get_hero_band_breadcrumb_related_and_closing_band(): void
     {
         $this->get('/security')->assertSee('class="ph"', false)->assertSee('aria-label="مسار الصفحة"', false)
-            ->assertSee('صفحات ذات صلة')->assertSee('كن أول من يعرف عند الإطلاق')->assertSee('ما زالت <bdi dir="ltr">AdsRanger</bdi>', false);
+            ->assertSee('صفحات ذات صلة')->assertSee('انضم إلى قائمة الإطلاق')->assertSee('ما زالت <bdi dir="ltr">AdsRanger</bdi>', false);
         $this->get('/en/pricing')->assertSee('Breadcrumb')->assertSee('Related pages');
         $this->get('/privacy')->assertSee('class="ph"', false)->assertDontSee('id="cb-h"', false);
         $this->get('/waitlist')->assertDontSee('Related pages')->assertDontSee('id="ar-sticky"', false);

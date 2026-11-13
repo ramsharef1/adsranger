@@ -6,7 +6,7 @@ namespace App\Support\Site;
  * GB-06 + GB-38 (IDEA-053): Growth's public-copy rules (claude/site/copy_rules_v1.json, CR-01…CR-21) as a check
  * on rendered pages. Text = visible text of <main>, the <title> and the meta description. "error" fails
  * PublicCopyLintTest; "warn" is reported only. Not built yet: CR-12 (Latin outside <bdi>, covered in part by
- * ArabicQualityTest) and CR-21 (in-development label, needs Growth's product-page list).
+ * ArabicQualityTest) and CR-21 (in-development label, needs Growth's product-page list). CR-22 / CR-23 added in cl101.
  */
 class CopyLint
 {
@@ -29,6 +29,10 @@ class CopyLint
             ['id' => 'CR-14', 'lang' => 'all', 'severity' => 'error', 'pattern' => '/\bcompliant\b|non-compliant|متوافق مع (الأنظمة|القانون)|approved by/iu'],
             ['id' => 'CR-15', 'lang' => 'all', 'severity' => 'error', 'pattern' => '/(launch\w*|الإطلاق)[^.؟!]{0,40}(january|february|march|april|may|june|july|august|september|october|november|december|يناير|فبراير|مارس|أبريل|مايو|يونيو|يوليو|أغسطس|سبتمبر|أكتوبر|نوفمبر|ديسمبر)\s*2027/iu', 'allow_paths' => ['/ramadan-2027', '/en/ramadan-2027', '/mena-calendar', '/en/mena-calendar']],
             ['id' => 'CR-16', 'lang' => 'all', 'severity' => 'error', 'pattern' => '/[٠-٩]/u'],
+            // CR-22 / CR-23 (Growth, Rami 14:28 "Errors now, with the rewording"): no email promises until a provider is set up
+            // (D-266); no "free forever" and no "unlimited" without a fair-use note in the same sentence (UX-270).
+            ['id' => 'CR-22', 'lang' => 'all', 'severity' => 'error', 'pattern' => '/we(\'|’)ll (email|notify) you|email you (at|when)|get (an|one) email|سنراسلك|نراسلك|نخبرك عند|سنرسل (لك|إليك)/iu'],
+            ['id' => 'CR-23', 'lang' => 'all', 'severity' => 'error', 'pattern' => '/free forever|مجان(ي|ًا|ية) (للأبد|إلى الأبد|دائمًا)|\bunlimited\b|غير محدود/iu', 'allow_sentence' => '/fair use|الاستخدام العادل/iu'],
         ];
     }
 

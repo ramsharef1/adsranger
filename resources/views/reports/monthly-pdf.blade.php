@@ -116,7 +116,7 @@
 @endif
 
 <div class="foot">
-    {{ __('report.generated', ['date' => $generated]) }} · {{ __('report.pdf_note') }} · {!! __('report.powered_by') !!}
+    {{ __('report.generated', ['date' => $generated]) }} · {{ __('report.pdf_note') }}@if (\App\Support\PoweredBy::on($agency ?? null)) · {!! \App\Support\PoweredBy::html($agency ?? null) !!}@endif
 </div>
 </body>
 </html>

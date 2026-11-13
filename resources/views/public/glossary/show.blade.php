@@ -5,7 +5,8 @@
     $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
     $item = \App\Support\Seo\PublicCatalog::glossary()[$term];
     $name = $ar ? $item['term_ar'] : $item['term_en'];
-    $title = ($ar ? "ما هو {$name}؟ | AdsRanger" : "What is {$name}? | AdsRanger");
+    $heading = \App\Support\Seo\PublicCatalog::glossaryHeading($item, $ar);
+    $title = $heading.' | AdsRanger';
     $meta = $ar ? $item['def_ar'] : $item['def_en'];
     $selfUrl = \App\Support\PublicUrl::absolute($arPath, $lang);
     $schema = [
@@ -20,7 +21,7 @@
 @extends('layouts.public')
 
 @section('hero')
-<h1>{{ $ar ? "ما هو {$name}؟" : "What is {$name}?" }}</h1>
+<h1>{{ $heading }}</h1>
 <p class="muted" style="font-size:17px">{{ $ar ? $item['def_ar'] : $item['def_en'] }}</p>
 @endsection
 

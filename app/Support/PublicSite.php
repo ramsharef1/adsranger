@@ -65,7 +65,7 @@ class PublicSite
             '/contact' => ['تواصل معنا', 'Contact', 'راسلنا بالعربية أو الإنجليزية', 'Email us in Arabic or English'],
             '/partners' => ['شراكة التصميم', 'Design partners', 'اعمل معنا قبل الإطلاق', 'Work with us before launch'],
             '/solutions/business-owners' => ['لأصحاب المشاريع', 'For business owners', 'لمن يدير إعلانات مشروعه بنفسه', 'For owners who run their own ads'],
-            '/waitlist' => ['قائمة الانتظار', 'Waitlist', 'نراسلك عند الإطلاق', 'We\'ll email you at launch'],
+            '/waitlist' => ['قائمة الانتظار', 'Waitlist', 'قائمة الإطلاق في 2027', 'The 2027 launch list'],
             '/privacy' => ['الخصوصية', 'Privacy', 'سياسة الخصوصية', 'Privacy policy'],
             '/terms' => ['الشروط', 'Terms', 'شروط الاستخدام', 'Terms of use'],
             '/data-deletion' => ['حذف البيانات', 'Data deletion', 'كيف تطلب حذف بياناتك', 'How to ask us to delete your data'],

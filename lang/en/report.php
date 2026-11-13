@@ -22,7 +22,7 @@ return [
     'no_data' => 'No results in this period yet.',
     'synced' => 'Data updated :ago',
     'not_synced' => 'Waiting for the first data sync',
-    'powered_by' => 'Powered by AdsRanger',
+    'powered_by' => 'Powered by :brand',
     'footer' => 'This page is read-only and shared by your agency. Figures come from the ad networks and may change for up to 3 days.',
     'switch' => 'العربية',
     'switch_lang' => 'ar',

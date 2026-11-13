@@ -67,8 +67,8 @@
     <p><a class="pill" href="{{ url('/r/'.$link->token).'?'.http_build_query(['p' => $period, 'lang' => $lang]) }}">{{ __('report.back') }}</a></p>
 
     <footer>
-        {{ __('report.footer') }}<br>
-        {!! __('report.powered_by') !!}
+        {{ __('report.footer') }}@if (\App\Support\PoweredBy::on($agency))<br>
+        {!! \App\Support\PoweredBy::html($agency) !!}@endif
     </footer>
 </div>
 </body>

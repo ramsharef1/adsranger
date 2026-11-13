@@ -4,7 +4,7 @@ $ar = ($lang ?? 'ar') === 'ar';
 $lang = $ar ? 'ar' : 'en';
 $arPath = '/mena-calendar';
 $u = fn (string $p) => \App\Support\PublicUrl::path($p, $lang);
-$title = $ar ? 'تقويم مواسم الإعلانات 2027 في المنطقة | AdsRanger' : 'MENA Ad Calendar 2027: Ramadan, Eid and Sale Dates | AdsRanger';
+$title = $ar ? 'تقويم مواسم الإعلانات 2027 في المنطقة | AdsRanger' : 'MENA Ad Calendar 2027: Ramadan, Eid and Sales | AdsRanger';
 $meta = $ar
     ? 'أهم مواعيد الإعلان في المنطقة لعام 2027، من رمضان والعيد إلى مواسم التخفيضات، مع موعد بدء التخطيط ومصدر لكل موعد.'
     : 'Key 2027 advertising dates across MENA, from Ramadan and Eid to sales seasons, with when to start planning and a source for each date.';

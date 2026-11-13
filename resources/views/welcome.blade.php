@@ -11,14 +11,14 @@
     $b = fn (string $s) => '<bdi dir="ltr">'.$s.'</bdi>';
 
     $faqs = $ar ? [
-        ['متى تُطلق AdsRanger؟', $b('AdsRanger').' قيد التطوير، والإطلاق في 2027. انضم إلى قائمة الانتظار لنراسلك عند الإطلاق.'],
+        ['متى تُطلق AdsRanger؟', $b('AdsRanger').' قيد التطوير، والإطلاق في 2027. انضم إلى قائمة الإطلاق الآن.'],
         ['كم السعر؟', 'تُعلن الأسعار عند الإطلاق. ويمكنك أن ترى ما تخطط كل باقة لتقديمه في <a href="'.$u('/pricing').'">صفحة الباقات</a>.'],
         ['ما المنصات الإعلانية المخطط ربطها؟', 'في المرحلة الأولى: '.$b('Meta').'، '.$b('Google Ads').'، '.$b('TikTok').'، '.$b('Snapchat').'، '.$b('Microsoft Advertising').'، '.$b('LinkedIn').'، '.$b('X').'. ويُفتح كل تكامل بعد موافقة المنصة على تطبيقنا.'],
         ['هل يمكن أن تعدّل AdsRanger حملات عملائي؟', 'تطلب بعض المنصات صلاحية إدارة عند الربط، لكن '.$b('AdsRanger').' لا تغيّر أي ميزانية أو حملة دون موافقة أحد أعضاء فريقك. والتقارير تقرأ البيانات فقط، واستوديو الإعلانات المخطط له لن ينشر أي شيء إلا بعد موافقتك.'],
         ['لمن صُممت AdsRanger؟', 'لوكالات الإعلان في المنطقة التي تدير إعلانات عملاء كثيرين، وللمستقلين عبر باقة المستقل.'],
         ['هل تشمل AdsRanger أدوات للسيو؟', 'نعم، وهي قيد التطوير: فحص المواقع، والكلمات المفتاحية، وتتبّع الترتيب، وإعلانات المنافسين في البحث، بالعربية أولًا. نعلن موعد كل أداة عند جاهزيتها.'],
     ] : [
-        ['When does AdsRanger launch?', 'AdsRanger is in development and launching in 2027. Join the waitlist and we\'ll email you at launch.'],
+        ['When does AdsRanger launch?', 'AdsRanger is in development and launching in 2027. Join the launch list now.'],
         ['How much will it cost?', 'Prices are shared at launch. You can see what each plan is planned to include on the <a href="'.$u('/pricing').'">plans page</a>.'],
         ['Which ad platforms are planned?', 'In the first stage: Meta, Google Ads, TikTok, Snapchat, Microsoft Advertising, LinkedIn and X. Each integration opens after the platform approves our app.'],
         ['Can AdsRanger change my clients\' campaigns?', 'Some platforms ask for management permission when you connect, but AdsRanger changes no budget or campaign without a team member\'s approval. Reports only read data, and the planned Ads Studio will publish nothing without your approval.'],
@@ -419,8 +419,8 @@
 </section>
 
 <section class="hp-close" aria-labelledby="h-close">
-    <h2 id="h-close">{{ $ar ? 'كن أول من يعرف عند الإطلاق' : 'Be the first to know at launch' }}</h2>
-    <p>{{ $ar ? 'اترك بريدك واسم وكالتك ودولتك، وسنراسلك عند الإطلاق في 2027.' : 'Leave your email, agency name and country, and we\'ll email you at launch in 2027.' }}</p>
+    <h2 id="h-close">{{ $ar ? 'انضم إلى قائمة الإطلاق' : 'Join the launch list' }}</h2>
+    <p>{{ $ar ? 'اترك بريدك واسم وكالتك ودولتك لتنضم إلى قائمة الإطلاق. الإطلاق في 2027.' : 'Leave your email, agency name and country to join the launch list. Launching 2027.' }}</p>
     <a class="btn" href="{{ $u('/waitlist') }}?type=agency" data-cta="waitlist" data-pos="closing">{{ $ar ? 'انضم إلى قائمة الانتظار' : 'Join the waitlist' }}</a>
 </section>
 @endsection

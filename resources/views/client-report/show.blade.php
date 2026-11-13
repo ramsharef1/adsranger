@@ -123,8 +123,8 @@
 
     <footer>
         {{ $synced ? __('report.synced', ['ago' => $synced->locale($lang)->diffForHumans()]) : __('report.not_synced') }}<br>
-        {{ __('report.footer') }}<br>
-        {!! __('report.powered_by') !!}
+        {{ __('report.footer') }}@if (\App\Support\PoweredBy::on($agency))<br>
+        {!! \App\Support\PoweredBy::html($agency) !!}@endif
     </footer>
 </div>
 </body>

@@ -1858,5 +1858,7 @@
     "Block a host": "حظر نطاق",
     "Site health score: 100 minus the average deduction per page audited (:c points per critical finding, :w per warning). Not a Google ranking.": "درجة صحة الموقع: 100 ناقص متوسط ما يُخصم لكل صفحة مفحوصة (:c نقاط لكل مشكلة حرجة، ثم :w نقاط لكل تحذير). ليست ترتيبًا في ⁦Google⁩.",
     "A critical finding needs fixing.": "توجد مشكلة حرجة تحتاج إصلاحًا.",
-    "Confirm you own this site or have its owner's permission before the first audit.": "أكّد أنك تملك هذا الموقع أو أن لديك إذن صاحبه قبل أول فحص."
+    "Confirm you own this site or have its owner's permission before the first audit.": "أكّد أنك تملك هذا الموقع أو أن لديك إذن صاحبه قبل أول فحص.",
+    "Show \"Powered by AdsRanger\" on client reports": "إظهار سطر «مدعوم من AdsRanger» في تقارير العملاء",
+    "A small line at the bottom of client report links and PDFs. Switch it off to show only your agency.": "سطر صغير أسفل روابط تقارير العملاء وملفات PDF. أوقفه ليظهر اسم وكالتك فقط."
 }

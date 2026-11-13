@@ -267,8 +267,8 @@ input[type=text],input[type=email],input[type=number],input[type=url],input[type
         @if ($closing)
             <section class="cb" aria-labelledby="cb-h">
                 <div>
-                    <h2 id="cb-h">{{ $ar ? 'كن أول من يعرف عند الإطلاق' : 'Be the first to know at launch' }}</h2>
-                    <p>{{ $ar ? 'اترك بريدك واسم وكالتك ودولتك، وسنراسلك عند الإطلاق في 2027.' : 'Leave your email, agency name and country, and we\'ll email you at launch in 2027.' }}</p>
+                    <h2 id="cb-h">{{ $ar ? 'انضم إلى قائمة الإطلاق' : 'Join the launch list' }}</h2>
+                    <p>{{ $ar ? 'اترك بريدك واسم وكالتك ودولتك لتنضم إلى قائمة الإطلاق. الإطلاق في 2027.' : 'Leave your email, agency name and country to join the launch list. Launching 2027.' }}</p>
                 </div>
                 <a class="btn" href="{{ $u('/waitlist') }}?type=agency" data-cta="waitlist" data-pos="closing">{{ $waitlistLabel }}</a>
             </section>

@@ -20,9 +20,11 @@ use App\Support\Devices;
 use App\Support\LiveVerification;
 use App\Support\Modules;
 use App\Support\PlatformHealth;
+use App\Support\PoweredBy;
 use App\Support\PublicSite;
 use App\Support\RestoreTest;
 use App\Support\Seo\PageAudit;
+use App\Support\Seo\PublicCatalog;
 use App\Support\Seo\SiteAuditRunner;
 use App\Support\Seo\ToolGuard;
 use App\Support\Site\CopyLint;
@@ -54,7 +56,9 @@ return [
     'A-17' => ['title' => 'Signed-in devices + new-device alert', 'code' => [Devices::class, MyDevices::class], 'tests' => ['Feature/DevicesAndActivityA17A18Test.php']],
     'A-18' => ['title' => 'Owner view of the workspace audit log', 'code' => [WorkspaceActivity::class], 'tests' => ['Feature/DevicesAndActivityA17A18Test.php']],
     'BZ-10' => ['title' => 'Free tools abuse guard', 'code' => [ToolGuard::class, ToolAbuseGuard::class, ToolGuardBoard::class], 'tests' => ['Feature/ToolGuardBz10Test.php']],
-    'GB-06' => ['title' => 'Public copy lint (Growth CR-01…CR-20) + AR/EN parity (GB-38)', 'code' => [CopyLint::class], 'tests' => ['Feature/PublicCopyLintTest.php']],
+    'GB-06' => ['title' => 'Public copy lint (Growth CR-01…CR-23) + AR/EN parity (GB-38)', 'code' => [CopyLint::class], 'tests' => ['Feature/PublicCopyLintTest.php']],
     // D-281: the Wave B.1 AEO / GEO scaffold is relabelled #301–#312 (module off, not Done, so no row yet); FR-087…095 keep #181–#189.
     'GB-01b' => ['title' => 'Held guides, posts and glossary terms; per-page release (D-279)', 'code' => [PublicSite::class, 'config:seo_tools'], 'tests' => ['Feature/ArticlesHeldD279Test.php']],
+    'BX-05' => ['title' => '"Powered by AdsRanger" on client reports, opt-out (D-278 / D-280)', 'code' => [PoweredBy::class], 'tests' => ['Feature/PoweredByOptOutBx05Test.php', 'Feature/AgencyLogoTest.php']],
+    'O-394' => ['title' => 'Copy rewrites 1–26 + glossary title template, no email promises (D-266)', 'code' => [PublicCatalog::class, CopyLint::class], 'tests' => ['Feature/PublicCopyLintTest.php']],
 ];

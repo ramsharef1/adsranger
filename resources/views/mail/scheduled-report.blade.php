@@ -71,7 +71,7 @@
     {!! __('report.mail_why', ['agency' => $agencyName, 'client' => $name]) !!}
     {{ __('report.pdf_note') }}<br>
     <a href="{{ $unsubscribeUrl }}" style="color:#0F766E">{{ __('report.mail_unsubscribe') }}</a><br>
-    <span style="color:#94A3B8">{!! __('report.powered_by') !!}</span>
+    @if (\App\Support\PoweredBy::on($agency ?? null))<span style="color:#94A3B8">{!! \App\Support\PoweredBy::html($agency ?? null, false) !!}</span>@endif
 </td></tr>
 </table>
 </td></tr>
