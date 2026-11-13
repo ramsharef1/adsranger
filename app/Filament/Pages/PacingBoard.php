@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Filament\Concerns\TranslatesPageLabels;
 use App\Jobs\SnapshotHealth;
 use App\Models\Client;
+use App\Support\CurrentClient;
 use App\Support\HealthScore;
 use App\Support\Pacing;
 use App\Support\PlanGate;
@@ -64,7 +65,7 @@ class PacingBoard extends Page
     protected function getViewData(): array
     {
         $a = Filament::getTenant();
-        $clients = \App\Support\CurrentClient::apply(Client::visibleTo(auth()->user(), $a)->where('status', 'active'), 'clients.id', $a)->with('agency')->orderBy('name')->get();
+        $clients = CurrentClient::apply(Client::visibleTo(auth()->user(), $a)->where('status', 'active'), 'clients.id', $a)->with('agency')->orderBy('name')->get();
         $rows = $clients->map(fn (Client $c) => ['client' => $c, 'p' => Pacing::month($c), 'band' => HealthScore::band($c->health_score)])->all();
         usort($rows, match ($this->sort) {
             'pace' => fn ($x, $y) => abs(($y['p']['pace'] ?? 100) - 100) <=> abs(($x['p']['pace'] ?? 100) - 100),
@@ -75,6 +76,6 @@ class PacingBoard extends Page
         return ['rows' => $rows, 'canManage' => TeamRoles::canManageData(auth()->user(), $a), 'tz' => $a->timezone ?: 'UTC',
             'scored' => $clients->max('health_at'),
             // #37 month-end forecast is Pro (EX-50: the column stays, the value locks).
-            'forecastLocked' => PlanGate::locked($a, 'forecast'), 'canUpgrade' => PlanGate::canUpgrade(auth()->user(), $a)];
+            'forecastLocked' => PlanGate::lockedShown($a, 'forecast'), 'canUpgrade' => PlanGate::canUpgrade(auth()->user(), $a)];
     }
 }

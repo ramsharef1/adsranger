@@ -22,6 +22,23 @@
                     <p>{{ __('Ask your workspace owner to choose a plan.') }}</p>
                 @endif
             </div>
+            @if ($canUpgrade && ($readOnlyUntil || $closed))
+                <div style="border-top:1px solid rgba(127,127,127,.2);padding-top:12px">
+                    @if ($extension && $extension->status === 'open')
+                        <p>{{ __('We got your request for more time. The answer will show here.') }}</p>
+                    @elseif ($extension && $extension->status === 'granted')
+                        <p>{{ __('More time granted: :n days.', ['n' => $extension->days]) }}</p>
+                    @else
+                        @if ($extension && $extension->status === 'declined')<p>{{ __('Your last request for more time was not granted.') }}</p>@endif
+                        <form wire:submit="requestMoreTime" style="display:grid;gap:8px">
+                            <label for="trial-reason">{{ __('Need more time to try AdsRanger? Tell us why in one line.') }}</label>
+                            <input id="trial-reason" type="text" wire:model="reason" maxlength="300" style="min-height:44px;border-radius:8px;padding:6px 10px;border:1px solid rgba(127,127,127,.4);background:transparent">
+                            @error('reason')<p style="color:#dc2626">{{ $message }}</p>@enderror
+                            <div><x-filament::button type="submit" color="gray" style="min-height:44px">{{ __('Ask for more time') }}</x-filament::button></div>
+                        </form>
+                    @endif
+                </div>
+            @endif
             <p style="font-size:13px;opacity:.75">{{ TrialNotice::helpHtml() }}</p>
         </div>
     </x-filament::section>

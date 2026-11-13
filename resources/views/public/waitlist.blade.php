@@ -96,6 +96,11 @@ $schema = [['@type' => 'WebPage', 'name' => $t['title'], 'url' => $self, 'inLang
         <div class="ok" id="wl-done" tabindex="-1" role="status">
             <h2>{{ $t['saved_h'] }}</h2>
             <p>{{ $t['saved_p'] }}</p>
+            @if (session('waitlist_ref'))
+                {{-- GR-07 (D-289): a share link for a colleague; we only count sign-ups per code. Growth reviews the line. --}}
+                @php $shareUrl = \App\Support\PublicUrl::absolute('/waitlist', $ar ? 'ar' : 'en').'?ref='.session('waitlist_ref'); @endphp
+                <p>{{ $ar ? 'شارك قائمة الإطلاق مع زميل:' : 'Share the launch list with a colleague:' }} <bdi dir="ltr"><a href="{{ $shareUrl }}">{{ $shareUrl }}</a></bdi></p>
+            @endif
         </div>
     @endif
     @if ($errors->any())

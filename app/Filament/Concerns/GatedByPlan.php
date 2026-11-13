@@ -55,6 +55,7 @@ trait GatedByPlan
         }
 
         $tenant = Filament::getTenant();
+        PlanGate::lockedShown($tenant, static::$planFeature); // PS-27: counts the locked page being opened
 
         return view('filament.pages.plan-locked', [
             'feature' => static::$planFeature,

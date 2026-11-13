@@ -28,6 +28,7 @@ return [
         'ops-log-roll' => 'ops-log-roll',
         'ops-deadlines' => 'ops-deadlines',
         'ops-live-site' => 'ops-live-site',
+        'usage-ledger' => 'usage-ledger',
     ],
 
     // EG-01: how long ops rows are kept (days). Customer data is never pruned here (D-164 / D-166: purge stays manual).

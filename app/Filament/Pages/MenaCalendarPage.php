@@ -76,6 +76,6 @@ class MenaCalendarPage extends Page
 
         return ['events' => $events, 'today' => $today, 'clients' => $clients, 'client' => $client, 'picked' => $picked, 'scenario' => $scenario,
             'seasons' => $seasons, 'countries' => config('adsranger.countries'), 'intl' => MenaCalendar::hasIntl(),
-            'scenarioLocked' => PlanGate::locked($a, 'scenario_planner'), 'canUpgrade' => PlanGate::canUpgrade(auth()->user(), $a)];
+            'scenarioLocked' => PlanGate::lockedShown($a, 'scenario_planner'), 'canUpgrade' => PlanGate::canUpgrade(auth()->user(), $a)];
     }
 }

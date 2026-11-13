@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Filament\Pages\PlanUsage;
 use App\Models\Agency;
 use App\Models\User;
+use App\Support\Business\UpgradeMoments;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 
@@ -17,6 +18,7 @@ class QuotaNotice
     /** @param 'ad_accounts'|'seats'|'clients' $key */
     public static function make(Agency $a, ?User $user, string $key): Notification
     {
+        UpgradeMoments::record($a->id, $key, 'limit'); // PS-27
         $limit = match ($key) {
             'seats' => PlanLimits::seatsLimit($a),
             'clients' => PlanLimits::clientsLimit($a),

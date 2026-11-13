@@ -15,6 +15,26 @@ use Illuminate\View\View;
 
 class ClientOnboardingController extends Controller
 {
+    /** DB-05 (D-292): built now, shown only when Business's legal line is in config (CLIENT_INTAKE_LEGAL_LINE). */
+    /** @return array<string, string> */
+    public static function intakeLabels(): array
+    {
+        return [
+            'offers' => __('What you sell and your current offers'),
+            'audiences' => __('Who your customers are'),
+            'competitors' => __('Businesses you compete with'),
+            'brand_words' => __('Words that describe your brand'),
+            'do' => __('Things your ads should always do'),
+            'dont' => __('Things your ads must never do'),
+            'contacts' => __('Who approves ads and who gets reports (roles, not passwords)'),
+        ];
+    }
+
+    public static function intakeLive(): bool
+    {
+        return filled(config('services.client_intake.legal_line'));
+    }
+
     public function show(string $token): View
     {
         $link = ClientOnboardingLink::with(['agency', 'client'])->where('token', $token)->firstOrFail();
@@ -36,12 +56,19 @@ class ClientOnboardingController extends Controller
             'granted_networks' => ['nullable', 'array'],
             'granted_networks.*' => ['string', 'max:40'],
             'brand_notes' => ['nullable', 'string', 'max:2000'],
+            'intake' => ['nullable', 'array'],
+            'intake.*' => ['nullable', 'string', 'max:1500'],
         ]);
+        // DB-05: the longer intake only counts once Business's legal line is set (D-292); before that the fields are not shown.
+        $intake = static::intakeLive()
+            ? array_filter(array_intersect_key($validated['intake'] ?? [], static::intakeLabels()), fn ($v) => filled($v))
+            : null;
 
         $link->update([
             'website_url' => $validated['website_url'] ?? $link->website_url,
             'granted_networks' => array_values($validated['granted_networks'] ?? []),
             'brand_notes' => $validated['brand_notes'] ?? $link->brand_notes,
+            'intake' => $intake ?: $link->intake,
             'status' => 'completed',
             'completed_at' => now(),
         ]);

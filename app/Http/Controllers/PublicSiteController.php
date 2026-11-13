@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -75,7 +76,7 @@ class PublicSiteController extends Controller
         $name = trim((string) ($data['name'] ?? ''));
         $networks = array_values(array_unique($data['networks'] ?? []));
 
-        WaitlistEntry::updateOrCreate(
+        $entry = WaitlistEntry::updateOrCreate(
             ['email' => strtolower(trim($data['email']))],
             [
                 'name' => $name !== '' ? $name : null,
@@ -90,7 +91,28 @@ class PublicSiteController extends Controller
             ]
         );
 
-        return redirect($target)->with('waitlist_saved', true);
+        // GR-01 / GR-07: where the sign-up came from (first page, tool, UTM, a colleague's code), kept from the first
+        // sign-up only; no IP, no device ID. Each entry gets its own share code.
+        if ($entry->wasRecentlyCreated) {
+            $origin = (array) $request->session()->get('origin', []);
+            $entry->forceFill([
+                'origin_landing' => $origin['landing'] ?? null,
+                'origin_tool' => $origin['tool'] ?? null,
+                'utm_source' => $origin['utm_source'] ?? null,
+                'utm_medium' => $origin['utm_medium'] ?? null,
+                'utm_campaign' => $origin['utm_campaign'] ?? null,
+                'referred_by' => isset($origin['ref']) && WaitlistEntry::where('ref_code', $origin['ref'])->exists() ? $origin['ref'] : null,
+            ]);
+        }
+        if (! $entry->ref_code) {
+            do {
+                $code = strtoupper(Str::random(8));
+            } while (WaitlistEntry::where('ref_code', $code)->exists());
+            $entry->forceFill(['ref_code' => $code]);
+        }
+        $entry->save();
+
+        return redirect($target)->with('waitlist_saved', true)->with('waitlist_ref', $entry->ref_code);
     }
 
     public function ramadan(string $lang = 'ar')

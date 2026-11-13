@@ -62,6 +62,15 @@
             <label for="brand_notes">{{ __('Target KPIs, Monthly Budget & Brand Guidelines') }}</label>
             <textarea id="brand_notes" name="brand_notes" rows="4" placeholder="{{ __('Share your target CPA/ROAS, key markets (KSA, UAE, Jordan), or brand tone notes...') }}">{{ old('brand_notes', $link->brand_notes) }}</textarea>
 
+            @if (\App\Http\Controllers\ClientOnboardingController::intakeLive())
+                {{-- DB-05 client intake: the answers reach the agency as drafts it confirms. --}}
+                @foreach (\App\Http\Controllers\ClientOnboardingController::intakeLabels() as $key => $label)
+                    <label for="intake_{{ $key }}">{{ $label }}</label>
+                    <textarea id="intake_{{ $key }}" name="intake[{{ $key }}]" rows="2" maxlength="1500">{{ old('intake.'.$key, $link->intake[$key] ?? '') }}</textarea>
+                @endforeach
+                <p style="color:#94A3B8;font-size:13px">{{ config('services.client_intake.legal_line') }}</p>
+            @endif
+
             <button type="submit" class="btn">{{ __('Confirm Access & Complete Onboarding') }}</button>
         </form>
     </div>

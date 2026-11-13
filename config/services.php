@@ -48,4 +48,9 @@ return [
         ],
     ],
 
+    // DB-05 (D-292): the client intake form's extra fields show only once Business's LEGAL line is set here.
+    'client_intake' => [
+        'legal_line' => env('CLIENT_INTAKE_LEGAL_LINE'),
+    ],
+
 ];

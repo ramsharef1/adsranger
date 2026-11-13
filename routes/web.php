@@ -12,6 +12,7 @@ use App\Http\Controllers\ReportUnsubscribeController;
 use App\Http\Controllers\StudioBriefController;
 use App\Http\Middleware\PublicTrailingSlash;
 use App\Http\Middleware\ToolAbuseGuard;
+use App\Http\Middleware\TrackOrigin;
 use App\Support\Ops\Heartbeat;
 use App\Support\Seo\PublicCatalog;
 use Illuminate\Http\Request;
@@ -26,7 +27,7 @@ Route::get('/up/heartbeat', function () {
     return response()->json($s, $s['ok'] ? 200 : 503)->header('Cache-Control', 'no-store');
 })->middleware('throttle:30,1');
 
-Route::middleware(PublicTrailingSlash::class)->group(function () {
+Route::middleware([PublicTrailingSlash::class, TrackOrigin::class])->group(function () {
     Route::get('/', fn () => view('welcome', ['lang' => 'ar']));
     Route::get('/en', fn () => view('welcome', ['lang' => 'en']));
 

@@ -16,6 +16,7 @@ class ClientOnboardingLink extends Model
         'requested_networks',
         'granted_networks',
         'brand_notes',
+        'intake',
         'status',
         'completed_at',
     ];
@@ -25,6 +26,7 @@ class ClientOnboardingLink extends Model
         return [
             'requested_networks' => 'array',
             'granted_networks' => 'array',
+            'intake' => 'array',
             'completed_at' => 'datetime',
         ];
     }

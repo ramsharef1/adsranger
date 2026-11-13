@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\Agency;
 use App\Models\User;
+use App\Support\Business\UpgradeMoments;
 
 /**
  * Plan-tier gating (D-30): which features an agency's plan unlocks, read from config/plan_features.php.
@@ -50,6 +51,17 @@ class PlanGate
     public static function locked(Agency $agency, string $feature): bool
     {
         return ! static::allows($agency, $feature);
+    }
+
+    /** Same as locked(), for a screen the user is actually looking at: also counts the upgrade moment (PS-27, D-289). */
+    public static function lockedShown(Agency $agency, string $feature): bool
+    {
+        $locked = static::locked($agency, $feature);
+        if ($locked) {
+            UpgradeMoments::record($agency->id, $feature, 'locked');
+        }
+
+        return $locked;
     }
 
     /** Owners and admins can upgrade; other roles are told to ask the owner (EX-50 point 4). */

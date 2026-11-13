@@ -8,6 +8,7 @@ use App\Jobs\RunNightShift;
 use App\Jobs\RunTrialLifecycle;
 use App\Jobs\SnapshotHealth;
 use App\Jobs\VerifyOwnLinks;
+use App\Support\Business\UsageLedger;
 use App\Support\Fx;
 use App\Support\Ops\Heartbeat;
 use App\Support\Ops\JobRuns;
@@ -43,3 +44,5 @@ Schedule::call(fn () => JobRuns::track('ops-log-roll', fn () => LogRoll::run()))
 // EG-10 API deadlines (daily push at 90 / 30 / 7 days) · WS-01 / WS-02 / LV-17 nightly live-site + free-tool check.
 Schedule::call(fn () => JobRuns::track('ops-deadlines', fn () => NetworkDeadlines::watch()))->dailyAt('06:05')->name('ops-deadlines');
 Schedule::call(fn () => JobRuns::track('ops-live-site', fn () => LiveSiteCheck::run()))->dailyAt('02:10')->name('ops-live-site')->withoutOverlapping();
+// R2 (D-289) EG-33 / NB-13: monthly usage ledger for the month just ended (1st, 04:10 UTC).
+Schedule::call(fn () => JobRuns::track('usage-ledger', fn () => UsageLedger::snapshot()))->monthlyOn(1, '04:10')->name('usage-ledger')->withoutOverlapping();

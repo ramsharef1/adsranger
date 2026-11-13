@@ -19,6 +19,11 @@
                     <div style="font-size:12px;padding:6px 0;border-top:1px solid rgba(148,163,184,.2)">
                         <strong>{{ $ob->prospect_name }}</strong> ({{ $ob->status }}) —
                         <a href="{{ url('/onboard/'.$ob->token) }}" target="_blank" style="text-decoration:underline">/onboard/{{ $ob->token }}</a>
+                        @if (! empty($ob->intake))
+                            <details style="margin-top:4px"><summary>{{ __('Client intake answers (drafts to confirm)') }}</summary>
+                                @foreach ($ob->intake as $k => $v)<div><strong>{{ \App\Http\Controllers\ClientOnboardingController::intakeLabels()[$k] ?? $k }}:</strong> <bdi>{{ $v }}</bdi></div>@endforeach
+                            </details>
+                        @endif
                     </div>
                 @endforeach
             </div>
