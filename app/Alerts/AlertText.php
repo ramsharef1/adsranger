@@ -47,6 +47,8 @@ class AlertText
         '/^Last 7 days ([\d,.]+) vs ([\d,.]+ [A-Z]{3}) the week before\.$/' => 'آخر 7 أيام: $1 مقابل $2 في الأسبوع السابق.',
         '/^Forecast ([\d,.]+) vs budget ([\d,.]+ [A-Z]{3}) for (?<n1>.+?)\. Spend about ([\d,.]+) a day to land on budget\.$/s' => 'الإنفاق المتوقع $1 مقابل ميزانية $2 لشهر ~1. أنفِق نحو $3 يوميًا لتصل إلى الميزانية.',
         '/^([\d,.]+ [A-Z]{3}) on (\d+) search terms with no conversions in the last 7 days\. Review them in Google Ads → Search terms\.$/' => '$1 على {search_terms:$2} دون أي تحويل خلال آخر 7 أيام. راجعها في Google Ads، قسم عبارات البحث.',
+        '/^(\S+) — redirects to another site: (\S*)\. Down since (\S+ \S+) UTC\. Ads sent (\d+) clicks here in 30 days\.$/' => '$1 — تنقل إلى موقع آخر: $2. معطّلة منذ $3 بتوقيت غرينتش. أرسلت الإعلانات {clicks:$4} إلى هذه الصفحة خلال 30 يومًا.',
+        '/^(\S+) — (?<n1>.+?)\. Down since (\S+ \S+) UTC\. Ads sent (\d+) clicks here in 30 days\.$/s' => '$1 — ~1. معطّلة منذ $2 بتوقيت غرينتش. أرسلت الإعلانات {clicks:$3} إلى هذه الصفحة خلال 30 يومًا.',
         '/^(\S+) — (?<n1>.+?)\. Ads sent (\d+) clicks here in 30 days\.$/s' => '$1 — ~1. أرسلت الإعلانات {clicks:$2} إلى هذه الصفحة خلال 30 يومًا.',
         '/^([\d,.]+ [A-Z]{3}) in (\d+) days on a (?<n1>.+?) goal with 0 results\.$/s' => '$1 خلال {days:$2} على هدف ~1 دون أي نتيجة.',
         '/^Spent ([\d,.]+) of a ([\d,.]+) daily budget \((\d+%)\) on (\S+)\.$/' => 'أُنفق $1 من ميزانية يومية قدرها $2 ($3) في $4.',

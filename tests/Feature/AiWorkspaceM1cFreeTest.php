@@ -104,8 +104,8 @@ class AiWorkspaceM1cFreeTest extends TestCase
 
         $this->actingAs($owner)->get("/app/{$agency->slug}/insights")->assertRedirect("/app/{$agency->slug}/lite");
         $this->withSession(['locale' => 'en'])->actingAs($owner)->get("/app/{$agency->slug}/lite")->assertOk()
-            ->assertSee('Ramadan offers')->assertSee('Automatic summary, no AI')->assertSee('Coming soon')->assertSee('Connect your AI to turn on the tools');
-        $this->withSession(['locale' => 'ar'])->actingAs($owner)->get("/app/{$agency->slug}/lite")->assertOk()->assertSee('قريبًا');
+            ->assertSee('Ramadan offers')->assertSee('Automatic summary, no AI')->assertSee('controls are in development')->assertDontSee('Coming soon')->assertSee('Connect your AI to turn on the tools');
+        $this->withSession(['locale' => 'ar'])->actingAs($owner)->get("/app/{$agency->slug}/lite")->assertOk()->assertSee('قيد التطوير')->assertDontSee('قريبًا');
         $this->withSession(['locale' => 'en'])->actingAs($owner)->get("/app/{$agency->slug}/ai-keys")->assertOk()->assertSee('comes with Pro')->assertDontSee('Test and save');
 
         AiConnection::create(['agency_id' => $agency->id, 'user_id' => $owner->id, 'oauth_client_id' => '9d0f8a3e-0000-4000-8000-000000000001', 'status' => 'verified',

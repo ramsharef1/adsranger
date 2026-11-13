@@ -17,6 +17,26 @@
         <p style="margin-top:10px;font-size:13px;opacity:.75">{{ __('Queue lanes') }}: {{ $drivers['lanes'] ? __('on') : __('off') }} · {{ __('Cache') }}: <bdi dir="ltr">{{ $drivers['cache'] }}</bdi> · {{ __('Sessions') }}: <bdi dir="ltr">{{ $drivers['session'] }}</bdi></p>
     </x-filament::section>
 
+    <x-filament::section :heading="__('App announcement')">
+        <x-slot name="description">{{ __('One short line at the top of the app for every workspace. People can close it. A new line replaces the old one.') }}</x-slot>
+        @if ($announcement)
+            <p style="margin-bottom:10px"><strong>{{ __('Showing now') }}:</strong> <bdi>{{ $announcement->body_ar }}</bdi> · <bdi dir="ltr">{{ $announcement->body_en }}</bdi>
+                · {{ __('until') }} <bdi dir="ltr">{{ \Illuminate\Support\Carbon::parse($announcement->ends_at)->timezone($tz)->format('Y-m-d H:i') }}</bdi>
+                <x-filament::button size="xs" color="gray" wire:click="endAnnouncement">{{ __('End now') }}</x-filament::button></p>
+        @endif
+        <form wire:submit="postAnnouncement" style="display:grid;gap:8px;max-width:640px">
+            <input wire:model="noteAr" class="fi-input" maxlength="240" dir="rtl" placeholder="{{ __('Arabic line') }}">
+            @error('noteAr')<span style="color:#dc2626;font-size:13px">{{ $message }}</span>@enderror
+            <input wire:model="noteEn" class="fi-input" maxlength="240" dir="ltr" placeholder="{{ __('English line') }}">
+            @error('noteEn')<span style="color:#dc2626;font-size:13px">{{ $message }}</span>@enderror
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <select wire:model="noteTone" class="fi-input"><option value="info">{{ __('Information') }}</option><option value="warning">{{ __('Warning') }}</option></select>
+                <label style="font-size:13px">{{ __('Days') }} <input type="number" min="1" max="30" wire:model="noteDays" class="fi-input" style="width:70px"></label>
+                <x-filament::button type="submit" size="sm">{{ __('Show in the app') }}</x-filament::button>
+            </div>
+        </form>
+    </x-filament::section>
+
     <x-filament::section :heading="__('Scheduled tasks')">
         <x-slot name="description">{{ __('Last finished run of each task. "Late" means a run that should have finished by now is missing.') }}</x-slot>
         <div style="overflow-x:auto">

@@ -18,7 +18,7 @@ class AgencyInvitation extends Model
 
     protected function casts(): array
     {
-        return ['expires_at' => 'datetime', 'accepted_at' => 'datetime'];
+        return ['expires_at' => 'datetime', 'accepted_at' => 'datetime', 'via_link' => 'boolean'];
     }
 
     public function agency(): BelongsTo
@@ -68,9 +68,38 @@ class AgencyInvitation extends Model
         return $invite;
     }
 
+    /** EH-11 (D-291 / D-293): a link valid for 24 hours, one use. Holds a seat until used or expired; no email is sent. */
+    public const LINK_VALID_MINUTES = 24 * 60;
+
+    /** @return array{0: self, 1: string} the invite and its link (the token is shown once, only its hash is stored) */
+    public static function link(Agency $agency, string $role, User $inviter): array
+    {
+        $token = Str::random(48);
+        $invite = static::create([
+            'agency_id' => $agency->id,
+            'email' => null,
+            'via_link' => true,
+            'role' => $role,
+            'token_hash' => hash('sha256', $token),
+            'invited_by' => $inviter->id,
+            'expires_at' => now()->addMinutes(static::LINK_VALID_MINUTES),
+        ]);
+        AuditLog::record('team.invite_link_created', $agency, ['role' => $role, 'invite' => $invite->id]);
+
+        return [$invite, url('/invite/'.$token)];
+    }
+
     public function accept(User $user): void
     {
         $agency = $this->agency;
+        if ($this->via_link && $this->email === null) {
+            // One use: claim the link first, so two people opening it at once cannot both join.
+            $claimed = static::whereKey($this->id)->whereNull('accepted_at')->where('expires_at', '>', now())
+                ->update(['accepted_at' => now(), 'email' => $user->email, 'updated_at' => now()]);
+            abort_if($claimed === 0, 410);
+            $this->refresh();
+            AuditLog::record('team.joined_by_link', $agency, ['user_id' => $user->id, 'email' => $user->email]);
+        }
         if (! $agency->members()->whereKey($user->id)->exists()) {
             $agency->members()->attach($user->id, ['role' => $this->role]);
         }
@@ -78,7 +107,9 @@ class AgencyInvitation extends Model
         if ($this->role === 'owner' && ! $agency->owner_id) {
             $agency->forceFill(['owner_id' => $user->id])->save();
         }
-        $this->update(['accepted_at' => now()]);
+        if ($this->accepted_at === null) {
+            $this->update(['accepted_at' => now()]);
+        }
         AuditLog::record('team.joined', $agency, ['user_id' => $user->id, 'role' => $this->role]);
     }
 }

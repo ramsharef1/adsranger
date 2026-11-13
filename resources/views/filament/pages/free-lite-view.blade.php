@@ -64,13 +64,9 @@
             @endforelse
         </section>
 
-        <section style="{{ $card }}">
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-                @foreach ([__('Pause / resume'), __('Budgets'), __('Approve AI changes'), __('Negative keywords')] as $ctl)
-                    <button type="button" disabled aria-disabled="true" style="min-height:44px;padding:0 14px;border-radius:10px;border:1px solid rgba(148,163,184,.35);opacity:.6;cursor:not-allowed">{{ $ctl }} · {{ __('Coming soon') }}</button>
-                @endforeach
-            </div>
-            <p style="{{ $muted }};margin:0">{{ __('Available once the ad platforms approve our apps.') }}</p>
+        {{-- D-294 (UX-275): one labelled note instead of greyed-out «قريبًا» buttons. --}}
+        <section style="{{ $card }}" data-controls-note>
+            <p style="margin:0">{{ __('Pause, budget and approval controls are in development. They arrive once the ad platforms approve our apps.') }}</p>
         </section>
 
         <p style="{{ $muted }};margin:0">{{ __('Share with your client on :plan.', ['plan' => \App\Support\PlanGate::tierLabel('solo')]) }}

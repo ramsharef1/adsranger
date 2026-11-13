@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Pages;
 
 use App\Filament\Concerns\TranslatesPageLabels;
 use App\Models\PlatformSetting;
+use App\Support\Announcements;
 use App\Support\Ops\ErrorLookup;
 use App\Support\Ops\Heartbeat;
 use App\Support\Ops\JobRuns;
@@ -56,6 +57,32 @@ class OperationsBoard extends Page
         return 'danger';
     }
 
+    public string $noteAr = '';
+
+    public string $noteEn = '';
+
+    public string $noteTone = 'info';
+
+    public int $noteDays = 3;
+
+    /** EH-17 (D-293): post the one app-wide announcement line (ends the previous one). */
+    public function postAnnouncement(): void
+    {
+        $this->validate([
+            'noteAr' => ['required', 'string', 'max:240'],
+            'noteEn' => ['required', 'string', 'max:240'],
+            'noteTone' => ['required', 'in:info,warning'],
+            'noteDays' => ['required', 'integer', 'min:1', 'max:30'],
+        ]);
+        Announcements::post($this->noteAr, $this->noteEn, $this->noteTone, $this->noteDays, auth()->id());
+        $this->reset('noteAr', 'noteEn');
+    }
+
+    public function endAnnouncement(): void
+    {
+        Announcements::end();
+    }
+
     public function lookup(): void
     {
         $this->found = ErrorLookup::find($this->ref);
@@ -70,6 +97,7 @@ class OperationsBoard extends Page
             'retention' => Prune::table(),
             'lastPrune' => PlatformSetting::get(Prune::LAST_KEY),
             'deadlines' => NetworkDeadlines::all(),
+            'announcement' => Announcements::current(),
             'liveSite' => PlatformSetting::get(LiveSiteCheck::LAST_KEY),
             'drivers' => ['lanes' => (bool) config('ops.lanes_enabled'), 'cache' => (string) config('cache.default'), 'session' => (string) config('session.driver')],
         ];

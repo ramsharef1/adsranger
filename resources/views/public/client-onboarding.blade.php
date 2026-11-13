@@ -23,7 +23,7 @@
         <span class="badge">{{ $agency->name ?? 'AdsRanger' }} · {{ __('Client Onboarding & Access Checklist') }}</span>
         <h1 style="margin:12px 0 6px; font-size:1.65rem;">{{ $link->prospect_name }}</h1>
         <p style="color:#94A3B8; margin:0 0 18px;">
-            {{ __('Grant read-only ad account access and share your brand notes in one secure step.') }}
+            {{ __('Tell your agency which ad accounts it can connect, and share your brand notes, in one step.') }}
         </p>
 
         @if (session('onboarding_completed') || $link->status === 'completed')
@@ -37,7 +37,7 @@
             <label for="website_url">{{ __('Primary Website or Store URL') }}</label>
             <input id="website_url" type="url" name="website_url" value="{{ old('website_url', $link->website_url) }}" placeholder="https://example.com">
 
-            <label>{{ __('Ad Networks Ready to Connect (Read-Only OAuth)') }}</label>
+            <label>{{ __('Ad accounts you are ready to connect') }}</label>
             @php
                 $requested = $link->requested_networks ?: ['meta', 'google_ads', 'ga4', 'tiktok', 'snapchat'];
                 $granted = $link->granted_networks ?: [];
@@ -54,7 +54,7 @@
                 @foreach ($requested as $netKey)
                     <label class="net-item">
                         <input type="checkbox" name="granted_networks[]" value="{{ $netKey }}" @checked(in_array($netKey, $granted, true))>
-                        <span>{{ $labels[$netKey] ?? strtoupper($netKey) }}</span>
+                        <span><bdi dir="ltr">{{ $labels[$netKey] ?? strtoupper($netKey) }}</bdi></span>
                     </label>
                 @endforeach
             </div>

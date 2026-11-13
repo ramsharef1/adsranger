@@ -59,7 +59,7 @@ class InvitationResource extends Resource
             ->emptyStateHeading(__('No pending invitations'))
             ->emptyStateDescription(__('Invite people from Team → Members.'))
             ->columns([
-                TextColumn::make('email')->searchable()->weight('bold'),
+                TextColumn::make('email')->searchable()->weight('bold')->placeholder(__('Invite link (not used yet)')),
                 TextColumn::make('role')->label(__('Role'))->badge()->formatStateUsing(fn (?string $state) => __(TeamRoles::label($state))),
                 TextColumn::make('inviter.name')->label(__('Invited by')),
                 TextColumn::make('expires_at')->label(__('Expires'))->since()
@@ -67,6 +67,7 @@ class InvitationResource extends Resource
             ])
             ->recordActions([
                 Action::make('resend')->label(__('Resend'))->requiresConfirmation()->icon('heroicon-o-paper-airplane')
+                    ->visible(fn (AgencyInvitation $record) => ! $record->via_link)
                     ->action(function (AgencyInvitation $record) {
                         AgencyInvitation::send($record->agency, $record->email, $record->role, auth()->user());
                         Notification::make()->title(__('Invitation sent again'))->success()->send();

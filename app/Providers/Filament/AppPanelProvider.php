@@ -93,6 +93,8 @@ class AppPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.pwa'))
             ->renderHook(PanelsRenderHook::SIMPLE_PAGE_END, fn () => view('panels.lang-switch'))
             // D-61 trial banner (days left / trial ended), under the top bar.
+            // EH-17 (D-293): the /admin announcement line, above the other banners.
+            ->renderHook(PanelsRenderHook::TOPBAR_AFTER, fn () => view('panels.announcement'))
             ->renderHook(PanelsRenderHook::TOPBAR_AFTER, fn () => view('panels.context-bar'))
             ->renderHook(PanelsRenderHook::TOPBAR_AFTER, fn () => view('panels.trial-banner'))
             // EX-50 point 6: usage warning at 80 % of the ad-account / seat limit (owner/admin).

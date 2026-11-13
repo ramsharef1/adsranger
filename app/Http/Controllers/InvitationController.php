@@ -20,6 +20,14 @@ class InvitationController extends Controller
         }
 
         $user = $request->user();
+
+        // EH-11: a link invite has no email; whoever opens it signs in or creates an account, then joins (one use).
+        if ($invite->via_link && $invite->email === null) {
+            $state = ! $user ? 'register' : ($invite->agency->members()->whereKey($user->id)->exists() ? 'member' : 'join');
+
+            return view('invite.page', compact('state', 'invite', 'token', 'user'));
+        }
+
         $existing = User::where('email', $invite->email)->exists();
 
         if (! $user && $existing) {
@@ -37,15 +45,25 @@ class InvitationController extends Controller
         abort_unless($invite && $invite->isUsable(), 410);
 
         $user = $request->user();
+        $byLink = $invite->via_link && $invite->email === null;
 
         if (! $user) {
-            abort_if(User::where('email', $invite->email)->exists(), 409);
-            $data = $request->validate([
+            $rules = [
                 'name' => ['required', 'string', 'max:120'],
                 'password' => ['required', 'confirmed', Password::min(10)],
+            ];
+            if ($byLink) {
+                // D-293: the link is the proof (handed to one person, 24 h, one use); the email is marked confirmed.
+                $rules['email'] = ['required', 'email:filter', 'max:190', 'unique:users,email'];
+            } else {
+                abort_if(User::where('email', $invite->email)->exists(), 409);
+            }
+            $data = $request->validate($rules, [
+                'email.unique' => __('This email already has an account. Sign in first, then open the link again.'),
             ]);
-            $user = DB::transaction(function () use ($data, $invite) {
-                $u = new User(['name' => $data['name'], 'email' => $invite->email, 'password' => $data['password']]);
+            $email = $byLink ? strtolower(trim($data['email'])) : $invite->email;
+            $user = DB::transaction(function () use ($data, $email) {
+                $u = new User(['name' => $data['name'], 'email' => $email, 'password' => $data['password']]);
                 $u->email_verified_at = now();
                 $u->save();
 
@@ -55,7 +73,7 @@ class InvitationController extends Controller
             $request->session()->regenerate();
         }
 
-        abort_unless($user->email === $invite->email, 403);
+        abort_unless($byLink || $user->email === $invite->email, 403);
 
         $invite->accept($user);
 

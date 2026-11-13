@@ -22,6 +22,7 @@ use App\Support\Severity;
 use App\Support\Webhooks;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 
 /** Evaluates the alert rules for one agency and keeps the inbox in sync (open, refresh, auto-resolve). */
 class AlertEngine
@@ -210,12 +211,16 @@ class AlertEngine
     /** Broken landing pages that ads still send clicks to (#49). */
     protected static function landingPage(Agency $a, array $r, array &$found): void
     {
-        foreach (LandingPage::where('agency_id', $a->id)->where('state', 'broken')->where('clicks_30d', '>=', (int) $r['t']['min_clicks'])
-            ->where('last_seen_at', '>=', now()->subDays(30))->limit(50)->get() as $lp) {
+        // DB-01: broken pages, and redirects that land on another site; "down since" comes from the first failed check.
+        $q = LandingPage::where('agency_id', $a->id)->where('clicks_30d', '>=', (int) $r['t']['min_clicks'])->where('last_seen_at', '>=', now()->subDays(30));
+        $q = Schema::hasColumn('landing_pages', 'down_since') ? $q->where(fn ($w) => $w->whereNotNull('down_since')->orWhere('state', 'broken')) : $q->where('state', 'broken');
+        foreach ($q->limit(50)->get() as $lp) {
+            $offsite = $lp->state !== 'broken';
             static::add($found, 'landing_page', $r, ['client_id' => $lp->client_id, 'entity_type' => 'landing_page', 'entity_id' => $lp->id,
                 'entity_name' => mb_substr($lp->url, 0, 190), 'title' => 'Broken landing page',
-                'detail' => $lp->url.' — '.($lp->error ?: 'HTTP '.$lp->status_code).'. Ads sent '.$lp->clicks_30d.' clicks here in 30 days.',
-                'payload' => ['status' => $lp->status_code]]);
+                'detail' => $lp->url.' — '.($offsite ? 'redirects to another site: '.mb_substr((string) $lp->final_url, 0, 200) : ($lp->error ?: 'HTTP '.$lp->status_code)).'.'
+                    .($lp->down_since ? ' Down since '.$lp->down_since->format('Y-m-d H:i').' UTC.' : '').' Ads sent '.$lp->clicks_30d.' clicks here in 30 days.',
+                'payload' => ['status' => $lp->status_code, 'down_since' => $lp->down_since?->toIso8601String(), 'offsite' => $offsite]]);
         }
     }
 

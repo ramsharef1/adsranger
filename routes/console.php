@@ -17,6 +17,7 @@ use App\Support\Ops\LogRoll;
 use App\Support\Ops\NetworkDeadlines;
 use App\Support\Ops\Prune;
 use App\Support\PlatformHealth;
+use App\Support\Site\ReindexGate;
 use Illuminate\Support\Facades\Schedule;
 
 // proc_open is disabled on this server, so every task runs in-process (job / call), never ->command().
@@ -26,7 +27,8 @@ Schedule::job(new RunAlerts)->everyFifteenMinutes()->name('alerts')->withoutOver
 // proc_open disabled, so Schedule::command() (which starts a child process) fails there; use job / call only.
 Schedule::call(fn () => JobRuns::track('platform-health', fn () => PlatformHealth::check()))->everyTenMinutes()->name('platform-health')->withoutOverlapping();
 Schedule::job(new SnapshotHealth)->dailyAt('04:00')->name('health-snapshot')->withoutOverlapping();
-Schedule::job(new CheckLandingPages)->dailyAt('05:10')->name('landing-pages')->withoutOverlapping();
+// DB-01 (D-292): once each morning, 06:30 Amman (03:30 UTC); the broken-page alert follows on the next alert run.
+Schedule::job(new CheckLandingPages)->dailyAt('03:30')->name('landing-pages')->withoutOverlapping();
 Schedule::call(fn () => JobRuns::track('fx-pull', fn () => Fx::pull()))->dailyAt('01:15')->name('fx-pull')->withoutOverlapping();
 // #106 scheduled email reports: daily, sends whatever is due on each workspace's date (off with REPORTS_EMAIL_ENABLED=false).
 Schedule::job(new QueueScheduledReports)->dailyAt(config('reports.send_at_utc', '05:20'))->name('scheduled-reports')->withoutOverlapping();
@@ -46,3 +48,5 @@ Schedule::call(fn () => JobRuns::track('ops-deadlines', fn () => NetworkDeadline
 Schedule::call(fn () => JobRuns::track('ops-live-site', fn () => LiveSiteCheck::run()))->dailyAt('02:10')->name('ops-live-site')->withoutOverlapping();
 // R2 (D-289) EG-33 / NB-13: monthly usage ledger for the month just ended (1st, 04:10 UTC).
 Schedule::call(fn () => JobRuns::track('usage-ledger', fn () => UsageLedger::snapshot()))->monthlyOn(1, '04:10')->name('usage-ledger')->withoutOverlapping();
+// CS-20 (D-290): nightly re-index gate check of the held guides, posts and glossary terms (02:40 UTC, after the live-site check).
+Schedule::call(fn () => JobRuns::track('reindex-gate', fn () => ReindexGate::run()))->dailyAt('02:40')->name('reindex-gate')->withoutOverlapping();

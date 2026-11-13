@@ -20,7 +20,7 @@ use UnitEnum;
 
 /**
  * Free plan lite view (Product M1 screens §6, spec v2 §3; D-286): campaigns for the last 30 days with ad sets and ads one
- * level down, a weekly summary built without AI, the controls shown as «قريبًا», and one banner at a time in the §6
+ * level down, a weekly summary built without AI, the controls named in one "in development" note (D-294; no greyed-out buttons), and one banner at a time in the §6
  * order. Never hides or deletes saved data.
  */
 class FreeLiteView extends Page

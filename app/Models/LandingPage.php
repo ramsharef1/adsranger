@@ -12,7 +12,7 @@ class LandingPage extends Model
 
     protected function casts(): array
     {
-        return ['checked_at' => 'datetime', 'last_seen_at' => 'datetime'];
+        return ['checked_at' => 'datetime', 'last_seen_at' => 'datetime', 'down_since' => 'datetime'];
     }
 
     public function agency(): BelongsTo

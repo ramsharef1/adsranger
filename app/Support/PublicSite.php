@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use App\Support\Site\ReindexGate;
+
 /**
  * Public-site structure for the shared template (D-234 revamp): page labels, the grouped header menu,
  * footer columns, breadcrumbs and "related pages". All paths are Arabic paths; PublicUrl::path() localises them.
@@ -100,10 +102,12 @@ class PublicSite
         return (bool) preg_match('#^/(guides|blog)(/|$)#', $path);
     }
 
-    /** D-279: a page Growth has rewritten and E1 has released (SITE_ARTICLES_RELEASED), given in its Arabic path. */
+    /** D-279: a page Growth has rewritten and that was released (SITE_ARTICLES_RELEASED, or the CS-20 gate), in its Arabic path. */
     public static function released(string $path): bool
     {
-        return in_array(preg_replace('#^/en(?=/)#', '', $path), (array) config('seo_tools.articles_released', []), true);
+        $path = preg_replace('#^/en(?=/)#', '', $path);
+
+        return in_array($path, (array) config('seo_tools.articles_released', []), true) || in_array($path, ReindexGate::releasedPaths(), true);
     }
 
     /** D-279: true while a guide, blog page or glossary term is held (noindex, out of the sitemap). */

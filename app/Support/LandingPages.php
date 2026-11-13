@@ -171,9 +171,26 @@ class LandingPages
 
     protected static function save(LandingPage $lp, array $v): LandingPage
     {
+        // DB-01: keep the time of the first failed check, so the alert can say how long ads have pointed at a dead page.
+        $down = static::isDown($v['state'] ?? $lp->state, $lp->url, $v['final_url'] ?? null);
+        $v['down_since'] = $down ? ($lp->down_since ?? now()) : null;
         $lp->forceFill($v + ['checked_at' => now()])->save();
 
         return $lp;
+    }
+
+    /** Broken, or a redirect that lands on another site (DB-01). */
+    public static function isDown(string $state, string $url, ?string $finalUrl): bool
+    {
+        if ($state === 'broken') {
+            return true;
+        }
+        if ($finalUrl === null || $finalUrl === '') {
+            return false;
+        }
+        $host = fn (string $u) => preg_replace('/^www\./', '', strtolower((string) parse_url($u, PHP_URL_HOST)));
+
+        return $host($finalUrl) !== '' && $host($finalUrl) !== $host($url);
     }
 
     public static function stateLabel(string $s): array

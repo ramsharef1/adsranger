@@ -32,9 +32,15 @@ button,.btn{display:inline-block;width:100%;margin-top:18px;padding:11px;border:
         <p>{{ $t('ربما انتهت صلاحيتها أو تم استخدامها. اطلب من فريقك إرسال دعوة جديدة.', 'It may have expired or already been used. Ask your team to send a new one.') }}</p>
     @else
         <h1>{{ $t('انضم إلى', 'Join') }} {{ $invite->agency->name }}</h1>
-        <p>{{ $t('دُعيت بدور', 'You were invited as') }} <strong>{{ \App\Support\TeamRoles::label($invite->role) }}</strong> · <span class="muted" dir="ltr">{{ $invite->email }}</span></p>
+        <p>{{ $t('دُعيت بدور', 'You were invited as') }} <strong>{{ \App\Support\TeamRoles::label($invite->role) }}</strong>@if ($invite->email) · <span class="muted" dir="ltr">{{ $invite->email }}</span>@endif</p>
+        @if ($invite->via_link && ! $invite->email)
+            <p class="muted">{{ $t('هذا الرابط يعمل مرة واحدة خلال 24 ساعة.', 'This link works once, within 24 hours.') }}</p>
+        @endif
 
-        @if ($state === 'join')
+        @if ($state === 'member')
+            <p>{{ $t('أنت عضو في مساحة العمل هذه بالفعل.', 'You are already a member of this workspace.') }}</p>
+            <a class="btn" href="/app/{{ $invite->agency->slug }}">{{ $t('افتح مساحة العمل', 'Open the workspace') }}</a>
+        @elseif ($state === 'join')
             <form method="post" action="/invite/{{ $token }}">@csrf
                 <button type="submit">{{ $t('قبول الدعوة', 'Accept invitation') }}</button>
             </form>
@@ -42,7 +48,15 @@ button,.btn{display:inline-block;width:100%;margin-top:18px;padding:11px;border:
             <p>{{ $t('أنت مسجّل الدخول بحساب مختلف:', 'You are signed in with a different account:') }} <strong dir="ltr">{{ $user->email }}</strong>.
                {{ $t('سجّل الخروج ثم افتح رابط الدعوة مرة أخرى.', 'Sign out, then open the invitation link again.') }}</p>
         @else
+            @if ($invite->via_link && ! $invite->email)
+                <p class="muted">{{ $t('لديك حساب؟', 'Have an account?') }} <a style="color:var(--acc)" href="/app/login">{{ $t('سجّل الدخول', 'Sign in') }}</a> {{ $t('ثم افتح الرابط مرة أخرى.', 'then open the link again.') }}</p>
+            @endif
             <form method="post" action="/invite/{{ $token }}">@csrf
+                @if ($invite->via_link && ! $invite->email)
+                    <label for="email">{{ $t('بريدك الإلكتروني للعمل', 'Your work email') }}</label>
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" required maxlength="190" autocomplete="email" dir="ltr">
+                    @error('email')<div class="err">{{ $message }}</div>@enderror
+                @endif
                 <label for="name">{{ $t('الاسم الكامل', 'Full name') }}</label>
                 <input id="name" name="name" value="{{ old('name') }}" required maxlength="120" autocomplete="name">
                 @error('name')<div class="err">{{ $message }}</div>@enderror
