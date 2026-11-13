@@ -7,7 +7,7 @@ return [
     'lanes_enabled' => (bool) env('QUEUE_LANES', false),
     'lanes' => [
         'high' => ['DailySync', 'SyncAdAccount', 'RunAlerts', 'CheckAccountHealth'],
-        'slow' => ['RunNightShift', 'RunSeoAudit', 'VerifyOwnLinks', 'CheckLandingPages', 'SnapshotHealth', 'RunAccountAudit', 'RunTrialLifecycle'],
+        'slow' => ['RunNightShift', 'ResumeNightShift', 'RunSeoAudit', 'VerifyOwnLinks', 'CheckLandingPages', 'SnapshotHealth', 'RunAccountAudit', 'RunTrialLifecycle'],
         // everything else (reports, webhooks) stays on `default`
     ],
 

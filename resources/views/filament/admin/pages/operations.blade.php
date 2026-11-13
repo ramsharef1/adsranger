@@ -37,6 +37,17 @@
         </form>
     </x-filament::section>
 
+    <x-filament::section :heading="__('AI tools (all workspaces)')">
+        <x-slot name="description">{{ __('Stop an AI tool for everyone at once, for bad output or provider trouble. Saved work stays.') }}</x-slot>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+            @foreach ($aiTools as $tool => $t)
+                <x-filament::button size="sm" :color="$t['off'] ? 'danger' : 'gray'" wire:click="toggleAi('{{ $tool }}')" data-ai-kill="{{ $tool }}">
+                    {{ __($t['label']) }}: {{ $t['off'] ? __('stopped (restart)') : __('running (stop)') }}
+                </x-filament::button>
+            @endforeach
+        </div>
+    </x-filament::section>
+
     <x-filament::section :heading="__('Scheduled tasks')">
         <x-slot name="description">{{ __('Last finished run of each task. "Late" means a run that should have finished by now is missing.') }}</x-slot>
         <div style="overflow-x:auto">

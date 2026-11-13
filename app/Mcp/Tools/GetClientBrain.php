@@ -32,7 +32,7 @@ class GetClientBrain extends AiTool
         $items = AiBrainItem::query()->where('client_id', $client->id)->when($type, fn ($q) => $q->where('type', $type))
             ->where('state', 'ok')->latest()->limit(30)->get();
 
-        return $this->ok(['context' => ContextPack::for($client), 'saved' => $items->map(fn (AiBrainItem $i) => [
+        return $this->ok(['context' => ContextPack::forAi($client), 'saved' => $items->map(fn (AiBrainItem $i) => [
             'id' => $i->id, 'type' => $i->type, 'title' => $i->title, 'text' => mb_substr((string) ($i->clean ?? $i->original), 0, 2000),
             'quality' => $i->band, 'saved_at' => $i->created_at->toDateString(), 'by_ai' => $i->providerName(),
         ])->all()]);

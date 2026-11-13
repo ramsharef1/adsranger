@@ -35,5 +35,5 @@ return [
         'gemini' => 'https://aistudio.google.com/apikey',
     ],
     'max_output_tokens' => 1500,
-    'night_shift' => ['max_clients' => 25, 'max_items_per_client' => 3],
+    'night_shift' => ['max_clients' => 25, 'max_items_per_client' => 3, 'retry_hours' => 6], // FS-09: own-key outage queue
 ];

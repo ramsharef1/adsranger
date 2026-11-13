@@ -2,7 +2,10 @@
 
 namespace App\Support\AiWorkspace;
 
+use App\Models\Agency;
 use App\Models\AiKey;
+use App\Models\AuditLog;
+use App\Support\CriticalPush;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 
@@ -66,6 +69,11 @@ class OwnKey
      */
     public static function complete(AiKey $key, string $system, string $user, bool $json): array
     {
+        // FS-01 (D-299): phones, emails and ID-like numbers never leave for the AI; the count goes back to the caller.
+        $rs = Redactor::clean($system);
+        $ru = Redactor::clean($user);
+        [$system, $user] = [$rs['text'], $ru['text']];
+        $redacted = Redactor::total($rs['counts']) + Redactor::total($ru['counts']);
         $estimate = static::estimate($key, $system.$user);
         if ($estimate > $key->remaining()) {
             return ['ok' => false, 'cost' => 0.0, 'error' => __('This would go over the monthly cap you set for this key. Raise the cap or wait for next month.')];
@@ -89,14 +97,16 @@ class OwnKey
                     ]),
             };
         } catch (ConnectionException) {
-            return ['ok' => false, 'cost' => 0.0, 'error' => __('The provider did not answer. Nothing was counted against your cap.')];
+            return ['ok' => false, 'cost' => 0.0, 'transient' => true, 'redacted' => $redacted, 'error' => __('The provider did not answer. Nothing was counted against your cap.')];
         }
 
         if ($r->failed()) {
             $msg = (string) ($r->json('error.message') ?? $r->json('error.type') ?? '');
             $billing = in_array($r->status(), [402, 429], true) || preg_match('/quota|billing|credit|insufficient|exhausted/i', $msg);
 
-            return ['ok' => false, 'cost' => 0.0, 'billing' => (bool) $billing,
+            // FS-09: a server error or a plain rate limit is worth waiting for; billing is not.
+            return ['ok' => false, 'cost' => 0.0, 'billing' => (bool) $billing, 'redacted' => $redacted,
+                'transient' => ! $billing && ($r->status() >= 500 || $r->status() === 429),
                 'error' => $billing ? __('Your provider account is out of credit or over its limit.') : __('The provider answered with an error (HTTP :code).', ['code' => $r->status()])];
         }
 
@@ -108,8 +118,32 @@ class OwnKey
         [, $pin, $pout] = static::model($key->provider, $key->model) ?? ['', 5.0, 15.0];
         $cost = round((int) $in * $pin / 1e6 + (int) $out * $pout / 1e6, 6);
         $key->addSpend($cost);
+        static::capNotice($key);
 
-        return ['ok' => trim((string) $text) !== '', 'text' => trim((string) $text), 'cost' => $cost, 'error' => trim((string) $text) === '' ? __('The provider returned an empty answer.') : null];
+        return ['ok' => trim((string) $text) !== '', 'text' => trim((string) $text), 'cost' => $cost, 'redacted' => $redacted, 'error' => trim((string) $text) === '' ? __('The provider returned an empty answer.') : null];
+    }
+
+    /** EG-23 (D-299): once a month, tell the owner when a key passes 80 % of its cap (phone push + the keys page; no email). */
+    public static function capNotice(AiKey $key): void
+    {
+        $month = now()->format('Y-m');
+        $cap = (float) $key->monthly_cap_usd;
+        if ($cap <= 0 || $key->cap_noticed_month === $month || $key->spentThisMonth() < 0.8 * $cap) {
+            return;
+        }
+        $key->forceFill(['cap_noticed_month' => $month])->save();
+        $agency = Agency::find($key->agency_id);
+        $owner = $agency?->owner;
+        if ($owner && config('push.enabled')) {
+            CriticalPush::push($owner, [
+                'title' => __('An AI key is at 80% of its monthly cap'),
+                'body' => __(':provider key: :spent of :cap USD used this month. At the cap, AI requests on this key stop until next month.',
+                    ['provider' => ucfirst($key->provider), 'spent' => number_format($key->spentThisMonth(), 2), 'cap' => number_format($cap, 2)]),
+            ], url('/app/'.$agency->slug.'/ai-keys'), 'adsr-ai-cap-'.$key->id);
+        }
+        if ($agency) {
+            AuditLog::record('ai_workspace.cap_80', $agency, ['key' => $key->id]);
+        }
     }
 
     /** Pull the JSON object out of a reply (some models wrap it in a code fence). */

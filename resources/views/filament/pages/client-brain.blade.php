@@ -68,6 +68,17 @@
             @if ($pack['rules'] !== [])
                 <div><strong>{{ __('Client rules') }}:</strong> @foreach ($pack['rules'] as $r)<span style="display:inline-block;margin-inline-end:8px"><bdi>{{ $r }}</bdi></span>@endforeach</div>
             @endif
+            {{-- FS-02 (D-299): what may go to AI about this client; everything is on until someone unticks it. --}}
+            @if ($canRun)
+                <form wire:submit="saveScope" data-ai-scope style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;border-top:1px solid rgba(148,163,184,.2);padding-top:10px">
+                    <strong style="font-size:13px">{{ __('Your AI may read') }}:</strong>
+                    @foreach (['spend' => __('Spend, cost and revenue'), 'results' => __('Results, clicks and impressions'), 'rules' => __('Client rules')] as $part => $label)
+                        <label style="display:inline-flex;gap:6px;align-items:center;min-height:44px;font-size:13px"><input type="checkbox" wire:model="scope" value="{{ $part }}"> {{ $label }}</label>
+                    @endforeach
+                    <x-filament::button type="submit" size="sm" color="gray">{{ __('Save') }}</x-filament::button>
+                </form>
+                <p style="{{ $muted }};font-size:12px;margin:0">{{ __('Phone numbers, emails and ID-like numbers are always hidden before anything is sent.') }}</p>
+            @endif
         </details>
     @endif
 

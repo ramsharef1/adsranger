@@ -22,6 +22,12 @@ class ContextPack
      * @return array{client: string, currency: string, data_until: ?string, periods: array<string, array{from: string, to: string}>,
      *   facts: list<array{label: string, value: float, period: string, source: string, date: ?string}>, rules: list<string>, do_not_claim: list<string>}
      */
+    /** FS-02 (D-299): the pack as sent to an AI — only the parts this client allows. @return array<string, mixed> */
+    public static function forAi(Client $client, ?Carbon $today = null): array
+    {
+        return AiScope::apply($client, static::for($client, $today));
+    }
+
     public static function for(Client $client, ?Carbon $today = null): array
     {
         $today = ($today ?? now())->copy()->startOfDay();

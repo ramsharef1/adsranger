@@ -72,7 +72,8 @@
             <div style="font-size:13px;border-top:1px solid rgba(148,163,184,.2);padding-top:6px">
                 <time datetime="{{ $r->started_at->toIso8601String() }}">{{ $fmt($r->started_at) }}</time> ·
                 {!! __('Clients checked: :c · items: :i · cost on your key: :usd (estimate)', ['c' => $ltr($r->clients_checked), 'i' => $ltr($r->items_found), 'usd' => $ltr(number_format((float) $r->cost_usd, 4).' USD')]) !!}
-                @if ($r->status !== 'ok') · <strong>{{ $r->status === 'partial' ? __('Stopped part way') : __('Failed') }}:</strong> {{ $r->error }}@endif
+                @if ($r->status !== 'ok') · <strong>{{ ['partial' => __('Stopped part way'), 'waiting' => __('Waiting for your AI provider')][$r->status] ?? __('Failed') }}:</strong> {{ $r->error }}@endif
+                @if ((int) $r->redacted > 0) · {{ __('Personal data hidden before sending: :n', ['n' => $r->redacted]) }}@endif
             </div>
         @empty
             <p style="{{ $muted }}">{{ __('No runs yet.') }}</p>

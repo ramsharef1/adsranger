@@ -3,7 +3,9 @@
 namespace App\Filament\Admin\Pages;
 
 use App\Filament\Concerns\TranslatesPageLabels;
+use App\Models\AuditLog;
 use App\Models\PlatformSetting;
+use App\Support\AiWorkspace\AiKill;
 use App\Support\Announcements;
 use App\Support\Ops\ErrorLookup;
 use App\Support\Ops\Heartbeat;
@@ -83,6 +85,14 @@ class OperationsBoard extends Page
         Announcements::end();
     }
 
+    /** FS-49: stop or restart one AI tool for every workspace. */
+    public function toggleAi(string $tool): void
+    {
+        abort_unless(array_key_exists($tool, AiKill::TOOLS), 404);
+        AiKill::set($tool, ! AiKill::off($tool));
+        AuditLog::record('ai.kill_switch', null, ['tool' => $tool, 'off' => AiKill::off($tool)]);
+    }
+
     public function lookup(): void
     {
         $this->found = ErrorLookup::find($this->ref);
@@ -98,6 +108,7 @@ class OperationsBoard extends Page
             'lastPrune' => PlatformSetting::get(Prune::LAST_KEY),
             'deadlines' => NetworkDeadlines::all(),
             'announcement' => Announcements::current(),
+            'aiTools' => collect(AiKill::TOOLS)->map(fn ($label, $tool) => ['label' => $label, 'off' => AiKill::off($tool)])->all(),
             'liveSite' => PlatformSetting::get(LiveSiteCheck::LAST_KEY),
             'drivers' => ['lanes' => (bool) config('ops.lanes_enabled'), 'cache' => (string) config('cache.default'), 'session' => (string) config('session.driver')],
         ];

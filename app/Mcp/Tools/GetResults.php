@@ -26,7 +26,7 @@ class GetResults extends AiTool
         if (! $client) {
             return $this->denied();
         }
-        $pack = ContextPack::for($client);
+        $pack = ContextPack::forAi($client);
 
         return $this->ok(['client' => $pack['client'], 'currency' => $pack['currency'], 'data_until' => $pack['data_until'], 'periods' => $pack['periods'],
             'facts' => $pack['facts'], 'note' => $pack['facts'] === [] ? 'No synced data for this client yet. Say so; do not estimate.' : null]);

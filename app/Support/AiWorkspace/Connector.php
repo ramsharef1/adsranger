@@ -17,7 +17,7 @@ class Connector
     public static function forToken(?User $user): ?AiConnection
     {
         $clientId = $user?->token()?->oauth_client_id;
-        if (! $user || ! $clientId) {
+        if (! $user || ! $clientId || AiKill::off('connector')) { // FS-49: paused for everyone from /admin
             return null;
         }
 

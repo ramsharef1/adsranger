@@ -57,7 +57,7 @@ class Playbooks
     public static function envelope(Client $client, string $playbook, string $notes = '', ?string $dialect = null, ?string $platform = null): array
     {
         $type = static::all()[$playbook]['output_type'] ?? null;
-        $pack = ContextPack::for($client);
+        $pack = ContextPack::forAi($client);
 
         return [
             'playbook' => $playbook.' '.self::VERSION,

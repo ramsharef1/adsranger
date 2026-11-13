@@ -2,6 +2,7 @@
 
 namespace App\Support\AiWorkspace;
 
+use App\Jobs\ResumeNightShift;
 use App\Models\Agency;
 use App\Models\AiKey;
 use App\Models\AiNightRun;
@@ -39,6 +40,9 @@ class NightShift
         $key = AiKey::where('agency_id', $agency->id)->where('provider', $shift->provider)->first();
 
         $fail = fn (string $why) => tap($run)->update(['status' => 'failed', 'error' => $why, 'finished_at' => now()]);
+        if (AiKill::off('night_shift')) { // FS-49
+            return $fail(__('The night shift is paused for everyone for now.'));
+        }
         if (! Modules::on('ai_workspace', null, $agency) && ! Modules::isPreviewAgency($agency)) {
             return $fail(__('AI Workspace is not available for this workspace yet.'));
         }
@@ -49,23 +53,59 @@ class NightShift
             return $fail(__('No key for this provider. Add one in My API keys.'));
         }
 
-        $clients = Client::where('agency_id', $agency->id)->whereIn('id', (array) $shift->client_ids)->limit((int) config('ai_workspace.night_shift.max_clients', 25))->get();
-        $items = 0;
-        $cost = 0.0;
-        $checked = 0;
-        foreach ($clients as $client) {
+        $ids = Client::where('agency_id', $agency->id)->whereIn('id', (array) $shift->client_ids)->limit((int) config('ai_workspace.night_shift.max_clients', 25))->pluck('id')->all();
+
+        return static::work($run, $key, $ids);
+    }
+
+    /** FS-09 (D-297): the provider was down or rate-limited; try the clients still left, up to 6 hours after the first try. */
+    public static function resume(AiNightRun $run, array $clientIds): AiNightRun
+    {
+        $key = AiKey::where('agency_id', $run->agency_id)->where('provider', $run->provider)->first();
+        if (! $key || AiKill::off('night_shift')) {
+            $run->update(['status' => 'failed', 'error' => __('The night shift could not finish.'), 'finished_at' => now()]);
+
+            return $run;
+        }
+
+        return static::work($run, $key, $clientIds);
+    }
+
+    /** @param list<int> $clientIds */
+    protected static function work(AiNightRun $run, AiKey $key, array $clientIds): AiNightRun
+    {
+        $agency = Agency::find($run->agency_id);
+        $items = (int) $run->items_found;
+        $cost = (float) $run->cost_usd;
+        $checked = (int) $run->clients_checked;
+        $redacted = (int) $run->redacted;
+        $clients = Client::whereIn('id', $clientIds)->orderBy('id')->get();
+        foreach ($clients as $i => $client) {
             $r = static::client($client, $key);
             $cost += $r['cost'];
+            $redacted += (int) ($r['redacted'] ?? 0);
             if (! $r['ok']) {
-                $run->update(['status' => $checked ? 'partial' : 'failed', 'error' => $r['error'], 'clients_checked' => $checked, 'items_found' => $items, 'cost_usd' => $cost, 'finished_at' => now()]);
+                $left = $clients->slice($i)->pluck('id')->all();
+                $maxRetries = (int) config('ai_workspace.night_shift.retry_hours', 6) * 2;
+                if (($r['transient'] ?? false) && (int) $run->retries < $maxRetries) {
+                    $run->update(['status' => 'waiting', 'error' => __('Your AI provider is not answering. Trying again in 30 minutes (up to 6 hours); never on our credits.'),
+                        'retries' => (int) $run->retries + 1, 'clients_checked' => $checked, 'items_found' => $items, 'cost_usd' => $cost, 'redacted' => $redacted]);
+                    ResumeNightShift::dispatch($run->id, $left)->delay(now()->addMinutes(30));
+
+                    return $run;
+                }
+                $error = ($r['transient'] ?? false) ? __('Your AI provider did not answer for 6 hours. The night shift stopped for today.') : $r['error'];
+                $run->update(['status' => $checked ? 'partial' : 'failed', 'error' => $error, 'clients_checked' => $checked, 'items_found' => $items, 'cost_usd' => $cost, 'redacted' => $redacted, 'finished_at' => now()]);
 
                 return $run;
             }
             $checked++;
             $items += $r['items'];
         }
-        $run->update(['clients_checked' => $checked, 'items_found' => $items, 'cost_usd' => $cost, 'finished_at' => now()]);
-        AuditLog::record('ai_workspace.night_shift', $agency, ['run' => $run->id, 'clients' => $checked, 'items' => $items]);
+        $run->update(['status' => 'ok', 'error' => null, 'clients_checked' => $checked, 'items_found' => $items, 'cost_usd' => $cost, 'redacted' => $redacted, 'finished_at' => now()]);
+        if ($agency) {
+            AuditLog::record('ai_workspace.night_shift', $agency, ['run' => $run->id, 'clients' => $checked, 'items' => $items, 'redacted' => $redacted]);
+        }
 
         return $run;
     }
@@ -73,7 +113,7 @@ class NightShift
     /** @return array{ok: bool, items: int, cost: float, error?: string} */
     protected static function client(Client $client, AiKey $key): array
     {
-        $pack = ContextPack::for($client);
+        $pack = ContextPack::forAi($client);
         $alerts = Alert::where('client_id', $client->id)->where('status', 'open')->latest('last_seen_at')->limit(20)->get()
             ->map(fn (Alert $a) => ['level' => ['high' => 'critical', 'medium' => 'warning'][$a->severity] ?? 'info', 'title' => strip_tags((string) $a->title), 'concerns' => strip_tags((string) $a->entity_name)])->all();
         if ($pack['facts'] === [] && $alerts === []) {
@@ -85,7 +125,8 @@ class NightShift
         $r = OwnKey::complete($key, $system, json_encode(['context' => ['client' => $pack['client'], 'currency' => $pack['currency'], 'data_until' => $pack['data_until'],
             'facts' => $pack['facts'], 'client_rules' => $pack['rules'], 'open_alerts' => $alerts]], JSON_UNESCAPED_UNICODE), true);
         if (! $r['ok']) {
-            return ['ok' => false, 'items' => 0, 'cost' => $r['cost'], 'error' => ($r['billing'] ?? false) ? __('Your key is out of credit.') : ($r['error'] ?? __('The provider answered with an error.'))];
+            return ['ok' => false, 'items' => 0, 'cost' => $r['cost'], 'transient' => (bool) ($r['transient'] ?? false), 'redacted' => (int) ($r['redacted'] ?? 0),
+                'error' => ($r['billing'] ?? false) ? __('Your key is out of credit.') : ($r['error'] ?? __('The provider answered with an error.'))];
         }
         $found = 0;
         foreach (array_slice((array) (OwnKey::json($r['text'])['items'] ?? []), 0, $max) as $it) {
@@ -99,6 +140,6 @@ class NightShift
             $found++;
         }
 
-        return ['ok' => true, 'items' => $found, 'cost' => $r['cost']];
+        return ['ok' => true, 'items' => $found, 'cost' => $r['cost'], 'redacted' => (int) ($r['redacted'] ?? 0)];
     }
 }

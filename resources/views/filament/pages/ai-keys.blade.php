@@ -20,6 +20,9 @@
                 <span style="{{ $muted }}">{!! $ltr(\App\Support\AiWorkspace\OwnKey::modelLabel($k->provider, $k->model)) !!}</span>
             </div>
             <div style="font-size:13px">{!! __('This month (estimate): :spent of :cap', ['spent' => $usd($k->spentThisMonth()), 'cap' => $usd($k->monthly_cap_usd)]) !!}</div>
+            @if ((float) $k->monthly_cap_usd > 0 && $k->spentThisMonth() >= 0.8 * (float) $k->monthly_cap_usd)
+                <div data-cap-80 style="font-size:13px;color:#b45309;font-weight:600">{{ __('Over 80% of the monthly cap. At the cap, requests on this key stop until next month.') }}</div>
+            @endif
             <div style="{{ $muted }}">@if ($k->tested_at){{ $k->test_ok ? '✓' : '✗' }} {{ $k->test_message }} · <time datetime="{{ $k->tested_at->toIso8601String() }}">{{ $k->tested_at->locale(app()->getLocale())->diffForHumans() }}</time>@endif</div>
             @if ($canManage)
                 <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:end" x-data="{ cap: '{{ (float) $k->monthly_cap_usd }}' }">

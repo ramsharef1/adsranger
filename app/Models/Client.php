@@ -18,7 +18,7 @@ class Client extends Model
     protected function casts(): array
     {
         return ['hide_spend' => 'boolean', 'monthly_budget' => 'float', 'target_cpr' => 'float', 'target_roas' => 'float', 'target_results' => 'integer',
-            'health_score' => 'integer', 'health_parts' => 'array', 'health_at' => 'datetime'];
+            'health_score' => 'integer', 'health_parts' => 'array', 'health_at' => 'datetime', 'ai_scope' => 'array'];
     }
 
     public function agency(): BelongsTo

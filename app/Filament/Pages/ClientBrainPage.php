@@ -9,6 +9,7 @@ use App\Models\AiKey;
 use App\Models\AuditLog;
 use App\Models\Client;
 use App\Support\AiWorkspace\AiBox;
+use App\Support\AiWorkspace\AiScope;
 use App\Support\AiWorkspace\ContextPack;
 use App\Support\AiWorkspace\OwnKey;
 use App\Support\AiWorkspace\Playbooks;
@@ -75,6 +76,18 @@ class ClientBrainPage extends Page
     public function mount(): void
     {
         $this->clientId = CurrentClient::id() ?: $this->clients()->first()?->id;
+        $this->loadScope();
+    }
+
+    public function updatedClientId(): void
+    {
+        $this->loadScope();
+    }
+
+    protected function loadScope(): void
+    {
+        $client = $this->client();
+        $this->scope = $client ? AiScope::allowed($client) : [];
     }
 
     protected function clients(): Collection
@@ -113,7 +126,23 @@ class ClientBrainPage extends Page
         }
         $this->boxNotes = '';
         $this->type = '';
-        Notification::make()->title(__('Saved to the client brain · cost on your key about :usd USD (estimate).', ['usd' => number_format($r['cost'], 4)]))->success()->send();
+        Notification::make()->success()
+            ->title(($r['cached'] ?? false) ? __('Same request in the last 4 hours: the saved answer is shown, no new cost.')
+                : __('Saved to the client brain · cost on your key about :usd USD (estimate).', ['usd' => number_format($r['cost'], 4)]))
+            ->body(($r['redacted'] ?? 0) ? __('Personal data hidden before sending: :n', ['n' => $r['redacted']]) : null)->send();
+    }
+
+    /** @var list<string> FS-02 (D-299): what may go to AI about this client */
+    public array $scope = [];
+
+    public function saveScope(): void
+    {
+        $client = $this->client();
+        abort_unless($client && TeamRoles::canManageData(auth()->user(), Filament::getTenant()), 403);
+        $parts = array_values(array_intersect(array_keys(AiScope::PARTS), $this->scope));
+        $client->forceFill(['ai_scope' => count($parts) === count(AiScope::PARTS) ? null : $parts])->save();
+        AuditLog::record('ai_workspace.scope', $client, ['scope' => $parts]);
+        Notification::make()->title(__('Saved. Your AI gets only what is ticked for this client.'))->success()->send();
     }
 
     public function remove(int $id): void
@@ -146,7 +175,7 @@ class ClientBrainPage extends Page
             ? OwnKey::estimate($key, json_encode(Playbooks::envelope($client, $this->boxPlaybook, $this->boxNotes, $this->boxDialect, $this->boxPlatform), JSON_UNESCAPED_UNICODE))
             : null;
 
-        return ['clients' => $this->clients(), 'client' => $client, 'items' => $items, 'pack' => $client ? ContextPack::for($client) : null,
+        return ['clients' => $this->clients(), 'client' => $client, 'items' => $items, 'pack' => $client ? ContextPack::forAi($client) : null, 'scopeParts' => AiScope::PARTS,
             'full' => $full = PlanGate::allows(Filament::getTenant(), 'ai_workspace_full'),
             'canManage' => $full && TeamRoles::canManageTeam(auth()->user(), Filament::getTenant()),
             'canRun' => TeamRoles::canManageData(auth()->user(), Filament::getTenant()), 'keys' => $keys, 'key' => $key, 'estimate' => $estimate];
