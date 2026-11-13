@@ -271,6 +271,23 @@
         </x-filament::section>
     @endif
 
+    {{-- FS-22 (R4): season review, plan vs actual by week --}}
+    @if ($season && $season['spend'] > 0)
+        <x-filament::section data-season-review>
+            <x-slot name="heading">{{ __('Season review: :season', ['season' => $season['label']]) }}</x-slot>
+            <x-slot name="description"><bdi dir="ltr">{{ $season['start'] }} → {{ $season['end'] }}</bdi>@if ($season['spend_vs_before'] !== null && ! $client->hide_spend) · {{ __('spend per day :pct% vs the 28 days before', ['pct' => ($season['spend_vs_before'] > 0 ? '+' : '').$season['spend_vs_before']]) }}@endif</x-slot>
+            <div style="overflow-x:auto"><table style="width:100%;font-size:13.5px;border-collapse:collapse">
+                <thead><tr><th style="text-align:start;padding:6px">{{ __('Week') }}</th>@unless ($client->hide_spend)<th style="text-align:end;padding:6px">{{ __('Spend') }}</th><th style="text-align:end;padding:6px">{{ __('Plan') }}</th>@endunless<th style="text-align:end;padding:6px">{{ __('Results') }}</th>@unless ($client->hide_spend)<th style="text-align:end;padding:6px">{{ __('Cost per result') }}</th>@endunless</tr></thead>
+                <tbody>@foreach ($season['weeks'] as $w)<tr style="border-top:1px solid rgba(148,163,184,.2)"><td style="padding:6px"><bdi dir="ltr">{{ $w['from'] }}</bdi></td>
+                    @unless ($client->hide_spend)<td style="padding:6px;text-align:end">{{ R::money($w['spend'], $cur) }}</td><td style="padding:6px;text-align:end">{{ $w['planned'] ? R::money($w['planned'], $cur) : '–' }}@if ($w['vs_plan'] !== null)<span style="{{ abs($w['vs_plan']) > 15 ? 'color:#B45309;font-weight:600' : 'opacity:.7' }}"> ({{ ($w['vs_plan'] > 0 ? '+' : '').$w['vs_plan'] }}%)</span>@endif</td>@endunless
+                    <td style="padding:6px;text-align:end">{{ number_format($w['results']) }}</td>@unless ($client->hide_spend)<td style="padding:6px;text-align:end">{{ $w['cpr'] !== null ? R::money($w['cpr'], $cur) : '–' }}</td>@endunless</tr>@endforeach</tbody>
+            </table></div>
+            @if (\App\Support\Modules::on('ai_workspace', null, $client->agency) && \App\Support\TeamRoles::canManageData(auth()->user(), $client->agency))
+                <div style="margin-top:8px"><x-filament::button size="sm" color="gray" wire:click="rememberSeason">{{ __('Keep in the client brain for next year') }}</x-filament::button></div>
+            @endif
+        </x-filament::section>
+    @endif
+
     {{-- FS-19 (R4): several ad-account currencies (one brand in several markets) --}}
     @if ($byCurrency->count() > 1 && ! $client->hide_spend)
         <x-filament::section data-by-currency>

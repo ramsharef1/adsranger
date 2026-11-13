@@ -2619,5 +2619,10 @@
     "Nobody": "لا أحد",
     "Save rota": "احفظ الجدول",
     "By account currency": "حسب عملة الحساب",
-    "Each market in its own money, then the total in the client's currency and in USD (rate on the last day of the period).": "كل سوق بعملته، ثم الإجمالي بعملة العميل وبالدولار (بسعر آخر يوم في الفترة)."
+    "Each market in its own money, then the total in the client's currency and in USD (rate on the last day of the period).": "كل سوق بعملته، ثم الإجمالي بعملة العميل وبالدولار (بسعر آخر يوم في الفترة).",
+    "Saved in the client brain.": "حُفظ في ذاكرة العميل.",
+    "Season review: :season": "مراجعة الموسم: :season",
+    "spend per day :pct% vs the 28 days before": "الإنفاق اليومي :pct% مقارنةً بالأيام الـ28 السابقة",
+    "Week": "الأسبوع",
+    "Keep in the client brain for next year": "احفظها في ذاكرة العميل للعام القادم"
 }

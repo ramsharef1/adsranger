@@ -30,6 +30,7 @@ use App\Support\MonthNotes;
 use App\Support\Pacing;
 use App\Support\Periods;
 use App\Support\PlanGate;
+use App\Support\SeasonReview;
 use App\Support\TeamRoles;
 use App\Support\WhatsAppReport;
 use Carbon\CarbonImmutable;
@@ -400,6 +401,17 @@ class ViewClient extends ViewRecord
         return TeamRoles::canManageData(auth()->user(), $this->record->agency);
     }
 
+    /** FS-22 (R4): keep the season review in the client brain for next year. */
+    public function rememberSeason(): void
+    {
+        abort_unless(TeamRoles::canManageData(auth()->user(), $this->record->agency), 403);
+        abort_unless(Modules::on('ai_workspace', null, $this->record->agency), 403);
+        if ($r = SeasonReview::latest($this->record)) {
+            SeasonReview::remember($this->record, $r, auth()->user());
+            Notification::make()->title(__('Saved in the client brain.'))->success()->send();
+        }
+    }
+
     public function removeLicence(int $id): void
     {
         abort_unless(TeamRoles::canManageData(auth()->user(), $this->record->agency), 403);
@@ -463,6 +475,7 @@ class ViewClient extends ViewRecord
             'top' => MetricsQuery::topAds($c, $from, $to),
             'alerts' => Alert::where('client_id', $c->id)->where('status', 'open')->latest()->limit(5)->get(),
             'series' => DataGaps::series($c, $from, $to),
+            'season' => SeasonReview::latest($c), // FS-22 (R4)
             // FS-19 (R4): one brand in several markets: each ad-account currency in its own money, plus the client total.
             'byCurrency' => DailyMetric::where('client_id', $c->id)->whereBetween('date', [$from, $to])->whereNotNull('currency')
                 ->selectRaw('currency, SUM(spend) as spend, SUM(results) as results, MIN(date) as d')->groupBy('currency')->get()
