@@ -417,7 +417,12 @@ class PublicSiteController extends Controller
             '/privacy' => 'legal/page',
             '/terms' => 'legal/page',
             '/data-deletion' => 'legal/page',
-        ] + (PublicSite::articlesPublic() ? ['/blog' => 'public/blog/index', '/guides' => 'public/guides/index'] : [])
+        ] + collect(PublicCatalog::glossary())->mapWithKeys(fn ($t, string $slug) => ['/glossary/'.$slug => 'public/glossary/show'])->all()
+          + (PublicSite::articlesPublic()
+              ? ['/blog' => 'public/blog/index', '/guides' => 'public/guides/index']
+                + collect(PublicCatalog::guides())->mapWithKeys(fn ($g, string $slug) => ['/guides/'.$slug => 'public/guides/show'])->all()
+                + collect(PublicCatalog::posts())->mapWithKeys(fn ($p, string $slug) => ['/blog/'.$slug => 'public/blog/show'])->all()
+              : [])
           + (config('seo_tools.public') ? (['/tools' => 'public/tools/index'] + collect(PublicSite::publicTools())->mapWithKeys(fn (string $t) => ['/tools/'.$t => 'public/tools/'.$t])->all()) : []);
     }
 

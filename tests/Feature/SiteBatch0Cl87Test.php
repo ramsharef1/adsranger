@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Support\Seo\PageAudit;
 use Tests\TestCase;
 
-/** cl87 (Rami's ADSR-920 picks, Batch 0): GB-01 / GB-02 (a) held articles, UX-253 page-audit notes. */
+/** cl87 (Rami's ADSR-920 picks, Batch 0): GB-01 articles + glossary terms listed (switch can hold them), UX-253 page-audit notes. */
 class SiteBatch0Cl87Test extends TestCase
 {
     public function test_held_articles_answer_with_noindex_and_stay_out_of_sitemap_and_llms(): void
@@ -33,7 +33,11 @@ class SiteBatch0Cl87Test extends TestCase
 
         $this->get('/guides/meta-ads-mena')->assertOk()->assertHeaderMissing('X-Robots-Tag');
         $this->get('/guides')->assertOk()->assertSee('/guides/meta-ads-mena', false);
-        $this->assertStringContainsString('adsranger.com/guides<', $this->get('/sitemaps/pages.xml')->getContent());
+        $sitemap = $this->get('/sitemaps/pages.xml')->getContent();
+        $this->assertStringContainsString('adsranger.com/guides<', $sitemap);
+        $this->assertStringContainsString('adsranger.com/guides/meta-ads-mena<', $sitemap);
+        $this->assertStringContainsString('adsranger.com/en/blog/eid-al-fitr-2027-campaign-checklist<', $sitemap);
+        $this->assertStringContainsString('adsranger.com/glossary/performance-max<', $sitemap);
     }
 
     public function test_page_audit_names_the_small_checks_it_deducts_for(): void
