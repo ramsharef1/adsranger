@@ -5,6 +5,7 @@ use App\Http\Controllers\ClientOnboardingController;
 use App\Http\Controllers\ClientReportController;
 use App\Http\Controllers\ConnectController;
 use App\Http\Controllers\InvitationController;
+use App\Http\Controllers\LeadDeskController;
 use App\Http\Controllers\MagicLoginController;
 use App\Http\Controllers\PublicAttributionCollectorController;
 use App\Http\Controllers\PublicSiteController;
@@ -140,6 +141,10 @@ Route::middleware([PublicTrailingSlash::class, TrackOrigin::class])->group(funct
 // #176 agency logo on client reports (random file name, see App\Support\AgencyLogo)
 Route::get('/brand/agency/{file}', [AgencyLogoController::class, 'show'])
     ->middleware('throttle:120,1')->where('file', '[A-Za-z0-9]{40}\.(png|svg)')->name('agency.logo');
+// XS-13 / XS-23 (R4, D-306): no-login lead page for a client's front desk (module lead_desk).
+Route::get('/l/{token}', [LeadDeskController::class, 'show'])->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{40}');
+Route::post('/l/{token}', [LeadDeskController::class, 'store'])->middleware('throttle:30,1')->where('token', '[A-Za-z0-9]{40}');
+Route::post('/l/{token}/{lead}', [LeadDeskController::class, 'update'])->middleware('throttle:60,1')->where(['token' => '[A-Za-z0-9]{40}', 'lead' => '[0-9]+']);
 Route::get('/r/{token}', [ClientReportController::class, 'show'])->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{40}');
 // #57 monthly PDF behind the same link
 Route::get('/r/{token}/ads', [ClientReportController::class, 'ads'])->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{40}');

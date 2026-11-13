@@ -69,6 +69,11 @@ class Modules
                 'description' => __('Your own AI with your clients\' data: client brain, quality checks, and the AdsRanger connector.'),
                 'beta_requestable' => false,
             ],
+            'lead_desk' => [
+                'label' => __('Lead page for the client\'s front desk'),
+                'description' => __('A private link where the client\'s staff log leads and WhatsApp chats, so reports show response time and real sales.'),
+                'beta_requestable' => false,
+            ],
             'panel_shell' => [
                 'label' => __('New panel layout'),
                 'description' => __('Areas in the header, a shorter side menu per area, the season line and a bottom bar on phones.'),

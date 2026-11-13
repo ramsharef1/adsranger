@@ -15,6 +15,7 @@ use App\Models\ClientLicence;
 use App\Models\ClientLink;
 use App\Models\CodWeek;
 use App\Models\DailyMetric;
+use App\Models\LeadDeskLink;
 use App\Models\ReportSchedule;
 use App\Support\ClientFreeze;
 use App\Support\ClientSetupCopy;
@@ -23,6 +24,7 @@ use App\Support\CodOutcomes;
 use App\Support\DataGaps;
 use App\Support\Fx;
 use App\Support\HealthScore;
+use App\Support\LeadDesk;
 use App\Support\MetricsQuery;
 use App\Support\Modules;
 use App\Support\MonthlyReport;
@@ -72,6 +74,25 @@ class ViewClient extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            // XS-13 / XS-23 (D-306): the client's front-desk lead page (module lead_desk).
+            Action::make('leadDesk')->label(__('Lead page link'))->icon('heroicon-o-inbox-arrow-down')->color('gray')
+                ->visible(fn () => Modules::on('lead_desk', null, $this->record->agency) && TeamRoles::canManageData(auth()->user(), $this->record->agency))
+                ->modalSubmitActionLabel(__('Make a new link'))
+                ->modalDescription(__('A private page where the client\'s staff log each lead or WhatsApp chat and tap "Contacted", "Qualified" or "Sale". No login, no phone numbers stored. Making a new link stops the old one.'))
+                ->action(function (): void {
+                    $link = LeadDeskLink::issue($this->record, auth()->user());
+                    Notification::make()->title(__('New lead page link'))->body($link->url())->persistent()->success()->send();
+                }),
+            Action::make('logLead')->label(__('Log a lead'))->icon('heroicon-o-plus-circle')->color('gray')
+                ->visible(fn () => Modules::on('lead_desk', null, $this->record->agency) && TeamRoles::canManageData(auth()->user(), $this->record->agency))
+                ->schema([
+                    Select::make('channel')->label(__('Source'))->options(collect(LeadDesk::channels())->map(fn ($v) => app()->getLocale() === 'ar' ? $v['ar'] : $v['en'])->all())->default('whatsapp')->required(),
+                    TextInput::make('label')->label(__('Name or short note (no phone number)'))->maxLength(60),
+                ])
+                ->action(function (array $data): void {
+                    LeadDesk::log($this->record, $data['channel'], $data['label'] ?? null, 'app');
+                    Notification::make()->title(__('Lead logged.'))->success()->send();
+                }),
             // XS-24 / NB-36 (D-305): licence type, number and expiry; printed on briefs, Desk reminder 30 days before.
             Action::make('addLicence')->label(__('Add licence'))->icon('heroicon-o-identification')->color('gray')
                 ->visible(fn () => TeamRoles::canManageData(auth()->user(), $this->record->agency))
@@ -475,6 +496,7 @@ class ViewClient extends ViewRecord
             'top' => MetricsQuery::topAds($c, $from, $to),
             'alerts' => Alert::where('client_id', $c->id)->where('status', 'open')->latest()->limit(5)->get(),
             'series' => DataGaps::series($c, $from, $to),
+            'leads' => Modules::on('lead_desk', null, $c->agency) ? LeadDesk::summary($c, $from, $to) : null, // XS-13 / XS-23
             'season' => SeasonReview::latest($c), // FS-22 (R4)
             // FS-19 (R4): one brand in several markets: each ad-account currency in its own money, plus the client total.
             'byCurrency' => DailyMetric::where('client_id', $c->id)->whereBetween('date', [$from, $to])->whereNotNull('currency')

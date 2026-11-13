@@ -271,6 +271,25 @@
         </x-filament::section>
     @endif
 
+    {{-- XS-13 / XS-23 (D-306): speed-to-lead and WhatsApp results, from the lead page --}}
+    @if ($leads)
+        <x-filament::section data-lead-summary>
+            <x-slot name="heading">{{ __('Leads and response time') }}</x-slot>
+            <x-slot name="description">{{ __('From the lead page your client\'s staff fill in, for this period.') }}</x-slot>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;font-size:14px">
+                <div><div style="{{ $muted }}">{{ __('Leads logged') }}</div><strong>{{ number_format($leads['leads']) }}</strong></div>
+                <div><div style="{{ $muted }}">{{ __('Answered within 1 hour') }}</div><strong>{{ $leads['within_hour'] !== null ? $leads['within_hour'].'%' : '–' }}</strong></div>
+                <div><div style="{{ $muted }}">{{ __('Typical time to answer') }}</div><strong>{{ $leads['median_minutes'] !== null ? trans_choice(':n minute|:n minutes', $leads['median_minutes'], ['n' => $leads['median_minutes']]) : '–' }}</strong></div>
+                <div><div style="{{ $muted }}">{{ __('WhatsApp chats that became interested or a sale') }}</div><strong>{{ number_format($leads['whatsapp_qualified']) }} / {{ number_format($leads['whatsapp']) }}</strong></div>
+                <div><div style="{{ $muted }}">{{ __('Sales') }}</div><strong>{{ number_format($leads['sales']) }}</strong>@if ($leads['sales_value'] > 0 && ! $client->hide_spend)<span style="{{ $muted }}"> · {{ R::money($leads['sales_value'], $cur) }}</span>@endif</div>
+                @unless ($client->hide_spend)
+                    <div><div style="{{ $muted }}">{{ __('Cost per answered lead') }}</div><strong>{{ $leads['cost_per_contacted'] !== null ? R::money($leads['cost_per_contacted'], $cur) : '–' }}</strong></div>
+                    <div><div style="{{ $muted }}">{{ __('Cost per sale') }}</div><strong>{{ $leads['cost_per_sale'] !== null ? R::money($leads['cost_per_sale'], $cur) : '–' }}</strong></div>
+                @endunless
+            </div>
+        </x-filament::section>
+    @endif
+
     {{-- FS-22 (R4): season review, plan vs actual by week --}}
     @if ($season && $season['spend'] > 0)
         <x-filament::section data-season-review>

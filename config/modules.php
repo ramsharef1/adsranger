@@ -27,6 +27,8 @@ return [
         'ai_workspace' => (bool) env('MODULE_AI_WORKSPACE', false),
         // PX-01 / PX-02 new panel shell (D-302): areas in the header, area sidebar, season ribbon, phone bottom bar.
         'panel_shell' => (bool) env('MODULE_PANEL_SHELL', false),
+        // XS-13 / XS-23 no-login lead page for a client's front desk (D-306).
+        'lead_desk' => (bool) env('MODULE_LEAD_DESK', false),
     ],
 
     'preview_agencies' => array_values(array_filter(array_map('trim', explode(',', (string) env('MODULES_PREVIEW_AGENCIES', ''))))),
