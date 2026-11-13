@@ -14,7 +14,7 @@ class ReachPostbackEndpoint extends Model
 
     protected function casts(): array
     {
-        return ['secret' => 'encrypted', 'allowed_ips' => 'array', 'active' => 'boolean', 'last_received_at' => 'datetime'];
+        return ['secret' => 'encrypted', 'allowed_ips' => 'array', 'active' => 'boolean', 'last_received_at' => 'datetime', 'param_map' => 'array'];
     }
 
     /** @return array{0: self, 1: string, 2: string} endpoint, plain token, plain secret (shown once) */

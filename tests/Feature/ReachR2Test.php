@@ -144,7 +144,7 @@ class ReachR2Test extends TestCase
 
         $served = collect($this->withHeaders(['User-Agent' => self::UA_DESKTOP])->getJson('/reach/v1/serve?w='.$web->public_key.'&p=sidebar')->json('offers'))->firstWhere('id', $plain->id);
         $this->get('/reach/v1/click?w='.$web->public_key.'&o='.$plain->id.'&p=sidebar&t=forged')->assertNotFound();
-        $this->get($served['click'])->assertRedirect('https://merchant.example/p?a=1&subid='.$p->ref.'_sidebar');
+        $this->get($served['click'])->assertRedirect('https://merchant.example/p?a=1&aff_sub='.$p->ref.'_sidebar'); // R-4 preset: Arabclicks reads aff_sub
 
         $copy = $this->postJson('/reach/v1/copy', ['w' => $web->public_key, 'o' => $plain->id, 'p' => 'sidebar', 't' => $served['t']])->assertOk()->json();
         $this->assertSame('POOL1', $copy['code']);

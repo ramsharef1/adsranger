@@ -81,6 +81,14 @@
                         <pre dir="ltr">{{ '<div data-reach="'.$w->public_key.'" data-placement="'.$w->placement.'" style="min-height:160px"></div>' }}
 {{ '<script async src="'.url('/reach/v1/tag.js').'"></script>' }}</pre>
                         <p class="muted">{{ $t('cls_note') }}</p>
+                        <details>
+                            <summary style="min-height:44px;display:flex;align-items:center;cursor:pointer">{{ $t('install_kits') }}</summary>
+                            <p><a class="btn" href="{{ url('/reach/portal/wordpress-plugin.zip').'?w='.$w->public_key }}" download>{{ $t('wp_plugin') }}</a></p>
+                            <p class="muted">{{ $t('wp_plugin_help') }}</p>
+                            <p><strong>{{ $t('cf_worker') }}</strong></p>
+                            <p class="muted">{{ $t('cf_worker_help') }}</p>
+                            <pre dir="ltr" style="max-height:260px;overflow:auto">{{ \App\Support\Reach\PublisherKit::cloudflareWorker($publisher, $w) }}</pre>
+                        </details>
                     @else
                         <pre dir="ltr">{{ url('/reach/v1/offerwall').'?w='.$w->public_key }}
 {{ url('/reach/v1/offerwall').'?w='.$w->public_key.'&format=html' }}</pre>

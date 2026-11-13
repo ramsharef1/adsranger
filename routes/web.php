@@ -169,6 +169,7 @@ Route::middleware([ReachEnabled::class])->group(function () {
         Route::get('/en/reach/portal', [ReachPortalController::class, 'show'])->defaults('lang', 'en');
         Route::get('/reach/portal/stats', [ReachPortalController::class, 'stats']);
         Route::get('/en/reach/portal/stats', [ReachPortalController::class, 'stats']);
+        Route::get('/reach/portal/wordpress-plugin.zip', [ReachPortalController::class, 'wordpressPlugin']);
         Route::post('/reach/portal/join', [ReachPortalController::class, 'join']);
         Route::post('/reach/portal/widgets', [ReachPortalController::class, 'addWidget']);
         Route::post('/reach/portal/settings', [ReachPortalController::class, 'settings']);

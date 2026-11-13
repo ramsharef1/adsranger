@@ -28,7 +28,7 @@ return [
         'pool_max' => 20,
     ],
 
-    'networks' => ['arabclicks', 'admitad', 'impact', 'direct_client'],
+    'networks' => ['arabclicks', 'linkaraby', 'admitad', 'impact', 'direct_client'],
     'offer_types' => ['cps', 'cpi', 'cpl'],
     'billing_modes' => ['escrow_prepaid', 'agency_guaranteed', 'postpaid_invoice'],
 
@@ -54,9 +54,31 @@ return [
 
     'max_blocked_domains' => 20,
 
-    // Query parameter each network reads back as the Sub-ID in its postback ({publisher ref}_{placement}). Set from the
-    // network's own docs when an account is opened; "subid" until then.
-    'subid_params' => ['arabclicks' => 'subid', 'admitad' => 'subid', 'impact' => 'subid', 'direct_client' => 'subid'],
+    // R-4 network presets (E2-064). `subid` = the click-link parameter the network echoes back in its postback
+    // ({publisher ref}_{placement}); `fields` = which postback parameter carries each value we read; `macros` = the
+    // placeholder each network fills in, used only to print a ready postback URL on /admin › Reach; `trust` = the
+    // recommended check (networks that can't sign a request use the IP allow-list). An endpoint can override
+    // `subid` and any field on /admin › Reach. Confirm the macros against the network account when it is opened.
+    'network_presets' => [
+        'arabclicks' => ['subid' => 'aff_sub', 'trust' => 'ip_allowlist',
+            'fields' => ['conversion_id' => 'transaction_id', 'payout' => 'payout', 'status' => 'status', 'offer_id' => 'offer_id'],
+            'macros' => ['transaction_id' => '{transaction_id}', 'aff_sub' => '{aff_sub}', 'payout' => '{payout}', 'status' => '{status}', 'offer_id' => '{offer_id}']],
+        'linkaraby' => ['subid' => 'aff_sub', 'trust' => 'ip_allowlist',
+            'fields' => ['conversion_id' => 'transaction_id', 'payout' => 'payout', 'status' => 'status', 'offer_id' => 'offer_id'],
+            'macros' => ['transaction_id' => '{transaction_id}', 'aff_sub' => '{aff_sub}', 'payout' => '{payout}', 'status' => '{status}', 'offer_id' => '{offer_id}']],
+        'admitad' => ['subid' => 'subid', 'trust' => 'ip_allowlist',
+            'fields' => ['conversion_id' => 'order_id', 'payout' => 'payment', 'status' => 'status', 'offer_id' => 'offer_id'],
+            'macros' => ['order_id' => '[[[order_id]]]', 'subid' => '[[[subid]]]', 'payment' => '[[[payment_sum]]]', 'status' => '[[[status]]]', 'offer_id' => '[[[offer_id]]]']],
+        'impact' => ['subid' => 'subId1', 'trust' => 'ip_allowlist',
+            'fields' => ['conversion_id' => 'action_id', 'payout' => 'payout', 'status' => 'status', 'offer_id' => 'campaign_id'],
+            'macros' => ['action_id' => '{ActionId}', 'subId1' => '{SubId1}', 'payout' => '{Payout}', 'status' => '{ActionStatus}', 'campaign_id' => '{CampaignId}']],
+        'direct_client' => ['subid' => 'subid', 'trust' => 'hmac',
+            'fields' => ['conversion_id' => 'conversion_id', 'payout' => 'payout', 'status' => 'status', 'offer_id' => 'offer_id'],
+            'macros' => ['conversion_id' => '{conversion_id}', 'subid' => '{subid}', 'payout' => '{payout}', 'status' => '{status}', 'offer_id' => '{offer_id}']],
+    ],
+
+    // Click-link Sub-ID parameter per network (read by Serve when it builds the outbound link); mirrors network_presets.
+    'subid_params' => ['arabclicks' => 'aff_sub', 'linkaraby' => 'aff_sub', 'admitad' => 'subid', 'impact' => 'subId1', 'direct_client' => 'subid'],
 
     // R-2 serve: the cache store for the stateless endpoints (null = the app's default store; set to "redis" where it runs).
     'cache_store' => env('REACH_CACHE_STORE'),

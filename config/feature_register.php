@@ -46,6 +46,7 @@ use App\Support\PublicSite;
 use App\Support\Reach\Attribution;
 use App\Support\Reach\OfferImporter;
 use App\Support\Reach\Postbacks;
+use App\Support\Reach\PublisherKit;
 use App\Support\Reach\Serve;
 use App\Support\Reach\Wallet;
 use App\Support\RestoreTest;
@@ -53,7 +54,6 @@ use App\Support\Seo\AiCrawlerChecker;
 use App\Support\Seo\Audit\PageSpeed;
 use App\Support\Seo\Audit\SiteAuditor;
 use App\Support\Seo\PageAudit;
-use App\Support\Seo\PublicCatalog;
 /*
  * A-12 (FR-029) register-to-code guard. Every row marked Done or Live in ADSR-060 / ADSR-920 is listed here with the
  * code it lives in and the test that proves it. RegisterToCodeTest fails if a listed class, view or test is missing,
@@ -61,6 +61,7 @@ use App\Support\Seo\PublicCatalog;
  *
  * 'code' entries: a class name, "view:<name>", "route:<uri>" or "config:<file>". 'tests': files under tests/.
  */
+use App\Support\Seo\PublicCatalog;
 use App\Support\Seo\SiteAuditRunner;
 use App\Support\Seo\ToolGuard;
 use App\Support\Site\CopyLint;
@@ -103,4 +104,5 @@ return [
     'FR-REACH-R3' => ['title' => 'AdsRanger Reach R-3: free AI Bot Traffic & Unmonetized Revenue Checker (/tools/ai-crawler-revenue-checker): robots.txt per AI crawler, llms.txt + Offer markup, SafeFetcher + ToolAbuseGuard, noindex and out of sitemap / menus / hub / share cards (seo_tools.module_gated, module reach)', 'code' => [AiCrawlerChecker::class, ReachToolController::class, 'view:public.tools.ai-crawler-revenue-checker', 'config:seo_tools', 'route:tools/ai-crawler-revenue-checker/run'], 'tests' => ['Feature/ReachR3Test.php']],
     'FR-089-A2' => ['title' => 'Site audit A2 speed lab (E2-062): static asset checks SPEED-01..04 (render-blocking script / CSS, first image without dimensions, inline payload) + optional PageSpeed Insights v5 mobile (score, LCP, INP field-only, CLS, TTFB); speed chip only when speed_checked_at exists (UX-250); module seo_audit, off', 'code' => [PageSpeed::class, SiteAuditor::class, 'view:filament.pages.seo-audit'], 'tests' => ['Feature/SeoAuditA2SpeedTest.php']],
     'FR-STORE-SYNC' => ['title' => 'Salla / Zid / Shopify signed store webhooks (E2-063): /webhooks/stores/{token} (CSRF-exempt, hash_equals HMAC-SHA256, replay window + unique event_uid), finished orders → per-SKU snapshots + observed COD rates on client_unit_economics (#193), returned COD orders, stock updates → #197 bleed guard; store connections in the profit hub (managers only); module intelligence_hub, off', 'code' => [StoreWebhooks::class, StoreWebhookController::class, 'route:webhooks/stores/{token}', 'config:store_sync'], 'tests' => ['Feature/MenaStoreWebhooksTest.php']],
+    'FR-REACH-R4' => ['title' => 'AdsRanger Reach R-4 (E2-064): network Sub-ID + postback presets (arabclicks / linkaraby aff_sub, admitad subid, impact subId1, direct_client subid) with per-endpoint overrides on /admin › Reach, and a deterministic WordPress plugin .zip + Cloudflare Worker snippet in /reach/portal › Placements (async tag.js, /llms.txt promo codes, schema.org Offer JSON-LD on pages that show offers); module reach, off', 'code' => [PublisherKit::class, Postbacks::class, ReachControlBoard::class, ReachPortalController::class, 'route:reach/portal/wordpress-plugin.zip'], 'tests' => ['Feature/ReachR4Test.php']],
 ];

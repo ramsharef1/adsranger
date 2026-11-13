@@ -50,9 +50,65 @@ class Postbacks
         return ($ips !== [] || $sig !== '') ? 'ok' : 'unsigned';
     }
 
+    /**
+     * R-4: the network preset with this endpoint's overrides on top.
+     *
+     * @return array{subid: string, trust: string, fields: array<string, string>, macros: array<string, string>}
+     */
+    public static function preset(ReachPostbackEndpoint $endpoint): array
+    {
+        $base = (array) config('reach.network_presets.'.$endpoint->network, []);
+        $fields = array_merge(
+            ['conversion_id' => 'conversion_id', 'payout' => 'payout', 'status' => 'status', 'offer_id' => 'offer_id'],
+            (array) ($base['fields'] ?? []),
+            array_filter((array) ($endpoint->param_map ?? []), fn ($v) => is_string($v) && $v !== '')
+        );
+
+        return [
+            'subid' => (string) ($endpoint->subid_param ?: ($base['subid'] ?? 'subid')),
+            'trust' => (string) ($base['trust'] ?? 'hmac'),
+            'fields' => $fields,
+            'macros' => (array) ($base['macros'] ?? []),
+        ];
+    }
+
+    /**
+     * R-4: reads the network's own parameter names (case-insensitive) into the canonical keys handle() uses.
+     *
+     * @param  array<string, mixed>  $p
+     * @return array<string, mixed>
+     */
+    public static function normalise(ReachPostbackEndpoint $endpoint, array $p): array
+    {
+        $preset = static::preset($endpoint);
+        $lower = array_change_key_case($p, CASE_LOWER);
+        $out = [];
+        foreach ($preset['fields'] + ['subid' => $preset['subid']] as $canonical => $param) {
+            $value = $lower[strtolower($param)] ?? null;
+            if ($value !== null && $value !== '' && ! isset($p[$canonical])) {
+                $out[$canonical] = $value;
+            }
+        }
+
+        return $out + $p;
+    }
+
+    /** R-4: the postback URL to paste at the network, with that network's macros (overrides applied). */
+    public static function template(ReachPostbackEndpoint $endpoint, string $receiverUrl): string
+    {
+        $preset = static::preset($endpoint);
+        $pairs = [];
+        foreach ($preset['fields'] + ['subid' => $preset['subid']] as $param) {
+            $pairs[$param] = $preset['macros'][$param] ?? '{'.$param.'}';
+        }
+
+        return $receiverUrl.'?'.implode('&', array_map(fn ($k, $v) => $k.'='.$v, array_keys($pairs), $pairs));
+    }
+
     /** @return array{ok: bool, result: string, entry_id?: int} */
     public static function handle(ReachPostbackEndpoint $endpoint, array $p): array
     {
+        $p = static::normalise($endpoint, $p);
         $conversionId = mb_substr(trim((string) ($p['conversion_id'] ?? $p['txn_id'] ?? $p['cid'] ?? '')), 0, 96);
         if ($conversionId === '') {
             return ['ok' => false, 'result' => 'missing_conversion_id'];

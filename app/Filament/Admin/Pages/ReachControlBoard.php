@@ -144,6 +144,25 @@ class ReachControlBoard extends Page
         $this->endpoint = ['network' => $network, 'label' => '', 'ips' => ''];
     }
 
+    /** @var array<int, array{subid: string, conversion_id: string, payout: string, status: string, offer_id: string}> R-4 per-endpoint overrides */
+    public array $overrides = [];
+
+    /** R-4: overrides the network preset for one endpoint (empty field = keep the preset). */
+    public function saveOverride(int $id): void
+    {
+        $e = ReachPostbackEndpoint::findOrFail($id);
+        $row = (array) ($this->overrides[$id] ?? []);
+        $clean = fn ($v) => preg_match('/^[A-Za-z0-9_\-]{1,32}$/', trim((string) $v)) ? trim((string) $v) : null;
+        $map = [];
+        foreach (['conversion_id', 'payout', 'status', 'offer_id'] as $field) {
+            if ($v = $clean($row[$field] ?? '')) {
+                $map[$field] = $v;
+            }
+        }
+        $e->update(['subid_param' => $clean($row['subid'] ?? ''), 'param_map' => $map ?: null]);
+        Notification::make()->title(__('reach_ui.admin.override_saved'))->success()->send();
+    }
+
     public function toggleEndpoint(int $id): void
     {
         $e = ReachPostbackEndpoint::findOrFail($id);

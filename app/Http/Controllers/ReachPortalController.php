@@ -6,6 +6,7 @@ use App\Models\ReachCouponCode;
 use App\Models\ReachPublisher;
 use App\Models\ReachWidget;
 use App\Support\Reach\OfferImporter;
+use App\Support\Reach\PublisherKit;
 use App\Support\Reach\Reach;
 use App\Support\Reach\Serve;
 use App\Support\Reach\Wallet;
@@ -61,6 +62,23 @@ class ReachPortalController extends Controller
             'referred' => $publisher ? ReachPublisher::where('referred_by_id', $publisher->id)->count() : 0,
             'ref' => (string) $request->session()->get('reach_ref', ''),
         ])->header('Cache-Control', 'no-store');
+    }
+
+    /** R-4: the publisher's own WordPress plugin, built for one of its web widgets (deterministic bytes). */
+    public function wordpressPlugin(Request $request): Response
+    {
+        $publisher = $this->publisher($request);
+        $this->gate($request, $publisher);
+        abort_unless($publisher, 404);
+        $widget = $publisher->widgets()->where('type', 'web_js')->where('public_key', (string) $request->query('w'))->first();
+        abort_unless($widget, 404);
+
+        return response(PublisherKit::wordpressZip($publisher, $widget), 200, [
+            'Content-Type' => 'application/zip',
+            'Content-Disposition' => 'attachment; filename="'.PublisherKit::PLUGIN_SLUG.'-'.$widget->placement.'.zip"',
+            'Cache-Control' => 'no-store',
+            'X-Robots-Tag' => 'noindex, nofollow',
+        ]);
     }
 
     public function stats(Request $request): JsonResponse
