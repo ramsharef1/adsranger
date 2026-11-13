@@ -60,6 +60,10 @@ class ExportTest extends TestCase
         $this->assertStringStartsWith(DataExport::BOM, $body);
         $this->assertStringContainsString('text/csv', $r->headers->get('Content-Type'));
         $lines = array_values(array_filter(explode("\n", substr($body, 3))));
+        // PS-06: this workspace runs on sample data, so the daily file opens with the sample-data mark; the rows follow it.
+        if (isset($lines[0]) && str_contains($lines[0], DemoData::LABEL)) {
+            array_shift($lines);
+        }
 
         return array_map(fn ($l) => str_getcsv($l, ',', '"', ''), $lines);
     }
@@ -226,7 +230,7 @@ class ExportTest extends TestCase
         Livewire::test(ExportData::class)
             ->callAction('metrics', ['from' => now()->subDays(10)->toDateString(), 'to' => now()->subDay()->toDateString()])
             ->assertHasNoActionErrors()
-            ->assertRedirectContains('/app/acme/export/daily-metrics.csv');
+            ->assertRedirectContains('/app/acme/export/daily-metrics.xlsx'); // DB-04: Excel is the default format
     }
 
     public function test_owner_can_self_serve_delete_workspace_with_password_and_slug(): void

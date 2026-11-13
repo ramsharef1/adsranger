@@ -2,7 +2,6 @@
 
 namespace App\Support;
 
-use App\Models\Client;
 use App\Models\ReportSchedule;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Http;
@@ -31,7 +30,7 @@ class WhatsAppReport
         [$from, $to] = static::periodRange($kind, $period, $s->agency?->timezone ?: 'UTC');
         $t = MetricsQuery::totals($c, $from, $to);
 
-        $lines = [];
+        $lines = DemoData::isSample($c) ? [$lang === 'ar' ? '⚠️ بيانات تجريبية: الأرقام ليست حقيقية' : '⚠️ Sample data: these numbers are not real'] : [];
         if ($lang === 'ar') {
             $title = $kind === 'monthly' ? "التقرير الشهري ({$period})" : "الملخص الأسبوعي ({$period})";
             $lines[] = "📊 *{$c->name}* — {$title}";

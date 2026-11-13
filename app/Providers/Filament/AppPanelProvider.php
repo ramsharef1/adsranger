@@ -16,6 +16,7 @@ use App\Filament\Pages\WhatsNewPage;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\GoogleSignInController;
 use App\Http\Controllers\PushController;
+use App\Http\Controllers\SampleDataController;
 use App\Http\Middleware\EnsureAgencyTwoStep;
 use App\Http\Middleware\EnsureOnboarded;
 use App\Http\Middleware\FreePlanFence;
@@ -78,6 +79,7 @@ class AppPanelProvider extends PanelProvider
             // #79 CSV / ZIP downloads (signed in + member of the workspace; role scoping in the controller).
             ->authenticatedTenantRoutes(function (): void {
                 Route::get('export/daily-metrics.csv', [ExportController::class, 'metrics'])->middleware('throttle:20,1')->name('export.metrics');
+                Route::get('export/daily-metrics.xlsx', [ExportController::class, 'metricsXlsx'])->middleware('throttle:20,1')->name('export.metrics.xlsx');
                 Route::get('export/clients.csv', [ExportController::class, 'clients'])->middleware('throttle:20,1')->name('export.clients');
                 Route::get('export/ad-accounts.csv', [ExportController::class, 'adAccounts'])->middleware('throttle:20,1')->name('export.accounts');
                 Route::get('export/workspace.zip', [ExportController::class, 'workspace'])->middleware('throttle:3,1')->name('export.workspace');
@@ -85,6 +87,9 @@ class AppPanelProvider extends PanelProvider
                 Route::post('push/subscribe', [PushController::class, 'subscribe'])->middleware('throttle:20,1')->name('push.subscribe');
                 Route::post('push/unsubscribe', [PushController::class, 'unsubscribe'])->middleware('throttle:20,1')->name('push.unsubscribe');
                 Route::post('push/test', [PushController::class, 'test'])->middleware('throttle:5,1')->name('push.test');
+                // PS-05 (D-296): sample data in place, one click in and out (owner + admins).
+                Route::post('sample-data/fill', [SampleDataController::class, 'fill'])->middleware('throttle:5,1')->name('sample-data.fill');
+                Route::post('sample-data/clear', [SampleDataController::class, 'clear'])->middleware('throttle:5,1')->name('sample-data.clear');
             })
             ->livewireComponents([GoogleFinishSignup::class, GoogleTwoStep::class])
             ->font('IBM Plex Sans Arabic', provider: GoogleFontProvider::class)
@@ -95,6 +100,7 @@ class AppPanelProvider extends PanelProvider
             // D-61 trial banner (days left / trial ended), under the top bar.
             // EH-17 (D-293): the /admin announcement line, above the other banners.
             ->renderHook(PanelsRenderHook::TOPBAR_AFTER, fn () => view('panels.announcement'))
+            ->renderHook(PanelsRenderHook::TOPBAR_AFTER, fn () => view('panels.sample-data'))
             ->renderHook(PanelsRenderHook::TOPBAR_AFTER, fn () => view('panels.context-bar'))
             ->renderHook(PanelsRenderHook::TOPBAR_AFTER, fn () => view('panels.trial-banner'))
             // EX-50 point 6: usage warning at 80 % of the ad-account / seat limit (owner/admin).

@@ -4,7 +4,9 @@ namespace App\Support;
 
 use App\Models\Agency;
 use App\Models\AuditLog;
+use App\Models\ClientLink;
 use App\Models\User;
+use App\Support\Import\ImportReview;
 
 /**
  * D-188 required onboarding (Business 913 · 19:56). Steps 1–3 (who you are, the workspace, the first client or
@@ -74,6 +76,12 @@ class Onboarding
             ['step' => 4, 'label' => __('onboarding.step4.title'), 'done' => $client && ($client->monthly_budget || $client->target_cpr), 'url' => $base.'/onboarding?step=4'],
             ['step' => 5, 'label' => __('onboarding.step5.title'), 'done' => $agency->connections()->exists() || $agency->dataImports()->exists(), 'url' => $base.'/onboarding?step=5'],
         ];
+        // PS-04 (D-290): the first-report path on uploaded data — sort the imported campaigns, then open the client's report link.
+        if ($agency->dataImports()->exists()) {
+            $items[] = ['step' => 8, 'label' => __('Sort your imported campaigns'), 'done' => ImportReview::pending($agency) === [], 'url' => $base.'/import-review'];
+            $items[] = ['step' => 9, 'label' => __('Preview your first client report'),
+                'done' => ClientLink::where('agency_id', $agency->id)->exists(), 'url' => $client ? $base.'/clients/'.$client->id : $base.'/clients'];
+        }
         if (static::hasTeamStep($agency)) {
             $items[] = ['step' => 6, 'label' => __('onboarding.step6.title'), 'done' => $agency->members()->count() > 1 || $agency->invitations()->exists(), 'url' => $base.'/onboarding?step=6'];
         }

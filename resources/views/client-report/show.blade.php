@@ -17,7 +17,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
     <meta name="referrer" content="no-referrer">
-    <title>{{ __('report.title', ['client' => $client->name]) }}</title>
+    <title>{{ \App\Support\DemoData::isSample($client) ? \App\Support\DemoData::LABEL.' · ' : '' }}{{ __('report.title', ['client' => $client->name]) }}</title>
     <link rel="icon" href="{{ asset('brand/favicon.svg') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
@@ -29,6 +29,9 @@
         <div>
             @if ($logoUrl = \App\Support\AgencyLogo::url($agency))
                 <img class="agency-logo" src="{{ $logoUrl }}" alt="{{ $agency->name }}" height="32" style="height:32px;width:auto;max-width:240px;display:block;margin-bottom:8px">
+            @endif
+            @if (\App\Support\DemoData::isSample($client))
+                <div data-sample-banner style="display:inline-block;margin-bottom:6px;padding:2px 10px;border-radius:999px;background:#fef3c7;color:#92400e;font-size:13px;font-weight:600">{{ $lang === 'ar' ? 'بيانات تجريبية: الأرقام هنا ليست حقيقية' : 'Sample data: these numbers are not real' }}</div>
             @endif
             <h1><bdi>{{ $client->name }}</bdi></h1>
             <div class="muted">{{ __('report.by', ['agency' => $agency->name]) }} · {{ __('report.range', ['from' => \Carbon\Carbon::parse($from)->locale($lang)->translatedFormat('j F Y'), 'to' => \Carbon\Carbon::parse($to)->locale($lang)->translatedFormat('j F Y')]) }}</div>

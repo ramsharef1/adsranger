@@ -69,20 +69,22 @@ class ExportData extends Page
         return Action::make('metrics')
             ->label(__('Download daily metrics'))
             ->icon('heroicon-o-arrow-down-tray')
-            ->modalHeading(__('Daily metrics CSV'))
+            ->modalHeading(__('Daily metrics'))
             ->modalDescription(__('One row per day, ad account and campaign, in each account\'s own currency.'))
             ->schema([
                 Select::make('client')->label(__('Client'))->placeholder(__('All clients you can see'))
                     ->options(fn () => Client::visibleTo(auth()->user(), $agency)->orderBy('name')->pluck('name', 'id'))->searchable(),
                 ...static::periodFields(),
+                // DB-04 (D-295): Excel with right-to-left sheets in Arabic, or CSV.
+                Select::make('format')->label(__('Format'))->options(['xlsx' => __('Excel (.xlsx)'), 'csv' => 'CSV'])->default('xlsx')->required(),
             ])
-            ->modalSubmitActionLabel(__('Download CSV'))
+            ->modalSubmitActionLabel(__('Download'))
             ->action(function (array $data) {
                 $q = ['from' => $data['from'], 'to' => $data['to']];
                 if (! empty($data['client'])) {
                     $q['client'] = $data['client'];
                 }
-                $this->redirect(static::exportUrl('metrics', $q));
+                $this->redirect(static::exportUrl(($data['format'] ?? 'csv') === 'xlsx' ? 'metrics.xlsx' : 'metrics', $q));
             });
     }
 

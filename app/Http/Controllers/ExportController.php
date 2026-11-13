@@ -6,10 +6,15 @@ use App\Models\Agency;
 use App\Models\AuditLog;
 use App\Models\Client;
 use App\Support\DataExport;
+use App\Support\DemoData;
 use Carbon\CarbonImmutable;
 use Filament\Facades\Filament;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use OpenSpout\Common\Entity\Row;
+use OpenSpout\Common\Entity\Style\Style;
+use OpenSpout\Writer\XLSX\Entity\SheetView;
+use OpenSpout\Writer\XLSX\Writer as XlsxWriter;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -80,9 +85,49 @@ class ExportController extends Controller
         AuditLog::record('export.csv', $client ?? $agency, ['kind' => 'daily_metrics', 'from' => $from, 'to' => $to,
             'client_id' => $client?->id, 'for_client' => $request->boolean('for_client'), 'spend' => $withSpend]);
 
-        $name = 'adsranger-'.static::slug($client?->name ?? $agency->name)."-daily-{$from}-{$to}.csv";
+        // PS-06: a file holding sample data says so in its name and on its first line.
+        $sample = collect($ids)->contains(fn ($id) => DemoData::isSample(Client::find($id)));
+        $name = 'adsranger-'.($sample ? 'sample-data-' : '').static::slug($client?->name ?? $agency->name)."-daily-{$from}-{$to}.csv";
 
-        return $this->csv($name, fn ($out) => DataExport::writeMetrics($out, $agency, $ids, $from, $to, $withSpend, $client === null));
+        return $this->csv($name, function ($out) use ($agency, $ids, $from, $to, $withSpend, $client, $sample) {
+            if ($sample) {
+                fputcsv($out, [DemoData::LABEL], ',', '"', '');
+            }
+            DataExport::writeMetrics($out, $agency, $ids, $from, $to, $withSpend, $client === null);
+        });
+    }
+
+    /**
+     * DB-04 (D-295): the same daily rows as an .xlsx — right-to-left sheet in Arabic, bold frozen header, numbers as numbers,
+     * the sample-data mark on top when it applies (PS-06).
+     */
+    public function metricsXlsx(Request $request)
+    {
+        $csv = $this->metrics($request);
+        ob_start();
+        $csv->sendContent();
+        $text = (string) ob_get_clean();
+        $rows = array_map(fn ($l) => str_getcsv($l, ',', '"', ''), array_values(array_filter(explode("\n", str_replace(["\r\n", "\r"], "\n", ltrim($text, DataExport::BOM))), fn ($l) => $l !== '')));
+        $name = preg_replace('/\.csv$/', '.xlsx', (string) $csv->headers->get('Content-Disposition'));
+        $file = preg_match('/filename="?([^";]+)"?/', $name, $m) ? $m[1] : 'adsranger-export.xlsx';
+
+        return response()->streamDownload(function () use ($rows) {
+            $w = new XlsxWriter;
+            $w->openToFile('php://output');
+            // The header is the first row with more than one cell (a sample-data mark may sit above it).
+            $header = collect($rows)->search(fn ($r) => count($r) > 1);
+            $view = (new SheetView)->setRightToLeft(app()->getLocale() === 'ar');
+            if ($header !== false) {
+                $view->setFreezeRow($header + 2);
+            }
+            $w->getCurrentSheet()->setSheetView($view); // set before the first row: the sheet view is written first
+            foreach ($rows as $i => $r) {
+                $isHeader = $i === $header;
+                $cells = array_map(fn ($v) => ! $isHeader && is_numeric($v) && ! preg_match('/^0\d/', $v) ? $v + 0 : $v, $r);
+                $w->addRow(Row::fromValues($cells, $isHeader ? (new Style)->setFontBold() : null));
+            }
+            $w->close();
+        }, $file, ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'Cache-Control' => 'private, no-store', 'X-Robots-Tag' => 'noindex, nofollow']);
     }
 
     public function clients(Request $request)

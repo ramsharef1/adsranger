@@ -2308,5 +2308,14 @@
     "Campaigns to sort: :n": "حملات تحتاج فرزًا: :n",
     "Sort imported campaigns": "فرز الحملات المستوردة",
     "No fresh upload": "لا رفع حديث للبيانات",
-    "A client with no live connection has had no new imported data for at least this many days.": "عميل بلا ربط مباشر لم تُستورد له بيانات جديدة منذ هذا العدد من الأيام على الأقل."
+    "A client with no live connection has had no new imported data for at least this many days.": "عميل بلا ربط مباشر لم تُستورد له بيانات جديدة منذ هذا العدد من الأيام على الأقل.",
+    "Sample data is showing in this workspace. Its clients start with «Demo ·» and every file made from them is marked as sample data.": "تظهر بيانات تجريبية في مساحة العمل هذه. أسماء عملائها تبدأ بكلمة «Demo»، وكل ملف يُصنع منها يحمل علامة «بيانات تجريبية».",
+    "Nothing here yet. Try the screens with sample clients first; you can clear them in one click.": "لا شيء هنا بعد. جرّب الشاشات أولًا بعملاء تجريبيين، ويمكنك حذفهم بنقرة واحدة.",
+    "Clear sample data": "احذف البيانات التجريبية",
+    "Show sample data here": "اعرض بيانات تجريبية هنا",
+    "Format": "الصيغة",
+    "Excel (.xlsx)": "ملف Excel",
+    "Download": "تنزيل",
+    "Sort your imported campaigns": "افرز حملاتك المستوردة",
+    "Preview your first client report": "اطّلع على أول تقرير لعميلك"
 }

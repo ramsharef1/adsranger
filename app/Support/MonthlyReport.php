@@ -82,7 +82,11 @@ class MonthlyReport
             'default_font' => 'dejavusans', 'autoScriptToLang' => true, 'autoLangToFont' => true,
             'directionality' => $lang === 'ar' ? 'rtl' : 'ltr',
         ]);
-        $mpdf->SetTitle(__('report.pdf_title', ['client' => $client->name], $lang));
+        $mpdf->SetTitle((DemoData::isSample($client) ? DemoData::LABEL.' · ' : '').__('report.pdf_title', ['client' => $client->name], $lang));
+        if (DemoData::isSample($client)) { // PS-06: sample numbers can never pass as real
+            $mpdf->SetWatermarkText(DemoData::LABEL, 0.08);
+            $mpdf->showWatermarkText = true;
+        }
         $mpdf->SetAuthor($client->agency->name);
         $mpdf->SetCreator('AdsRanger');
         $mpdf->WriteHTML($html);

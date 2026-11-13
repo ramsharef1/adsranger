@@ -264,6 +264,31 @@ class DemoData
         }
     }
 
+    /** PS-06: a client made by the sample data (its ad account sits on the demo connection, or it carries the sample prefix). */
+    public static function isSample(?Client $c): bool
+    {
+        if (! $c) {
+            return false;
+        }
+
+        static $seen = [];
+        if (app()->runningUnitTests() || count($seen) > 500) {
+            $seen = [];
+        }
+
+        return $seen[$c->id] ??= str_starts_with($c->name, 'Demo · ') || AdAccount::where('client_id', $c->id)
+            ->whereHas('connection', fn ($q) => $q->where('external_user_id', self::TAG))->exists();
+    }
+
+    /** True while the workspace shows sample data (PS-05). */
+    public static function present(Agency $a): bool
+    {
+        return Connection::where('agency_id', $a->id)->where('external_user_id', self::TAG)->exists();
+    }
+
+    /** PS-06 label, both languages, for file names, titles and watermarks. */
+    public const LABEL = 'بيانات تجريبية · Sample data';
+
     public static function remove(Agency $a): void
     {
         foreach (Connection::where('agency_id', $a->id)->where('external_user_id', self::TAG)->get() as $conn) {
