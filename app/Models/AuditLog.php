@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AuditLog extends Model
 {
@@ -15,15 +17,19 @@ class AuditLog extends Model
         return ['meta' => 'array', 'created_at' => 'datetime'];
     }
 
-    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /** A-18: rows made inside a workspace keep its id (admin and console rows have none). */
     public static function record(string $action, ?Model $subject = null, array $meta = []): void
     {
+        $tenant = Filament::getTenant();
+
         static::create([
             'user_id' => auth()->id(),
+            'agency_id' => $tenant instanceof Agency ? $tenant->getKey() : null,
             'action' => $action,
             'subject_type' => $subject ? $subject::class : null,
             'subject_id' => $subject?->getKey(),
