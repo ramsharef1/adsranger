@@ -9,7 +9,7 @@
         <div style="overflow-x:auto">
             <table style="width:100%;font-size:14px;border-collapse:collapse">
                 <thead><tr>
-                    <th style="{{ $cell }}">{{ __('Workspace') }}</th><th style="{{ $cell }}">{{ __('Plan') }}</th>
+                    <th style="{{ $cell }}">{{ __('Workspace') }}</th><th style="{{ $cell }}">{{ __('plan.plan') }}</th>
                     <th style="{{ $cell }}">{{ __('Signed up') }}</th><th style="{{ $cell }}">{{ __('Last sign-in') }}</th>
                     <th style="{{ $cell }}">{{ __('Ad accounts') }}</th><th style="{{ $cell }}">{{ __('Last sync') }}</th>
                     <th style="{{ $cell }}">{{ __('Reports (30 days)') }}</th><th style="{{ $cell }}">{{ __('Signs') }}</th>
