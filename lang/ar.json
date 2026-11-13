@@ -2643,5 +2643,12 @@
     "WhatsApp chats that became interested or a sale": "محادثات WhatsApp التي صارت اهتمامًا أو بيعًا",
     "Sales": "المبيعات",
     "Cost per answered lead": "تكلفة العميل المحتمل الذي رُدّ عليه",
-    "Cost per sale": "تكلفة البيعة"
+    "Cost per sale": "تكلفة البيعة",
+    "Alerts caught": "تنبيهات رُصدت",
+    "Alerts handled by your team": "تنبيهات عالجها فريقك",
+    "Scheduled reports sent": "تقارير مجدولة أُرسلت",
+    "Data imports": "عمليات استيراد بيانات",
+    "AI drafts checked": "مسودات ذكاء اصطناعي فُحصت",
+    "What AdsRanger did for you this month": "ما أنجزته AdsRanger لك هذا الشهر",
+    "About :hours hours saved («تقدير»: count × minutes per task, shown below).": "نحو :hours ساعة موفَّرة («تقدير»: العدد × دقائق كل مهمة، موضحة أدناه)."
 }

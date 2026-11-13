@@ -122,4 +122,6 @@
             </div>
         </x-filament::section>
     @endif
+
+    <x-value-card :card="$valueCard" />
 </x-filament-panels::page>

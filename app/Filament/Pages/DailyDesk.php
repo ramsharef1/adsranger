@@ -16,7 +16,9 @@ use App\Support\CurrentClient;
 use App\Support\MetricsQuery;
 use App\Support\Modules;
 use App\Support\Periods;
+use App\Support\TeamRoles;
 use App\Support\TwoPerson;
+use App\Support\ValueCard;
 use App\Support\WeekList;
 use BackedEnum;
 use Filament\Facades\Filament;
@@ -121,6 +123,7 @@ class DailyDesk extends Page
 
         return [
             'approvals' => TwoPerson::forApprover($a, auth()->user()), // DS-35 (D-305)
+            'valueCard' => TeamRoles::canManageTeam(auth()->user(), $a) ? ValueCard::month($a) : null, // PS-29 (D-306): owners and admins
             'licences' => $licences,
             'weekList' => WeekList::for($a, auth()->user()),
             'followUps' => $followUps,

@@ -11,6 +11,7 @@ use App\Support\NetworkAccess;
 use App\Support\PlanGate;
 use App\Support\PlanLimits;
 use App\Support\Trial;
+use App\Support\ValueCard;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
@@ -114,6 +115,7 @@ class PlanUsage extends Page
     {
         $a = Filament::getTenant();
         $user = auth()->user();
+        $valueCard = ValueCard::month($a); // PS-29 (D-306)
         $betaModules = collect(Modules::catalog())
             ->filter(fn (array $meta, string $key): bool => $meta['beta_requestable'] && ! Modules::on($key, $user, $a))
             ->all();
@@ -124,7 +126,7 @@ class PlanUsage extends Page
             ->pluck('module_key')
             ->all();
 
-        return [
+        return ['valueCard' => $valueCard] + [
             'agency' => $a,
             'plan' => $a->planModel,
             'trialDays' => PlanLimits::trialDaysLeft($a),

@@ -6,6 +6,9 @@
 @endphp
 <x-filament-panels::page>
     @include('filament.partials.onboarding-checklist')
+    @if ($valueCard && $valueCard['hours'] > 0)
+        <x-value-card :card="$valueCard" />
+    @endif
     @if ($approvals->isNotEmpty())
         {{-- DS-35 (D-305): risky actions waiting for a second owner or admin. --}}
         <x-filament::section :heading="__('Waiting for your approval')" data-approvals>
