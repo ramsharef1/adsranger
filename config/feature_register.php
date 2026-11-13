@@ -25,6 +25,7 @@ use App\Support\RestoreTest;
 use App\Support\Seo\PageAudit;
 use App\Support\Seo\SiteAuditRunner;
 use App\Support\Seo\ToolGuard;
+use App\Support\Site\CopyLint;
 use App\Support\WebPush;
 
 /*
@@ -53,4 +54,5 @@ return [
     'A-17' => ['title' => 'Signed-in devices + new-device alert', 'code' => [Devices::class, MyDevices::class], 'tests' => ['Feature/DevicesAndActivityA17A18Test.php']],
     'A-18' => ['title' => 'Owner view of the workspace audit log', 'code' => [WorkspaceActivity::class], 'tests' => ['Feature/DevicesAndActivityA17A18Test.php']],
     'BZ-10' => ['title' => 'Free tools abuse guard', 'code' => [ToolGuard::class, ToolAbuseGuard::class, ToolGuardBoard::class], 'tests' => ['Feature/ToolGuardBz10Test.php']],
+    'GB-06' => ['title' => 'Public copy lint (Growth CR-01…CR-20) + AR/EN parity (GB-38)', 'code' => [CopyLint::class], 'tests' => ['Feature/PublicCopyLintTest.php']],
 ];
