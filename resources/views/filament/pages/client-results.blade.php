@@ -254,6 +254,35 @@
         </x-filament::section>
     @endif
 
+    {{-- FS-24 / XS-44 (R4): daily spend; a day without data is a gap with its reason, never a zero. --}}
+    @php
+        $sd = $series['days'];
+        $maxDay = max(1, collect($sd)->max('spend') ?? 0);
+        $gapColor = ['not_connected' => 'rgba(148,163,184,.35)', 'sync_failed' => 'rgba(180,35,24,.35)', 'no_data' => 'rgba(181,71,8,.30)'];
+        $gapLabels = \App\Support\DataGaps::reasonLabels();
+    @endphp
+    <x-filament::section data-daily-chart>
+        <x-slot name="heading">{{ __('Daily spend') }}</x-slot>
+        <div role="img" aria-label="{{ __('Daily spend for the period; days without data are marked as gaps') }}" style="display:flex;gap:2px;align-items:flex-end;height:120px;overflow-x:auto">
+            @foreach ($sd as $day => $v)
+                @if ($v['gap'])
+                    <div data-gap="{{ $v['gap'] }}" title="{{ $day }} · {{ __('No data') }}: {{ $gapLabels[$v['gap']] }}" style="flex:1 0 6px;min-width:6px;height:100%;border-radius:3px;background:repeating-linear-gradient(135deg,{{ $gapColor[$v['gap']] }} 0 3px,transparent 3px 6px)"></div>
+                @else
+                    <div title="{{ $day }} · {{ R::money($v['spend'], $cur) }}" style="flex:1 0 6px;min-width:6px;border-radius:3px 3px 0 0;background:#14B8A6;height:{{ max(2, round($v['spend'] / $maxDay * 118)) }}px"></div>
+                @endif
+            @endforeach
+        </div>
+        @if ($series['gaps'])
+            <ul style="margin:8px 0 0;padding-inline-start:18px;font-size:13px" data-gap-list>
+                @foreach ($series['gaps'] as $g)
+                    <li>{{ trans_choice('No data for :n day|No data for :n days', $g['days'], ['n' => $g['days']]) }} (<bdi dir="ltr">{{ $g['from'] === $g['to'] ? $g['from'] : $g['from'].' → '.$g['to'] }}</bdi>): {{ $gapLabels[$g['reason']] }}</li>
+                @endforeach
+            </ul>
+        @else
+            <div style="{{ $muted }};margin-top:6px">{{ __('Data for every day in this period.') }}</div>
+        @endif
+    </x-filament::section>
+
     <x-filament::section>
         <x-slot name="heading">{{ __('6-month trend') }}</x-slot>
         <div style="display:grid;grid-template-columns:repeat({{ count($months) }},1fr);gap:10px;align-items:end;height:170px">

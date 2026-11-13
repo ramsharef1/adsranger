@@ -2515,5 +2515,13 @@
     "of :n orders": "من :n طلب",
     "Delivery rate": "نسبة التوصيل",
     "Cost per delivered order": "تكلفة الطلب المسلّم",
-    "Cost per order placed": "تكلفة الطلب المقدَّم"
+    "Cost per order placed": "تكلفة الطلب المقدَّم",
+    "No account or upload yet": "لا حساب ولا رفع بيانات بعد",
+    "Sync failed": "فشلت المزامنة",
+    "Nothing came back from the platform": "لم تُرجع المنصة أي بيانات",
+    "Daily spend": "الإنفاق اليومي",
+    "Daily spend for the period; days without data are marked as gaps": "الإنفاق اليومي للفترة؛ الأيام بلا بيانات معلَّمة كفجوات",
+    "No data": "لا بيانات",
+    "Data for every day in this period.": "توجد بيانات لكل يوم في هذه الفترة.",
+    "No data for :n day|No data for :n days": "{0} لا أيام بلا بيانات|{1} يوم واحد بلا بيانات|{2} يومان بلا بيانات|[3,10] :n أيام بلا بيانات|[11,*] :n يومًا بلا بيانات"
 }

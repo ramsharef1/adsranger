@@ -16,6 +16,7 @@ use App\Models\ReportSchedule;
 use App\Support\ClientFreeze;
 use App\Support\ClientSetupCopy;
 use App\Support\CodOutcomes;
+use App\Support\DataGaps;
 use App\Support\HealthScore;
 use App\Support\MetricsQuery;
 use App\Support\Modules;
@@ -401,6 +402,7 @@ class ViewClient extends ViewRecord
             ],
             'top' => MetricsQuery::topAds($c, $from, $to),
             'alerts' => Alert::where('client_id', $c->id)->where('status', 'open')->latest()->limit(5)->get(),
+            'series' => DataGaps::series($c, $from, $to),
             'cod' => CodOutcomes::summary($c, now($c->agency?->timezone ?: 'UTC')->subWeeks(8)->toDateString(), now($c->agency?->timezone ?: 'UTC')->toDateString()),
             'codWeeks' => CodWeek::with('campaign')->where('client_id', $c->id)->orderByDesc('week_start')->limit(8)->get(),
             'contacts' => ClientContact::with('user')->where('client_id', $c->id)->orderByDesc('happened_on')->orderByDesc('id')->limit(10)->get(),
