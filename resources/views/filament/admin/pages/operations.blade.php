@@ -46,6 +46,30 @@
         <p style="margin-top:10px;font-size:13px;opacity:.75">{{ __('Scheduler heartbeat') }}: {{ $heartbeat['last'] ? __(':n minutes ago', ['n' => $heartbeat['age_minutes']]) : __('never') }} · <bdi dir="ltr">/up/heartbeat</bdi></p>
     </x-filament::section>
 
+    <x-filament::section :heading="__('Live site check (nightly)')">
+        <x-slot name="description">{{ __('Every page in the sitemap and every link in /llms.txt, read from the live site with the copy rules; plus the free tools run once on our home page.') }}</x-slot>
+        @if (is_array($liveSite))
+            <p style="font-size:13px;opacity:.75"><bdi dir="ltr">{{ \Illuminate\Support\Carbon::parse($liveSite['at'])->timezone($tz)->format('Y-m-d H:i') }}</bdi> · {{ __(':n pages', ['n' => $liveSite['pages']]) }} · {{ __(':n warnings', ['n' => $liveSite['warnings']]) }} · <bdi dir="ltr">{{ collect($liveSite['tools'] ?? [])->map(fn ($v, $k) => "$k: $v")->implode(' · ') }}</bdi></p>
+            @forelse ($liveSite['errors'] as $e)
+                <div style="color:#dc2626"><bdi>{{ $e }}</bdi></div>
+            @empty
+                <p style="color:#0d9488">{{ __('No errors.') }}</p>
+            @endforelse
+        @else
+            <p style="opacity:.75">{{ __('Not run yet. It runs every night.') }}</p>
+        @endif
+    </x-filament::section>
+
+    <x-filament::section :heading="__('Ad platform API deadlines')">
+        <x-slot name="description">{{ __('From the networks register. A phone alert goes out 90, 30 and 7 days before each open one.') }}</x-slot>
+        @foreach ($deadlines as $d)
+            <div style="padding:4px 0;{{ $d['done'] ? 'opacity:.6' : '' }}">
+                <span style="font-weight:600;{{ ! $d['done'] && $d['days'] <= 30 ? 'color:#dc2626' : '' }}">{{ $d['done'] ? __('Done') : __(':n days', ['n' => $d['days']]) }}</span>
+                · <bdi dir="ltr">{{ $d['date'] }}</bdi> · <bdi>{{ $d['network'] }}</bdi>: <bdi dir="ltr">{{ $d['what'] }}</bdi> → <bdi dir="ltr">{{ $d['action'] }}</bdi>
+            </div>
+        @endforeach
+    </x-filament::section>
+
     <x-filament::section :heading="__('Find an error by its reference')">
         <x-slot name="description">{{ __('Paste the reference shown on an error page. Searches the server log and the older log files.') }}</x-slot>
         <form wire:submit="lookup" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">

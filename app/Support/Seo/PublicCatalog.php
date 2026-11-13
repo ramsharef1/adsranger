@@ -1065,6 +1065,9 @@ class PublicCatalog
         'retargeting', 'conversions-api', 'performance-max', 'search-terms', 'ad-set', 'creative', 'thruplay', 'targets', 'cac', 'ltv', 'mena',
         'ad-network', 'benchmarks'];
 
+    /** GR-40 (D-289): glossary terms named in the Arabic dual take «ما هما» (none yet; Growth adds slugs here). */
+    public const AR_DUAL = [];
+
     public static function glossaryHeading(array $item, bool $ar, ?string $slug = null): string
     {
         $item['ar_feminine'] = ! empty($item['ar_feminine']) || in_array($slug, self::AR_FEMININE, true);
@@ -1073,7 +1076,8 @@ class PublicCatalog
             return $fixed;
         }
         $name = $ar ? $item['term_ar'] : $item['term_en'];
-        $make = fn (string $n) => $ar ? (empty($item['ar_feminine']) ? 'ما هو ' : 'ما هي ').$n.'؟' : 'What Is '.$n.'?';
+        $item['ar_dual'] = ! empty($item['ar_dual']) || in_array($slug, self::AR_DUAL, true);
+        $make = fn (string $n) => $ar ? (! empty($item['ar_dual']) ? 'ما هما ' : (empty($item['ar_feminine']) ? 'ما هو ' : 'ما هي ')).$n.'؟' : 'What Is '.$n.'?';
         $heading = $make($name);
         if (mb_strlen($heading.' | AdsRanger') > 60) {
             $short = trim(preg_replace('/\s*\([^)]*\)\s*/u', ' ', $name));

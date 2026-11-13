@@ -11,7 +11,9 @@ use App\Jobs\VerifyOwnLinks;
 use App\Support\Fx;
 use App\Support\Ops\Heartbeat;
 use App\Support\Ops\JobRuns;
+use App\Support\Ops\LiveSiteCheck;
 use App\Support\Ops\LogRoll;
+use App\Support\Ops\NetworkDeadlines;
 use App\Support\Ops\Prune;
 use App\Support\PlatformHealth;
 use Illuminate\Support\Facades\Schedule;
@@ -38,3 +40,6 @@ Schedule::job(new VerifyOwnLinks)->monthlyOn(1, '06:20')->name('links-verify')->
 Schedule::call(fn () => JobRuns::track('ops-heartbeat', fn () => Heartbeat::beat()))->everyFiveMinutes()->name('ops-heartbeat');
 Schedule::call(fn () => JobRuns::track('ops-prune', fn () => Prune::run()))->dailyAt('03:40')->name('ops-prune')->withoutOverlapping();
 Schedule::call(fn () => JobRuns::track('ops-log-roll', fn () => LogRoll::run()))->dailyAt('03:50')->name('ops-log-roll')->withoutOverlapping();
+// EG-10 API deadlines (daily push at 90 / 30 / 7 days) · WS-01 / WS-02 / LV-17 nightly live-site + free-tool check.
+Schedule::call(fn () => JobRuns::track('ops-deadlines', fn () => NetworkDeadlines::watch()))->dailyAt('06:05')->name('ops-deadlines');
+Schedule::call(fn () => JobRuns::track('ops-live-site', fn () => LiveSiteCheck::run()))->dailyAt('02:10')->name('ops-live-site')->withoutOverlapping();

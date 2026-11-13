@@ -33,6 +33,8 @@ class CopyLint
             // (D-266); no "free forever" and no "unlimited" without a fair-use note in the same sentence (UX-270).
             ['id' => 'CR-22', 'lang' => 'all', 'severity' => 'error', 'pattern' => '/we(\'|’)ll (email|notify) you|email you (at|when)|get (an|one) email|سنراسلك|نراسلك|نخبرك عند|سنرسل (لك|إليك)/iu'],
             ['id' => 'CR-23', 'lang' => 'all', 'severity' => 'error', 'pattern' => '/free forever|مجان(ي|ًا|ية) (للأبد|إلى الأبد|دائمًا)|\bunlimited\b|غير محدود/iu', 'allow_sentence' => '/fair use|الاستخدام العادل/iu'],
+            // GR-43 (D-289): a season named with a past year reads stale (warning; Growth decides per page).
+            ['id' => 'CR-24', 'lang' => 'all', 'severity' => 'warning', 'pattern' => '/(رمضان|عيد الفطر|عيد الأضحى|الجمعة البيضاء|Ramadan|Eid al-(Fitr|Adha)|White Friday)\s+(20(1\d|2[0-5]))\b/iu'],
         ];
     }
 

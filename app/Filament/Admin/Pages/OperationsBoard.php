@@ -8,6 +8,8 @@ use App\Support\Ops\ErrorLookup;
 use App\Support\Ops\Heartbeat;
 use App\Support\Ops\JobRuns;
 use App\Support\Ops\LaunchReadiness;
+use App\Support\Ops\LiveSiteCheck;
+use App\Support\Ops\NetworkDeadlines;
 use App\Support\Ops\Prune;
 use BackedEnum;
 use Filament\Pages\Page;
@@ -67,6 +69,8 @@ class OperationsBoard extends Page
             'jobs' => JobRuns::board(),
             'retention' => Prune::table(),
             'lastPrune' => PlatformSetting::get(Prune::LAST_KEY),
+            'deadlines' => NetworkDeadlines::all(),
+            'liveSite' => PlatformSetting::get(LiveSiteCheck::LAST_KEY),
             'drivers' => ['lanes' => (bool) config('ops.lanes_enabled'), 'cache' => (string) config('cache.default'), 'session' => (string) config('session.driver')],
         ];
     }

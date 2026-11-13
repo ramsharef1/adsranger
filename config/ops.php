@@ -26,6 +26,8 @@ return [
         'ops-heartbeat' => 'ops-heartbeat',
         'ops-prune' => 'ops-prune',
         'ops-log-roll' => 'ops-log-roll',
+        'ops-deadlines' => 'ops-deadlines',
+        'ops-live-site' => 'ops-live-site',
     ],
 
     // EG-01: how long ops rows are kept (days). Customer data is never pruned here (D-164 / D-166: purge stays manual).
@@ -50,6 +52,20 @@ return [
 
     // EG-06: what production must look like. Mail stays `log` while D-266 holds.
     'expect_mailer' => env('OPS_EXPECT_MAILER', 'log'),
+
+    // FS-54: health-alert kind (prefix) → the runbook step that fixes it (ADSR-003).
+    'runbook' => [
+        'log' => 'ADSR-003 › Logs: open /admin/operations, paste the error reference',
+        'failed_jobs' => 'ADSR-003 › Queue: php artisan queue:failed, then queue:retry <id> after the fix',
+        'queue' => 'ADSR-003 › Queue: check the worker process, then php artisan queue:restart',
+        'sync' => 'ADSR-003 › Sync: /admin › Live verification shows the failing account',
+        'uptime' => 'ADSR-003 › Web: systemctl status nginx php84-php-fpm',
+        'restore' => 'ADSR-003 › Backups: run /usr/local/bin/adsranger-restore-test.sh',
+        'config' => 'ADSR-003 › .env: fix the key named in the alert, then php artisan optimize:clear',
+        'cert' => 'ADSR-003 › TLS: certbot renew --dry-run, then certbot renew',
+        'jobs' => 'ADSR-003 › Scheduler: crontab -l for schedule:run; /admin/operations shows which task',
+        'live_site' => 'ADSR-003 › Site: /admin/operations lists the pages and rules',
+    ],
 
     // Run the drift / cert checks outside production too (tests).
     'force_checks' => (bool) env('OPS_FORCE_CHECKS', false),

@@ -5,9 +5,14 @@ namespace App\Support;
 use App\Models\AdAccount;
 use App\Models\AdNetwork;
 use App\Models\Agency;
+use App\Models\AiBrainItem;
 use App\Models\Client;
 use App\Models\Connection;
+use App\Models\DailyMetric;
+use App\Models\LandingPage;
 use App\Sync\SyncService;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Schema;
 
 /** Sample clients + 90 days of Meta-style data, so screens can be tried before any network is approved. */
 class DemoData
@@ -29,6 +34,7 @@ class DemoData
         foreach ($specs as $i => [$name, $vertical, $market, $cur, $camps]) {
             $client = Client::firstOrCreate(['agency_id' => $a->id, 'name' => $name], ['vertical' => $vertical, 'market' => $market, 'currency' => $cur,
                 'monthly_budget' => array_sum(array_column($camps, 4)) * 30, 'notes' => 'Sample data. Remove it from /admin → Agencies.']);
+            self::seedExtras($a, $client);
             $acct = AdAccount::firstOrCreate(['connection_id' => $conn->id, 'external_id' => 'act_demo'.($i + 1)], [
                 'agency_id' => $a->id, 'ad_network_id' => $meta->id, 'client_id' => $client->id, 'name' => $name, 'currency' => $cur,
                 'timezone' => $a->timezone, 'status' => '1', 'is_active' => false]);
@@ -215,7 +221,7 @@ class DemoData
         $out = ['hour' => $spread($hours, 'h'), 'placement' => $spread($places, 'p'), 'region' => $spread($regions, 'r'), 'age_gender' => $spread($ages, 'a')];
 
         // 30-day reach per ad set + account (frequency 1.8–3.8; ~20% overlap).
-        $since = \Carbon\Carbon::parse($yesterday)->subDays(29)->toDateString();
+        $since = Carbon::parse($yesterday)->subDays(29)->toDateString();
         $sets = [];
         foreach ($rows as $r) {
             if ($r['date'] < $since || empty($r['ad_set'])) {
@@ -241,12 +247,29 @@ class DemoData
         return $out;
     }
 
+    /**
+     * EG-11 (D-289): sample rows for the other screens too, so preview workspaces show them filled: AI Workspace brain
+     * items (labelled sample). Report schedules stay out: one per client, and sample data never sends.
+     */
+    protected static function seedExtras(Agency $a, Client $client): void
+    {
+        if (Schema::hasTable('ai_brain_items') && ! AiBrainItem::where('client_id', $client->id)->exists()) {
+            foreach ([
+                ['rule', 'Sample: brand words to keep', 'Sample data. Always write the brand name as given; no prices in ads.'],
+                ['decision', 'Sample: budget split for the season', 'Sample data. 60% of spend goes to lead campaigns until the season ends.'],
+                ['learning', 'Sample: what worked last month', 'Sample data. Short videos brought cheaper results than images.'],
+            ] as [$type, $title, $text]) {
+                AiBrainItem::create(['agency_id' => $a->id, 'client_id' => $client->id, 'type' => $type, 'title' => $title, 'original' => $text, 'clean' => $text]);
+            }
+        }
+    }
+
     public static function remove(Agency $a): void
     {
         foreach (Connection::where('agency_id', $a->id)->where('external_user_id', self::TAG)->get() as $conn) {
             $clientIds = $conn->adAccounts()->pluck('client_id')->filter();
-            \App\Models\DailyMetric::whereIn('ad_account_id', $conn->adAccounts()->pluck('id'))->delete();
-            \App\Models\LandingPage::where('agency_id', $a->id)->whereIn('client_id', $clientIds)->delete();
+            DailyMetric::whereIn('ad_account_id', $conn->adAccounts()->pluck('id'))->delete();
+            LandingPage::where('agency_id', $a->id)->whereIn('client_id', $clientIds)->delete();
             Client::whereIn('id', $clientIds)->delete();
             $conn->delete(); // cascades to ad accounts, structure and metrics
         }

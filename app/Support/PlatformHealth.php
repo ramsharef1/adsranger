@@ -9,6 +9,8 @@ use App\Models\User;
 use App\Support\Ops\CertExpiry;
 use App\Support\Ops\ConfigDrift;
 use App\Support\Ops\JobRuns;
+use App\Support\Ops\LiveSiteCheck;
+use App\Support\Ops\Runbook;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -112,18 +114,25 @@ class PlatformHealth
             $problems[] = ['kind' => 'jobs', 'text' => __('Scheduled tasks late or failed: :list', ['list' => implode(', ', $missed)])];
         }
 
+        // 9. WS-01 / WS-02 / LV-17: the nightly live-site check found copy or link errors, or a free tool failed.
+        foreach (LiveSiteCheck::problems() as $i => $text) {
+            $problems[] = ['kind' => 'live_site'.$i, 'text' => $text];
+        }
+
         // 6. A-5: the monthly restore test passed and is recent.
         if (config('health.restore_test', true) && ($restore = RestoreTest::problem()) !== null) {
             $problems[] = ['kind' => 'restore', 'text' => $restore];
         }
 
+        // FS-54: every alert carries the runbook step that fixes it.
+        $problems = array_map(fn ($p) => $p + ['fix' => Runbook::hint($p['kind'])], $problems);
         PlatformSetting::put(self::LAST_KEY, ['at' => now()->toIso8601String(), 'problems' => $problems]);
 
         $sent = [];
         foreach ($problems as $p) {
             if (Cache::add('health.alerted.'.$p['kind'], 1, now()->addHour())) {
                 AuditLog::record('platform.health_alert', null, $p);
-                $sent[] = $p['text'];
+                $sent[] = $p['text'].($p['fix'] ? ' → '.$p['fix'] : '');
             }
         }
         if ($sent !== []) {

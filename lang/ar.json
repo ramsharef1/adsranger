@@ -2136,5 +2136,17 @@
     "on": "مفعّلة",
     "passed, recent": "ناجح وحديث",
     "until they expire": "حتى انتهاء صلاحيتها",
-    "Operations": "التشغيل"
+    "Operations": "التشغيل",
+    ":network: :what in :n days (:date). :action": "<bdi>:network</bdi>: :what بعد :n يومًا (:date). المطلوب: :action",
+    "Ad platform API deadline": "موعد نهائي لواجهة منصة إعلانية",
+    "Free tools that did not answer the nightly check: :list": "أدوات مجانية لم تستجب في الفحص الليلي: :list",
+    "Live site check (nightly)": "فحص الموقع المباشر (ليلًا)",
+    "Every page in the sitemap and every link in /llms.txt, read from the live site with the copy rules; plus the free tools run once on our home page.": "كل صفحة في خريطة الموقع وكل رابط في ملف llms.txt، تُقرأ من الموقع المباشر وتُفحص بقواعد النصوص، وتُشغَّل الأدوات المجانية مرة على صفحتنا الرئيسية.",
+    ":n pages": ":n صفحة",
+    ":n warnings": ":n تنبيه",
+    "No errors.": "لا أخطاء.",
+    "Not run yet. It runs every night.": "لم يُشغَّل بعد، ويعمل كل ليلة.",
+    "Ad platform API deadlines": "المواعيد النهائية لواجهات المنصات الإعلانية",
+    "From the networks register. A phone alert goes out 90, 30 and 7 days before each open one.": "من سجل المنصات. يصل تنبيه إلى الهاتف قبل 90 و30 و7 أيام من كل موعد مفتوح.",
+    "Copy or link errors found by the nightly live-site check: :n": "أخطاء في النصوص أو الروابط وجدها الفحص الليلي للموقع: :n"
 }

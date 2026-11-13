@@ -20,7 +20,7 @@
                 <p style="margin:0;font-size:14px;font-weight:600">{{ __('No problems found.') }}</p>
             @else
                 <ul role="list" style="margin:0;padding-inline-start:18px;font-size:14px">
-                    @foreach ($health['problems'] as $p)<li>{{ $p['text'] }}</li>@endforeach
+                    @foreach ($health['problems'] as $p)<li>{{ $p['text'] }}@if (! empty($p['fix']))<br><span style="font-size:12px;opacity:.75"><bdi dir="ltr">{{ $p['fix'] }}</bdi></span>@endif</li>@endforeach
                 </ul>
             @endif
         @endif
