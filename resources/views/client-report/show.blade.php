@@ -153,6 +153,8 @@
         @foreach ($pdfMonths as $m => $label)
             <a class="pill" href="{{ url('/r/'.$link->token.'/pdf').'?'.http_build_query(['m' => $m, 'lang' => $lang]) }}">{{ $label }}</a>
         @endforeach
+        @php $lastMonth = array_key_first($pdfMonths); @endphp
+        <a class="pill" href="{{ url('/r/'.$link->token.'/pdf').'?'.http_build_query(['m' => $lastMonth, 'lang' => 'both']) }}" lang="ar">{{ $pdfMonths[$lastMonth] }} · العربية + <bdi dir="ltr">English</bdi></a>
     </nav>
     @endif
     <p><a class="pill" href="{{ url('/r/'.$link->token.'/csv').'?'.http_build_query(['p' => $period, 'lang' => $lang]) }}">{!! __('report.download_csv') !!}</a></p>

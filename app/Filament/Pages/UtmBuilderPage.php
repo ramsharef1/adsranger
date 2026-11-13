@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Concerns\TranslatesPageLabels;
+use App\Support\CampaignName;
 use App\Support\LandingPages;
 use App\Support\UtmBuilder;
 use BackedEnum;
@@ -53,6 +54,14 @@ class UtmBuilderPage extends Page
 
     /** @var array<string, mixed>|null */
     public ?array $check = null;
+
+    /** @var array{client: string, objective: string, market: string, extra: string, date: string, gregorian: bool, hijri: bool, sep: string} XS-21 (R5) */
+    public array $name = ['client' => '', 'objective' => 'LEADS', 'market' => '', 'extra' => '', 'date' => '', 'gregorian' => false, 'hijri' => true, 'sep' => '_'];
+
+    public function useName(): void
+    {
+        $this->campaign = strtolower(CampaignName::build($this->name));
+    }
 
     public function updatedPreset(string $key): void
     {
@@ -125,6 +134,7 @@ class UtmBuilderPage extends Page
             'invalid' => trim($this->baseUrl) !== '' && UtmBuilder::build($this->baseUrl, []) === null,
             'warnings' => trim($this->baseUrl) === '' ? [] : UtmBuilder::warnings($this->baseUrl, $this->values($first)),
             'tenant' => Filament::getTenant(),
+            'builtName' => CampaignName::build(['date' => $this->name['date'] ?: now(Filament::getTenant()?->timezone ?: 'UTC')->toDateString()] + $this->name),
         ];
     }
 }

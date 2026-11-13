@@ -41,10 +41,13 @@ class MonthlyReport
         $to = $start->copy()->endOfMonth()->toDateString();
         $prevStart = $start->copy()->subMonthNoOverflow();
 
+        // XS-22 (R5): 'both' gives every label in Arabic and English; dates come in both languages.
+        $fmt = fn (Carbon $d, string $f) => $lang === 'both' ? ['ar' => $d->copy()->locale('ar')->translatedFormat($f), 'en' => $d->copy()->locale('en')->translatedFormat($f)] : $d->copy()->locale($lang)->translatedFormat($f);
+
         return [
             'client' => $client, 'agency' => $client->agency, 'lang' => $lang,
-            'monthLabel' => $start->copy()->locale($lang)->translatedFormat('F Y'),
-            'prevLabel' => $prevStart->copy()->locale($lang)->translatedFormat('F Y'),
+            'monthLabel' => $fmt($start, 'F Y'),
+            'prevLabel' => $fmt($prevStart, 'F Y'),
             't' => MetricsQuery::totals($client, $from, $to),
             'prev' => MetricsQuery::totals($client, $prevStart->toDateString(), $prevStart->copy()->endOfMonth()->toDateString()),
             'budget' => $client->monthly_budget ?: null,
@@ -52,7 +55,7 @@ class MonthlyReport
             'hideSpend' => (bool) $client->hide_spend,
             'notes' => MonthNotes::get($client, $month), // XS-03 / FS-20 (R4)
             'gaps' => DataGaps::forReport($client, $from, $to), // FS-24 / XS-44
-            'generated' => now($client->agency->timezone ?: 'UTC')->locale($lang)->translatedFormat('j F Y'),
+            'generated' => $fmt(now($client->agency->timezone ?: 'UTC'), 'j F Y'),
         ];
     }
 
@@ -67,7 +70,7 @@ class MonthlyReport
     public static function pdf(Client $client, string $month, string $lang): string
     {
         $previous = app()->getLocale();
-        app()->setLocale($lang);
+        app()->setLocale($lang === 'both' ? 'ar' : $lang);
         try {
             $html = view('reports.monthly-pdf', static::data($client, $month, $lang))->render();
         } finally {
@@ -82,9 +85,9 @@ class MonthlyReport
             'mode' => 'utf-8', 'format' => 'A4', 'tempDir' => $tmp,
             'margin_left' => 14, 'margin_right' => 14, 'margin_top' => 16, 'margin_bottom' => 16, 'margin_header' => 6,
             'default_font' => 'dejavusans', 'autoScriptToLang' => true, 'autoLangToFont' => true,
-            'directionality' => $lang === 'ar' ? 'rtl' : 'ltr',
+            'directionality' => $lang === 'en' ? 'ltr' : 'rtl',
         ]);
-        $mpdf->SetTitle((DemoData::isSample($client) ? DemoData::LABEL.' · ' : '').__('report.pdf_title', ['client' => $client->name], $lang));
+        $mpdf->SetTitle((DemoData::isSample($client) ? DemoData::LABEL.' · ' : '').__('report.pdf_title', ['client' => $client->name], $lang === 'both' ? 'ar' : $lang));
         if (DemoData::isSample($client)) { // PS-06: sample numbers can never pass as real
             $mpdf->SetWatermarkText(DemoData::LABEL, 0.08);
             $mpdf->showWatermarkText = true;

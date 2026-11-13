@@ -99,7 +99,7 @@ class ClientReportController extends Controller
         abort_unless($client && $client->status !== 'archived', 404);
         abort_unless(PlanGate::allows($client->agency, 'monthly_pdf'), 404);
 
-        $lang = in_array($request->query('lang'), ['ar', 'en'], true) ? $request->query('lang') : ($client->agency->language === 'en' ? 'en' : 'ar');
+        $lang = in_array($request->query('lang'), ['ar', 'en', 'both'], true) ? $request->query('lang') : ($client->agency->language === 'en' ? 'en' : 'ar'); // XS-22: 'both'
         $month = $request->query('m');
         if (! MonthlyReport::validMonth($month)) {
             $month = now($client->agency->timezone ?: 'UTC')->startOfMonth()->subMonthNoOverflow()->format('Y-m');

@@ -2736,5 +2736,15 @@
     "Tag each ad with its dialect to compare. Untagged ads use a guess from the ad name when it has dialect words.": "ضع وسم اللهجة على كل إعلان للمقارنة. الإعلانات بلا وسم تُقدَّر لهجتها من اسم الإعلان إن احتوى كلمات لهجة.",
     "Tag ads (top 15 by spend)": "وسم الإعلانات (أعلى 15 إنفاقًا)",
     "guess: :d": "تقدير: :d",
-    "Dialect of :ad": "لهجة :ad"
+    "Dialect of :ad": "لهجة :ad",
+    "Campaign name": "اسم الحملة",
+    "Build a consistent name. The Hijri month token (for example RMD-1448 for Ramadan 1448) lets you find every Ramadan campaign across years.": "ابنِ اسمًا موحّدًا. رمز الشهر الهجري (مثل RMD-1448 لرمضان 1448) يسهّل العثور على كل حملات رمضان عبر السنوات.",
+    "Client code": "رمز العميل",
+    "Objective": "الهدف",
+    "Extra (offer, audience)": "إضافة (العرض، الجمهور)",
+    "Launch date": "تاريخ الإطلاق",
+    "Separator": "الفاصل",
+    "Hijri month": "الشهر الهجري",
+    "Year and month (YYYYMM)": "السنة والشهر (YYYYMM)",
+    "Use as utm_campaign": "استخدمه في utm_campaign"
 }

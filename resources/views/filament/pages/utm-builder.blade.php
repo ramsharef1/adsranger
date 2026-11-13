@@ -96,4 +96,29 @@
             @endif
         </div>
     </div>
+    {{-- XS-21 (R5): campaign name builder with the Hijri month token (RMD-1448). --}}
+    @php $nf = 'min-height:44px;padding:6px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.35);background:transparent;font-size:13px;width:100%'; $nl = 'display:block;font-size:12px;font-weight:600;margin-bottom:4px'; @endphp
+    <x-filament::section data-campaign-name>
+        <x-slot name="heading">{{ __('Campaign name') }}</x-slot>
+        <x-slot name="description">{{ __('Build a consistent name. The Hijri month token (for example RMD-1448 for Ramadan 1448) lets you find every Ramadan campaign across years.') }}</x-slot>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;align-items:end">
+            <div><label for="cn-client" style="{{ $nl }}">{{ __('Client code') }}</label><input id="cn-client" wire:model.live.debounce.300ms="name.client" maxlength="20" placeholder="ZAD" style="{{ $nf }}"></div>
+            <div><label for="cn-obj" style="{{ $nl }}">{{ __('Objective') }}</label><select id="cn-obj" wire:model.live="name.objective" style="{{ $nf }}">@foreach (\App\Support\CampaignName::OBJECTIVES as $o)<option value="{{ $o }}">{{ $o }}</option>@endforeach</select></div>
+            <div><label for="cn-mk" style="{{ $nl }}">{{ __('Market') }}</label><input id="cn-mk" wire:model.live.debounce.300ms="name.market" maxlength="8" placeholder="KSA" style="{{ $nf }}"></div>
+            <div><label for="cn-x" style="{{ $nl }}">{{ __('Extra (offer, audience)') }}</label><input id="cn-x" wire:model.live.debounce.300ms="name.extra" maxlength="30" placeholder="IFTAR-OFFER" style="{{ $nf }}"></div>
+            <div><label for="cn-d" style="{{ $nl }}">{{ __('Launch date') }}</label><input id="cn-d" type="date" wire:model.live="name.date" style="{{ $nf }}"></div>
+            <div><label for="cn-sep" style="{{ $nl }}">{{ __('Separator') }}</label><select id="cn-sep" wire:model.live="name.sep" style="{{ $nf }}"><option value="_">_</option><option value="|">|</option><option value="-">-</option></select></div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:8px">
+            <label style="display:flex;gap:6px;align-items:center;min-height:44px;font-size:13px"><input type="checkbox" wire:model.live="name.hijri">{{ __('Hijri month') }}</label>
+            <label style="display:flex;gap:6px;align-items:center;min-height:44px;font-size:13px"><input type="checkbox" wire:model.live="name.gregorian">{{ __('Year and month (YYYYMM)') }}</label>
+        </div>
+        @if ($builtName !== '')
+            <div x-data="{ ok: false }" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px">
+                <code dir="ltr" style="font-size:15px;padding:6px 10px;border-radius:8px;background:rgba(148,163,184,.12)">{{ $builtName }}</code>
+                <button type="button" x-on:click="navigator.clipboard.writeText(@js($builtName)); ok = true; setTimeout(() => ok = false, 1500)" style="min-height:44px;padding:0 12px;border-radius:8px;border:1px solid rgba(148,163,184,.4);background:transparent;font-size:13px"><span x-show="! ok">{{ __('Copy') }}</span><span x-show="ok" x-cloak>{{ __('Copied') }}</span></button>
+                <button type="button" wire:click="useName" style="min-height:44px;padding:0 12px;border-radius:8px;border:1px solid rgba(148,163,184,.4);background:transparent;font-size:13px">{{ __('Use as utm_campaign') }}</button>
+            </div>
+        @endif
+    </x-filament::section>
 </x-filament-panels::page>

@@ -38,6 +38,32 @@ class MenaCalendar
         return $cal->get(\IntlCalendar::FIELD_YEAR);
     }
 
+    /**
+     * XS-21 (R5): Hijri [year, month] for a Gregorian date: Umm al-Qura through intl, else the tabular Islamic calendar
+     * (may differ by a day at month edges).
+     *
+     * @return array{0: int, 1: int}
+     */
+    public static function hijriYearMonth(string $date): array
+    {
+        $g = Carbon::parse($date, 'UTC')->setTime(12, 0);
+        if (static::hasIntl()) {
+            $cal = \IntlCalendar::createInstance('UTC', 'en_US@calendar=islamic-umalqura');
+            $cal->setTime($g->getTimestampMs());
+
+            return [$cal->get(\IntlCalendar::FIELD_YEAR), $cal->get(\IntlCalendar::FIELD_MONTH) + 1];
+        }
+        $jd = intdiv($g->getTimestamp(), 86400) + 2440588;
+        $l = $jd - 1948440 + 10632;
+        $n = intdiv($l - 1, 10631);
+        $l = $l - 10631 * $n + 354;
+        $j = intdiv(10985 - $l, 5316) * intdiv(50 * $l, 17719) + intdiv($l, 5670) * intdiv(43 * $l, 15238);
+        $l = $l - intdiv(30 - $j, 15) * intdiv(17719 * $j, 50) - intdiv($j, 16) * intdiv(15238 * $j, 43) + 29;
+        $m = intdiv(24 * $l, 709);
+
+        return [30 * $n + $j - 30, $m];
+    }
+
     /** "12 Ramadan 1448" (en) or «١٢ رمضان ١٤٤٨» (ar). */
     public static function hijriLabel(string $date, string $locale = 'en'): string
     {
@@ -52,6 +78,7 @@ class MenaCalendar
 
     /**
      * Events overlapping [$from, $to], optionally for one market (fixed national days are market-specific).
+     *
      * @return array<int, array{key:string,label:string,ar:string,start:string,end:string,days:int,kind:string,markets:array,tip:string,estimated:bool}>
      */
     public static function events(string $from, string $to, ?string $market = null): array
@@ -100,6 +127,7 @@ class MenaCalendar
 
     /**
      * How this client performed in the latest past occurrence of an event vs the 28 days before it.
+     *
      * @return array{spend:float,cpr:?float,results:?float,start:string,end:string,source:string}|null
      */
     public static function seasonality(Client $c, string $key): ?array

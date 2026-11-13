@@ -292,12 +292,12 @@ class ViewClient extends ViewRecord
                 ->schema([
                     Select::make('month')->label(__('Month'))->options(fn () => MonthlyReport::months(12, app()->getLocale() === 'ar' ? 'ar' : 'en', $this->record->agency->timezone ?: 'UTC'))
                         ->default(fn () => array_key_first(MonthlyReport::months(1)))->required(),
-                    Select::make('lang')->label(__('Language'))->options(['ar' => 'العربية', 'en' => 'English'])
+                    Select::make('lang')->label(__('Language'))->options(['ar' => 'العربية', 'en' => 'English', 'both' => 'العربية + English'])
                         ->default(fn () => $this->record->agency->language === 'en' ? 'en' : 'ar')->required(),
                 ])
                 ->modalSubmitActionLabel(__('Download PDF'))
                 ->action(function (array $data) {
-                    abort_unless(MonthlyReport::validMonth($data['month'] ?? null) && in_array($data['lang'] ?? null, ['ar', 'en'], true), 422);
+                    abort_unless(MonthlyReport::validMonth($data['month'] ?? null) && in_array($data['lang'] ?? null, ['ar', 'en', 'both'], true), 422);
                     AuditLog::record('report.monthly_pdf', $this->record, ['month' => $data['month'], 'lang' => $data['lang']]);
                     $pdf = MonthlyReport::pdf($this->record, $data['month'], $data['lang']);
 
