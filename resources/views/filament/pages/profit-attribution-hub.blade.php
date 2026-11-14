@@ -263,5 +263,7 @@
                 </div>
             </x-filament::section>
         </div>
+
+        @include('filament.pages.partials.sem-hub-extensions')
     @endif
 </x-filament-panels::page>

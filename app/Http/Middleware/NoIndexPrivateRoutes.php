@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 class NoIndexPrivateRoutes
 {
     /** Path prefixes that are never indexable (no leading slash). */
-    public const PRIVATE_PREFIXES = ['app', 'admin', 'invite', 'r', 'collect', 'survey', 'filament', 'livewire', 'storage', 'up'];
+    public const PRIVATE_PREFIXES = ['app', 'admin', 'invite', 'r', 'collect', 'survey', 'feeds', 'pitch', 'filament', 'livewire', 'storage', 'up'];
 
     public function handle(Request $request, Closure $next): Response
     {

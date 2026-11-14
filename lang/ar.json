@@ -2985,5 +2985,21 @@
     "Address (EN)": "العنوان بالإنجليزية",
     "Save branch & check NAP": "حفظ الفرع وفحص NAP",
     "NAP issues": "ملاحظات اتساق NAP",
-    "NAP check clean": "فحص NAP سليم"
+    "NAP check clean": "فحص NAP سليم",
+    "Search term rows imported: :count": "صفوف عبارات البحث المستوردة: :count",
+    "Product feed created.": "أُنشئت خلاصة المنتجات.",
+    "Search term n-gram bleed miner (1/2/3-word stems)": "منقِّب هدر عبارات البحث (جذور من 1/2/3 كلمات)",
+    "Import search terms CSV": "استيراد CSV عبارات البحث",
+    "No zero-conversion search stems above threshold yet.": "لا توجد جذور بحث بلا تحويلات فوق الحد المحدد بعد.",
+    "Profit-labeled shopping feeds (/feeds/{token}.xml)": "خلاصات التسوق المصنّفة بالربحية (/feeds/{token}.xml)",
+    "Brand prefix (AR)": "بادئة العلامة التجارية (AR)",
+    "Brand prefix (EN)": "بادئة العلامة التجارية (EN)",
+    "Generate feed link": "توليد رابط الخلاصة",
+    "Deterministic root-cause performance investigator (14d vs prior 14d)": "محقِّق الأسباب الجذرية الحتمي للأداء (14 يومًا مقابل 14 يومًا قبلها)",
+    "ROAS delta": "تغيّر ROAS",
+    "POAS delta": "تغيّر POAS",
+    "CPC impact on ROAS": "أثر CPC على ROAS",
+    "CVR impact on ROAS": "أثر CVR على ROAS",
+    "AOV impact on ROAS": "أثر AOV على ROAS",
+    "Primary driver": "العامل الرئيسي"
 }
