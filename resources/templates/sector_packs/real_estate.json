@@ -1,0 +1,15 @@
+{
+    "key": "real_estate",
+    "kind": "sector_packs",
+    "labels": {},
+    "extra_metrics": [],
+    "seasons": [
+        "ramadan",
+        "saudi_national",
+        "uae_national"
+    ],
+    "features": [
+        "ad_permits",
+        "off_plan_launch"
+    ]
+}

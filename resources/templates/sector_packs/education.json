@@ -1,0 +1,11 @@
+{
+    "key": "education",
+    "kind": "sector_packs",
+    "labels": {},
+    "extra_metrics": [],
+    "seasons": [
+        "back_to_school",
+        "new_year"
+    ],
+    "features": []
+}

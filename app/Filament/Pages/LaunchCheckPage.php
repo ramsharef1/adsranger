@@ -34,6 +34,8 @@ class LaunchCheckPage extends Page
 
     public string $url = '';
 
+    public string $adName = '';
+
     public string $adText = '';
 
     /** @var list<array{key: string, ok: bool, level: string, message: string}>|null */
@@ -46,10 +48,10 @@ class LaunchCheckPage extends Page
 
     public function check(): void
     {
-        $this->validate(['clientId' => 'required|integer', 'url' => 'required|url:http,https|max:1000', 'adText' => 'required|string|max:3000'],
-            [], ['url' => __('Landing page link'), 'adText' => __('Ad text')]);
+        $this->validate(['clientId' => 'required|integer', 'url' => 'required|url:http,https|max:1000', 'adName' => 'nullable|string|max:160', 'adText' => 'required|string|max:3000'],
+            [], ['url' => __('Landing page link'), 'adName' => __('Ad or listing name (optional)'), 'adText' => __('Ad text')]);
         $c = Client::visibleTo(auth()->user(), Filament::getTenant())->findOrFail($this->clientId);
-        $this->results = LaunchPreflight::run($c, trim($this->url), $this->adText);
+        $this->results = LaunchPreflight::run($c, trim($this->url), $this->adText, true, trim($this->adName) !== '' ? trim($this->adName) : null);
     }
 
     protected function getViewData(): array

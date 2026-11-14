@@ -1,0 +1,25 @@
+{
+    "key": "charity",
+    "kind": "sector_packs",
+    "labels": {
+        "revenue": "Donation value",
+        "purchase": "Donors",
+        "conversion": "Donors",
+        "purchases": "Donors",
+        "conversions": "Donors"
+    },
+    "extra_metrics": [
+        {
+            "key": "donation_per_1k_impressions",
+            "label": "Donation per 1,000 impressions",
+            "formula": "revenue_per_1k_impressions",
+            "format": "money"
+        }
+    ],
+    "seasons": [
+        "ramadan",
+        "last_ten_nights",
+        "dhul_hijjah"
+    ],
+    "features": []
+}

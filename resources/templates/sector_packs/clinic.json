@@ -1,0 +1,14 @@
+{
+    "key": "clinic",
+    "kind": "sector_packs",
+    "labels": {},
+    "extra_metrics": [],
+    "seasons": [
+        "ramadan",
+        "eid_fitr",
+        "eid_adha"
+    ],
+    "features": [
+        "ad_permits"
+    ]
+}

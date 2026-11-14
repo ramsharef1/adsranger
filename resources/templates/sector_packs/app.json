@@ -1,0 +1,13 @@
+{
+    "key": "app",
+    "kind": "sector_packs",
+    "labels": {},
+    "extra_metrics": [],
+    "seasons": [
+        "ramadan",
+        "white_friday"
+    ],
+    "features": [
+        "delivery_weeks"
+    ]
+}

@@ -18,29 +18,37 @@ use Carbon\CarbonPeriod;
  */
 class ClientCalendar
 {
-    public const KINDS = ['season', 'payday', 'school', 'campaign_end', 'report', 'follow_up', 'licence', 'resume'];
+    public const KINDS = ['season', 'payday', 'school', 'campaign_end', 'report', 'follow_up', 'licence', 'resume', 'launch'];
 
     /** @return array<string, string> */
     public static function kindLabels(): array
     {
         return ['season' => __('Season'), 'payday' => __('Payday (usually)'), 'school' => __('School or exams'), 'campaign_end' => __('Campaign ends'), 'report' => __('Report goes out'), 'follow_up' => __('Follow-up'),
-            'licence' => __('Licence expires'), 'resume' => __('Client resumes')];
+            'licence' => __('Licence expires'), 'resume' => __('Client resumes'), 'launch' => __('Project launch')];
     }
 
-    /** @return list<array{date: string, kind: string, title: string, client_id: ?int, client: ?string}> sorted by date */
+    /** @return list<array{date: string, kind: string, title: string, client_id: ?int, client: ?string, highlighted?: bool}> sorted by date */
     public static function events(Agency $a, ?User $user, string $from, string $to, ?int $clientId = null): array
     {
         $clients = Client::visibleTo($user, $a)->whereIn('status', ['active', 'paused'])->when($clientId, fn ($q) => $q->whereKey($clientId))->get()->keyBy('id');
         $ids = $clients->keys();
         $ar = app()->getLocale() === 'ar';
+        $highlightedKeys = $clients->flatMap(fn (Client $c) => SectorPacks::forClient($c)['seasons'])->unique()->values()->all();
         $out = [];
-        $add = function (string $date, string $kind, string $title, ?int $cid) use (&$out, $clients) {
-            $out[] = ['date' => $date, 'kind' => $kind, 'title' => $title, 'client_id' => $cid, 'client' => $cid ? $clients[$cid]?->name : null];
+        $add = function (string $date, string $kind, string $title, ?int $cid, bool $highlighted = false) use (&$out, $clients) {
+            $out[] = ['date' => $date, 'kind' => $kind, 'title' => $title, 'client_id' => $cid, 'client' => $cid ? $clients[$cid]?->name : null, 'highlighted' => $highlighted];
         };
 
         foreach (MenaCalendar::events($from, $to, $a->country ?: null) as $e) {
             if ($e['start'] >= $from) {
-                $add($e['start'], 'season', ($ar ? $e['ar'] : $e['label']).(($e['status'] ?? '') === 'expected' ? ' · '.__('expected') : (($e['status'] ?? '') === 'confirmed' ? ' · '.__('confirmed') : '')), null);
+                $add($e['start'], 'season', ($ar ? $e['ar'] : $e['label']).(($e['status'] ?? '') === 'expected' ? ' · '.__('expected') : (($e['status'] ?? '') === 'confirmed' ? ' · '.__('confirmed') : '')), null, in_array($e['key'], $highlightedKeys, true));
+            }
+        }
+        if (in_array('last_ten_nights', $highlightedKeys, true)) {
+            foreach (SectorPacks::seasonsBetween($from, $to, $a->country ?: null, ['last_ten_nights']) as $lt) {
+                if ($lt['start'] >= $from && $lt['start'] <= $to) {
+                    $add($lt['start'], 'season', ($ar ? $lt['ar'] : $lt['label']).(($lt['status'] ?? '') === 'expected' ? ' · '.__('expected') : (($lt['status'] ?? '') === 'confirmed' ? ' · '.__('confirmed') : '')), null, true);
+                }
             }
         }
         // PS-21 / XS-20 (R5): the agency's own payday and school / exam dates for the countries of these clients.
@@ -72,10 +80,16 @@ class ClientCalendar
         ClientContact::whereIn('client_id', $ids)->whereNull('next_done_at')->whereBetween('next_on', [$from, $to])->get()
             ->each(fn ($c) => $add($c->next_on->toDateString(), 'follow_up', ClientContact::kindLabels()[$c->kind] ?? $c->kind, $c->client_id));
         ClientLicence::whereIn('client_id', $ids)->whereBetween('expires_on', [$from, $to])->get()
-            ->each(fn ($l) => $add($l->expires_on->toDateString(), 'licence', (ClientLicence::kindLabels()[$l->kind] ?? $l->kind).' '.$l->number, $l->client_id));
+            ->each(fn ($l) => $add($l->expires_on->toDateString(), 'licence', (ClientLicence::kindLabels()[$l->kind] ?? $l->kind).' '.$l->number.($l->ad_name ? ' · '.$l->ad_name : ''), $l->client_id));
         foreach ($clients->where('status', 'paused') as $c) {
             if ($c->paused_until && $c->paused_until->toDateString() >= $from && $c->paused_until->toDateString() <= $to) {
                 $add($c->paused_until->toDateString(), 'resume', __('Back from pause'), $c->id);
+            }
+        }
+        foreach ($clients as $c) {
+            if ($c->launch_date && $c->launch_date->toDateString() >= $from && $c->launch_date->toDateString() <= $to) {
+                $project = trim((string) TextClean::invisible((string) ($c->launch_project_name ?? ''))) ?: __('Off-plan launch');
+                $add($c->launch_date->toDateString(), 'launch', $project, $c->id);
             }
         }
 

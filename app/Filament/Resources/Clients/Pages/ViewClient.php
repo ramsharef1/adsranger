@@ -17,6 +17,7 @@ use App\Models\ClientLicence;
 use App\Models\ClientLink;
 use App\Models\CodWeek;
 use App\Models\DailyMetric;
+use App\Models\DeliveryWeek;
 use App\Models\LeadDeskLink;
 use App\Models\ReportSchedule;
 use App\Support\Arabic\Phrases;
@@ -25,6 +26,7 @@ use App\Support\ClientSetupCopy;
 use App\Support\ClientSummaryText;
 use App\Support\CodOutcomes;
 use App\Support\DataGaps;
+use App\Support\DeliveryOutcomes;
 use App\Support\DialectResults;
 use App\Support\Fx;
 use App\Support\HealthScore;
@@ -38,7 +40,9 @@ use App\Support\Pacing;
 use App\Support\Periods;
 use App\Support\PlanGate;
 use App\Support\SeasonReview;
+use App\Support\SectorPacks;
 use App\Support\TeamRoles;
+use App\Support\TextClean;
 use App\Support\WhatsAppReport;
 use App\Support\WorkingDays;
 use Carbon\CarbonImmutable;
@@ -122,19 +126,29 @@ class ViewClient extends ViewRecord
                     $hasLink = ClientLink::where('client_id', $this->record->id)->whereNull('revoked_at')->exists();
                     Notification::make()->title(__('Sent to the report link.'))->body($hasLink ? null : __('This client has no report link yet. Make one so they can answer.'))->success()->send();
                 }),
-            // XS-24 / NB-36 (D-305): licence type, number and expiry; printed on briefs, Desk reminder 30 days before.
+            // XS-24 / NB-36 (D-305) + Step 1a per-ad permit matching: licence type, number, optional ad_name, and expiry; neutral reminder only.
             Action::make('addLicence')->label(__('Add licence'))->icon('heroicon-o-identification')->color('gray')
                 ->visible(fn () => TeamRoles::canManageData(auth()->user(), $this->record->agency))
                 ->modalDescription(__('For ads that must show a licence or permit number. AdsRanger keeps the number and reminds you before it expires; it does not judge whether an ad is compliant.'))
                 ->schema([
                     Select::make('kind')->label(__('Type'))->options(ClientLicence::kindLabels())->required()->default('real_estate'),
                     TextInput::make('number')->label(__('Licence number'))->required()->maxLength(80),
+                    TextInput::make('ad_name')->label(__('Ad or listing name (optional)'))->maxLength(160)
+                        ->helperText(__('Leave empty when the permit applies to all ads, or enter a specific ad or listing name.')),
                     DatePicker::make('expires_on')->label(__('Expires on (optional)'))->native(false),
                     TextInput::make('note')->label(__('Note'))->maxLength(200),
                 ])
                 ->action(function (array $data): void {
-                    ClientLicence::create(['agency_id' => $this->record->agency_id, 'client_id' => $this->record->id, 'kind' => $data['kind'],
-                        'number' => trim(strip_tags($data['number'])), 'expires_on' => $data['expires_on'] ?? null, 'note' => trim(strip_tags((string) ($data['note'] ?? ''))) ?: null]);
+                    abort_unless(TeamRoles::canManageData(auth()->user(), $this->record->agency), 403);
+                    ClientLicence::create([
+                        'agency_id' => $this->record->agency_id,
+                        'client_id' => $this->record->id,
+                        'kind' => $data['kind'],
+                        'number' => trim(strip_tags((string) TextClean::invisible($data['number']))),
+                        'ad_name' => trim(strip_tags((string) TextClean::invisible((string) ($data['ad_name'] ?? '')))) ?: null,
+                        'expires_on' => $data['expires_on'] ?? null,
+                        'note' => trim(strip_tags((string) ($data['note'] ?? ''))) ?: null,
+                    ]);
                     Notification::make()->title(__('Licence saved.'))->success()->send();
                 }),
             // XS-03 / FS-20 (R4): "what we did" and "next month" for the monthly report; drafted from the app, edited by the agency.
@@ -228,6 +242,56 @@ class ViewClient extends ViewRecord
                             $r['skipped'] ? __('Rows without a valid date, skipped: :n', ['n' => $r['skipped']]) : null,
                             $r['unknown_campaigns'] ? __('Campaign names not found, kept for the whole client: :names', ['names' => implode(', ', array_slice($r['unknown_campaigns'], 0, 5))]) : null,
                         ])->filter()->implode(' · ') ?: null)->success()->send();
+                }),
+            // DS-23 (Step 1a, D-308): delivery-app weekly orders (manual + CSV/Excel import, Arabic & English headers + Eastern digits).
+            Action::make('deliveryWeek')->label(__('Delivery week'))->icon('heroicon-o-shopping-bag')->color('gray')
+                ->visible(fn () => TeamRoles::canManageData(auth()->user(), $this->record->agency))
+                ->modalDescription(__('Weekly delivery-app orders (Talabat, HungerStation, Jahez, Careem Food, etc.). Counts and optional order value only; no customer details.'))
+                ->schema([
+                    DatePicker::make('week_start')->label(__('Week starting'))->required()->native(false)->default(now($this->record->agency?->timezone ?: 'UTC')->startOfWeek(CarbonInterface::SUNDAY)->toDateString()),
+                    TextInput::make('app_name')->label(__('Delivery app'))->required()->maxLength(80)->placeholder(__('e.g. Talabat, HungerStation, Jahez')),
+                    TextInput::make('orders_count')->label(__('Delivery orders'))->required()->default('0')
+                        ->dehydrateStateUsing(fn ($state) => trim((string) TextClean::western((string) $state))),
+                    TextInput::make('orders_value')->label(__('Order value (optional)'))
+                        ->dehydrateStateUsing(fn ($state) => $state !== null && trim((string) $state) !== '' ? trim((string) TextClean::western((string) $state)) : null),
+                ])
+                ->action(function (array $data): void {
+                    abort_unless(TeamRoles::canManageData(auth()->user(), $this->record->agency), 403);
+                    DeliveryOutcomes::save(
+                        $this->record,
+                        (string) $data['week_start'],
+                        (string) $data['app_name'],
+                        (string) ($data['orders_count'] ?? '0'),
+                        $data['orders_value'] ?? null,
+                        'manual',
+                        auth()->user(),
+                    );
+                    Notification::make()->title(__('Delivery week saved.'))->success()->send();
+                }),
+            Action::make('deliverySheet')->label(__('Import delivery sheet'))->icon('heroicon-o-arrow-up-tray')->color('gray')
+                ->visible(fn () => TeamRoles::canManageData(auth()->user(), $this->record->agency))
+                ->modalDescription(__('One row per week and delivery app: Week start, App, Orders, Order value (optional). Arabic or English headers and Eastern-Arabic digits are supported.'))
+                ->schema([
+                    FileUpload::make('file')->label(__('CSV or Excel file'))->disk('local')->directory('imports')->storeFileNamesIn('file_name')
+                        ->acceptedFileTypes(['text/csv', 'text/plain', 'application/csv', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
+                        ->maxSize(1024)->required(),
+                ])
+                ->action(function (array $data): void {
+                    abort_unless(TeamRoles::canManageData(auth()->user(), $this->record->agency), 403);
+                    $path = Storage::disk('local')->path($data['file']);
+                    try {
+                        $r = DeliveryOutcomes::importFile($this->record, $path, (string) ($data['file_name'] ?? $data['file']), auth()->user());
+                    } finally {
+                        Storage::disk('local')->delete($data['file']);
+                    }
+                    if ($r['missing_columns']) {
+                        Notification::make()->title(__('The sheet needs week start, delivery app, and orders columns.'))->danger()->send();
+
+                        return;
+                    }
+                    Notification::make()->title(__('Delivery weeks saved: :n', ['n' => $r['saved']]))
+                        ->body($r['skipped'] ? __('Rows without a valid date, skipped: :n', ['n' => $r['skipped']]) : null)
+                        ->success()->send();
                 }),
             // XS-10 (R4, D-303): pause a client (alerts, scheduled reports, night shift stop; data kept), one click to resume.
             Action::make('pauseClient')->label(__('Pause client'))->icon('heroicon-o-pause-circle')->color('gray')
@@ -468,6 +532,12 @@ class ViewClient extends ViewRecord
         ClientLicence::where('client_id', $this->record->id)->whereKey($id)->delete();
     }
 
+    public function removeDeliveryWeek(int $id): void
+    {
+        abort_unless(TeamRoles::canManageData(auth()->user(), $this->record->agency), 403);
+        DeliveryWeek::where('agency_id', $this->record->agency_id)->where('client_id', $this->record->id)->whereKey($id)->delete();
+    }
+
     public function revokeLink(int $id): void
     {
         abort_unless($this->canManageLinks(), 403);
@@ -538,6 +608,11 @@ class ViewClient extends ViewRecord
                     'local' => Fx::convert((float) $r->spend, $r->currency, $c->currency ?: 'USD', $to), 'usd' => Fx::convert((float) $r->spend, $r->currency, 'USD', $to)])->values(),
             'cod' => CodOutcomes::summary($c, now($c->agency?->timezone ?: 'UTC')->subWeeks(8)->toDateString(), now($c->agency?->timezone ?: 'UTC')->toDateString()),
             'codWeeks' => CodWeek::with('campaign')->where('client_id', $c->id)->orderByDesc('week_start')->limit(8)->get(),
+            'delivery' => DeliveryOutcomes::summary($c, now($c->agency?->timezone ?: 'UTC')->subWeeks(8)->toDateString(), now($c->agency?->timezone ?: 'UTC')->toDateString()),
+            'deliveryWeeks' => DeliveryWeek::where('agency_id', $c->agency_id)->where('client_id', $c->id)->orderByDesc('week_start')->orderBy('app_name')->limit(8)->get(),
+            'sectorExtraMetrics' => SectorPacks::extraMetrics($c, $t),
+            'sectorSeasons' => SectorPacks::highlightedSeasonsForClient($c),
+            'launchCountdown' => SectorPacks::launchCountdown($c),
             'licences' => ClientLicence::where('client_id', $c->id)->orderBy('expires_on')->get(),
             'contacts' => ClientContact::with('user')->where('client_id', $c->id)->orderByDesc('happened_on')->orderByDesc('id')->limit(10)->get(),
             'synced' => MetricsQuery::lastSynced($c),

@@ -1,5 +1,6 @@
 @php
     use App\Support\ResultResolver as R;
+    use App\Support\SectorPacks;
     $cur = $client->currency;
     $delta = function ($now, $prev, $lowerIsBetter = false) {
         if (! $prev || $now === null) return null;
@@ -7,17 +8,21 @@
         $good = $lowerIsBetter ? $p < 0 : $p > 0;
         return ['pct' => $p, 'good' => abs($p) < 0.5 ? null : $good];
     };
+    $mainResultLabel = SectorPacks::resultLabel($client, $t['main_type'] ?: ($client->vertical === 'charity' ? 'purchase' : null), app()->getLocale()) ?: __('Results');
     $kpis = [
         [__('Spend'), R::money($t['spend'], $cur), $delta($t['spend'], $prev['spend']), null],
-        [R::label($t['main_type'], app()->getLocale()) ?: __('Results'), number_format($t['main_results']), $delta($t['main_results'], $prev['main_results']), __('Main goal by spend')],
+        [$mainResultLabel, number_format($t['main_results']), $delta($t['main_results'], $prev['main_results']), __('Main goal by spend')],
         [__('Cost per result'), R::money($t['cpr'], $cur), $delta($t['cpr'], $prev['cpr'], true), null],
         [__('ROAS'), $t['roas'] ? number_format($t['roas'], 2).'×' : '–', $delta($t['roas'], $prev['roas']), __('Purchase / conversion goals only')],
         [__('Link CTR'), $t['ctr'] ? number_format($t['ctr'], 2).'%' : '–', $delta($t['ctr'], $prev['ctr']), null],
     ];
+    if ($client->vertical === 'charity') {
+        $kpis[] = [SectorPacks::revenueLabel($client), R::money($t['revenue'], $cur), $delta($t['revenue'], $prev['revenue']), null];
+    }
     $goals = array_filter([
-        'Leads' => $t['leads'], 'Conversations' => $t['messages'],
-        'Purchases' => $t['purchases'], 'Purchase value' => $t['revenue'] > 0 ? R::money($t['revenue'], $cur) : 0,
-        'ThruPlays' => $t['thruplays'], 'Landing page views' => $t['landing_views'], 'Link clicks' => $t['link_clicks'],
+        __('Leads') => $t['leads'], __('Conversations') => $t['messages'],
+        SectorPacks::purchasesLabel($client) => $t['purchases'], SectorPacks::revenueLabel($client) => $t['revenue'] > 0 ? R::money($t['revenue'], $cur) : 0,
+        __('ThruPlays') => $t['thruplays'], __('Landing page views') => $t['landing_views'], __('Link clicks') => $t['link_clicks'],
     ]);
     $maxSpend = max(1, collect($months)->max('spend'));
     $maxRes = max(1, collect($months)->max('main_results'));
@@ -43,7 +48,7 @@
         @foreach ($kpis as [$label, $value, $d, $hint])
             <div style="{{ $card }}">
                 <div style="{{ $muted }}">{{ $label }}</div>
-                <div style="font-size:22px;font-weight:700;margin-top:4px">{{ $value }}</div>
+                <div style="font-size:22px;font-weight:700;margin-top:4px"><bdi dir="ltr">{{ $value }}</bdi></div>
                 <div style="font-size:12px;margin-top:2px">
                     @if ($d)
                         <span style="color:{{ $d['good'] === null ? 'inherit' : ($d['good'] ? '#16a34a' : '#dc2626') }}">{{ $d['pct'] >= 0 ? '▲' : '▼' }} {{ number_format(abs($d['pct']), 1) }}%</span>
@@ -54,7 +59,22 @@
                 </div>
             </div>
         @endforeach
+        @foreach ($sectorExtraMetrics ?? [] as $em)
+            <div style="{{ $card }}" data-sector-metric="{{ $em['key'] }}">
+                <div style="{{ $muted }}">{{ $em['label'] }}</div>
+                <div style="font-size:22px;font-weight:700;margin-top:4px"><bdi dir="ltr">{{ $em['formatted'] }}</bdi></div>
+            </div>
+        @endforeach
     </div>
+    @if (! empty($launchCountdown))
+        <div role="status" data-launch-countdown style="border:1px solid rgba(13,148,136,.4);background:rgba(20,184,166,.10);border-radius:12px;padding:10px 14px;font-size:14px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap">
+            <div>
+                <strong><bdi>{{ $launchCountdown['project'] }}</bdi></strong> · <span>{{ $launchCountdown['text'] }}</span>
+                <span style="{{ $muted }}"> · <bdi dir="ltr">{{ $launchCountdown['date'] }}</bdi></span>
+            </div>
+            <a href="{{ \App\Filament\Pages\ClientCalendarPage::getUrl() }}" style="display:inline-flex;align-items:center;min-height:44px;color:#0F766E;text-decoration:underline;font-size:13px">{{ __('Client calendar') }}</a>
+        </div>
+    @endif
     {{-- DS-26 (R5): the two periods have different numbers of working days, so compare per working day too. --}}
     @if ($workdays)
         <div data-working-days style="{{ $muted }};margin-top:-4px">
@@ -100,10 +120,10 @@
                 @endif
                 <div><div style="{{ $muted }}">{{ __('Needed per day') }}</div><strong>{{ $pace['daily_needed'] !== null ? R::money($pace['daily_needed'], $cur) : '–' }}</strong></div>
                 @if ($forecastLocked)
-                    <div><div style="{{ $muted }}">{{ __(':result so far', ['result' => R::label($pace['main_type'], app()->getLocale()) ?: __('Results')]) }}</div><strong>{{ number_format($pace['results']) }}</strong>@if ($pace['target_results'])<span style="{{ $muted }}"> · {{ __('target :n', ['n' => number_format($pace['target_results'])]) }}</span>@endif</div>
+                    <div><div style="{{ $muted }}">{{ __(':result so far', ['result' => SectorPacks::resultLabel($client, $pace['main_type'], app()->getLocale()) ?: __('Results')]) }}</div><strong>{{ number_format($pace['results']) }}</strong>@if ($pace['target_results'])<span style="{{ $muted }}"> · {{ __('target :n', ['n' => number_format($pace['target_results'])]) }}</span>@endif</div>
                     <div><div style="{{ $muted }}">{{ __('Forecast cost / result') }}</div><x-locked-button feature="forecast" /></div>
                 @else
-                    <div><div style="{{ $muted }}">{{ __(':result so far → forecast', ['result' => R::label($pace['main_type'], app()->getLocale()) ?: __('Results')]) }}</div><strong>{{ number_format($pace['results']) }} → {{ number_format($pace['forecast_results']) }}</strong>@if ($pace['target_results'])<span style="{{ $muted }}"> · {{ __('target :n', ['n' => number_format($pace['target_results'])]) }}</span>@endif</div>
+                    <div><div style="{{ $muted }}">{{ __(':result so far → forecast', ['result' => SectorPacks::resultLabel($client, $pace['main_type'], app()->getLocale()) ?: __('Results')]) }}</div><strong>{{ number_format($pace['results']) }} → {{ number_format($pace['forecast_results']) }}</strong>@if ($pace['target_results'])<span style="{{ $muted }}"> · {{ __('target :n', ['n' => number_format($pace['target_results'])]) }}</span>@endif</div>
                     <div><div style="{{ $muted }}">{{ __('Forecast cost / result') }}</div><strong>{{ R::money($pace['forecast_cpr'], $cur) }}</strong></div>
                 @endif
                 @if (! empty($pace['weekday_curve']))
@@ -121,11 +141,11 @@
             <x-slot name="heading">{{ __('Results by goal') }}</x-slot>
             <div style="display:flex;flex-wrap:wrap;gap:18px">
                 @foreach ($t['by_type'] as $type => $n)
-                    <div><div style="{{ $muted }}">{{ __(':result (goal)', ['result' => R::label($type, app()->getLocale())]) }}</div><div style="font-weight:600">{{ number_format($n) }}
+                    <div><div style="{{ $muted }}">{{ __(':result (goal)', ['result' => SectorPacks::resultLabel($client, $type, app()->getLocale())]) }}</div><div style="font-weight:600">{{ number_format($n) }}
                         @if (($t['type_spend'][$type] ?? 0) > 0 && $n > 0)<span style="{{ $muted }}"> · {{ __(':amount each', ['amount' => R::money($t['type_spend'][$type] / $n, $cur)]) }}</span>@endif</div></div>
                 @endforeach
                 @foreach ($goals as $label => $n)
-                    <div><div style="{{ $muted }}">{{ __($label) }}</div><div style="font-weight:600">{{ is_numeric($n) ? number_format($n) : $n }}</div></div>
+                    <div><div style="{{ $muted }}">{{ $label }}</div><div style="font-weight:600">{{ is_numeric($n) ? number_format($n) : $n }}</div></div>
                 @endforeach
             </div>
         </x-filament::section>
@@ -192,13 +212,66 @@
         </x-filament::section>
     @endif
 
-    {{-- XS-24 / NB-36 (D-305): licences the ads must show --}}
+    {{-- Step 1a (DS-20): highlighted sector seasons (Ramadan, Last ten nights, Dhul Hijjah) --}}
+    @if (! empty($sectorSeasons))
+        <x-filament::section data-sector-seasons>
+            <x-slot name="heading">{{ __('Key seasons on the calendar') }}</x-slot>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;font-size:13.5px">
+                @foreach ($sectorSeasons as $ss)
+                    <div style="{{ $card }};border-color:rgba(13,148,136,.35);background:rgba(20,184,166,.06)">
+                        <div style="font-weight:700;color:#0F766E">{{ app()->getLocale() === 'ar' ? $ss['ar'] : $ss['label'] }}</div>
+                        <div style="{{ $muted }};margin-top:4px"><bdi dir="ltr">{{ $ss['start'] }} → {{ $ss['end'] }}</bdi> · {{ $ss['status'] === 'confirmed' ? __('confirmed') : __('expected') }}</div>
+                    </div>
+                @endforeach
+            </div>
+        </x-filament::section>
+    @endif
+
+    {{-- DS-23 (Step 1a, D-308): delivery-app weekly orders --}}
+    @if (! empty($delivery))
+        <x-filament::section data-delivery>
+            <x-slot name="heading">{{ __('Delivery apps: weekly orders') }}</x-slot>
+            <x-slot name="description">{{ __('Last 8 weeks from manual entry or imported sheets.') }}</x-slot>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px">
+                <div><div style="{{ $muted }}">{{ __('Delivery orders') }}</div><strong>{{ number_format($delivery['orders']) }}</strong></div>
+                @if ($delivery['value_formatted'] !== null)
+                    <div><div style="{{ $muted }}">{{ __('Order value') }}</div><strong><bdi dir="ltr">{{ $delivery['value_formatted'] }}</bdi></strong></div>
+                @endif
+                @unless ($client->hide_spend)
+                    <div><div style="{{ $muted }}">{{ __('Cost per delivery order') }}</div><strong><bdi dir="ltr">{{ $delivery['cost_per_order_formatted'] }}</bdi></strong></div>
+                @endunless
+            </div>
+            <div style="overflow-x:auto;margin-top:10px">
+                <table style="width:100%;font-size:13px;border-collapse:collapse">
+                    <thead><tr>
+                        <th style="text-align:start;padding:6px">{{ __('Week starting') }}</th>
+                        <th style="text-align:start;padding:6px">{{ __('Delivery app') }}</th>
+                        <th style="text-align:end;padding:6px">{{ __('Delivery orders') }}</th>
+                        <th style="text-align:end;padding:6px">{{ __('Order value') }}</th>
+                    </tr></thead>
+                    <tbody>
+                        @foreach ($deliveryWeeks as $dw)
+                            <tr style="border-top:1px solid rgba(148,163,184,.2)">
+                                <td style="padding:6px"><bdi dir="ltr">{{ $dw->week_start->toDateString() }}</bdi></td>
+                                <td style="padding:6px"><bdi>{{ $dw->app_name }}</bdi></td>
+                                <td style="padding:6px;text-align:end">{{ number_format($dw->orders_count) }}</td>
+                                <td style="padding:6px;text-align:end"><bdi dir="ltr">{{ $dw->orders_value !== null ? R::money((float) $dw->orders_value, $cur) : '–' }}</bdi></td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </x-filament::section>
+    @endif
+
+    {{-- XS-24 / NB-36 (D-305) + Step 1a per-ad permit reminder: licences the ads must show --}}
     @if ($licences->isNotEmpty())
         <x-filament::section data-client-licences>
             <x-slot name="heading">{{ __('Licences') }}</x-slot>
             @foreach ($licences as $l)
                 <div style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:6px 0;border-top:1px solid rgba(148,163,184,.2);font-size:14px">
                     <span><strong>{{ \App\Models\ClientLicence::kindLabels()[$l->kind] ?? $l->kind }}</strong> · <bdi dir="ltr">{{ $l->number }}</bdi>
+                        @if ($l->ad_name) · <span style="{{ $muted }}">{{ __('Ad') }}: <bdi>{{ $l->ad_name }}</bdi></span>@endif
                         @if ($l->expires_on) · <span @if ($l->expires_on->lte(now()->addDays(30))) style="color:#B45309;font-weight:600" @endif>{{ __('expires on :date', ['date' => $l->expires_on->locale(app()->getLocale())->translatedFormat('j M Y')]) }}</span>@endif
                         @if ($l->note)<span style="{{ $muted }}"> · {{ $l->note }}</span>@endif</span>
                     @if (\App\Support\TeamRoles::canManageData(auth()->user(), $client->agency))
@@ -249,7 +322,7 @@
             <div style="display:grid;gap:8px">
                 @foreach ($funnel as $f)
                     <div style="display:grid;grid-template-columns:150px 1fr 150px;gap:10px;align-items:center;font-size:13px">
-                        <div>{{ __($f['label']) }}</div>
+                        <div>{{ $f['label'] === 'Purchases' ? SectorPacks::purchasesLabel($client) : __($f['label']) }}</div>
                         <div style="height:14px;border-radius:6px;background:rgba(148,163,184,.18);overflow:hidden">
                             <div style="height:14px;width:{{ max(1, round(log10(max(1, $f['n'])) / log10(max(10, $fTop)) * 100)) }}%;background:#14B8A6"></div>
                         </div>
@@ -474,7 +547,7 @@
                             @endif
                             @if ($r['status'])<span style="{{ $muted }}"> · {{ strtolower($r['status']) }}</span>@endif
                         </td>
-                        <td style="padding:6px">{{ R::label($r['main_type'], app()->getLocale()) }}</td>
+                        <td style="padding:6px">{{ SectorPacks::resultLabel($client, $r['main_type'], app()->getLocale()) }}</td>
                         <td style="padding:6px;text-align:end">{{ R::money($r['spend']) }}</td>
                         <td style="padding:6px;text-align:end">{{ number_format($r['main_results']) }}</td>
                         <td style="padding:6px;text-align:end">{{ R::money($r['cpr']) }}</td>
@@ -502,7 +575,7 @@
                             <div style="width:100%;aspect-ratio:1;border-radius:8px;background:rgba(148,163,184,.15)"></div>
                         @endif
                         <div style="font-size:12px;font-weight:600;margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ $ad['name'] }}</div>
-                        <div style="{{ $muted }}">{{ number_format($ad['main_results']) }} {{ R::label($ad['main_type'], app()->getLocale()) }} · {{ R::money($ad['cpr'], $cur) }}</div>
+                        <div style="{{ $muted }}">{{ number_format($ad['main_results']) }} {{ SectorPacks::resultLabel($client, $ad['main_type'], app()->getLocale()) }} · {{ R::money($ad['cpr'], $cur) }}</div>
                     </div>
                 @endforeach
             </div>

@@ -17,7 +17,7 @@ use Carbon\Carbon;
 class LaunchPreflight
 {
     /** @return list<array{key: string, ok: bool, level: string, message: string}> */
-    public static function run(Client $c, string $url, string $adText, ?bool $fetch = true): array
+    public static function run(Client $c, string $url, string $adText, ?bool $fetch = true, ?string $adName = null): array
     {
         $out = [];
         $add = function (string $key, bool $ok, string $level, string $message) use (&$out) {
@@ -53,11 +53,19 @@ class LaunchPreflight
         $policy = PolicyPreCheck::analyze($adText);
         $add('policy', $policy['passed'], 'warning', $policy['passed'] ? __('No risky claim words found.') : __('Words platforms often reject: :list', ['list' => implode(' · ', $policy['issues'])]));
 
-        // 6. Licence number in the ad when the client has one (Gulf disclosure)
-        $lic = ClientLicence::where('client_id', $c->id)->get();
+        // 6. Licence / ad-permit reminder when the client has a general licence or a matching ad_name permit (neutral reminder only; never judges compliance)
+        $lic = SectorPacks::matchingLicences($c, [$adName, $adText, $url], true);
         if ($lic->isNotEmpty()) {
-            $shown = $lic->first(fn ($l) => str_contains($adText, $l->number));
-            $add('licence', (bool) $shown, 'warning', $shown ? __('The licence number is in the ad.') : __('This client has a licence number (:n); check whether the ad must show it.', ['n' => $lic->pluck('number')->implode(', ')]));
+            $shown = $lic->first(fn (ClientLicence $l): bool => str_contains($adText, $l->number));
+            $hasAdPermit = $lic->contains(fn (ClientLicence $l): bool => filled($l->ad_name));
+            $list = $lic->map(fn (ClientLicence $l): string => filled($l->ad_name) ? "{$l->ad_name} ({$l->number})" : $l->number)->implode(', ');
+            $okMessage = ($shown && filled($shown->ad_name))
+                ? __('The licence number is in the ad (:ad: :n).', ['ad' => $shown->ad_name, 'n' => $shown->number])
+                : __('The licence number is in the ad.');
+            $warnMessage = $hasAdPermit
+                ? __('Permit reminder (:n): check whether this ad needs to display the permit number.', ['n' => $list])
+                : __('This client has a licence number (:n); check whether the ad must show it.', ['n' => $lic->pluck('number')->implode(', ')]);
+            $add('licence', (bool) $shown, 'warning', $shown ? $okMessage : $warnMessage);
         }
 
         // 7. A season starting soon

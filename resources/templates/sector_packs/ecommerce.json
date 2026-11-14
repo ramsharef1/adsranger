@@ -1,0 +1,13 @@
+{
+    "key": "ecommerce",
+    "kind": "sector_packs",
+    "labels": {},
+    "extra_metrics": [],
+    "seasons": [
+        "ramadan",
+        "eid_fitr",
+        "singles_day",
+        "white_friday"
+    ],
+    "features": []
+}

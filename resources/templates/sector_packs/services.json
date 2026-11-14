@@ -1,0 +1,11 @@
+{
+    "key": "services",
+    "kind": "sector_packs",
+    "labels": {},
+    "extra_metrics": [],
+    "seasons": [
+        "ramadan",
+        "back_to_school"
+    ],
+    "features": []
+}

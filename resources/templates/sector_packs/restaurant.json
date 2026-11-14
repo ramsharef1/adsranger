@@ -1,0 +1,15 @@
+{
+    "key": "restaurant",
+    "kind": "sector_packs",
+    "labels": {},
+    "extra_metrics": [],
+    "seasons": [
+        "ramadan",
+        "eid_fitr",
+        "eid_adha",
+        "mothers_day"
+    ],
+    "features": [
+        "delivery_weeks"
+    ]
+}
