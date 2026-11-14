@@ -21,6 +21,7 @@ use App\Filament\Pages\NightShiftPage;
 use App\Filament\Pages\OnboardingPage;
 use App\Filament\Pages\RetainerSplitPage;
 use App\Filament\Pages\SeoAuditPage;
+use App\Filament\Pages\SeoTelemetryPage;
 use App\Filament\Pages\WhatsNewPage;
 use App\Filament\Pages\WorkspaceActivity;
 use App\Http\Controllers\ReachPortalController;
@@ -67,8 +68,11 @@ use App\Support\Seo\AeoCitationRadar;
 use App\Support\Seo\AiCrawlerChecker;
 use App\Support\Seo\Audit\PageSpeed;
 use App\Support\Seo\Audit\SiteAuditor;
+use App\Support\Seo\Ga4FunnelReconciler;
+use App\Support\Seo\GscSearchAnalyticsSync;
 use App\Support\Seo\PageAudit;
 use App\Support\Seo\PublicCatalog;
+use App\Support\Seo\ServerAccessLogAnalyzer;
 use App\Support\Seo\SiteAuditRunner;
 use App\Support\Seo\ToolGuard;
 use App\Support\Site\CopyLint;
@@ -117,4 +121,5 @@ return [
     'FR-CREATIVE-FATIGUE' => ['title' => 'Creative fatigue & peak-season decay guard (E2-066): ad-level frequency saturation + click-through / ThruPlay rate drop vs the ad\'s own 3-week baseline, tighter limits during Ramadan\'s last ten nights, Eid and White Friday (MenaCalendar), open / resolved alerts, board with visibleTo + hide_spend and a draft-replacement link into Creative Studio; module studio, off', 'code' => [CreativeFatigueDetector::class, CreativeFatigueBoardPage::class, 'view:filament.pages.creative-fatigue-board', 'config:creative_fatigue'], 'tests' => ['Feature/CreativeFatigueGuardTest.php']],
     'FR-RETAINER-SPLIT' => ['title' => 'Retainer vs ad-spend split (E2-067): monthly pass-through ad spend vs agency management fee (fixed / share of spend / hybrid, minimum, tax on the fee only at the typed rate), ResultResolver::money (3 decimals JOD / KWD / BHD / OMR), CSV + ZATCA TLV Base64 + JoFotara UBL 2.1 XML drafts with a neutral reminder; no export for hide_spend clients; module agency_ops_hub, off', 'code' => [RetainerSplit::class, RetainerSplitPage::class, 'view:filament.pages.retainer-split'], 'tests' => ['Feature/AgencyRetainerSplitTest.php']],
     'FR-ADMIN-PX-SHELL' => ['title' => '/admin dense PX command-center shell (E2-068): 4-area switcher rail (Overview, Growth, Platform, Guards + All), ground-truth live telemetry ribbon (workspaces, modules + preview slugs, scheduler/queue heartbeat, Reach cache store, /app jump), compact/comfortable row density toggle, live Register-to-code guard viewer, and Slate/Teal cockpit polish', 'code' => [AdminShell::class, RegisterGuardBoard::class, 'view:panels.admin-shell-areas', 'view:panels.admin-shell-ribbon', 'view:panels.admin-shell-bottom'], 'tests' => ['Feature/AdminPxShellTest.php']],
+    'FR-SEO-TELEMETRY' => ['title' => 'GSC Search Analytics sync/CSV + striking-distance (#4–#15) + query-decay detector, GA4 Data API v1 + 3-way reconciliation (Ad Claims vs GA4 Key Events vs Store Orders), and memory-safe streamed server access log analyzer (.log / .gz) under seo_audit (E2-069)', 'code' => [GscSearchAnalyticsSync::class, Ga4FunnelReconciler::class, ServerAccessLogAnalyzer::class, SeoTelemetryPage::class, 'view:filament.pages.seo-telemetry'], 'tests' => ['Feature/SeoGscGa4LogsTest.php']],
 ];
