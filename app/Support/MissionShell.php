@@ -106,17 +106,16 @@ class MissionShell
     }
 
     /**
-     * The one thing to do next: the most severe open alert on a client this person sees, oldest first.
+     * The one thing to do next: the most severe open alert this person can open, oldest first.
      *
      * @return ?array{title: string, client: string, level: string, url: string}
      */
     public static function nextStep(Agency $agency): ?array
     {
-        $ids = Client::visibleTo(auth()->user(), $agency)->where('status', 'active')->pluck('name', 'id');
-        if ($ids->isEmpty()) {
-            return null;
-        }
-        $a = Alert::where('agency_id', $agency->id)->where('status', 'open')->whereIn('client_id', $ids->keys())
+        // The same scope as the alert pages (clients this person sees, and the client picked in the top bar), so the
+        // link always opens.
+        $a = AlertResource::getEloquentQuery()->where('status', 'open')->whereNotNull('client_id')
+            ->whereIn('client_id', Client::where('agency_id', $agency->id)->where('status', 'active')->select('id'))
             ->orderByRaw("case when severity in ('critical', 'high') then 0 when severity in ('warning', 'medium') then 1 else 2 end")
             ->orderBy('created_at')->first();
         if (! $a) {
@@ -124,8 +123,8 @@ class MissionShell
         }
 
         return [
-            'title' => (string) $a->title,
-            'client' => (string) ($ids[$a->client_id] ?? ''),
+            'title' => (string) $a->localTitle(),
+            'client' => (string) Client::whereKey($a->client_id)->value('name'),
             'level' => in_array($a->severity, ['critical', 'high'], true) ? 'critical' : (in_array($a->severity, ['warning', 'medium'], true) ? 'warning' : 'info'),
             'url' => AlertResource::getUrl('view', ['record' => $a]),
         ];

@@ -73,6 +73,20 @@ class MissionShellTest extends TestCase
         $this->assertStringNotContainsString('First steps', $html, 'the first-steps list is for simple mode');
     }
 
+    public function test_next_step_follows_the_client_picked_in_the_top_bar_and_its_link_opens(): void
+    {
+        [$agency, $owner] = $this->workspace(['panel_shell' => true, 'mission_shell' => true]);
+        $calm = Client::create(['agency_id' => $agency->id, 'name' => 'Calm Co', 'status' => 'active', 'currency' => 'USD']);
+        $hot = Client::create(['agency_id' => $agency->id, 'name' => 'Hot Co', 'status' => 'active', 'currency' => 'USD']);
+        $slow = Alert::create(['agency_id' => $agency->id, 'client_id' => $calm->id, 'rule_key' => 'x', 'severity' => 'warning', 'title' => 'Slow week', 'fingerprint' => 'a', 'status' => 'open']);
+        Alert::create(['agency_id' => $agency->id, 'client_id' => $hot->id, 'rule_key' => 'y', 'severity' => 'critical', 'title' => 'Spend is twice the plan', 'fingerprint' => 'b', 'status' => 'open']);
+
+        $html = $this->page($agency, $owner, 'desk?client='.$calm->id);
+        $this->assertMatchesRegularExpression('#data-mission-next.*?Slow week.*?Calm Co#s', $html, 'with a client picked, the next step is that client\'s');
+        $this->assertStringContainsString("/app/{$agency->slug}/alerts/{$slow->id}", $html);
+        $this->actingAs($owner)->get("/app/{$agency->slug}/alerts/{$slow->id}")->assertOk();
+    }
+
     public function test_simple_mode_shortens_the_rail_and_shows_first_steps(): void
     {
         [$agency, $owner] = $this->workspace(['panel_shell' => true, 'mission_shell' => true, 'agency_ops_hub' => true]);
