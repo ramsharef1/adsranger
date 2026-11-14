@@ -67,4 +67,116 @@
             </div>
         @endif
     </x-filament::section>
+
+    <x-filament::section>
+        <x-slot name="heading">{{ __('Cross-channel rule engine (dry-run & approval queue, max 20% delta)') }}</x-slot>
+        @if ($canManageStores)
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px;font-size:13px">
+                <input type="text" wire:model="ruleName" placeholder="{{ __('Strategy name') }}" class="pah-input">
+                <select wire:model="ruleField" class="pah-input" dir="ltr">
+                    <option value="poas">poas</option>
+                    <option value="roas">roas</option>
+                    <option value="cpa">cpa</option>
+                    <option value="cod_return_rate_pct">cod_return_rate_pct</option>
+                    <option value="min_stock_qty">min_stock_qty</option>
+                    <option value="oos_sku_count">oos_sku_count</option>
+                </select>
+                <select wire:model="ruleOp" class="pah-input" dir="ltr">
+                    <option value="<">&lt;</option>
+                    <option value="<=">&lt;=</option>
+                    <option value=">">&gt;</option>
+                    <option value=">=">&gt;=</option>
+                </select>
+                <input type="number" step="0.1" wire:model="ruleTarget" class="pah-input" dir="ltr">
+                <input type="number" step="1" min="1" max="20" wire:model="ruleMaxDeltaPct" class="pah-input" dir="ltr" placeholder="<=20%">
+                <select wire:model="ruleMode" class="pah-input">
+                    <option value="dry_run">{{ __('Dry run') }}</option>
+                    <option value="approval_queue">{{ __('Approval queue') }}</option>
+                </select>
+            </div>
+            <div style="margin-top:8px">
+                <button type="button" wire:click="createAutomationStrategy" class="pah-btn pah-btn-solid">{{ __('Save strategy') }}</button>
+            </div>
+        @endif
+        @if (isset($automationStrategies) && $automationStrategies->isNotEmpty())
+            <div style="margin-top:10px;display:grid;gap:6px;font-size:13px">
+                @foreach ($automationStrategies as $strat)
+                    @php $latestRun = $strat->runs->first(); @endphp
+                    <div class="pah-row">
+                        <span>
+                            <strong>{{ $strat->name }}</strong>
+                            (<bdi dir="ltr">{{ $strat->execution_mode }} · max {{ $strat->max_budget_delta_pct }}%</bdi>)
+                            @if ($latestRun)
+                                · <bdi dir="ltr">{{ $latestRun->status }}</bdi>
+                            @endif
+                        </span>
+                        @if ($canManageStores)
+                            <button type="button" wire:click="runAutomationStrategy({{ $strat->id }})" class="pah-btn">{{ __('Evaluate now') }}</button>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </x-filament::section>
+
+    <x-filament::section>
+        <x-slot name="heading">{{ __('Customer cohort LTV & CAC payback curves') }}</x-slot>
+        @if ($canManageStores)
+            <div style="display:grid;gap:8px">
+                <textarea wire:model="cohortCsv" rows="3" dir="ltr" class="pah-input" placeholder="cohort_month,acquisition_key,customers_count,cac_amount,d30_ltv,d60_ltv,d90_ltv,d180_ltv"></textarea>
+                <div>
+                    <button type="button" wire:click="importCohortsCsv" class="pah-btn pah-btn-solid">{{ __('Import cohort CSV') }}</button>
+                </div>
+            </div>
+        @endif
+        @if (! empty($cohortSummary))
+            <div style="margin-top:10px;display:grid;gap:6px;font-size:13px">
+                @foreach ($cohortSummary as $ch)
+                    <div class="pah-row">
+                        <span><bdi dir="ltr">{{ $ch['cohort_month'] }} · {{ $ch['acquisition_key'] }}</bdi> ({{ $ch['customers_count'] }})</span>
+                        <span>
+                            @if (! $client->hide_spend)
+                                <bdi dir="ltr">CAC {{ \App\Support\ResultResolver::money($ch['cac_amount'], $currency) }} · D90 {{ \App\Support\ResultResolver::money($ch['d90_ltv'], $currency) }}</bdi> ·
+                            @endif
+                            <bdi dir="ltr">{{ $ch['payback_days'] !== null ? $ch['payback_days'].'d' : '—' }}</bdi>
+                        </span>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </x-filament::section>
+
+    <x-filament::section>
+        <x-slot name="heading">{{ __('Ad landing URL & pixel watchdog (SafeFetcher)') }}</x-slot>
+        @if ($canManageStores)
+            <div style="display:grid;grid-template-columns:1fr auto;gap:8px">
+                <input type="url" wire:model="watchedUrlInput" dir="ltr" placeholder="https://example.com/offer" class="pah-input">
+                <button type="button" wire:click="addAndCheckWatchedUrl" class="pah-btn pah-btn-solid">{{ __('Watch & check URL') }}</button>
+            </div>
+        @endif
+        @if (isset($watchedUrls) && $watchedUrls->isNotEmpty())
+            <div style="margin-top:10px;display:grid;gap:6px;font-size:13px">
+                @foreach ($watchedUrls as $wu)
+                    <div class="pah-row">
+                        <span>
+                            <bdi dir="ltr">{{ $wu->url }}</bdi> ·
+                            <bdi dir="ltr">HTTP {{ $wu->last_http_status ?? '—' }} · {{ $wu->redirect_hops }} hops</bdi>
+                            @if ($wu->has_noindex)
+                                · <strong>{{ __('noindex detected') }}</strong>
+                            @endif
+                            @if ($wu->broken_whatsapp_link)
+                                · <strong>{{ __('Broken WhatsApp link') }}</strong>
+                            @endif
+                            @if (! empty($wu->missing_pixels))
+                                · <bdi dir="ltr">{{ implode(', ', $wu->missing_pixels) }}</bdi>
+                            @endif
+                        </span>
+                        @if ($canManageStores)
+                            <button type="button" wire:click="recheckWatchedUrl({{ $wu->id }})" class="pah-btn">{{ __('Recheck') }}</button>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </x-filament::section>
 </div>

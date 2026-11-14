@@ -44,6 +44,9 @@ use App\Support\AiWorkspace\FreePlan;
 use App\Support\AiWorkspace\NightShift;
 use App\Support\AiWorkspace\QualityGate;
 use App\Support\Arabic\Normaliser;
+use App\Support\Attribution\CohortLtvAnalyzer;
+use App\Support\Attribution\CrossChannelRuleEngine;
+use App\Support\Attribution\LandingUrlWatchdog;
 use App\Support\Attribution\PerformanceInvestigator;
 use App\Support\Attribution\SearchTermNgramMiner;
 use App\Support\Attribution\ShoppingFeedBuilder;
@@ -133,4 +136,5 @@ return [
     'FR-SEO-TELEMETRY' => ['title' => 'GSC Search Analytics sync/CSV + striking-distance (#4–#15) + query-decay detector, GA4 Data API v1 + 3-way reconciliation (Ad Claims vs GA4 Key Events vs Store Orders), and memory-safe streamed server access log analyzer (.log / .gz) under seo_audit (E2-069)', 'code' => [GscSearchAnalyticsSync::class, Ga4FunnelReconciler::class, ServerAccessLogAnalyzer::class, SeoTelemetryPage::class, 'view:filament.pages.seo-telemetry'], 'tests' => ['Feature/SeoGscGa4LogsTest.php']],
     'FR-SEO-AUTHORITY-LOCAL' => ['title' => 'Rank tracker + cannibalization detector, topical pillar-spoke silos, GSC backlink CSV + competitor domain intersection gap + Google Disavow .txt exporter, and multi-branch Local GBP NAP/RTL checker & bilingual review drafts under seo_audit (E2-070)', 'code' => [SeoRankTracker::class, SeoTopicalClusterPlanner::class, SeoBacklinkAndDisavow::class, SeoLocalGbpManager::class, SeoAuthorityLocalPage::class, 'view:filament.pages.seo-authority-local'], 'tests' => ['Feature/SeoAuthorityAndLocalTest.php']],
     'FR-SEM-FEEDS-INVESTIGATOR' => ['title' => 'Search-term 1/2/3-gram bleed miner (Normaliser::key + negative export), tokenized profit-quadrant shopping feeds (/feeds/{token}.xml, OOS filter, AR/EN title enrichment, noindex), and deterministic CPA/ROAS/POAS root-cause waterfall investigator under intelligence_hub (E2-071)', 'code' => [SearchTermNgramMiner::class, ShoppingFeedBuilder::class, PerformanceInvestigator::class, ProductFeedController::class, 'route:feeds/{token}.xml', 'view:filament.pages.partials.sem-hub-extensions'], 'tests' => ['Feature/SemNgramsFeedsInvestigatorTest.php']],
+    'FR-SEM-RULES-COHORTS-WATCHDOG' => ['title' => 'Cross-channel rule engine (store stock + COD return rate + ad metrics, budget delta clamped <= 20%, dry-run default + approval queue), customer cohort D30/D60/D90/D180 LTV & CAC payback curves, and SafeFetcher ad landing URL & pixel/WhatsApp watchdog under intelligence_hub (E2-072)', 'code' => [CrossChannelRuleEngine::class, CohortLtvAnalyzer::class, LandingUrlWatchdog::class, 'view:filament.pages.partials.sem-hub-extensions'], 'tests' => ['Feature/SemRulesCohortsWatchdogTest.php']],
 ];

@@ -3,12 +3,17 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Concerns\HeldBackModule;
+use App\Models\AutomationStrategy;
 use App\Models\CapiBridgeEvent;
 use App\Models\Client;
 use App\Models\ClientCustomKpi;
 use App\Models\ClientProductFeed;
 use App\Models\ClientStoreConnection;
 use App\Models\ClientUnitEconomic;
+use App\Models\WatchedLandingUrl;
+use App\Support\Attribution\CohortLtvAnalyzer;
+use App\Support\Attribution\CrossChannelRuleEngine;
+use App\Support\Attribution\LandingUrlWatchdog;
 use App\Support\Attribution\PerformanceInvestigator;
 use App\Support\Attribution\ProfitAndAttributionManager;
 use App\Support\Attribution\SafeFormulaEvaluator;
@@ -129,6 +134,26 @@ class ProfitAttributionHubPage extends Page
     public string $feedBrandAr = '';
 
     public string $feedBrandEn = '';
+
+    // E2-072 cross-channel rules, cohort LTV & landing URL watchdog
+    public string $ruleName = '';
+
+    public string $ruleField = 'poas';
+
+    public string $ruleOp = '<';
+
+    public float $ruleTarget = 1.5;
+
+    public float $ruleMaxDeltaPct = 10.0;
+
+    public string $ruleMode = 'dry_run';
+
+    public string $cohortCsv = '';
+
+    public string $watchedUrlInput = '';
+
+    /** @var list<string> */
+    public array $watchedExpectedPixels = ['meta_pixel', 'google_tag'];
 
     public function mount(): void
     {
@@ -505,6 +530,89 @@ class ProfitAttributionHubPage extends Page
         Notification::make()->title(__('Product feed created.'))->success()->send();
     }
 
+    public function createAutomationStrategy(): void
+    {
+        $client = $this->resolveSelectedClient();
+        if (! $client || ! $this->canManageStores() || trim($this->ruleName) === '') {
+            return;
+        }
+        CrossChannelRuleEngine::createStrategy($client, [
+            'name' => $this->ruleName,
+            'conditions' => [
+                [
+                    'field' => $this->ruleField,
+                    'op' => $this->ruleOp,
+                    'value' => $this->ruleTarget,
+                ],
+            ],
+            'actions' => [
+                [
+                    'type' => 'adjust_budget_pct',
+                    'delta_pct' => -abs($this->ruleMaxDeltaPct),
+                ],
+            ],
+            'max_budget_delta_pct' => $this->ruleMaxDeltaPct,
+            'execution_mode' => $this->ruleMode,
+        ]);
+        $this->ruleName = '';
+        Notification::make()->title(__('Automation strategy saved in safe mode.'))->success()->send();
+    }
+
+    public function runAutomationStrategy(int $id): void
+    {
+        $client = $this->resolveSelectedClient();
+        if (! $client || ! $this->canManageStores()) {
+            return;
+        }
+        $strategy = AutomationStrategy::where('agency_id', $client->agency_id)
+            ->where('client_id', $client->id)
+            ->find($id);
+        if (! $strategy) {
+            return;
+        }
+        CrossChannelRuleEngine::evaluateStrategy($strategy);
+        Notification::make()->title(__('Strategy evaluated without live spend mutation.'))->success()->send();
+    }
+
+    public function importCohortsCsv(): void
+    {
+        $client = $this->resolveSelectedClient();
+        if (! $client || ! $this->canManageStores() || trim($this->cohortCsv) === '') {
+            return;
+        }
+        $saved = CohortLtvAnalyzer::importCsv($client, $this->cohortCsv);
+        $this->cohortCsv = '';
+        Notification::make()->title(__('Cohort rows imported: :count', ['count' => $saved]))->success()->send();
+    }
+
+    public function addAndCheckWatchedUrl(): void
+    {
+        $client = $this->resolveSelectedClient();
+        if (! $client || ! $this->canManageStores() || trim($this->watchedUrlInput) === '') {
+            return;
+        }
+        $watched = LandingUrlWatchdog::watchUrl($client, $this->watchedUrlInput, $this->watchedExpectedPixels);
+        LandingUrlWatchdog::check($watched);
+        $this->watchedUrlInput = '';
+        Notification::make()->title(__('Landing URL checked via SafeFetcher.'))->success()->send();
+    }
+
+    public function recheckWatchedUrl(int $id): void
+    {
+        $client = $this->resolveSelectedClient();
+        if (! $client || ! $this->canManageStores()) {
+            return;
+        }
+        $watched = WatchedLandingUrl::where('agency_id', $client->agency_id)
+            ->where('client_id', $client->id)
+            ->find($id);
+        if (! $watched) {
+            return;
+        }
+        LandingUrlWatchdog::check($watched);
+        Notification::make()->title(__('Landing URL rechecked.'))->success()->send();
+    }
+
     public function getViewData(): array
     {
         $agency = Filament::getTenant();
@@ -574,6 +682,16 @@ class ProfitAttributionHubPage extends Page
                 now()->subDays(13)->toDateString(),
                 now()->toDateString()
             ),
+            'automationStrategies' => AutomationStrategy::where('agency_id', $client->agency_id)
+                ->where('client_id', $client->id)
+                ->with(['runs' => fn ($q) => $q->latest('ran_at')->limit(1)])
+                ->latest('id')
+                ->get(),
+            'cohortSummary' => CohortLtvAnalyzer::summarize($client),
+            'watchedUrls' => WatchedLandingUrl::where('agency_id', $client->agency_id)
+                ->where('client_id', $client->id)
+                ->latest('id')
+                ->get(),
         ];
     }
 }
