@@ -20,6 +20,7 @@ use App\Filament\Pages\MyDevices;
 use App\Filament\Pages\NightShiftPage;
 use App\Filament\Pages\OfflineConversionsPage;
 use App\Filament\Pages\OnboardingPage;
+use App\Filament\Pages\RamadanPhasesPage;
 use App\Filament\Pages\RetainerSplitPage;
 use App\Filament\Pages\SeoAuditPage;
 use App\Filament\Pages\SeoAuthorityLocalPage;
@@ -68,6 +69,7 @@ use App\Support\PlanGate;
 use App\Support\PlatformHealth;
 use App\Support\PoweredBy;
 use App\Support\PublicSite;
+use App\Support\RamadanPhases;
 use App\Support\Reach\Attribution;
 use App\Support\Reach\OfferImporter;
 use App\Support\Reach\Postbacks;
@@ -152,4 +154,5 @@ return [
     'FR-UNIFIED-PLAN-MATRIX' => ['title' => 'Unified plan tier feature & quota matrix across Free, Starter, Pro, and Agency for SEO, SEM, MENA growth, and AI Workspace Night Shift v1 capabilities (E2-074)', 'code' => [PlanGate::class, 'config:plan_features'], 'tests' => ['Feature/UnifiedPlanMatrixTest.php']],
     'FR-MISSION-SHELL' => ['title' => 'Mission control shell (D-312): dark look on top of the panel shell, icon rail for areas and add-ons (locked while the add-on is off), next-step panel from the most severe open alert, desktop client dock, simple / expert mode with first steps, classic-look opt-out per person; behind mission_shell', 'code' => [MissionShell::class, UiPrefsController::class, 'view:panels.mission-head', 'view:panels.mission-docks', 'view:panels.mission-mode'], 'tests' => ['Feature/MissionShellTest.php']],
     'FR-SECTOR-PACKS' => ['title' => 'Sector packs Step 1a (E2-077, D-308 / DS-20..23): light JSON sector-pack presets under resources/templates/sector_packs/*.json, Charity donation labels & safe donation-per-1,000-impressions + Ramadan / Last Ten Nights / Dhul Hijjah highlights, client_licences.ad_name neutral permit reminders on briefs & LaunchPreflight, Real Estate off-plan 5-form Arabic countdown & ClientCalendar launch entry, and DeliveryWeek manual + AR/EN CSV import with hide_spend & tenant isolation', 'code' => [SectorPacks::class, DeliveryOutcomes::class], 'tests' => ['Feature/SectorPacksTest.php']],
+    'FR-RAMADAN-PHASES' => ['title' => 'Cross-client Ramadan 6-phase board Step 1b (E2-079, EH-19): 14d before Ramadan, days 1–10, days 11–20, last ten nights, Eid al-Fitr (3d), and 14d after Eid from MenaCalendar + RamadanHours + holiday_statuses (expected / confirmed), with MetricsQuery + ResultResolver spend/results/CPR, phase-over-phase delta, BudgetPlan pacing, Client::visibleTo, and hide_spend protection', 'code' => [RamadanPhases::class, RamadanPhasesPage::class, 'view:filament.pages.ramadan-phases'], 'tests' => ['Feature/RamadanPhasesBoardTest.php']],
 ];

@@ -32,6 +32,7 @@ class Shell
         Pages\MenaCalendarPage::class => 'today',
         Pages\ClientCalendarPage::class => 'today',
         Pages\RamadanReadinessPage::class => 'today',
+        Pages\RamadanPhasesPage::class => 'today',
         Pages\MarketDatesPage::class => 'today',
 
         Resources\Clients\ClientResource::class => 'clients',

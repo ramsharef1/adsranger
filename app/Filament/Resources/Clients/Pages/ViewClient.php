@@ -535,7 +535,18 @@ class ViewClient extends ViewRecord
     public function removeDeliveryWeek(int $id): void
     {
         abort_unless(TeamRoles::canManageData(auth()->user(), $this->record->agency), 403);
-        DeliveryWeek::where('agency_id', $this->record->agency_id)->where('client_id', $this->record->id)->whereKey($id)->delete();
+        $row = DeliveryWeek::where('agency_id', $this->record->agency_id)->where('client_id', $this->record->id)->whereKey($id)->first();
+        if (! $row) {
+            return;
+        }
+        $week = $row->week_start?->toDateString();
+        $appName = $row->app_name;
+        $row->delete();
+        AuditLog::record('delivery_week.removed', $this->record, [
+            'delivery_week_id' => $row->id,
+            'week_start' => $week,
+            'app_name' => $appName,
+        ]);
     }
 
     public function revokeLink(int $id): void
