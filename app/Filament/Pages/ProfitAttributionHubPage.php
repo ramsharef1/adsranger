@@ -10,8 +10,10 @@ use App\Models\ClientCustomKpi;
 use App\Models\ClientProductFeed;
 use App\Models\ClientStoreConnection;
 use App\Models\ClientUnitEconomic;
+use App\Models\CreatorPartnership;
 use App\Models\WatchedLandingUrl;
 use App\Support\Attribution\CohortLtvAnalyzer;
+use App\Support\Attribution\CreatorPoasTracker;
 use App\Support\Attribution\CrossChannelRuleEngine;
 use App\Support\Attribution\LandingUrlWatchdog;
 use App\Support\Attribution\PerformanceInvestigator;
@@ -154,6 +156,23 @@ class ProfitAttributionHubPage extends Page
 
     /** @var list<string> */
     public array $watchedExpectedPixels = ['meta_pixel', 'google_tag'];
+
+    // E2-073 Creator & influencer POAS tracker
+    public string $creatorName = '';
+
+    public string $creatorPlatform = 'snapchat';
+
+    public float $creatorFlatFee = 0.0;
+
+    public float $creatorGiftedCogs = 0.0;
+
+    public float $creatorBoostedSpend = 0.0;
+
+    public string $creatorPromoCode = '';
+
+    public int $creatorOrders = 0;
+
+    public float $creatorGrossRevenue = 0.0;
 
     public function mount(): void
     {
@@ -613,6 +632,26 @@ class ProfitAttributionHubPage extends Page
         Notification::make()->title(__('Landing URL rechecked.'))->success()->send();
     }
 
+    public function recordCreatorPartnership(): void
+    {
+        $client = $this->resolveSelectedClient();
+        if (! $client || ! $this->canManageStores() || trim($this->creatorName) === '') {
+            return;
+        }
+        CreatorPoasTracker::recordPartnership($client, [
+            'creator_name' => $this->creatorName,
+            'platform' => $this->creatorPlatform,
+            'flat_fee' => $this->creatorFlatFee,
+            'gifted_cogs' => $this->creatorGiftedCogs,
+            'boosted_spend' => $this->creatorBoostedSpend,
+            'promo_code' => $this->creatorPromoCode,
+            'attributed_orders' => $this->creatorOrders,
+            'gross_revenue' => $this->creatorGrossRevenue,
+        ]);
+        $this->reset(['creatorName', 'creatorPromoCode']);
+        Notification::make()->title(__('Creator partnership POAS saved.'))->success()->send();
+    }
+
     public function getViewData(): array
     {
         $agency = Filament::getTenant();
@@ -689,6 +728,10 @@ class ProfitAttributionHubPage extends Page
                 ->get(),
             'cohortSummary' => CohortLtvAnalyzer::summarize($client),
             'watchedUrls' => WatchedLandingUrl::where('agency_id', $client->agency_id)
+                ->where('client_id', $client->id)
+                ->latest('id')
+                ->get(),
+            'creatorPartnerships' => CreatorPartnership::where('agency_id', $client->agency_id)
                 ->where('client_id', $client->id)
                 ->latest('id')
                 ->get(),

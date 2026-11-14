@@ -39,6 +39,31 @@
         @endif
     </section>
 
+    @if (isset($nightActions) && $nightActions->isNotEmpty())
+        <section style="{{ $card }}">
+            <h3 style="font-size:15px;font-weight:700;margin:0">{{ __('Supervised morning action queue') }}</h3>
+            @foreach ($nightActions as $act)
+                <div style="border-top:1px solid rgba(148,163,184,.2);padding-top:10px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;font-size:13px">
+                    <div>
+                        <strong><bdi>{{ $act->client?->name }}</bdi></strong> · <bdi dir="ltr">{{ $act->action_type }}</bdi>
+                        · <span>{{ \App\Support\AiWorkspace\NightShiftActionQueue::statusLabel($act->status) }}</span>
+                        <div style="{{ $muted }}">{{ $act->rationale }}</div>
+                    </div>
+                    @if ($canManage)
+                        <div style="display:flex;gap:8px;flex-wrap:wrap">
+                            @if ($act->status === 'pending_approval')
+                                <x-filament::button type="button" size="sm" wire:click="decideNightAction({{ $act->id }}, 'queue')" style="min-height:44px">{{ __('Confirm & queue') }}</x-filament::button>
+                                <x-filament::button type="button" size="sm" color="gray" wire:click="decideNightAction({{ $act->id }}, 'reject')" style="min-height:44px">{{ __('Dismiss') }}</x-filament::button>
+                            @elseif ($act->status === 'approved_queued')
+                                <x-filament::button type="button" size="sm" color="gray" wire:click="undoNightAction({{ $act->id }})" style="min-height:44px">{{ __('Undo') }}</x-filament::button>
+                            @endif
+                        </div>
+                    @endif
+                </div>
+            @endforeach
+        </section>
+    @endif
+
     @if ($canManage)
         <form wire:submit="save" style="{{ $card }}">
             <h3 style="font-size:15px;font-weight:700;margin:0">{{ __('Settings') }}</h3>

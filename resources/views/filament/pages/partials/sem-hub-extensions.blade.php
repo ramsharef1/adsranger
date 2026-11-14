@@ -179,4 +179,46 @@
             </div>
         @endif
     </x-filament::section>
+
+    <x-filament::section>
+        <x-slot name="heading">{{ __('Creator & influencer partnership POAS (flat fee + gifted COGS + boosted spend)') }}</x-slot>
+        @if ($canManageStores)
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px;font-size:13px">
+                <input type="text" wire:model="creatorName" placeholder="{{ __('Creator name') }}" class="pah-input">
+                <select wire:model="creatorPlatform" class="pah-input" dir="ltr">
+                    <option value="snapchat">snapchat</option>
+                    <option value="tiktok">tiktok</option>
+                    <option value="instagram">instagram</option>
+                    <option value="youtube">youtube</option>
+                </select>
+                <input type="text" wire:model="creatorPromoCode" dir="ltr" placeholder="{{ __('Promo code') }}" class="pah-input">
+                <input type="number" step="0.01" wire:model="creatorFlatFee" dir="ltr" placeholder="{{ __('Flat fee') }}" class="pah-input">
+                <input type="number" step="0.01" wire:model="creatorGiftedCogs" dir="ltr" placeholder="{{ __('Gifted COGS') }}" class="pah-input">
+                <input type="number" step="0.01" wire:model="creatorBoostedSpend" dir="ltr" placeholder="{{ __('Boosted spend') }}" class="pah-input">
+                <input type="number" step="1" wire:model="creatorOrders" dir="ltr" placeholder="{{ __('Orders') }}" class="pah-input">
+                <input type="number" step="0.01" wire:model="creatorGrossRevenue" dir="ltr" placeholder="{{ __('Revenue') }}" class="pah-input">
+            </div>
+            <div style="margin-top:8px">
+                <button type="button" wire:click="recordCreatorPartnership" class="pah-btn pah-btn-solid">{{ __('Save creator POAS') }}</button>
+            </div>
+        @endif
+        @if (isset($creatorPartnerships) && $creatorPartnerships->isNotEmpty())
+            <div style="margin-top:10px;display:grid;gap:6px;font-size:13px">
+                @foreach ($creatorPartnerships as $cp)
+                    <div class="pah-row">
+                        <span>
+                            <strong><bdi>{{ $cp->creator_name }}</bdi></strong>
+                            (<bdi dir="ltr">{{ $cp->platform }}{{ $cp->promo_code ? ' · '.$cp->promo_code : '' }}</bdi>)
+                        </span>
+                        <span>
+                            @if (! $client->hide_spend)
+                                <bdi dir="ltr">{{ \App\Support\ResultResolver::money($cp->totalInvestment(), $currency) }}</bdi> ·
+                            @endif
+                            <strong dir="ltr">Net POAS {{ number_format((float) $cp->net_poas, 2) }}x</strong>
+                        </span>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </x-filament::section>
 </div>

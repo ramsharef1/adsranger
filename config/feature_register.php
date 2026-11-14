@@ -18,6 +18,7 @@ use App\Filament\Pages\CreativeFatigueBoardPage;
 use App\Filament\Pages\FreeLiteView;
 use App\Filament\Pages\MyDevices;
 use App\Filament\Pages\NightShiftPage;
+use App\Filament\Pages\OfflineConversionsPage;
 use App\Filament\Pages\OnboardingPage;
 use App\Filament\Pages\RetainerSplitPage;
 use App\Filament\Pages\SeoAuditPage;
@@ -26,6 +27,7 @@ use App\Filament\Pages\SeoTelemetryPage;
 use App\Filament\Pages\WhatsNewPage;
 use App\Filament\Pages\WorkspaceActivity;
 use App\Http\Controllers\ProductFeedController;
+use App\Http\Controllers\ProspectPitchDeckController;
 use App\Http\Controllers\ReachPortalController;
 use App\Http\Controllers\ReachServeController;
 use App\Http\Controllers\ReachToolController;
@@ -37,16 +39,20 @@ use App\Mcp\Servers\AdsRangerServer;
 use App\Models\CostLine;
 use App\Models\LaunchCheck;
 use App\Support\AdminShell;
+use App\Support\AgencyOps\PitchDeckBuilder;
 use App\Support\AgencyOps\RetainerSplit;
 use App\Support\AiWorkspace\AiBox;
 use App\Support\AiWorkspace\Brain;
 use App\Support\AiWorkspace\FreePlan;
 use App\Support\AiWorkspace\NightShift;
+use App\Support\AiWorkspace\NightShiftActionQueue;
 use App\Support\AiWorkspace\QualityGate;
 use App\Support\Arabic\Normaliser;
 use App\Support\Attribution\CohortLtvAnalyzer;
+use App\Support\Attribution\CreatorPoasTracker;
 use App\Support\Attribution\CrossChannelRuleEngine;
 use App\Support\Attribution\LandingUrlWatchdog;
+use App\Support\Attribution\OfflineConversionDispatcher;
 use App\Support\Attribution\PerformanceInvestigator;
 use App\Support\Attribution\SearchTermNgramMiner;
 use App\Support\Attribution\ShoppingFeedBuilder;
@@ -137,4 +143,5 @@ return [
     'FR-SEO-AUTHORITY-LOCAL' => ['title' => 'Rank tracker + cannibalization detector, topical pillar-spoke silos, GSC backlink CSV + competitor domain intersection gap + Google Disavow .txt exporter, and multi-branch Local GBP NAP/RTL checker & bilingual review drafts under seo_audit (E2-070)', 'code' => [SeoRankTracker::class, SeoTopicalClusterPlanner::class, SeoBacklinkAndDisavow::class, SeoLocalGbpManager::class, SeoAuthorityLocalPage::class, 'view:filament.pages.seo-authority-local'], 'tests' => ['Feature/SeoAuthorityAndLocalTest.php']],
     'FR-SEM-FEEDS-INVESTIGATOR' => ['title' => 'Search-term 1/2/3-gram bleed miner (Normaliser::key + negative export), tokenized profit-quadrant shopping feeds (/feeds/{token}.xml, OOS filter, AR/EN title enrichment, noindex), and deterministic CPA/ROAS/POAS root-cause waterfall investigator under intelligence_hub (E2-071)', 'code' => [SearchTermNgramMiner::class, ShoppingFeedBuilder::class, PerformanceInvestigator::class, ProductFeedController::class, 'route:feeds/{token}.xml', 'view:filament.pages.partials.sem-hub-extensions'], 'tests' => ['Feature/SemNgramsFeedsInvestigatorTest.php']],
     'FR-SEM-RULES-COHORTS-WATCHDOG' => ['title' => 'Cross-channel rule engine (store stock + COD return rate + ad metrics, budget delta clamped <= 20%, dry-run default + approval queue), customer cohort D30/D60/D90/D180 LTV & CAC payback curves, and SafeFetcher ad landing URL & pixel/WhatsApp watchdog under intelligence_hub (E2-072)', 'code' => [CrossChannelRuleEngine::class, CohortLtvAnalyzer::class, LandingUrlWatchdog::class, 'view:filament.pages.partials.sem-hub-extensions'], 'tests' => ['Feature/SemRulesCohortsWatchdogTest.php']],
+    'FR-MENA-GROWTH-AND-AIW-M2' => ['title' => 'Creator & influencer Net POAS tracker (intelligence_hub), 60-second agency-branded prospect audit & 3-tier pitch deck (/pitch/{token} + bilingual mPDF under agency_ops_hub, noindex), SHA-256 WhatsApp/CRM offline CAPI & Google GCLID loop (lead_desk, queued_until_credentials honesty gate), and supervised Night Shift v1 action queue with undo under ai_workspace (E2-073)', 'code' => [CreatorPoasTracker::class, PitchDeckBuilder::class, ProspectPitchDeckController::class, OfflineConversionDispatcher::class, OfflineConversionsPage::class, NightShiftActionQueue::class, 'route:pitch/{token}', 'route:pitch/{token}/pdf', 'view:public.pitch-deck', 'view:reports.pitch-deck-pdf', 'view:filament.pages.offline-conversions'], 'tests' => ['Feature/MenaGrowthAndNightShiftM2Test.php']],
 ];

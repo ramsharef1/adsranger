@@ -8,9 +8,11 @@ use App\Models\AiBrainItem;
 use App\Models\AiKey;
 use App\Models\AiNightRun;
 use App\Models\AiNightShift;
+use App\Models\AiNightShiftAction;
 use App\Models\AuditLog;
 use App\Models\Client;
 use App\Support\AiWorkspace\NightShift;
+use App\Support\AiWorkspace\NightShiftActionQueue;
 use App\Support\PlanGate;
 use App\Support\TeamRoles;
 use BackedEnum;
@@ -109,6 +111,24 @@ class NightShiftPage extends Page
             ->{$run->status === 'ok' ? 'success' : 'warning'}()->send();
     }
 
+    public function decideNightAction(int $actionId, string $decision): void
+    {
+        abort_unless($this->canManage(), 403);
+        $agency = Filament::getTenant();
+        $action = AiNightShiftAction::where('agency_id', $agency->getKey())->findOrFail($actionId);
+        NightShiftActionQueue::decide($action, auth()->user(), $decision);
+        Notification::make()->title(__('Morning action updated.'))->success()->send();
+    }
+
+    public function undoNightAction(int $actionId): void
+    {
+        abort_unless($this->canManage(), 403);
+        $agency = Filament::getTenant();
+        $action = AiNightShiftAction::where('agency_id', $agency->getKey())->findOrFail($actionId);
+        NightShiftActionQueue::undo($action, auth()->user());
+        Notification::make()->title(__('Morning action undone.'))->success()->send();
+    }
+
     protected function getViewData(): array
     {
         $agency = Filament::getTenant();
@@ -123,8 +143,16 @@ class NightShiftPage extends Page
             ->filter(fn ($i) => isset($i->meta['feedback']))->groupBy(fn ($i) => $i->meta['level'] ?? 'info')
             ->map(fn ($g) => ['useful' => $g->where('meta.feedback', 'useful')->count(), 'not' => $g->where('meta.feedback', 'not_useful')->count()]);
 
+        $visibleClients = Client::visibleTo(auth()->user(), $agency)->orderBy('name')->get();
+        $nightActions = AiNightShiftAction::with('client')
+            ->where('agency_id', $agency->getKey())
+            ->whereIn('client_id', $visibleClients->pluck('id'))
+            ->latest('id')
+            ->limit(20)
+            ->get();
+
         return ['full' => $this->full(), 'runs' => $runs, 'last' => $last, 'items' => $items, 'feedback' => $feedback, 'keys' => AiKey::where('agency_id', $agency->getKey())->get(),
-            'clients' => Client::visibleTo(auth()->user(), $agency)->orderBy('name')->get(), 'canManage' => $this->canManage(),
+            'clients' => $visibleClients, 'nightActions' => $nightActions, 'canManage' => $this->canManage(),
             'isOwner' => TeamRoles::isOwner(auth()->user(), $agency), 'tz' => $agency->timezone ?: 'UTC'];
     }
 }

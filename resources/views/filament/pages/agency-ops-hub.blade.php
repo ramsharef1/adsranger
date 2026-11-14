@@ -103,5 +103,38 @@
                 @endif
             </div>
         </div>
+
+        <div class="p-5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 space-y-4">
+            <h3 class="text-base font-bold text-gray-900 dark:text-white">{{ __('60-Second Prospect Audit & 3-Tier Pitch Deck') }}</h3>
+            @if ($canManageOps)
+                <form wire:submit="createPitchDeck" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;align-items:end">
+                    <input type="text" wire:model="prospectName" placeholder="{{ __('Prospect brand name') }}" style="min-height:44px;padding:8px 12px;border-radius:8px;border:1px solid rgba(148,163,184,.35);background:transparent;font-size:13px" />
+                    <input type="url" wire:model="prospectUrl" dir="ltr" placeholder="https://prospect.com" style="min-height:44px;padding:8px 12px;border-radius:8px;border:1px solid rgba(148,163,184,.35);background:transparent;font-size:13px" />
+                    <select wire:model="prospectCurrency" dir="ltr" style="min-height:44px;padding:8px 12px;border-radius:8px;border:1px solid rgba(148,163,184,.35);background:transparent;font-size:13px">
+                        <option value="SAR">SAR</option>
+                        <option value="AED">AED</option>
+                        <option value="KWD">KWD</option>
+                        <option value="JOD">JOD</option>
+                        <option value="USD">USD</option>
+                    </select>
+                    <button type="submit" style="min-height:44px;padding:0 16px;border-radius:8px;background:#0d9488;color:#fff;font-weight:600;font-size:13px;border:0;cursor:pointer">
+                        {{ __('Build pitch deck') }}
+                    </button>
+                </form>
+            @endif
+            @if (isset($pitchDecks) && $pitchDecks->isNotEmpty())
+                <div style="display:grid;gap:8px;font-size:13px">
+                    @foreach ($pitchDecks as $pd)
+                        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;border:1px solid rgba(148,163,184,.25);border-radius:8px">
+                            <span><strong><bdi>{{ $pd->prospect_name }}</bdi></strong> (<bdi dir="ltr">{{ $pd->prospect_url }}</bdi>)</span>
+                            <span style="display:flex;gap:10px;align-items:center">
+                                <a href="{{ url('/pitch/'.$pd->share_token) }}" target="_blank" rel="noopener" style="color:#0d9488;font-weight:600">{{ __('Open preview') }}</a>
+                                <a href="{{ url('/pitch/'.$pd->share_token.'/pdf') }}" style="color:#0d9488;font-weight:600">PDF</a>
+                            </span>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
     </div>
 </x-filament-panels::page>

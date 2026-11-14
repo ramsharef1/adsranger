@@ -7,9 +7,12 @@ use App\Models\AgencyOperationalAudit;
 use App\Models\BudgetReallocationLog;
 use App\Models\Client;
 use App\Models\InfluencerCampaign;
+use App\Models\ProspectPitchDeck;
 use App\Support\AgencyOperationsHub;
+use App\Support\AgencyOps\PitchDeckBuilder;
 use App\Support\CurrentClient;
 use App\Support\InfluencerCampaignTracker;
+use App\Support\TeamRoles;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
@@ -48,6 +51,12 @@ class AgencyOpsHubPage extends Page
     public int $ordersCount = 25;
 
     public float $attributedRevenue = 8500.0;
+
+    public string $prospectName = '';
+
+    public string $prospectUrl = '';
+
+    public string $prospectCurrency = 'SAR';
 
     public function mount(): void
     {
@@ -113,6 +122,17 @@ class AgencyOpsHubPage extends Page
         Notification::make()->title(__('Influencer campaign attributed'))->success()->send();
     }
 
+    public function createPitchDeck(): void
+    {
+        $agency = Filament::getTenant();
+        if (! $agency || ! TeamRoles::canManageData(auth()->user(), $agency) || trim($this->prospectName) === '' || trim($this->prospectUrl) === '') {
+            return;
+        }
+        PitchDeckBuilder::generate($agency, $this->prospectName, $this->prospectUrl, $this->prospectCurrency);
+        $this->reset(['prospectName', 'prospectUrl']);
+        Notification::make()->title(__('Prospect pitch deck generated.'))->success()->send();
+    }
+
     public function getViewData(): array
     {
         $agency = Filament::getTenant();
@@ -145,6 +165,8 @@ class AgencyOpsHubPage extends Page
             'reallocations' => $scope(BudgetReallocationLog::query())->latest()->limit(10)->get(),
             'operationalAudits' => $scope(AgencyOperationalAudit::query())->latest()->limit(10)->get(),
             'influencerCampaigns' => $scope(InfluencerCampaign::query())->latest()->limit(10)->get(),
+            'pitchDecks' => ProspectPitchDeck::where('agency_id', $agencyId)->latest('id')->limit(10)->get(),
+            'canManageOps' => $agency ? TeamRoles::canManageData($user, $agency) : false,
         ];
     }
 }
