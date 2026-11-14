@@ -14,7 +14,7 @@ class ProspectPitchDeckController extends Controller
     protected function resolveDeck(string $token): ProspectPitchDeck
     {
         $deck = ProspectPitchDeck::with('agency')->where('share_token', $token)->first();
-        abort_unless($deck && $deck->agency, 404);
+        abort_unless($deck && $deck->agency && $deck->revoked_at === null, 404);
         abort_unless(Modules::on('agency_ops_hub', null, $deck->agency), 404);
 
         return $deck;

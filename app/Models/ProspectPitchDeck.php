@@ -14,6 +14,7 @@ class ProspectPitchDeck extends Model
         return [
             'audit_snapshot' => 'array',
             'tier_quotes' => 'array',
+            'revoked_at' => 'datetime',
         ];
     }
 

@@ -50,6 +50,15 @@ class MissionShell
         return static::available($agency) && static::look() === 'mission';
     }
 
+    /**
+     * /admin has no workspace, so it follows the global switch (super admins preview it, as with every held-back
+     * module) and the person's own look.
+     */
+    public static function onAdmin(): bool
+    {
+        return Filament::getCurrentPanel()?->getId() === 'admin' && auth()->check() && Modules::on('mission_shell') && static::look() === 'mission';
+    }
+
     public static function look(): string
     {
         return (auth()->user()?->ui_prefs['look'] ?? 'mission') === 'classic' ? 'classic' : 'mission';

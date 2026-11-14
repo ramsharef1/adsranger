@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Concerns\HeldBackModule;
+use App\Models\Alert;
 use App\Models\BlendedRoasMetric;
 use App\Models\Client;
 use App\Models\CompetitorCreativeRadar;
@@ -14,10 +15,13 @@ use App\Support\BlendedRoasCalculator;
 use App\Support\CurrentClient;
 use App\Support\KeywordMappingManager;
 use App\Support\PsychologicalTriggerAnalyzer;
+use App\Support\ResultResolver;
+use App\Support\TeamRoles;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Support\Carbon;
 
 class IntelligenceHubPage extends Page
 {
@@ -43,7 +47,7 @@ class IntelligenceHubPage extends Page
 
     public string $hookDialect = 'gulf';
 
-    // #69 Ask the platform (AR/EN) & #99 Weekly AI account review
+    // Summary of saved numbers and the top open alerts (no model is called here)
     public string $platformQuestion = '';
 
     public string $platformAnswer = '';
@@ -85,101 +89,96 @@ class IntelligenceHubPage extends Page
         return $this->clientId ? $q->whereKey($this->clientId)->first() : $q->orderBy('name')->first();
     }
 
+    protected function canManage(): bool
+    {
+        $agency = Filament::getTenant();
+
+        return $agency !== null && TeamRoles::canManageData(auth()->user(), $agency);
+    }
+
+    /** A starter keyword list built from fixed phrase templates around the typed service. No model and no search volumes. */
     public function generateKeywords(): void
     {
         $client = $this->resolveSelectedClient();
-        if (! $client || trim($this->seedKeyword) === '') {
+        if (! $client || ! $this->canManage()) {
             return;
         }
-        KeywordMappingManager::generateForClient($client, trim($this->seedKeyword), $this->keywordLocale);
+        $data = $this->validate([
+            'seedKeyword' => ['required', 'string', 'min:2', 'max:80'],
+            'keywordLocale' => ['required', 'in:ar,en'],
+        ], [], ['seedKeyword' => __('Core service or product'), 'keywordLocale' => __('Language')]);
+        KeywordMappingManager::generateForClient($client, trim($data['seedKeyword']), $data['keywordLocale']);
         $this->seedKeyword = '';
-        Notification::make()->title(__('Keyword intent matrix generated'))->success()->send();
+        Notification::make()->title(__('Starter keyword list saved'))->success()->send();
     }
 
+    /** A word check: which persuasion word groups appear in the text. It does not predict results. */
     public function scoreHook(): void
     {
         $client = $this->resolveSelectedClient();
-        if (! $client || trim($this->adCopySample) === '') {
+        if (! $client || ! $this->canManage()) {
             return;
         }
-        PsychologicalTriggerAnalyzer::analyzeAndScore($client, trim($this->adCopySample), $this->hookDialect);
+        $data = $this->validate([
+            'adCopySample' => ['required', 'string', 'min:3', 'max:300'],
+            'hookDialect' => ['required', 'in:gulf,egyptian,levantine,msa'],
+        ], [], ['adCopySample' => __('Ad hook or headline'), 'hookDialect' => __('Dialect')]);
+        PsychologicalTriggerAnalyzer::analyzeAndScore($client, trim($data['adCopySample']), $data['hookDialect']);
         $this->adCopySample = '';
-        Notification::make()->title(__('Psychological hook scored'))->success()->send();
+        Notification::make()->title(__('Word check saved'))->success()->send();
     }
 
+    /** Revenue ÷ spend across every channel for yesterday (the last complete day) in the workspace's time zone. */
     public function computeBlendedRoas(): void
+    {
+        $client = $this->resolveSelectedClient();
+        if (! $client || ! $this->canManage()) {
+            return;
+        }
+        $tz = Filament::getTenant()?->timezone ?: 'UTC';
+        BlendedRoasCalculator::computeForClientDate($client, now($tz)->subDay()->toDateString());
+        Notification::make()->title(__('Return snapshot updated for yesterday'))->success()->send();
+    }
+
+    /**
+     * A plain summary of the client's latest saved snapshot. It reads saved numbers only: no model is called and
+     * nothing is filled in when a number is missing. The typed question is not interpreted.
+     */
+    public function askPlatform(): void
     {
         $client = $this->resolveSelectedClient();
         if (! $client) {
             return;
         }
-        BlendedRoasCalculator::computeForClientDate($client, now()->toDateString());
-        Notification::make()->title(__('Blended ROAS & MER snapshot updated'))->success()->send();
-    }
+        $m = BlendedRoasMetric::where('agency_id', $client->agency_id)->where('client_id', $client->id)->latest('metric_date')->first();
+        if (! $m || (float) $m->total_spend <= 0) {
+            $this->platformAnswer = __(':client: no return snapshot with spend is saved yet. Press "Update snapshot" after data for yesterday has arrived.', ['client' => $client->name]);
 
-    /** #69 Ask the platform (Arabic / English) natural-language analyst. */
-    public function askPlatform(): void
-    {
-        $client = $this->resolveSelectedClient();
-        $q = trim($this->platformQuestion);
-        if (! $client || $q === '') {
             return;
         }
-
-        $latestMer = BlendedRoasMetric::where('agency_id', $client->agency_id)
-            ->where('client_id', $client->id)
-            ->latest('metric_date')
-            ->first();
-
-        $topHook = PsychologicalHookScore::where('agency_id', $client->agency_id)
-            ->where('client_id', $client->id)
-            ->orderByDesc('overall_score')
-            ->first();
-
-        $merVal = $latestMer ? number_format((float) $latestMer->mer_ratio, 2).'x' : '3.20x';
-        $spendVal = $latestMer ? number_format((float) $latestMer->total_ad_spend, 2) : '0.00';
-        $hookScore = $topHook ? (int) $topHook->overall_score : 82;
-
-        $isArabic = preg_match('/\p{Arabic}/u', $q) === 1 || app()->getLocale() === 'ar';
-
-        if ($isArabic) {
-            $this->platformAnswer = "تحليل فوري للعميل {$client->name}: يبلغ العائد المدمج الحالي (MER) {$merVal} بإجمالي إنفاق مرصود {$spendVal} {$client->currency}، وأعلى تقييم خطاف إعلاني هو {$hookScore}/100. نوصي بتركيز الميزانية على المجموعات الإعلانية ذات نية الشراء العالية ومراجعة عبارات البحث السلبية.";
-        } else {
-            $this->platformAnswer = "Instant diagnosis for {$client->name}: Current blended MER is {$merVal} (tracked spend {$spendVal} {$client->currency}) with a top creative hook score of {$hookScore}/100. Focus incremental budget on high-intent ad sets and prune low-converting placements.";
-        }
-
-        Notification::make()->title(__('Platform insight ready'))->success()->send();
+        $best = collect((array) $m->channel_breakdown)->filter(fn ($c) => (float) ($c['spend'] ?? 0) > 0)->sortByDesc(fn ($c) => (float) ($c['roas'] ?? 0))->keys()->first();
+        $this->platformAnswer = __(':client on :date: spend :spend, revenue :revenue, return :mer× across all channels.', [
+            'client' => $client->name,
+            'date' => Carbon::parse($m->metric_date)->toDateString(),
+            'spend' => ResultResolver::money((float) $m->total_spend, $client->currency),
+            'revenue' => ResultResolver::money((float) $m->total_revenue, $client->currency),
+            'mer' => number_format((float) $m->marketing_efficiency_ratio, 2),
+        ]).($best ? ' '.__('Highest return that day: :network.', ['network' => $best]) : '');
     }
 
-    /** #99 Weekly AI account review: top 3 actions per client. */
+    /** The client's three most serious open alerts, oldest first. Nothing is written when there are none. */
     public function generateWeeklyReview(): void
     {
         $client = $this->resolveSelectedClient();
         if (! $client) {
             return;
         }
-
-        $latestMer = BlendedRoasMetric::where('agency_id', $client->agency_id)
-            ->where('client_id', $client->id)
-            ->latest('metric_date')
-            ->first();
-
-        $merRatio = $latestMer ? (float) $latestMer->mer_ratio : 2.8;
-
-        $this->weeklyActions = [
-            __('Action 1 (:client): Shift 15% of non-converting awareness spend into top-performing high-intent search & retargeting ad sets (current MER :merx).', [
-                'client' => $client->name,
-                'mer' => number_format($merRatio, 2),
-            ]),
-            __('Action 2 (:client): Refresh ad creatives with frequency > 3.5 using a Gulf/Levantine social-proof hook before weekend peak hours.', [
-                'client' => $client->name,
-            ]),
-            __('Action 3 (:client): Audit landing page checkout drop-off and verify CAPI Event Match Quality (EMQ) stays above 8.0/10.', [
-                'client' => $client->name,
-            ]),
-        ];
-
-        Notification::make()->title(__('Weekly top 3 actions generated'))->success()->send();
+        $alerts = Alert::where('agency_id', $client->agency_id)->where('client_id', $client->id)->where('status', 'open')
+            ->orderByRaw("case when severity in ('critical', 'high') then 0 when severity in ('warning', 'medium') then 1 else 2 end")
+            ->orderBy('created_at')->limit(3)->get();
+        $this->weeklyActions = $alerts->isEmpty()
+            ? [__(':client has no open alerts.', ['client' => $client->name])]
+            : $alerts->map(fn (Alert $a) => $client->name.': '.$a->localTitle())->all();
     }
 
     public function getViewData(): array
@@ -217,6 +216,7 @@ class IntelligenceHubPage extends Page
             'trendRadars' => $scope(CompetitorCreativeRadar::query())->latest()->limit(10)->get(),
             'uxHeatmaps' => $scope(UxFunnelHeatmap::query())->latest()->limit(10)->get(),
             'accelerators' => $scope(NetworkAcceleratorEvent::query())->latest()->limit(10)->get(),
+            'canManageHub' => $agency ? TeamRoles::canManageData($user, $agency) : false,
         ];
     }
 }

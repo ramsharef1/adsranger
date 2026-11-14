@@ -68,8 +68,11 @@ class Wave19AiOnboardingWebhooksTest extends TestCase
             ->set('platformQuestion', 'How is our blended ROAS performing this week?')
             ->call('askPlatform')
             ->assertSee('Riyadh Luxury Retail')
+            ->assertSee('no return snapshot') // cl149: nothing is invented when no numbers are saved
+            ->assertDontSee('3.20x')
             ->call('generateWeeklyReview')
-            ->assertSee('Action 1 (Riyadh Luxury Retail)');
+            ->assertSee('Riyadh Luxury Retail has no open alerts.')
+            ->assertDontSee('Action 1 (Riyadh Luxury Retail)');
     }
 
     public function test_client_onboarding_link_and_webhook_export_feed_work_end_to_end(): void

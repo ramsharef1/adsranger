@@ -194,9 +194,16 @@
                     @foreach ($pitchDecks as $pd)
                         <div class="p-3 rounded-lg bg-gray-50 text-sm flex justify-between items-center gap-3" style="flex-wrap:wrap">
                             <span><strong><bdi>{{ $pd->prospect_name }}</bdi></strong> · <bdi dir="ltr">{{ $pd->prospect_url }}</bdi><br><span class="hub-note">{{ $pd->created_at?->diffForHumans() }}</span></span>
-                            <span class="flex gap-3 items-center">
-                                <a href="{{ url('/pitch/'.$pd->share_token) }}" target="_blank" rel="noopener" class="font-semibold text-teal-600">{{ __('Open preview') }}</a>
-                                <a href="{{ url('/pitch/'.$pd->share_token.'/pdf') }}" class="font-semibold text-teal-600">PDF</a>
+                            <span class="flex gap-3 items-center" style="flex-wrap:wrap">
+                                @if ($pd->revoked_at)
+                                    <span class="hub-chip" data-deck-revoked>{{ __('Link switched off') }}</span>
+                                @else
+                                    <a href="{{ url('/pitch/'.$pd->share_token) }}" target="_blank" rel="noopener" class="font-semibold text-teal-600">{{ __('Open preview') }}</a>
+                                    <a href="{{ url('/pitch/'.$pd->share_token.'/pdf') }}" class="font-semibold text-teal-600">PDF</a>
+                                    @if ($canManageOps)
+                                        <button type="button" class="hub-btn" wire:click="revokePitchDeck({{ $pd->id }})" wire:confirm="{{ __('Switch this link off? Anyone who has it will see a not-found page.') }}" style="background:transparent;color:var(--h-2);border:1px solid var(--h-control)">{{ __('Switch link off') }}</button>
+                                    @endif
+                                @endif
                             </span>
                         </div>
                     @endforeach

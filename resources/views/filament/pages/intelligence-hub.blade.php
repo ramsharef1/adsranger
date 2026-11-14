@@ -1,147 +1,154 @@
+@php
+    use App\Support\ResultResolver;
+    $names = $clients->pluck('name', 'id');
+    $curOf = $clients->pluck('currency', 'id');
+    $latest = $blendedMetrics->first();
+    $groupLabel = ['urgency' => __('Urgency'), 'fomo' => __('Scarcity'), 'authority' => __('Trust'), 'aspiration' => __('Aspiration')];
+    $intentLabel = ['transactional' => __('Ready to buy'), 'commercial' => __('Comparing'), 'informational' => __('Learning')];
+    $extras = array_filter([__('Competitor ad notes') => $trendRadars->count(), __('Page funnel notes') => $uxHeatmaps->count(), __('Network setup events') => $accelerators->count()]);
+@endphp
 <x-filament-panels::page>
     @include('filament.pages.partials.hub-styles')
-    <div class="hub space-y-6">
+    <div class="hub space-y-6" data-intelligence-hub>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 flex items-center justify-between">
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-500">{{ preg_replace('/\s*\((?:#|S\d)[^)]*\)/u', '', __('Blended ROAS & MER (#18)')) }}</h3>
-                    <p class="mt-2 text-2xl font-bold text-teal-600">{{ $blendedMetrics->count() }}</p>
-                    <p class="text-xs text-gray-500 mt-1">{{ __('Cross-channel MER snapshots') }}</p>
-                </div>
-                <button type="button" wire:click="computeBlendedRoas" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-teal-600 text-white hover:bg-teal-500">
-                    {{ __('Compute MER') }}
-                </button>
+            <div class="p-4 rounded-xl bg-white border">
+                <h3 class="text-sm font-semibold text-gray-500">{{ __('Return across all channels') }}</h3>
+                @if ($latest && (float) $latest->total_spend > 0)
+                    <p class="mt-2 text-2xl font-bold text-teal-600"><bdi dir="ltr">{{ number_format((float) $latest->marketing_efficiency_ratio, 2) }}×</bdi></p>
+                    <p class="hub-note mt-1"><bdi>{{ $names[$latest->client_id] ?? '' }}</bdi> · <bdi dir="ltr">{{ \Illuminate\Support\Carbon::parse($latest->metric_date)->toDateString() }}</bdi> · {{ __('spend') }} <bdi dir="ltr">{{ ResultResolver::money((float) $latest->total_spend, $curOf[$latest->client_id] ?? null) }}</bdi> · {{ __('revenue') }} <bdi dir="ltr">{{ ResultResolver::money((float) $latest->total_revenue, $curOf[$latest->client_id] ?? null) }}</bdi></p>
+                @else
+                    <p class="mt-2 text-sm" data-no-snapshot>{{ __('No snapshot with spend yet') }}</p>
+                    <p class="hub-note mt-1">{{ __('Revenue ÷ spend for one day, every channel together.') }}</p>
+                @endif
             </div>
-            <div class="p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
-                <h3 class="text-sm font-semibold text-gray-500">{{ preg_replace('/\s*\((?:#|S\d)[^)]*\)/u', '', __('AI Keyword Matrices (#16)')) }}</h3>
+            <div class="p-4 rounded-xl bg-white border">
+                <h3 class="text-sm font-semibold text-gray-500">{{ __('Starter keyword lists') }}</h3>
                 <p class="mt-2 text-2xl font-bold text-teal-600">{{ $keywordMaps->count() }}</p>
-                <p class="text-xs text-gray-500 mt-1">{{ __('Google & Microsoft Ads intent clusters') }}</p>
+                <p class="hub-note mt-1">{{ __('Phrase templates, not search volumes') }}</p>
             </div>
-            <div class="p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
-                <h3 class="text-sm font-semibold text-gray-500">{{ preg_replace('/\s*\((?:#|S\d)[^)]*\)/u', '', __('Psychological Hook Scores (#17)')) }}</h3>
+            <div class="p-4 rounded-xl bg-white border">
+                <h3 class="text-sm font-semibold text-gray-500">{{ __('Ad text word checks') }}</h3>
                 <p class="mt-2 text-2xl font-bold text-teal-600">{{ $hookScores->count() }}</p>
-                <p class="text-xs text-gray-500 mt-1">{{ __('Dialect-adapted emotional trigger audits') }}</p>
+                <p class="hub-note mt-1">{{ __('Which persuasion words a text uses') }}</p>
             </div>
         </div>
+        @if ($extras)
+            <p class="hub-note">{{ __('Also saved for this scope:') }} @foreach ($extras as $label => $n){{ $label }} {{ $n }}@if (! $loop->last) · @endif @endforeach</p>
+        @endif
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
-                <h3 class="text-sm font-semibold text-gray-500">{{ preg_replace('/\s*\((?:#|S\d)[^)]*\)/u', '', __('Competitor Trend Radars (#22)')) }}</h3>
-                <p class="mt-2 text-2xl font-bold text-teal-600">{{ $trendRadars->count() }}</p>
-            </div>
-            <div class="p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
-                <h3 class="text-sm font-semibold text-gray-500">{{ preg_replace('/\s*\((?:#|S\d)[^)]*\)/u', '', __('UX Funnel Heatmaps (#19)')) }}</h3>
-                <p class="mt-2 text-2xl font-bold text-teal-600">{{ $uxHeatmaps->count() }}</p>
-            </div>
-            <div class="p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
-                <h3 class="text-sm font-semibold text-gray-500">{{ preg_replace('/\s*\((?:#|S\d)[^)]*\)/u', '', __('Network Accelerators (#23–#26)')) }}</h3>
-                <p class="mt-2 text-2xl font-bold text-teal-600">{{ $accelerators->count() }}</p>
-            </div>
-        </div>
+        @unless ($canManageHub)
+            <p class="p-3 rounded-lg bg-gray-50 border text-sm" data-hub-view-only>{{ __('You can view this page. Saving lists, checks and snapshots needs a role that can manage data.') }}</p>
+        @endunless
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="p-5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 space-y-4">
-                <h3 class="text-base font-bold text-gray-900 dark:text-white">{{ __('Generate AI Keyword Intent Matrix') }}</h3>
-                <form wire:submit="generateKeywords" class="space-y-3">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">{{ __('Client') }}</label>
-                        <select wire:model="clientId" class="mt-1 w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 text-sm">
-                            @foreach($clients as $c)
-                                <option value="{{ $c->id }}">{{ $c->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div class="md:col-span-2">
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">{{ __('Core service or product') }}</label>
-                            <input type="text" wire:model="seedKeyword" class="mt-1 w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 text-sm" placeholder="{{ __('e.g. Dental Implants') }}" />
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">{{ __('Language') }}</label>
-                            <select wire:model="keywordLocale" class="mt-1 w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 text-sm">
-                                <option value="ar">{{ __('Arabic') }}</option>
-                                <option value="en">{{ __('English') }}</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button type="submit" class="px-4 py-2 rounded-lg bg-teal-600 text-white text-xs font-semibold hover:bg-teal-500">
-                        {{ __('Generate keyword clusters') }}
-                    </button>
-                </form>
-
-                @if($keywordMaps->isNotEmpty())
-                    <div class="pt-3 border-t border-gray-100 dark:border-gray-800 space-y-2">
-                        @foreach($keywordMaps->take(3) as $km)
-                            <div class="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/60 text-xs flex justify-between items-center">
-                                <span class="font-semibold">{{ $km->seed_keyword }}</span>
-                                <span class="text-gray-500">{{ strtoupper($km->locale) }} · {{ count($km->negative_keywords ?? []) }} {{ __('negatives') }}</span>
-                            </div>
+        <section class="p-5 rounded-xl bg-white border space-y-4" aria-labelledby="ih-summary">
+            <div>
+                <h3 id="ih-summary" class="text-base font-bold text-gray-900">{{ __('Summary from saved numbers') }}</h3>
+                <p class="hub-note mt-1">{{ __('Reads the latest saved snapshot and the open alerts for the chosen client. No AI model is used here, and nothing is filled in when a number is missing.') }}</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3" style="align-items:end">
+                <div class="md:col-span-2">
+                    <label for="ih-client" class="block text-xs font-medium">{{ __('Client') }}</label>
+                    <select id="ih-client" wire:model="clientId" class="mt-1 w-full">
+                        @foreach ($clients as $c)
+                            <option value="{{ $c->id }}">{{ $c->name }}</option>
                         @endforeach
-                    </div>
-                @endif
-            </div>
-
-            <div class="p-5 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 space-y-4">
-                <h3 class="text-base font-bold text-gray-900 dark:text-white">{{ __('Score Ad Copy Psychological Triggers') }}</h3>
-                <form wire:submit="scoreHook" class="space-y-3">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div class="md:col-span-2">
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">{{ __('Ad hook or headline') }}</label>
-                            <input type="text" wire:model="adCopySample" class="mt-1 w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 text-sm" />
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">{{ __('Dialect') }}</label>
-                            <select wire:model="hookDialect" class="mt-1 w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800 text-sm">
-                                <option value="gulf">{{ __('Gulf') }}</option>
-                                <option value="egyptian">{{ __('Egyptian') }}</option>
-                                <option value="levantine">{{ __('Levantine') }}</option>
-                                <option value="msa">{{ __('MSA') }}</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button type="submit" class="px-4 py-2 rounded-lg bg-teal-600 text-white text-xs font-semibold hover:bg-teal-500">
-                        {{ __('Analyze & score hook') }}
-                    </button>
-                </form>
-
-                @if($hookScores->isNotEmpty())
-                    <div class="pt-3 border-t border-gray-100 dark:border-gray-800 space-y-2">
-                        @foreach($hookScores->take(3) as $hs)
-                            <div class="p-3 rounded-lg bg-gray-50 dark:bg-gray-800/60 text-xs flex justify-between items-center">
-                                <span class="truncate max-w-xs">{{ $hs->original_copy }}</span>
-                                <span class="font-bold text-teal-600">{{ $hs->overall_score }}/100</span>
-                            </div>
-                        @endforeach
-                    </div>
-                @endif
-            </div>
-        </div>
-    </div>
-
-        {{-- #69 Ask the Platform (AR/EN) & #99 Weekly AI Account Review --}}
-        <div style="background:rgba(15,23,42,.04);border:1px solid rgba(148,163,184,.28);border-radius:12px;padding:16px">
-            <h3 style="margin:0 0 8px;font-size:15px;font-weight:700">{{ __("Ask the Platform & Weekly AI Review") }}</h3>
-            <form wire:submit="askPlatform" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px">
-                <input type="text" wire:model="platformQuestion" placeholder="{{ __("Ask in Arabic or English about CPA, MER, or creative fatigue...") }}"
-                       style="flex:1;min-width:220px;padding:8px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.4);background:transparent">
-                <button type="submit" style="padding:8px 14px;border-radius:8px;background:#0F766E;color:#fff;border:0;font-weight:600;cursor:pointer">
-                    {{ __("Ask AI Analyst") }}
-                </button>
-                <button type="button" wire:click="generateWeeklyReview" style="padding:8px 14px;border-radius:8px;border:1px solid #0F766E;color:#0F766E;background:transparent;font-weight:600;cursor:pointer">
-                    {{ __("Top 3 Weekly Actions") }}
-                </button>
-            </form>
-            @if ($this->platformAnswer)
-                <div data-ai-platform-answer style="padding:10px 12px;border-radius:8px;background:rgba(20,184,166,.12);margin-bottom:8px;font-size:13px">
-                    {{ $this->platformAnswer }}
+                    </select>
                 </div>
+                <button type="button" class="hub-btn" wire:click="askPlatform">{{ __('Show the summary') }}</button>
+                <button type="button" class="hub-btn" wire:click="generateWeeklyReview" style="background:transparent;color:var(--h-ac);border:1px solid var(--h-ac)">{{ __('Top 3 open alerts') }}</button>
+            </div>
+            @if ($canManageHub)
+                <div><button type="button" class="hub-btn" wire:click="computeBlendedRoas" style="background:transparent;color:var(--h-ac);border:1px solid var(--h-ac)">{{ __('Update snapshot for yesterday') }}</button></div>
+            @endif
+            @if ($this->platformAnswer)
+                <div data-ai-platform-answer class="p-3 rounded-lg bg-teal-50 text-sm">{{ $this->platformAnswer }}</div>
             @endif
             @if (! empty($this->weeklyActions))
-                <ul data-weekly-ai-actions style="margin:6px 0 0;padding-inline-start:18px;font-size:13px">
+                <ul data-weekly-ai-actions class="text-sm" style="margin:0;padding-inline-start:18px">
                     @foreach ($this->weeklyActions as $act)
                         <li style="margin-bottom:4px">{{ $act }}</li>
                     @endforeach
                 </ul>
             @endif
+        </section>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <section class="p-5 rounded-xl bg-white border space-y-4" aria-labelledby="ih-keywords">
+                <div>
+                    <h3 id="ih-keywords" class="text-base font-bold text-gray-900">{{ __('Starter keyword list') }}</h3>
+                    <p class="hub-note mt-1">{{ __('Type a service and get the usual phrase patterns grouped by intent, with a few common negatives. It is a starting template: check volumes in the ad platform before use.') }}</p>
+                </div>
+                @if ($canManageHub)
+                    <form wire:submit="generateKeywords" class="space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div class="md:col-span-2">
+                                <label for="ih-seed" class="block text-xs font-medium">{{ __('Core service or product') }}</label>
+                                <input id="ih-seed" type="text" maxlength="80" wire:model="seedKeyword" class="mt-1 w-full" placeholder="{{ __('e.g. Dental Implants') }}" />
+                                @error('seedKeyword')<p class="hub-note" style="color:#B42318">{{ $message }}</p>@enderror
+                            </div>
+                            <div>
+                                <label for="ih-locale" class="block text-xs font-medium">{{ __('Language') }}</label>
+                                <select id="ih-locale" wire:model="keywordLocale" class="mt-1 w-full">
+                                    <option value="ar">{{ __('Arabic') }}</option>
+                                    <option value="en">{{ __('English') }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit">{{ __('Build the list') }}</button>
+                    </form>
+                @endif
+                @forelse ($keywordMaps->take(3) as $km)
+                    <details class="p-3 rounded-lg bg-gray-50 text-sm">
+                        <summary style="cursor:pointer"><span class="font-semibold"><bdi>{{ $km->target_service }}</bdi></span> · <bdi>{{ $names[$km->client_id] ?? '' }}</bdi> · <span class="hub-note">{{ $km->locale === 'ar' ? __('Arabic') : __('English') }}</span></summary>
+                        @foreach ((array) $km->intent_buckets as $intent => $words)
+                            <p class="mt-2"><span class="hub-chip">{{ $intentLabel[$intent] ?? $intent }}</span> <bdi>{{ implode(' · ', (array) $words) }}</bdi></p>
+                        @endforeach
+                        <p class="mt-2"><span class="hub-chip hub-warn">{{ __('Negatives') }}</span> <bdi>{{ implode(' · ', (array) $km->negative_keywords) }}</bdi></p>
+                    </details>
+                @empty
+                    <p class="hub-note">{{ __('No keyword lists yet.') }}</p>
+                @endforelse
+            </section>
+
+            <section class="p-5 rounded-xl bg-white border space-y-4" aria-labelledby="ih-words">
+                <div>
+                    <h3 id="ih-words" class="text-base font-bold text-gray-900">{{ __('Ad text word check') }}</h3>
+                    <p class="hub-note mt-1">{{ __('Shows which word groups a headline uses: urgency, scarcity, trust and aspiration. It counts words from a fixed list. It does not predict how the ad will perform.') }}</p>
+                </div>
+                @if ($canManageHub)
+                    <form wire:submit="scoreHook" class="space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div class="md:col-span-2">
+                                <label for="ih-copy" class="block text-xs font-medium">{{ __('Ad hook or headline') }}</label>
+                                <input id="ih-copy" type="text" maxlength="300" wire:model="adCopySample" class="mt-1 w-full" />
+                                @error('adCopySample')<p class="hub-note" style="color:#B42318">{{ $message }}</p>@enderror
+                            </div>
+                            <div>
+                                <label for="ih-dialect" class="block text-xs font-medium">{{ __('Dialect') }}</label>
+                                <select id="ih-dialect" wire:model="hookDialect" class="mt-1 w-full">
+                                    <option value="gulf">{{ __('Gulf') }}</option>
+                                    <option value="egyptian">{{ __('Egyptian') }}</option>
+                                    <option value="levantine">{{ __('Levantine') }}</option>
+                                    <option value="msa">{{ __('MSA') }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit">{{ __('Check the words') }}</button>
+                    </form>
+                @endif
+                @forelse ($hookScores->take(3) as $hs)
+                    <div class="p-3 rounded-lg bg-gray-50 text-sm">
+                        <p><bdi>{{ $hs->original_copy }}</bdi></p>
+                        <p class="mt-2">
+                            @foreach ((array) $hs->trigger_scores as $group => $score)
+                                <span class="hub-chip {{ (int) $score > 0 ? 'hub-ok' : '' }}">{{ $groupLabel[$group] ?? $group }}: {{ (int) $score > 0 ? __('found') : __('not found') }}</span>
+                            @endforeach
+                        </p>
+                    </div>
+                @empty
+                    <p class="hub-note">{{ __('No word checks yet.') }}</p>
+                @endforelse
+            </section>
         </div>
+    </div>
 </x-filament-panels::page>

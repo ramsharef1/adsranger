@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Filament\Concerns\HeldBackModule;
 use App\Models\AgencyOperationalAudit;
+use App\Models\AuditLog;
 use App\Models\BudgetReallocationLog;
 use App\Models\Client;
 use App\Models\InfluencerCampaign;
@@ -181,6 +182,21 @@ class AgencyOpsHubPage extends Page
         PitchDeckBuilder::generate($agency, $this->prospectName, $this->prospectUrl, $this->prospectCurrency);
         $this->reset(['prospectName', 'prospectUrl']);
         Notification::make()->title(__('Prospect pitch deck generated.'))->success()->send();
+    }
+
+    /** Switches a shared deck link off (404 for anyone who has it). The deck stays listed as revoked. */
+    public function revokePitchDeck(int $id): void
+    {
+        $agency = Filament::getTenant();
+        if (! $agency || ! $this->canManage()) {
+            return;
+        }
+        $deck = ProspectPitchDeck::where('agency_id', $agency->id)->whereNull('revoked_at')->whereKey($id)->first();
+        if ($deck) {
+            $deck->update(['revoked_at' => now()]);
+            AuditLog::record('pitch_deck.revoked', $agency, ['deck_id' => $deck->id]);
+            Notification::make()->title(__('Link switched off'))->success()->send();
+        }
     }
 
     public function getViewData(): array

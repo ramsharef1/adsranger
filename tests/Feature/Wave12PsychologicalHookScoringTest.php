@@ -25,9 +25,14 @@ class Wave12PsychologicalHookScoringTest extends TestCase
         );
 
         $this->assertSame($agency->id, $result->agency_id);
-        $this->assertGreaterThanOrEqual(70, $result->overall_score);
-        $this->assertGreaterThanOrEqual(70, $result->trigger_scores['urgency']);
-        $this->assertGreaterThanOrEqual(70, $result->trigger_scores['fomo']);
+        // cl149: a word check, 35 points per matching word; a text with no matching word scores 0.
+        $this->assertGreaterThan(0, $result->overall_score);
+        $this->assertGreaterThanOrEqual(35, $result->trigger_scores['urgency']);
+        $this->assertGreaterThanOrEqual(35, $result->trigger_scores['fomo']);
+        foreach ($result->dialect_variants as $variant) {
+            $this->assertDoesNotMatchRegularExpression('/Guaranteed|مضمون|بضمان/u', str_replace('احصل الآن على عطر العود الحصري مع ضمان معتمد لأفضل تألق', '', $variant));
+        }
+        $this->assertSame(0, PsychologicalTriggerAnalyzer::analyzeAndScore($client, 'عطر عود', 'gulf')->overall_score);
         $this->assertArrayHasKey('gulf', $result->dialect_variants);
         $this->assertArrayHasKey('levantine', $result->dialect_variants);
         $this->assertArrayHasKey('egyptian', $result->dialect_variants);

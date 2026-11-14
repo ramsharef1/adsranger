@@ -3,11 +3,21 @@
 namespace Tests\Feature;
 
 use App\Filament\Pages\AgencyOpsHubPage;
+use App\Filament\Pages\IntelligenceHubPage;
+use App\Filament\Pages\OrganicSocialPage;
 use App\Models\Agency;
 use App\Models\AgencyOperationalAudit;
+use App\Models\Alert;
+use App\Models\BlendedRoasMetric;
 use App\Models\Client;
 use App\Models\InfluencerCampaign;
+use App\Models\IntentKeywordMap;
+use App\Models\ProspectPitchDeck;
+use App\Models\PsychologicalHookScore;
+use App\Models\SocialPost;
 use App\Models\User;
+use App\Support\AdminShell;
+use App\Support\OrganicSocialManager;
 use App\Support\Shell;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -107,5 +117,93 @@ class HubPagesDesignTest extends TestCase
         $html = $this->page($this->member('owner'), 'agency-ops');
         $this->assertStringContainsString('1,120.000 KWD', $html, 'payout shown in the client currency with 3 decimals');
         $this->assertStringContainsString('3 days left', $html);
+    }
+
+    public function test_intelligence_hub_reads_saved_numbers_only_and_checks_roles(): void
+    {
+        Filament::setCurrentPanel(Filament::getPanel('app'));
+        $this->actingAs($this->member('analyst'));
+        Filament::setTenant($this->agency);
+        Livewire::test(IntelligenceHubPage::class)->set('seedKeyword', 'dental implants')->call('generateKeywords')
+            ->set('adCopySample', 'Book now, limited offer')->call('scoreHook')->call('computeBlendedRoas');
+        $this->assertSame(0, IntentKeywordMap::count() + PsychologicalHookScore::count() + BlendedRoasMetric::count());
+
+        $this->actingAs($this->member('manager'));
+        Filament::setTenant($this->agency);
+        Livewire::test(IntelligenceHubPage::class)->set('seedKeyword', 'x')->call('generateKeywords')->assertHasErrors('seedKeyword');
+        Livewire::test(IntelligenceHubPage::class)->set('seedKeyword', 'dental implants')->set('keywordLocale', 'en')->call('generateKeywords')->assertHasNoErrors();
+        $this->assertSame('dental implants', IntentKeywordMap::sole()->target_service);
+
+        BlendedRoasMetric::create(['agency_id' => $this->agency->id, 'client_id' => $this->client->id, 'metric_date' => '2026-11-13', 'total_spend' => 100, 'total_revenue' => 450,
+            'total_conversions' => 9, 'blended_roas' => 4.5, 'marketing_efficiency_ratio' => 4.5, 'channel_breakdown' => ['meta' => ['spend' => 60, 'revenue' => 330, 'roas' => 5.5], 'google_ads' => ['spend' => 40, 'revenue' => 120, 'roas' => 3]]]);
+        Alert::create(['agency_id' => $this->agency->id, 'client_id' => $this->client->id, 'rule_key' => 'x', 'severity' => 'critical', 'title' => 'Spend is twice the plan', 'fingerprint' => 'a', 'status' => 'open']);
+        Livewire::test(IntelligenceHubPage::class)->set('clientId', $this->client->id)->call('askPlatform')
+            ->assertSee('spend 100.000 KWD')->assertSee('return 4.50')->assertSee('Highest return that day: meta.')
+            ->call('generateWeeklyReview')->assertSee('Zad Store: Spend is twice the plan');
+
+        $html = $this->page($this->member('owner'), 'intelligence-hub');
+        $this->assertStringContainsString('No AI model is used here', $html);
+        $this->assertStringContainsString('dental implants pricing', $html, 'the saved list shows its phrases');
+    }
+
+    public function test_organic_social_is_a_content_plan_with_controls(): void
+    {
+        Filament::setCurrentPanel(Filament::getPanel('app'));
+        $this->actingAs($this->member('analyst'));
+        Filament::setTenant($this->agency);
+        Livewire::test(OrganicSocialPage::class)->set('planClientId', $this->client->id)->set('planContent', 'Ramadan offer')->set('planPlatforms', ['meta'])->call('planPost');
+        $this->assertSame(0, SocialPost::count());
+
+        $this->actingAs($this->member('manager'));
+        Filament::setTenant($this->agency);
+        Livewire::test(OrganicSocialPage::class)->set('planClientId', $this->client->id)->set('planContent', 'Ramadan offer')->call('planPost')->assertHasErrors('planPlatforms');
+        Livewire::test(OrganicSocialPage::class)->set('planClientId', $this->client->id)->set('planContent', 'Ramadan offer')->set('planPlatforms', ['meta', 'tiktok'])
+            ->set('planAt', now()->addDays(3)->format('Y-m-d\TH:i'))->call('planPost')->assertHasNoErrors();
+        $post = SocialPost::sole();
+        $this->assertSame('scheduled', $post->status);
+        $this->assertNull($post->published_at, 'nothing is published by planning');
+
+        Livewire::test(OrganicSocialPage::class)->call('markPosted', $post->id);
+        $this->assertSame('published', $post->fresh()->status);
+        $second = OrganicSocialManager::schedulePost($this->client, 'Second', ['x']);
+        Livewire::test(OrganicSocialPage::class)->call('cancelPost', $second->id);
+        $this->assertSame('cancelled', $second->fresh()->status);
+        $this->assertSame(2, SocialPost::count(), 'cancelled posts are kept');
+
+        $html = $this->page($this->member('owner'), 'organic-social');
+        $this->assertStringContainsString('data-social-honesty', $html);
+        $this->assertStringContainsString('Posted (marked by hand)', $html);
+    }
+
+    public function test_a_pitch_deck_link_can_be_switched_off(): void
+    {
+        $deck = ProspectPitchDeck::create(['agency_id' => $this->agency->id, 'prospect_name' => 'Lamsa', 'prospect_url' => 'https://example.com', 'currency' => 'SAR',
+            'share_token' => str_repeat('a', 40), 'audit_snapshot' => [], 'tier_quotes' => []]);
+        Filament::setCurrentPanel(Filament::getPanel('app'));
+        $this->actingAs($this->member('analyst'));
+        Filament::setTenant($this->agency);
+        Livewire::test(AgencyOpsHubPage::class)->call('revokePitchDeck', $deck->id);
+        $this->assertNull($deck->fresh()->revoked_at);
+
+        $this->actingAs($this->member('owner'));
+        Filament::setTenant($this->agency);
+        Livewire::test(AgencyOpsHubPage::class)->call('revokePitchDeck', $deck->id);
+        $this->assertNotNull($deck->fresh()->revoked_at);
+        $this->get('/pitch/'.$deck->share_token)->assertNotFound();
+        $this->get('/pitch/'.$deck->share_token.'/pdf')->assertNotFound();
+        $this->assertStringContainsString('data-deck-revoked', $this->page($this->member('admin'), 'agency-ops'));
+    }
+
+    public function test_admin_gets_the_mission_look_and_a_person_can_leave_it(): void
+    {
+        $admin = User::factory()->create(['role' => 'super_admin']);
+        $admin->forceFill(['app_authentication_secret' => 'JBSWY3DPEHPK3PXP'])->save(); // two-step is required on /admin
+        $html = $this->withSession(['locale' => 'en'])->actingAs($admin)->get('/admin')->assertOk()->getContent();
+        $this->assertStringContainsString('data-mission-admin-tokens', $html);
+        $admin->forceFill(['ui_prefs' => ['look' => 'classic']])->save();
+        AdminShell::forget();
+        $html = $this->actingAs($admin->fresh())->get('/admin')->assertOk()->getContent();
+        $this->assertStringNotContainsString('data-mission-admin-tokens', $html);
+        $this->assertStringContainsString('data-admin-shell-tokens', $html);
     }
 }

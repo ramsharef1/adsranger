@@ -9,6 +9,8 @@ use App\Filament\Pages\Auth\RequestPasswordReset;
 use App\Filament\Pages\Auth\ResetPassword;
 use App\Http\Middleware\SetPanelLocale;
 use App\Support\AdminShell;
+use App\Support\MissionShell;
+use App\Support\Modules;
 use App\Support\PanelColors;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
@@ -51,6 +53,8 @@ class AdminPanelProvider extends PanelProvider
             ->font('IBM Plex Sans Arabic', provider: GoogleFontProvider::class)
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.head'))
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.admin-head'))
+            // Mission control look (D-314): after the admin shell's own tokens, so it wins when it is on.
+            ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.mission-admin-head'))
             // UX-5: a permanent "System admin" label on the login and in the panel.
             ->renderHook(PanelsRenderHook::SIMPLE_PAGE_START, fn () => view('panels.admin-label-auth'))
             ->renderHook(PanelsRenderHook::TOPBAR_START, fn () => view('panels.admin-label'))
@@ -77,6 +81,15 @@ class AdminPanelProvider extends PanelProvider
                         redirect(request()->header('Referer') ?: Filament::getUrl());
                     })
                     ->visible(fn (): bool => AdminShell::on()),
+                Action::make('mission-look')
+                    ->label(fn (): string => MissionShell::look() === 'mission' ? __('Classic look') : __('Mission control look'))
+                    ->icon('heroicon-o-swatch')
+                    ->action(function (): void {
+                        $u = auth()->user();
+                        $u->forceFill(['ui_prefs' => array_merge((array) $u->ui_prefs, ['look' => MissionShell::look() === 'mission' ? 'classic' : 'mission'])])->save();
+                        redirect(request()->header('Referer') ?: Filament::getUrl());
+                    })
+                    ->visible(fn (): bool => Modules::on('mission_shell')),
                 Action::make('switch-language')
                     ->label(fn (): string => __('ui.switch_to'))
                     ->icon('heroicon-o-language')

@@ -24,7 +24,9 @@ class PsychologicalTriggerAnalyzer
                     $hits++;
                 }
             }
-            return min(100, 55 + ($hits * 15));
+
+            // No matching word means 0. The old base of 55 gave every text a pass mark it had not earned.
+            return min(100, $hits * 35);
         };
 
         $triggers = [
@@ -36,11 +38,12 @@ class PsychologicalTriggerAnalyzer
 
         $overall = (int) round(array_sum($triggers) / count($triggers));
 
+        // Openers only. The earlier variants added "guaranteed" and "certified", claims the advertiser never made.
         $variants = [
-            'gulf' => "لا يطوفك العرض الحصري — {$text} (مضمون ومعتمد في الخليج)",
-            'levantine' => "ما تروّح الفرصة عليك اليوم — {$text} (بأعلى جودة وثقة)",
-            'egyptian' => "إلحق العرض الحصري دلوقتي — {$text} (بضمان كامل)",
-            'en' => "Don't miss this exclusive offer today — {$text} (100% Guaranteed)",
+            'gulf' => "لا يطوفك — {$text}",
+            'levantine' => "ما تفوّت الفرصة — {$text}",
+            'egyptian' => "ما تفوّتش الفرصة — {$text}",
+            'en' => "Don't miss it — {$text}",
         ];
 
         return PsychologicalHookScore::create([
