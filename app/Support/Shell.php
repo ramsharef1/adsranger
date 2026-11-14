@@ -62,6 +62,7 @@ class Shell
 
         Pages\SeoAuditPage::class => 'seo',
         Pages\SeoTelemetryPage::class => 'seo',
+        Pages\SeoAuthorityLocalPage::class => 'seo',
         Pages\ArabicSeoPage::class => 'seo',
         Pages\AeoGeoHubPage::class => 'seo',
 
