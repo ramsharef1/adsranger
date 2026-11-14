@@ -12,6 +12,7 @@ use App\Support\AgencyOperationsHub;
 use App\Support\AgencyOps\PitchDeckBuilder;
 use App\Support\CurrentClient;
 use App\Support\InfluencerCampaignTracker;
+use App\Support\Modules;
 use App\Support\TeamRoles;
 use BackedEnum;
 use Filament\Facades\Filament;
@@ -34,9 +35,10 @@ class AgencyOpsHubPage extends Page
 
     public ?int $clientId = null;
 
-    public float $remainingBalance = 1500.0;
+    /** Typed by the person; no sample numbers are pre-filled. */
+    public $remainingBalance = null;
 
-    public float $dailyBurnRate = 250.0;
+    public $dailyBurnRate = null;
 
     public string $influencerName = '';
 
@@ -44,13 +46,13 @@ class AgencyOpsHubPage extends Page
 
     public string $promoCode = '';
 
-    public float $fixedFee = 1000.0;
+    public $fixedFee = null;
 
-    public float $commissionPercent = 10.0;
+    public $commissionPercent = null;
 
-    public int $ordersCount = 25;
+    public $ordersCount = null;
 
-    public float $attributedRevenue = 8500.0;
+    public $attributedRevenue = null;
 
     public string $prospectName = '';
 
@@ -92,34 +94,82 @@ class AgencyOpsHubPage extends Page
         return $this->clientId ? $q->whereKey($this->clientId)->first() : $q->orderBy('name')->first();
     }
 
+    protected function canManage(): bool
+    {
+        $agency = Filament::getTenant();
+
+        return $agency !== null && TeamRoles::canManageData(auth()->user(), $agency);
+    }
+
     public function runRunwayAudit(): void
     {
         $client = $this->resolveSelectedClient();
-        if (! $client) {
+        if (! $client || ! $this->canManage()) {
             return;
         }
-        AgencyOperationsHub::calculateBudgetRunway($client, (float) $this->remainingBalance, (float) $this->dailyBurnRate);
+        $data = $this->validate([
+            'remainingBalance' => ['required', 'numeric', 'min:0', 'max:999999999'],
+            'dailyBurnRate' => ['required', 'numeric', 'gt:0', 'max:999999999'],
+        ], [], ['remainingBalance' => __('Remaining balance'), 'dailyBurnRate' => __('Daily burn rate')]);
+        AgencyOperationsHub::calculateBudgetRunway($client, (float) $data['remainingBalance'], (float) $data['dailyBurnRate']);
+        $this->reset(['remainingBalance', 'dailyBurnRate']);
         Notification::make()->title(__('Budget runway audit recorded'))->success()->send();
     }
 
     public function recordInfluencer(): void
     {
         $client = $this->resolveSelectedClient();
-        if (! $client || trim($this->influencerName) === '' || trim($this->promoCode) === '') {
+        if (! $client || ! $this->canManage()) {
             return;
         }
+        $data = $this->validate([
+            'influencerName' => ['required', 'string', 'max:120'],
+            'influencerPlatform' => ['required', 'in:'.implode(',', array_keys(self::platforms()))],
+            'promoCode' => ['required', 'string', 'max:48', 'regex:/^[A-Za-z0-9_\-]+$/'],
+            'fixedFee' => ['required', 'numeric', 'min:0', 'max:999999999'],
+            'commissionPercent' => ['required', 'numeric', 'min:0', 'max:100'],
+            'ordersCount' => ['required', 'integer', 'min:0', 'max:9999999'],
+            'attributedRevenue' => ['required', 'numeric', 'min:0', 'max:999999999'],
+        ], [], [
+            'influencerName' => __('Creator name'), 'influencerPlatform' => __('Platform'), 'promoCode' => __('Promo code'), 'fixedFee' => __('Fixed fee'),
+            'commissionPercent' => __('Commission %'), 'ordersCount' => __('Orders'), 'attributedRevenue' => __('Revenue'),
+        ]);
         InfluencerCampaignTracker::recordAndAttribute(
             $client,
-            trim($this->influencerName), $this->influencerPlatform,
-            strtoupper(trim($this->promoCode)),
-            (float) $this->fixedFee,
-            (float) $this->commissionPercent,
-            (int) $this->ordersCount,
-            (float) $this->attributedRevenue
+            trim($data['influencerName']), $data['influencerPlatform'],
+            strtoupper(trim($data['promoCode'])),
+            (float) $data['fixedFee'],
+            (float) $data['commissionPercent'],
+            (int) $data['ordersCount'],
+            (float) $data['attributedRevenue']
         );
-        $this->influencerName = '';
-        $this->promoCode = '';
+        $this->reset(['influencerName', 'promoCode', 'fixedFee', 'commissionPercent', 'ordersCount', 'attributedRevenue']);
         Notification::make()->title(__('Influencer campaign attributed'))->success()->send();
+    }
+
+    /** @return array<string, string> */
+    public static function platforms(): array
+    {
+        return ['snapchat' => 'Snapchat', 'tiktok' => 'TikTok', 'instagram' => 'Instagram', 'youtube' => 'YouTube', 'x' => 'X', 'other' => __('Other')];
+    }
+
+    /** @return array{0: string, 1: string} label and tone (ok · warn · bad) for a stored audit status */
+    public static function statusLabel(string $status): array
+    {
+        return [
+            'healthy' => [__('Enough budget'), 'ok'], 'warning_low' => [__('Runs out within a week'), 'warn'], 'critical_depletion' => [__('Runs out within 3 days'), 'bad'],
+            'profitable' => [__('Profitable'), 'ok'], 'margin_squeeze' => [__('Low margin'), 'warn'],
+            'stable_peg' => [__('Stable'), 'ok'], 'fx_hedge_alert' => [__('Exchange rate moved'), 'warn'],
+            'balanced' => [__('Balanced'), 'ok'], 'overloaded' => [__('Overloaded'), 'bad'],
+        ][$status] ?? [$status, 'warn'];
+    }
+
+    public static function auditLabel(string $type): string
+    {
+        return [
+            'budget_runway' => __('Budget runway'), 'retainer_margin' => __('Retainer margin'),
+            'mena_fx_volatility' => __('Exchange rate check'), 'media_buyer_workload' => __('Team workload'),
+        ][$type] ?? $type;
     }
 
     public function createPitchDeck(): void
@@ -167,6 +217,8 @@ class AgencyOpsHubPage extends Page
             'influencerCampaigns' => $scope(InfluencerCampaign::query())->latest()->limit(10)->get(),
             'pitchDecks' => ProspectPitchDeck::where('agency_id', $agencyId)->latest('id')->limit(10)->get(),
             'canManageOps' => $agency ? TeamRoles::canManageData($user, $agency) : false,
+            'showDomain' => Modules::on('custom_domains', null, $agency),
+            'platforms' => self::platforms(),
         ];
     }
 }

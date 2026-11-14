@@ -102,6 +102,11 @@ class MissionShell
             ];
         }
 
+        // An add-on's own page counts as the add-on, not as the area its page is filed under.
+        if (collect($out)->contains(fn (array $i) => $i['current'] && isset(static::addOns()[$i['key']]))) {
+            $out = array_map(fn (array $i) => isset(static::addOns()[$i['key']]) ? $i : [...$i, 'current' => false], $out);
+        }
+
         return $out;
     }
 

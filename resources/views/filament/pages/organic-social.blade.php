@@ -1,5 +1,6 @@
 <x-filament-panels::page>
-    <div class="space-y-6">
+    @include('filament.pages.partials.hub-styles')
+    <div class="hub space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div class="p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
                 <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('Scheduled & published posts') }}</div>
@@ -10,8 +11,14 @@
                 <div class="text-2xl font-bold text-teal-600 dark:text-teal-400 mt-1">{{ $inbox->where('status', 'open')->count() }} {{ __('open') }}</div>
             </div>
             <div class="p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
-                <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('Best time to post') }}</div>
-                <div class="text-lg font-bold text-teal-600 dark:text-teal-400 mt-1">{{ __($bestTime['best_day']) }} · {{ $bestTime['recommended_hour'] }}</div>
+                {{-- Shown only when it comes from this client's own posts; the hour is not measured, so it is not shown. --}}
+                <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('Best day to post') }}</div>
+                @if (($bestTime['avg_engagements'] ?? 0) > 0)
+                    <div class="text-lg font-bold text-teal-600 dark:text-teal-400 mt-1">{{ __($bestTime['best_day']) }}</div>
+                    <div class="hub-note">{{ __('From this client\'s past posts') }}</div>
+                @else
+                    <div class="text-sm mt-1" data-no-best-day>{{ __('Not enough posts yet to say') }}</div>
+                @endif
             </div>
             <div class="p-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
                 <div class="text-sm text-gray-500 dark:text-gray-400">{{ __('Auto-moderation rules') }}</div>
