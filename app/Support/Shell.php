@@ -144,6 +144,7 @@ class Shell
     public static function forget(): void
     {
         static::$urls = null;
+        app()->forgetInstance(NavigationManager::class);
     }
 
     protected static function path(?string $url): string
@@ -177,7 +178,7 @@ class Shell
     public static function areaLinks(): array
     {
         $links = [];
-        foreach ((new NavigationManager)->get() as $group) {
+        foreach (ShellNavigationManager::allGroups() as $group) {
             foreach ($group->getItems() as $item) {
                 $a = static::itemArea($item);
                 if ($a !== null && ! isset($links[$a])) {
