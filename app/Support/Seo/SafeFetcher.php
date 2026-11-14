@@ -84,7 +84,7 @@ class SafeFetcher
      * for plain-text / XML resources such as /robots.txt, /llms.txt, and XML sitemaps (#293, #300).
      *
      * @param  list<string>  $allowedTypes
-     * @return array{ok: bool, status: ?int, url: string, body: string, content_type: string, x_robots_tag?: string, error: ?string}
+     * @return array{ok: bool, status: ?int, url: string, body: string, content_type: string, x_robots_tag?: string, redirects?: int, error: ?string}
      */
     public static function fetchResource(string $url, array $allowedTypes = ['html', 'plain', 'xml', 'text']): array
     {
@@ -95,11 +95,11 @@ class SafeFetcher
             $host = strtolower($p['host'] ?? '');
             $port = $p['port'] ?? ($scheme === 'https' ? 443 : 80);
             if (! in_array($scheme, ['http', 'https'], true) || $host === '' || ! in_array($port, [80, 443], true) || isset($p['user']) || isset($p['pass'])) {
-                return ['ok' => false, 'status' => null, 'url' => $url, 'body' => '', 'content_type' => '', 'error' => 'blocked'];
+                return ['ok' => false, 'status' => null, 'url' => $url, 'body' => '', 'content_type' => '', 'redirects' => $hop, 'error' => 'blocked'];
             }
             $ip = $resolve($host);
             if (! $ip) {
-                return ['ok' => false, 'status' => null, 'url' => $url, 'body' => '', 'content_type' => '', 'error' => 'blocked'];
+                return ['ok' => false, 'status' => null, 'url' => $url, 'body' => '', 'content_type' => '', 'redirects' => $hop, 'error' => 'blocked'];
             }
             try {
                 $res = Http::withOptions([
@@ -118,7 +118,7 @@ class SafeFetcher
                     'Accept-Language' => 'ar,en;q=0.8',
                 ])->timeout(self::TIMEOUT)->connectTimeout(self::TIMEOUT)->get($url);
             } catch (Throwable) {
-                return ['ok' => false, 'status' => null, 'url' => $url, 'body' => '', 'content_type' => '', 'error' => 'unreachable'];
+                return ['ok' => false, 'status' => null, 'url' => $url, 'body' => '', 'content_type' => '', 'redirects' => $hop, 'error' => 'unreachable'];
             }
             if (in_array($res->status(), [301, 302, 303, 307, 308], true) && ($loc = $res->header('Location'))) {
                 $url = self::absolute($url, $loc);
@@ -136,11 +136,11 @@ class SafeFetcher
                     }
                 }
                 if (! $matched) {
-                    return ['ok' => false, 'status' => $res->status(), 'url' => $url, 'body' => '', 'content_type' => $type, 'error' => 'unsupported_type'];
+                    return ['ok' => false, 'status' => $res->status(), 'url' => $url, 'body' => '', 'content_type' => $type, 'redirects' => $hop, 'error' => 'unsupported_type'];
                 }
             }
             if (strlen($body) > self::MAX_BYTES) {
-                return ['ok' => false, 'status' => $res->status(), 'url' => $url, 'body' => '', 'content_type' => $type, 'error' => 'too_large'];
+                return ['ok' => false, 'status' => $res->status(), 'url' => $url, 'body' => '', 'content_type' => $type, 'redirects' => $hop, 'error' => 'too_large'];
             }
 
             return [
@@ -150,11 +150,12 @@ class SafeFetcher
                 'body' => self::toUtf8($body, $type),
                 'content_type' => $type,
                 'x_robots_tag' => trim((string) $res->header('X-Robots-Tag')), // AEO crawler check (#305)
+                'redirects' => $hop,
                 'error' => $res->status() === 200 ? null : 'status',
             ];
         }
 
-        return ['ok' => false, 'status' => null, 'url' => $url, 'body' => '', 'content_type' => '', 'error' => 'redirects'];
+        return ['ok' => false, 'status' => null, 'url' => $url, 'body' => '', 'content_type' => '', 'redirects' => self::MAX_REDIRECTS + 1, 'error' => 'redirects'];
     }
 
     /** Our own hosts (config seo_tools.own_hosts) map to a fixed IP, used only if that IP is itself public. */
