@@ -3208,5 +3208,22 @@
     "Order value": "قيمة الطلبات",
     "Cost per delivery order": "تكلفة طلب التوصيل",
     "Key season": "موسم رئيس",
-    "Permit / licence reminder": "تذكير بالتصريح أو الترخيص"
+    "Permit / licence reminder": "تذكير بالتصريح أو الترخيص",
+    "Ramadan phase board": "لوحة مراحل رمضان",
+    "14 days before Ramadan": "14 يومًا قبل رمضان",
+    "Days 1–10": "الأيام 1–10",
+    "Days 11–20": "الأيام 11–20",
+    "Last ten nights": "العشر الأواخر",
+    "Eid al-Fitr": "عيد الفطر",
+    "14 days after Eid": "14 يومًا بعد العيد",
+    "Ramadan season": "موسم رمضان",
+    "Active now": "مفعّل الآن",
+    "Switches on in Ramadan": "يُفعّل تلقائيًا في رمضان",
+    "Switched off": "مُوقف",
+    "Daily summary after iftar: :time · Quiet hours: :quiet": "الملخص اليومي بعد الإفطار: :time · ساعات الهدوء: :quiet",
+    "Spend hidden": "الإنفاق مخفي",
+    "Completed": "مكتملة",
+    "Upcoming": "قادمة",
+    "Planned budget": "الميزانية المخططة",
+    "Change percentages compare the daily average of each phase with the previous phase. Planned budgets prorate by day from the monthly budget plan (or the client's monthly budget). Phases without synced or imported data show —.": "تقارن نسب التغير المتوسط اليومي لكل مرحلة بالمرحلة السابقة. تُحتسب الميزانية المخططة بالتناسب اليومي من خطة الميزانية الشهرية (أو الميزانية الشهرية للعميل). المراحل التي لا توجد فيها بيانات مزامَنة أو مستوردة يظهر فيها —."
 }
