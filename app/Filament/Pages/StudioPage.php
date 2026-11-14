@@ -11,6 +11,7 @@ use App\Models\CreativeAsset;
 use App\Models\CreativeBrief;
 use App\Models\CreativeFatigueAlert;
 use App\Support\Arabic\Phrases;
+use App\Support\SectorPacks;
 use App\Support\StudioCopyGenerator;
 use App\Support\TeamRoles;
 use App\Support\Trial;
@@ -246,6 +247,7 @@ class StudioPage extends Page
             'violations' => $violations,
             'dialects' => StudioCopyGenerator::DIALECTS,
             'placements' => StudioCopyGenerator::PLACEMENTS,
+            'matchedLicences' => $client ? SectorPacks::matchingLicences($client, [$this->briefTitle, $this->headline, $this->hook, $this->primaryText, $this->offer], true) : collect(),
             'briefs' => $client ? CreativeBrief::where('client_id', $client->id)->latest('id')->limit(15)->get() : collect(),
             'assets' => $client ? CreativeAsset::where('client_id', $client->id)->latest('id')->limit(15)->get() : collect(),
         ];

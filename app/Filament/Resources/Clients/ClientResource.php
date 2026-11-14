@@ -17,10 +17,12 @@ use App\Support\ClientSetupScore;
 use App\Support\HealthScore;
 use App\Support\PanelSearch;
 use App\Support\TeamRoles;
+use App\Support\TextClean;
 use BackedEnum;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -28,6 +30,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\GlobalSearch\GlobalSearchResult;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -109,8 +112,14 @@ class ClientResource extends Resource
             Section::make(__('Client'))->columns(2)->schema([
                 TextInput::make('name')->label(__('Name'))->required()->maxLength(120),
                 Select::make('status')->label(__('Status'))->options(['active' => __('Active'), 'paused' => __('Paused'), 'archived' => __('Archived')])->default('active')->required(),
-                Select::make('vertical')->options(config('adsranger.verticals'))->searchable(),
+                Select::make('vertical')->options(config('adsranger.verticals'))->searchable()->live(),
                 Select::make('market')->label(__('Main market'))->options(config('adsranger.countries'))->searchable()->default($agency?->country),
+                TextInput::make('launch_project_name')->label(__('Off-plan project name (optional)'))->maxLength(160)
+                    ->visible(fn (Get $get): bool => $get('vertical') === 'real_estate' || filled($get('launch_project_name')) || filled($get('launch_date')))
+                    ->dehydrateStateUsing(fn ($state) => filled($state) ? TextClean::invisible((string) $state) : null),
+                DatePicker::make('launch_date')->label(__('Project launch date (optional)'))->native(false)
+                    ->visible(fn (Get $get): bool => $get('vertical') === 'real_estate' || filled($get('launch_project_name')) || filled($get('launch_date')))
+                    ->dehydrateStateUsing(fn ($state) => filled($state) ? TextClean::western((string) $state) : null),
                 // XS-16 (R5): one dialect per client; empty = from the market.
                 Select::make('dialect')->label(__('Dialect'))->options(Phrases::dialectLabels())->placeholder(__('From the main market'))
                     ->helperText(__('Used for phrases, ad line variants and AI drafts for this client.')),

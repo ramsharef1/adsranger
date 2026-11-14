@@ -1,0 +1,11 @@
+{
+    "key": "media",
+    "kind": "sector_packs",
+    "labels": {},
+    "extra_metrics": [],
+    "seasons": [
+        "ramadan",
+        "eid_fitr"
+    ],
+    "features": []
+}

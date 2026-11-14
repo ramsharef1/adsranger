@@ -48,7 +48,7 @@ class ClientCalendarPage extends Page
     {
         $a = Filament::getTenant();
         $today = CarbonImmutable::now($a->timezone ?: 'UTC');
-        $days = in_array($this->days, [14, 30, 60, 90], true) ? $this->days : 30;
+        $days = in_array($this->days, [14, 30, 60, 90, 365], true) ? $this->days : 30;
         $events = collect(ClientCalendar::events($a, auth()->user(), $today->toDateString(), $today->addDays($days)->toDateString(), $this->clientId ?: null))
             ->whereIn('kind', $this->kinds)->groupBy('date');
 

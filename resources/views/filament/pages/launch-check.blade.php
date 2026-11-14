@@ -12,6 +12,8 @@
             <div><label for="lc-url" style="display:block;font-size:13px;font-weight:600;margin-bottom:4px">{{ __('Landing page link') }}</label>
                 <input id="lc-url" type="url" wire:model="url" style="{{ $field }}" dir="ltr" placeholder="https://example.com/offer?utm_source=meta&utm_medium=paid&utm_campaign=…">
                 @error('url')<div style="color:#B42318;font-size:13px">{{ $message }}</div>@enderror</div>
+            <div><label for="lc-ad-name" style="display:block;font-size:13px;font-weight:600;margin-bottom:4px">{{ __('Ad or listing name (optional)') }}</label>
+                <input id="lc-ad-name" type="text" wire:model="adName" maxlength="160" style="{{ $field }}" dir="auto" placeholder="{{ __('Matches any saved ad permit name') }}"></div>
             <div><label for="lc-ad" style="display:block;font-size:13px;font-weight:600;margin-bottom:4px">{{ __('Ad text') }}</label>
                 <textarea id="lc-ad" wire:model="adText" rows="4" style="{{ $field }};min-height:100px" dir="auto"></textarea>
                 @error('adText')<div style="color:#B42318;font-size:13px">{{ $message }}</div>@enderror</div>

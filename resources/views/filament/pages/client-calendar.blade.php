@@ -1,13 +1,13 @@
 @php
     $field = 'min-height:44px;padding:6px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.35);background:transparent;font-size:13px';
-    $dot = ['season' => '#0F766E', 'payday' => '#047857', 'school' => '#7A5AF8', 'campaign_end' => '#B54708', 'report' => '#1849A9', 'follow_up' => '#53389E', 'licence' => '#B42318', 'resume' => '#067647'];
+    $dot = ['season' => '#0F766E', 'payday' => '#047857', 'school' => '#7A5AF8', 'campaign_end' => '#B54708', 'report' => '#1849A9', 'follow_up' => '#53389E', 'licence' => '#B42318', 'resume' => '#067647', 'launch' => '#0D9488'];
 @endphp
 <x-filament-panels::page>
     <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:end">
         <div><label for="cc-client" style="display:block;font-size:12px;font-weight:600;margin-bottom:4px">{{ __('Client') }}</label>
             <select id="cc-client" wire:model.live="clientId" style="{{ $field }}"><option value="">{{ __('All clients') }}</option>@foreach ($clients as $id => $n)<option value="{{ $id }}">{{ $n }}</option>@endforeach</select></div>
         <div><label for="cc-days" style="display:block;font-size:12px;font-weight:600;margin-bottom:4px">{{ __('Period') }}</label>
-            <select id="cc-days" wire:model.live="days" style="{{ $field }}">@foreach ([14, 30, 60, 90] as $d)<option value="{{ $d }}">{{ trans_choice('Next :n day|Next :n days', $d, ['n' => $d]) }}</option>@endforeach</select></div>
+            <select id="cc-days" wire:model.live="days" style="{{ $field }}">@foreach ([14, 30, 60, 90, 365] as $d)<option value="{{ $d }}">{{ trans_choice('Next :n day|Next :n days', $d, ['n' => $d]) }}</option>@endforeach</select></div>
         <fieldset style="display:flex;flex-wrap:wrap;gap:6px 12px;border:0;padding:0;margin:0"><legend style="font-size:12px;font-weight:600;margin-bottom:4px">{{ __('Show') }}</legend>
             @foreach ($labels as $k => $l)<label style="display:flex;gap:6px;align-items:center;min-height:44px;font-size:13px"><input type="checkbox" wire:model.live="kinds" value="{{ $k }}"><span style="width:8px;height:8px;border-radius:999px;background:{{ $dot[$k] }}" aria-hidden="true"></span>{{ $l }}</label>@endforeach
         </fieldset>
@@ -25,7 +25,8 @@
                             <li style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span style="width:8px;height:8px;border-radius:999px;background:{{ $dot[$e['kind']] }};flex:none" aria-hidden="true"></span>
                                 <strong>{{ $labels[$e['kind']] }}</strong>
                                 @if ($e['client'])<a href="{{ \App\Filament\Resources\Clients\ClientResource::getUrl('view', ['record' => $e['client_id']]) }}" style="color:#0F766E;text-decoration:underline"><bdi>{{ $e['client'] }}</bdi></a>@endif
-                                <span dir="auto">{{ $e['title'] }}</span></li>
+                                <span dir="auto">{{ $e['title'] }}</span>
+                                @if (! empty($e['highlighted']))<span data-highlighted-season="1" style="padding:2px 8px;border-radius:999px;border:1px solid rgba(13,148,136,.45);background:rgba(20,184,166,.12);color:#0F766E;font-size:12px;font-weight:600">{{ __('Key season') }}</span>@endif</li>
                         @endforeach
                     </ul>
                 </x-filament::section>

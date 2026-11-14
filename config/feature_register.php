@@ -59,6 +59,7 @@ use App\Support\Attribution\SearchTermNgramMiner;
 use App\Support\Attribution\ShoppingFeedBuilder;
 use App\Support\Attribution\StoreWebhooks;
 use App\Support\CriticalPush;
+use App\Support\DeliveryOutcomes;
 use App\Support\Devices;
 use App\Support\LiveVerification;
 use App\Support\MissionShell;
@@ -81,6 +82,7 @@ use App\Support\Reach\Serve;
  */
 use App\Support\Reach\Wallet;
 use App\Support\RestoreTest;
+use App\Support\SectorPacks;
 use App\Support\Seo\AeoCitationRadar;
 use App\Support\Seo\AiCrawlerChecker;
 use App\Support\Seo\Audit\PageSpeed;
@@ -149,4 +151,5 @@ return [
     'FR-MENA-GROWTH-AND-AIW-M2' => ['title' => 'Creator & influencer Net POAS tracker (intelligence_hub), 60-second agency-branded prospect audit & 3-tier pitch deck (/pitch/{token} + bilingual mPDF under agency_ops_hub, noindex), SHA-256 WhatsApp/CRM offline CAPI & Google GCLID loop (lead_desk, queued_until_credentials honesty gate), and supervised Night Shift v1 action queue with undo under ai_workspace (E2-073)', 'code' => [CreatorPoasTracker::class, PitchDeckBuilder::class, ProspectPitchDeckController::class, OfflineConversionDispatcher::class, OfflineConversionsPage::class, NightShiftActionQueue::class, 'route:pitch/{token}', 'route:pitch/{token}/pdf', 'view:public.pitch-deck', 'view:reports.pitch-deck-pdf', 'view:filament.pages.offline-conversions'], 'tests' => ['Feature/MenaGrowthAndNightShiftM2Test.php']],
     'FR-UNIFIED-PLAN-MATRIX' => ['title' => 'Unified plan tier feature & quota matrix across Free, Starter, Pro, and Agency for SEO, SEM, MENA growth, and AI Workspace Night Shift v1 capabilities (E2-074)', 'code' => [PlanGate::class, 'config:plan_features'], 'tests' => ['Feature/UnifiedPlanMatrixTest.php']],
     'FR-MISSION-SHELL' => ['title' => 'Mission control shell (D-312): dark look on top of the panel shell, icon rail for areas and add-ons (locked while the add-on is off), next-step panel from the most severe open alert, desktop client dock, simple / expert mode with first steps, classic-look opt-out per person; behind mission_shell', 'code' => [MissionShell::class, UiPrefsController::class, 'view:panels.mission-head', 'view:panels.mission-docks', 'view:panels.mission-mode'], 'tests' => ['Feature/MissionShellTest.php']],
+    'FR-SECTOR-PACKS' => ['title' => 'Sector packs Step 1a (E2-077, D-308 / DS-20..23): light JSON sector-pack presets under resources/templates/sector_packs/*.json, Charity donation labels & safe donation-per-1,000-impressions + Ramadan / Last Ten Nights / Dhul Hijjah highlights, client_licences.ad_name neutral permit reminders on briefs & LaunchPreflight, Real Estate off-plan 5-form Arabic countdown & ClientCalendar launch entry, and DeliveryWeek manual + AR/EN CSV import with hide_spend & tenant isolation', 'code' => [SectorPacks::class, DeliveryOutcomes::class], 'tests' => ['Feature/SectorPacksTest.php']],
 ];

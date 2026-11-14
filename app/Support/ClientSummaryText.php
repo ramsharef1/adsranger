@@ -29,7 +29,7 @@ class ClientSummaryText
 
             return ' ('.($pct > 0 ? '+' : '').$pct.'% '.($ar ? 'عن الفترة السابقة' : 'vs the period before').')';
         };
-        $result = ResultResolver::label($t['main_type'], $ar ? 'ar' : 'en') ?: ($ar ? 'النتائج' : 'Results');
+        $result = SectorPacks::resultLabel($c, $t['main_type'], $ar ? 'ar' : 'en') ?: ($ar ? 'النتائج' : 'Results');
 
         $lines = DemoData::isSample($c) ? [$ar ? '⚠️ بيانات تجريبية: الأرقام ليست حقيقية' : '⚠️ Sample data: these numbers are not real'] : [];
         $lines[] = '*'.$c->name.'* · '.$from.' → '.$to;

@@ -1,0 +1,12 @@
+{
+    "key": "travel",
+    "kind": "sector_packs",
+    "labels": {},
+    "extra_metrics": [],
+    "seasons": [
+        "eid_fitr",
+        "eid_adha",
+        "new_year"
+    ],
+    "features": []
+}

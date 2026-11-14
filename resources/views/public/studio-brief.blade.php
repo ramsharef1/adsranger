@@ -7,7 +7,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
-<title>{{ $brief->title }} · {{ $brief->client?->name }} · AdsRanger Studio</title>
+<title>{{ $brief->title }} · {{ $brief->client?->name }}{{ $brief->agency?->name ? ' · '.$brief->agency->name : '' }}</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0b1020;--card:#121933;--ink:#eef1fb;--muted:#9aa3c0;--acc:{{ $accent }};--line:#232c4d}
@@ -15,7 +15,7 @@
 .w{max-width:780px;margin:0 auto;padding:28px 20px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:20px}
 .badge{display:inline-block;padding:4px 10px;border-radius:99px;font-size:12px;border:1px solid var(--line);color:var(--acc)}
-.btn{padding:10px 18px;border-radius:10px;border:0;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px}
+.btn{min-height:44px;padding:10px 18px;border-radius:10px;border:0;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px}
 .btn-ok{background:#2DD4BF;color:#0b1020}
 .btn-chg{background:transparent;border:1px solid #f59e0b;color:#fbbf24}
 textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#0b1020;color:var(--ink);font-family:inherit;margin:10px 0}
@@ -49,13 +49,13 @@ textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--
             <strong>{{ $brief->headline }}</strong>
             <span style="background:var(--acc);color:#0b1020;padding:6px 14px;border-radius:8px;font-weight:600;font-size:13px">{{ $brief->cta }}</span>
         </div>
-        {{-- XS-24 / NB-36 (D-305): licence lines the ad must carry. --}}
+        {{-- XS-24 / NB-36 (D-305) + Step 1a per-ad neutral permit reminder. --}}
         @php
-            $lics = $brief->client ? \App\Models\ClientLicence::where('client_id', $brief->client_id)->get() : collect();
+            $lics = \App\Support\SectorPacks::licencesForBrief($brief);
         @endphp
         @if ($lics->isNotEmpty())
             <div style="margin-top:12px;font-size:13px;color:var(--muted)" data-brief-licences>
-                @foreach ($lics as $l)<div>{{ $ar ? 'رقم الترخيص' : 'Licence no.' }}: <bdi dir="ltr">{{ $l->number }}</bdi></div>@endforeach
+                @foreach ($lics as $l)<div>{{ $ar ? 'رقم الترخيص' : 'Licence no.' }}: <bdi dir="ltr">{{ $l->number }}</bdi>@if ($l->ad_name) · <bdi>{{ $l->ad_name }}</bdi>@endif</div>@endforeach
             </div>
         @endif
     </div>

@@ -118,7 +118,7 @@
                     </div>
                     <div>
                         <label style="display:block;font-size:12px;opacity:.75">{{ __('Brief title') }}</label>
-                        <input type="text" wire:model="briefTitle" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.3);background:transparent;color:inherit">
+                        <input type="text" wire:model.live="briefTitle" style="width:100%;padding:7px 10px;border-radius:8px;border:1px solid rgba(148,163,184,.3);background:transparent;color:inherit">
                     </div>
                     <div>
                         <label style="display:block;font-size:12px;opacity:.75">{{ __('Hook (first line)') }}</label>
@@ -162,6 +162,13 @@
                         <strong style="font-size:14px">{{ $headline }}</strong>
                         <span style="padding:6px 12px;border-radius:8px;background:{{ $primaryColor }};color:#0b1020;font-weight:600;font-size:12px">{{ $cta }}</span>
                     </div>
+                    @if (($matchedLicences ?? collect())->isNotEmpty())
+                        <div data-studio-licences style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(148,163,184,.2);font-size:12.5px;opacity:.85">
+                            @foreach ($matchedLicences as $ml)
+                                <div>{{ __('Permit / licence reminder') }}: <bdi dir="ltr">{{ $ml->number }}</bdi>@if ($ml->ad_name) · <bdi>{{ $ml->ad_name }}</bdi>@endif</div>
+                            @endforeach
+                        </div>
+                    @endif
                 </div>
             </div>
         </x-filament::section>
@@ -185,8 +192,13 @@
                     </thead>
                     <tbody>
                         @foreach ($briefs as $b)
+                            @php $bLicences = \App\Support\SectorPacks::licencesForBrief($b); @endphp
                             <tr style="border-top:1px solid rgba(148,163,184,.18)">
-                                <td style="padding:8px;font-weight:600">{{ $b->title }} (v{{ $b->version }})</td>
+                                <td style="padding:8px;font-weight:600">{{ $b->title }} (v{{ $b->version }})
+                                    @if ($bLicences->isNotEmpty())
+                                        <div style="font-size:12px;font-weight:400;opacity:.75">@foreach ($bLicences as $bl)<bdi dir="ltr">{{ $bl->number }}</bdi>@if ($bl->ad_name) (<bdi>{{ $bl->ad_name }}</bdi>)@endif @if (! $loop->last) · @endif @endforeach</div>
+                                    @endif
+                                </td>
                                 <td style="padding:8px">{{ strtoupper($b->dialect) }}</td>
                                 <td style="padding:8px">{{ $b->placement }}</td>
                                 <td style="padding:8px"><x-filament::badge :color="$b->status === 'approved' ? 'success' : ($b->status === 'changes_requested' ? 'warning' : 'info')">{{ $b->status }}</x-filament::badge></td>

@@ -14,7 +14,7 @@
         }
         return new \Illuminate\Support\HtmlString(e(__($key, $pick('ar'), 'ar')).'<br><span class="en">'.e(__($key, $pick('en'), 'en')).'</span>');
     };
-    $rl = fn ($type) => $both ? trim((R::label($type, 'ar') ?: __('report.results', [], 'ar')).' / '.(R::label($type, 'en') ?: __('report.results', [], 'en'))) : R::label($type, $lang);
+    $rl = fn ($type) => $both ? trim((\App\Support\SectorPacks::resultLabel($client, $type, 'ar') ?: __('report.results', [], 'ar')).' / '.(\App\Support\SectorPacks::resultLabel($client, $type, 'en') ?: __('report.results', [], 'en'))) : \App\Support\SectorPacks::resultLabel($client, $type, $lang);
     $pct = function ($now, $before) {
         if (! $before || $now === null) { return null; }
         return round(($now - $before) / $before * 100);

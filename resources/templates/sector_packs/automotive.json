@@ -1,0 +1,12 @@
+{
+    "key": "automotive",
+    "kind": "sector_packs",
+    "labels": {},
+    "extra_metrics": [],
+    "seasons": [
+        "ramadan",
+        "saudi_national",
+        "new_year"
+    ],
+    "features": []
+}

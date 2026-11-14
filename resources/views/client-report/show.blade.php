@@ -1,12 +1,13 @@
 @php
     use App\Support\ResultResolver as R;
+    use App\Support\SectorPacks;
     $dir = $lang === 'ar' ? 'rtl' : 'ltr';
     $cur = $client->currency;
     $delta = function ($now, $before) {
         if (! $before || $now === null) { return null; }
         return round(($now - $before) / $before * 100);
     };
-    $typeLabel = R::label($t['main_type'], $lang);
+    $typeLabel = SectorPacks::resultLabel($client, $t['main_type'], $lang);
     $q = fn (array $over) => url()->current().'?'.http_build_query(array_merge(['p' => $period, 'lang' => $lang], $over));
     $num = fn ($v) => number_format((float) $v);
 @endphp
@@ -127,7 +128,7 @@
                 @foreach ($campaigns as $c)
                     <tr>
                         <td><bdi>{{ $c['name'] }}</bdi></td>
-                        <td class="n">{{ $num($c['main_results']) }} <span class="muted">{{ R::label($c['main_type'], $lang) }}</span></td>
+                        <td class="n">{{ $num($c['main_results']) }} <span class="muted">{{ SectorPacks::resultLabel($client, $c['main_type'], $lang) }}</span></td>
                         @if (! $hideSpend)
                             <td class="n"><bdi dir="ltr">{{ R::money($c['spend'], $cur) }}</bdi></td><td class="n"><bdi dir="ltr">{{ R::money($c['cpr'], $cur) }}</bdi></td>
                         @endif
