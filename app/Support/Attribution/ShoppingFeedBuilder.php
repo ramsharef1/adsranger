@@ -5,6 +5,7 @@ namespace App\Support\Attribution;
 use App\Models\Client;
 use App\Models\ClientProductFeed;
 use App\Models\SkuPerformanceSnapshot;
+use App\Support\PlanGate;
 use App\Support\TextClean;
 use DOMDocument;
 use Illuminate\Support\Str;
@@ -78,6 +79,9 @@ class ShoppingFeedBuilder
             })->values();
         }
 
+        if ($maxSkus === null && $feed->agency) {
+            $maxSkus = PlanGate::quota($feed->agency, 'shopping_feed_skus');
+        }
         if ($maxSkus !== null && $maxSkus > 0) {
             $snapshots = $snapshots->take($maxSkus);
         }

@@ -103,10 +103,37 @@ class PlanGate
     {
         $out = array_fill_keys(static::offeredTiers(), []);
         foreach (config('plan_features.features') as $key => $f) {
-            $out[$f['tier']][] = $key;
+            if (isset($out[$f['tier']])) {
+                $out[$f['tier']][] = $key;
+            }
         }
 
         return $out;
+    }
+
+    /** Numeric plan quota for the workspace's effective tier, or null when unlimited (fair use). */
+    public static function quota(Agency $agency, string $quotaKey): ?int
+    {
+        $map = config("plan_features.quotas.$quotaKey");
+        if (! is_array($map)) {
+            return null;
+        }
+        $tier = static::tier($agency);
+        if (! array_key_exists($tier, $map) || $map[$tier] === null) {
+            return null;
+        }
+
+        return (int) $map[$tier];
+    }
+
+    public static function withinQuota(Agency $agency, string $quotaKey, int $currentCount): bool
+    {
+        if (Modules::overridesFeature($agency, $quotaKey)) {
+            return true;
+        }
+        $limit = static::quota($agency, $quotaKey);
+
+        return $limit === null || $currentCount < $limit;
     }
 
     /** Whether an alert rule is available to the agency (#23: 7 rules on Starter, the rest on Pro). */
