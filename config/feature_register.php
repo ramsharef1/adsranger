@@ -25,6 +25,7 @@ use App\Filament\Pages\SeoAuthorityLocalPage;
 use App\Filament\Pages\SeoTelemetryPage;
 use App\Filament\Pages\WhatsNewPage;
 use App\Filament\Pages\WorkspaceActivity;
+use App\Http\Controllers\ProductFeedController;
 use App\Http\Controllers\ReachPortalController;
 use App\Http\Controllers\ReachServeController;
 use App\Http\Controllers\ReachToolController;
@@ -43,6 +44,9 @@ use App\Support\AiWorkspace\FreePlan;
 use App\Support\AiWorkspace\NightShift;
 use App\Support\AiWorkspace\QualityGate;
 use App\Support\Arabic\Normaliser;
+use App\Support\Attribution\PerformanceInvestigator;
+use App\Support\Attribution\SearchTermNgramMiner;
+use App\Support\Attribution\ShoppingFeedBuilder;
 use App\Support\Attribution\StoreWebhooks;
 use App\Support\CriticalPush;
 use App\Support\Devices;
@@ -128,4 +132,5 @@ return [
     'FR-ADMIN-PX-SHELL' => ['title' => '/admin dense PX command-center shell (E2-068): 4-area switcher rail (Overview, Growth, Platform, Guards + All), ground-truth live telemetry ribbon (workspaces, modules + preview slugs, scheduler/queue heartbeat, Reach cache store, /app jump), compact/comfortable row density toggle, live Register-to-code guard viewer, and Slate/Teal cockpit polish', 'code' => [AdminShell::class, RegisterGuardBoard::class, 'view:panels.admin-shell-areas', 'view:panels.admin-shell-ribbon', 'view:panels.admin-shell-bottom'], 'tests' => ['Feature/AdminPxShellTest.php']],
     'FR-SEO-TELEMETRY' => ['title' => 'GSC Search Analytics sync/CSV + striking-distance (#4–#15) + query-decay detector, GA4 Data API v1 + 3-way reconciliation (Ad Claims vs GA4 Key Events vs Store Orders), and memory-safe streamed server access log analyzer (.log / .gz) under seo_audit (E2-069)', 'code' => [GscSearchAnalyticsSync::class, Ga4FunnelReconciler::class, ServerAccessLogAnalyzer::class, SeoTelemetryPage::class, 'view:filament.pages.seo-telemetry'], 'tests' => ['Feature/SeoGscGa4LogsTest.php']],
     'FR-SEO-AUTHORITY-LOCAL' => ['title' => 'Rank tracker + cannibalization detector, topical pillar-spoke silos, GSC backlink CSV + competitor domain intersection gap + Google Disavow .txt exporter, and multi-branch Local GBP NAP/RTL checker & bilingual review drafts under seo_audit (E2-070)', 'code' => [SeoRankTracker::class, SeoTopicalClusterPlanner::class, SeoBacklinkAndDisavow::class, SeoLocalGbpManager::class, SeoAuthorityLocalPage::class, 'view:filament.pages.seo-authority-local'], 'tests' => ['Feature/SeoAuthorityAndLocalTest.php']],
+    'FR-SEM-FEEDS-INVESTIGATOR' => ['title' => 'Search-term 1/2/3-gram bleed miner (Normaliser::key + negative export), tokenized profit-quadrant shopping feeds (/feeds/{token}.xml, OOS filter, AR/EN title enrichment, noindex), and deterministic CPA/ROAS/POAS root-cause waterfall investigator under intelligence_hub (E2-071)', 'code' => [SearchTermNgramMiner::class, ShoppingFeedBuilder::class, PerformanceInvestigator::class, ProductFeedController::class, 'route:feeds/{token}.xml', 'view:filament.pages.partials.sem-hub-extensions'], 'tests' => ['Feature/SemNgramsFeedsInvestigatorTest.php']],
 ];

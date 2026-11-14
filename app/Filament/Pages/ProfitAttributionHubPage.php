@@ -6,10 +6,14 @@ use App\Filament\Concerns\HeldBackModule;
 use App\Models\CapiBridgeEvent;
 use App\Models\Client;
 use App\Models\ClientCustomKpi;
+use App\Models\ClientProductFeed;
 use App\Models\ClientStoreConnection;
 use App\Models\ClientUnitEconomic;
+use App\Support\Attribution\PerformanceInvestigator;
 use App\Support\Attribution\ProfitAndAttributionManager;
 use App\Support\Attribution\SafeFormulaEvaluator;
+use App\Support\Attribution\SearchTermNgramMiner;
+use App\Support\Attribution\ShoppingFeedBuilder;
 use App\Support\CurrentClient;
 use App\Support\TeamRoles;
 use BackedEnum;
@@ -114,6 +118,17 @@ class ProfitAttributionHubPage extends Page
     public string $storeIdentifier = '';
 
     public string $storeSecret = '';
+
+    // E2-071 N-Gram bleed miner & shopping feeds
+    public string $searchTermCsv = '';
+
+    public string $feedChannel = 'google_merchant';
+
+    public bool $feedIncludeOos = false;
+
+    public string $feedBrandAr = '';
+
+    public string $feedBrandEn = '';
 
     public function mount(): void
     {
@@ -460,6 +475,36 @@ class ProfitAttributionHubPage extends Page
         return ClientStoreConnection::where('agency_id', $client->agency_id)->where('client_id', $client->id)->find($id);
     }
 
+    public function importSearchTermsCsv(): void
+    {
+        $client = $this->resolveSelectedClient();
+        if (! $client || ! $this->canManageStores() || trim($this->searchTermCsv) === '') {
+            return;
+        }
+        $saved = SearchTermNgramMiner::importCsv($client, $this->searchTermCsv);
+        $this->searchTermCsv = '';
+        Notification::make()->title(__('Search term rows imported: :count', ['count' => $saved]))->success()->send();
+    }
+
+    public function createShoppingFeed(): void
+    {
+        $client = $this->resolveSelectedClient();
+        if (! $client || ! $this->canManageStores()) {
+            return;
+        }
+        ShoppingFeedBuilder::createOrUpdateFeed(
+            $client,
+            $this->feedChannel,
+            $this->feedIncludeOos,
+            array_filter([
+                'brand_ar' => trim($this->feedBrandAr),
+                'brand_en' => trim($this->feedBrandEn),
+            ])
+        );
+        $this->reset(['feedBrandAr', 'feedBrandEn']);
+        Notification::make()->title(__('Product feed created.'))->success()->send();
+    }
+
     public function getViewData(): array
     {
         $agency = Filament::getTenant();
@@ -520,6 +565,15 @@ class ProfitAttributionHubPage extends Page
             'storeRates' => $econ?->storeRates() ?? ['orders' => 0, 'cod_share_pct' => null, 'cod_return_rate_pct' => null],
             'storeMinOrders' => (int) config('store_sync.min_orders_for_rates', 20),
             'canManageStores' => $this->canManageStores(),
+            'ngramBleed' => SearchTermNgramMiner::mineBleed($client),
+            'productFeeds' => ClientProductFeed::where('agency_id', $client->agency_id)->where('client_id', $client->id)->latest('id')->get(),
+            'investigator' => PerformanceInvestigator::investigateClient(
+                $client,
+                now()->subDays(27)->toDateString(),
+                now()->subDays(14)->toDateString(),
+                now()->subDays(13)->toDateString(),
+                now()->toDateString()
+            ),
         ];
     }
 }
