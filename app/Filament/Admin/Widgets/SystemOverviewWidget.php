@@ -7,11 +7,15 @@ use App\Models\AuditLog;
 use App\Models\NetworkRequest;
 use App\Models\PartnerApplication;
 use App\Models\WaitlistEntry;
+use App\Support\AdminShell;
+use App\Support\Modules;
 use App\Support\Signup;
 use Filament\Widgets\Widget;
 
 class SystemOverviewWidget extends Widget
 {
+    protected static bool $isLazy = false;
+
     protected static ?int $sort = -10;
 
     protected int|string|array $columnSpan = 'full';
@@ -25,12 +29,15 @@ class SystemOverviewWidget extends Widget
 
     protected function getViewData(): array
     {
-        $enabledModules = (array) config('modules.enabled', []);
-        $offModulesCount = collect($enabledModules)->filter(fn ($v) => ! $v)->count();
+        $moduleKeys = array_keys((array) config('modules.enabled', []));
+        $enabledModulesCount = count(array_filter($moduleKeys, fn (string $m): bool => Modules::enabled($m)));
+        $totalModulesCount = count($moduleKeys);
+        $offModulesCount = $totalModulesCount - $enabledModulesCount;
         $waitlistTotal = WaitlistEntry::count();
         $waitlistConsented = WaitlistEntry::whereNotNull('consent_at')->count();
 
         return [
+            'density' => AdminShell::density(),
             'agenciesTotal' => Agency::count(),
             'agenciesActive' => Agency::where('status', 'active')->count(),
             'waitlistTotal' => $waitlistTotal,
@@ -39,8 +46,10 @@ class SystemOverviewWidget extends Widget
             'partnersTotal' => PartnerApplication::count(),
             'networkRequestsTotal' => NetworkRequest::count(),
             'signupOpen' => Signup::isOpen(),
+            'enabledModulesCount' => $enabledModulesCount,
             'offModulesCount' => $offModulesCount,
-            'totalModulesCount' => count($enabledModules),
+            'totalModulesCount' => $totalModulesCount,
+            'previewCount' => count(Modules::previewAgencies()),
             'recentWaitlist' => WaitlistEntry::query()->orderByDesc('created_at')->limit(5)->get(),
             'recentPartners' => PartnerApplication::query()->orderByDesc('created_at')->limit(5)->get(),
             'recentAudits' => AuditLog::query()->orderByDesc('id')->limit(5)->get(),

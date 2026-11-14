@@ -8,7 +8,10 @@ use App\Filament\Pages\Auth\AdminLogin;
 use App\Filament\Pages\Auth\RequestPasswordReset;
 use App\Filament\Pages\Auth\ResetPassword;
 use App\Http\Middleware\SetPanelLocale;
+use App\Support\AdminShell;
+use App\Support\PanelColors;
 use Filament\Actions\Action;
+use Filament\Facades\Filament;
 use Filament\FontProviders\GoogleFontProvider;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -17,7 +20,6 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -52,12 +54,29 @@ class AdminPanelProvider extends PanelProvider
             // UX-5: a permanent "System admin" label on the login and in the panel.
             ->renderHook(PanelsRenderHook::SIMPLE_PAGE_START, fn () => view('panels.admin-label-auth'))
             ->renderHook(PanelsRenderHook::TOPBAR_START, fn () => view('panels.admin-label'))
+            // E2-068: PX dense multi-area command-center shell (area switcher rail, telemetry ribbon, phone bottom bar).
+            ->renderHook(PanelsRenderHook::TOPBAR_LOGO_AFTER, fn () => view('panels.admin-shell-areas'))
+            ->renderHook(PanelsRenderHook::TOPBAR_AFTER, fn () => view('panels.admin-shell-ribbon'))
+            ->renderHook(PanelsRenderHook::BODY_END, fn () => view('panels.admin-shell-bottom'))
             ->renderHook(PanelsRenderHook::SIMPLE_PAGE_END, fn () => view('panels.lang-switch'))
             ->profile(isSimple: false)
             ->colors([
-                'primary' => Color::Teal,
+                'primary' => PanelColors::primary(),
             ])
             ->userMenuItems([
+                Action::make('admin-density')
+                    ->label(fn (): string => AdminShell::density() === 'compact' ? __('Comfortable rows') : __('Compact rows'))
+                    ->icon('heroicon-o-bars-3')
+                    ->action(function (): void {
+                        $u = auth()->user();
+                        $u->forceFill([
+                            'ui_prefs' => array_merge((array) $u->ui_prefs, [
+                                'density' => AdminShell::density() === 'compact' ? 'comfortable' : 'compact',
+                            ]),
+                        ])->save();
+                        redirect(request()->header('Referer') ?: Filament::getUrl());
+                    })
+                    ->visible(fn (): bool => AdminShell::on()),
                 Action::make('switch-language')
                     ->label(fn (): string => __('ui.switch_to'))
                     ->icon('heroicon-o-language')
