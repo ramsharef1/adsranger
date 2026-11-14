@@ -61,6 +61,7 @@ class Shell
         Pages\OrganicSocialPage::class => 'ads',
 
         Pages\SeoAuditPage::class => 'seo',
+        Pages\SeoTelemetryPage::class => 'seo',
         Pages\ArabicSeoPage::class => 'seo',
         Pages\AeoGeoHubPage::class => 'seo',
 
