@@ -20,12 +20,14 @@ use App\Http\Controllers\ExportController;
 use App\Http\Controllers\GoogleSignInController;
 use App\Http\Controllers\PushController;
 use App\Http\Controllers\SampleDataController;
+use App\Http\Controllers\UiPrefsController;
 use App\Http\Middleware\EnsureAgencyTwoStep;
 use App\Http\Middleware\EnsureOnboarded;
 use App\Http\Middleware\FreePlanFence;
 use App\Http\Middleware\SetPanelLocale;
 use App\Http\Middleware\TrialLifecycleGate;
 use App\Models\Agency;
+use App\Support\MissionShell;
 use App\Support\PanelColors;
 use App\Support\Shell;
 use Filament\Actions\Action;
@@ -95,6 +97,8 @@ class AppPanelProvider extends PanelProvider
                 // PS-05 (D-296): sample data in place, one click in and out (owner + admins).
                 Route::post('sample-data/fill', [SampleDataController::class, 'fill'])->middleware('throttle:5,1')->name('sample-data.fill');
                 Route::post('sample-data/clear', [SampleDataController::class, 'clear'])->middleware('throttle:5,1')->name('sample-data.clear');
+                // Mission shell (D-312): a person's own look and mode.
+                Route::post('ui/prefs', [UiPrefsController::class, 'set'])->middleware('throttle:30,1')->name('ui.prefs');
             })
             ->livewireComponents([GoogleFinishSignup::class, GoogleTwoStep::class])
             ->font('IBM Plex Sans Arabic', provider: GoogleFontProvider::class)
@@ -103,6 +107,10 @@ class AppPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.pwa'))
             // PX-01 / PX-02 (D-302): new shell, only when the panel_shell module is on for this workspace.
             ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.shell-head'))
+            // Mission control shell (D-312): only when mission_shell is on for this workspace and the person kept the look.
+            ->renderHook(PanelsRenderHook::HEAD_END, fn () => view('panels.mission-head'))
+            ->renderHook(PanelsRenderHook::BODY_END, fn () => view('panels.mission-docks'))
+            ->renderHook(PanelsRenderHook::GLOBAL_SEARCH_BEFORE, fn () => view('panels.mission-mode'))
             ->renderHook(PanelsRenderHook::TOPBAR_LOGO_AFTER, fn () => view('panels.shell-areas'))
             ->renderHook(PanelsRenderHook::BODY_END, fn () => view('panels.shell-bottom'))
             ->renderHook(PanelsRenderHook::BODY_END, fn () => view('panels.keyboard')) // PS-25 (R5)
@@ -154,6 +162,15 @@ class AppPanelProvider extends PanelProvider
                         redirect(request()->header('Referer') ?: Filament::getUrl());
                     })
                     ->visible(fn (): bool => Shell::on()),
+                Action::make('mission-look')
+                    ->label(fn (): string => MissionShell::look() === 'mission' ? __('Classic look') : __('Mission control look'))
+                    ->icon('heroicon-o-swatch')
+                    ->action(function (): void {
+                        $u = auth()->user();
+                        $u->forceFill(['ui_prefs' => array_merge((array) $u->ui_prefs, ['look' => MissionShell::look() === 'mission' ? 'classic' : 'mission'])])->save();
+                        redirect(request()->header('Referer') ?: Filament::getUrl());
+                    })
+                    ->visible(fn (): bool => MissionShell::available()),
                 Action::make('whats-new')
                     ->label(fn (): string => __("What's new"))
                     ->icon('heroicon-o-sparkles')

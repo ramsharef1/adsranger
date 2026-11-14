@@ -79,6 +79,11 @@ class Modules
                 'description' => __('Areas in the header, a shorter side menu per area, the season line and a bottom bar on phones.'),
                 'beta_requestable' => false,
             ],
+            'mission_shell' => [
+                'label' => __('Mission control look'),
+                'description' => __('Dark panel with an icon rail for areas and add-ons, a next-step panel, a client dock and a simple or expert mode. Needs the new panel layout.'),
+                'beta_requestable' => false,
+            ],
             'reach' => [
                 'label' => __('AdsRanger Reach (publishers)'),
                 'description' => __('Publisher offers, coupon attribution, conversion postbacks and estimate wallets. No money moves before launch.'),

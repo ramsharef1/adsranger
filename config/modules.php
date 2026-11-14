@@ -31,6 +31,8 @@ return [
         'lead_desk' => (bool) env('MODULE_LEAD_DESK', false),
         // FR-REACH AdsRanger Reach (publisher offers, postbacks, wallets): estimates only until launch (D-262).
         'reach' => (bool) env('MODULE_REACH', false),
+        // Mission control shell (D-312): dark look, icon rail with add-ons, next-step panel, client dock, simple / expert mode. Needs panel_shell.
+        'mission_shell' => (bool) env('MODULE_MISSION_SHELL', false),
     ],
 
     'preview_agencies' => array_values(array_filter(array_map('trim', explode(',', (string) env('MODULES_PREVIEW_AGENCIES', ''))))),

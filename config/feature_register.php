@@ -32,6 +32,7 @@ use App\Http\Controllers\ReachPortalController;
 use App\Http\Controllers\ReachServeController;
 use App\Http\Controllers\ReachToolController;
 use App\Http\Controllers\StoreWebhookController;
+use App\Http\Controllers\UiPrefsController;
 use App\Http\Middleware\AiConnectorGuard;
 use App\Http\Middleware\FreePlanFence;
 use App\Http\Middleware\ToolAbuseGuard;
@@ -60,6 +61,7 @@ use App\Support\Attribution\StoreWebhooks;
 use App\Support\CriticalPush;
 use App\Support\Devices;
 use App\Support\LiveVerification;
+use App\Support\MissionShell;
 use App\Support\Modules;
 use App\Support\PlanGate;
 use App\Support\PlatformHealth;
@@ -70,8 +72,6 @@ use App\Support\Reach\OfferImporter;
 use App\Support\Reach\Postbacks;
 use App\Support\Reach\PublisherKit;
 use App\Support\Reach\Serve;
-use App\Support\Reach\Wallet;
-use App\Support\RestoreTest;
 /*
  * A-12 (FR-029) register-to-code guard. Every row marked Done or Live in ADSR-060 / ADSR-920 is listed here with the
  * code it lives in and the test that proves it. RegisterToCodeTest fails if a listed class, view or test is missing,
@@ -79,6 +79,8 @@ use App\Support\RestoreTest;
  *
  * 'code' entries: a class name, "view:<name>", "route:<uri>" or "config:<file>". 'tests': files under tests/.
  */
+use App\Support\Reach\Wallet;
+use App\Support\RestoreTest;
 use App\Support\Seo\AeoCitationRadar;
 use App\Support\Seo\AiCrawlerChecker;
 use App\Support\Seo\Audit\PageSpeed;
@@ -146,4 +148,5 @@ return [
     'FR-SEM-RULES-COHORTS-WATCHDOG' => ['title' => 'Cross-channel rule engine (store stock + COD return rate + ad metrics, budget delta clamped <= 20%, dry-run default + approval queue), customer cohort D30/D60/D90/D180 LTV & CAC payback curves, and SafeFetcher ad landing URL & pixel/WhatsApp watchdog under intelligence_hub (E2-072)', 'code' => [CrossChannelRuleEngine::class, CohortLtvAnalyzer::class, LandingUrlWatchdog::class, 'view:filament.pages.partials.sem-hub-extensions'], 'tests' => ['Feature/SemRulesCohortsWatchdogTest.php']],
     'FR-MENA-GROWTH-AND-AIW-M2' => ['title' => 'Creator & influencer Net POAS tracker (intelligence_hub), 60-second agency-branded prospect audit & 3-tier pitch deck (/pitch/{token} + bilingual mPDF under agency_ops_hub, noindex), SHA-256 WhatsApp/CRM offline CAPI & Google GCLID loop (lead_desk, queued_until_credentials honesty gate), and supervised Night Shift v1 action queue with undo under ai_workspace (E2-073)', 'code' => [CreatorPoasTracker::class, PitchDeckBuilder::class, ProspectPitchDeckController::class, OfflineConversionDispatcher::class, OfflineConversionsPage::class, NightShiftActionQueue::class, 'route:pitch/{token}', 'route:pitch/{token}/pdf', 'view:public.pitch-deck', 'view:reports.pitch-deck-pdf', 'view:filament.pages.offline-conversions'], 'tests' => ['Feature/MenaGrowthAndNightShiftM2Test.php']],
     'FR-UNIFIED-PLAN-MATRIX' => ['title' => 'Unified plan tier feature & quota matrix across Free, Starter, Pro, and Agency for SEO, SEM, MENA growth, and AI Workspace Night Shift v1 capabilities (E2-074)', 'code' => [PlanGate::class, 'config:plan_features'], 'tests' => ['Feature/UnifiedPlanMatrixTest.php']],
+    'FR-MISSION-SHELL' => ['title' => 'Mission control shell (D-312): dark look on top of the panel shell, icon rail for areas and add-ons (locked while the add-on is off), next-step panel from the most severe open alert, desktop client dock, simple / expert mode with first steps, classic-look opt-out per person; behind mission_shell', 'code' => [MissionShell::class, UiPrefsController::class, 'view:panels.mission-head', 'view:panels.mission-docks', 'view:panels.mission-mode'], 'tests' => ['Feature/MissionShellTest.php']],
 ];
