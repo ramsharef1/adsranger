@@ -8,6 +8,7 @@ use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\LeadDeskController;
 use App\Http\Controllers\MagicLoginController;
 use App\Http\Controllers\ProductFeedController;
+use App\Http\Controllers\ProspectPitchDeckController;
 use App\Http\Controllers\PublicAttributionCollectorController;
 use App\Http\Controllers\PublicSiteController;
 use App\Http\Controllers\ReachLandingController;
@@ -243,6 +244,12 @@ Route::post('/webhooks/stores/{token}', [StoreWebhookController::class, 'receive
 // E2-071: tokenized shopping product feed XML enriched with SKU profit quadrants (404 while intelligence_hub is off, noindex)
 Route::get('/feeds/{token}.xml', [ProductFeedController::class, 'show'])
     ->middleware('throttle:120,1')->where('token', '[A-Za-z0-9]{32,64}')->name('feeds.xml');
+
+// E2-073: agency-branded 60-second prospect pitch deck & bilingual mPDF export (404 while agency_ops_hub is off, noindex)
+Route::get('/pitch/{token}', [ProspectPitchDeckController::class, 'show'])
+    ->middleware('throttle:60,1')->where('token', '[A-Za-z0-9]{32,64}')->name('pitch.show');
+Route::get('/pitch/{token}/pdf', [ProspectPitchDeckController::class, 'pdf'])
+    ->middleware('throttle:20,1')->where('token', '[A-Za-z0-9]{32,64}')->name('pitch.pdf');
 
 // Wave 21 public growth pages (E2 `7c3df2e`) held back 2026-11-07 (D-168): the partner directory (view kept as
 // public/partners-held; /partners is now the P-25 design-partner page, D-219), case studies and

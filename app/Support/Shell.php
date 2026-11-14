@@ -58,6 +58,7 @@ class Shell
         Pages\LaunchCheckPage::class => 'ads',
         Pages\StudioPage::class => 'ads',
         Pages\AgencyOpsHubPage::class => 'ads',
+        Pages\OfflineConversionsPage::class => 'ads',
         Pages\OrganicSocialPage::class => 'ads',
 
         Pages\SeoAuditPage::class => 'seo',
