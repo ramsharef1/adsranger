@@ -130,7 +130,7 @@ return [
             'name' => ['en' => 'Creator & influencer Net POAS', 'ar' => 'صافي ربحية شراكات صناع المحتوى'],
             'what' => ['en' => 'Measure net creator return after flat fees, gifted COGS, boosted spend and COD returns.', 'ar' => 'قِس صافي عائد صناع المحتوى بعد الأجر الثابت وتكلفة الهدايا والتمويل والمرتجعات.']],
         'mena_offline_conversions' => ['tier' => 'pro', 'refs' => ['E2-073'],
-            'name' => ['en' => 'Offline CAPI & GCLID conversion loop', 'ar' => 'حلقة تحويلات المبيعات الميدانية عبر CAPI ثم GCLID'],
+            'name' => ['en' => 'Offline server-side & GCLID conversion loop', 'ar' => 'حلقة تحويلات المبيعات الميدانية وأحداث الخادم'],
             'what' => ['en' => 'Hash phone and email with SHA-256 and sync qualified or closed-won deals.', 'ar' => 'شفّر الهاتف والبريد بمعيار SHA-256 وزامن الصفقات المؤهلة والمغلقة.']],
         'ai_night_shift_queue' => ['tier' => 'pro', 'refs' => ['E2-073'],
             'name' => ['en' => 'Night Shift v1 supervised queue', 'ar' => 'طابور المناوب الليلي الخاضع للإشراف'],
